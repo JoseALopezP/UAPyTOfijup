@@ -2,7 +2,7 @@ import styles from './AddBlock.module.css'
 
 export function AddBlock () {
     return(
-        <section className={`${styles.TableSection}`}>
+        <section className={`${styles.audienciaSection}`}>
             <table>
                 <thead>
                     <tr>
