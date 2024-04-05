@@ -1,7 +1,10 @@
 
 export default function listaAudiencias() {
-    return (
-      <>
-      </>
-    )
+  useEffect(() => {
+    if (user == null) router.push("/signin")
+  }, [user]) 
+  return (
+    <>
+    </>
+  )
 }
