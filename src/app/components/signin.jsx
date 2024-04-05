@@ -1,9 +1,10 @@
 'use client'
 import signIn from "@/firebase/auth/signin";
+import styles from './signin.module.css'
 import { useState } from "react";
 import { useRouter } from 'next/navigation'
 
-export default function Page() {
+export default function SignIn() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const router = useRouter()
@@ -17,9 +18,9 @@ export default function Page() {
         return router.push("/admin")
     }
     return (
-        <div className="wrapper">
+        <section className={`${styles.signInSection}`}>
             <div className="form-wrapper">
-                <h1 className="mt-60 mb-30">Sign in</h1>
+                <h1 className="mt-60 mb-30">Iniciar sesión</h1>
                 <form onSubmit={handleForm} className="form">
                     <label htmlFor="email">
                         <p>Correo Electrónico</p>
@@ -32,6 +33,6 @@ export default function Page() {
                     <button type="submit">Iniciar Sesión</button>
                 </form>
             </div>
-        </div>
+        </section>
     );
 }
