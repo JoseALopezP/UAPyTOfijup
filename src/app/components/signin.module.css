@@ -1,6 +1,17 @@
 .signInSection{
-        background-color: beige;
+        background-color: #375166;
         width: 50vw;
         height: 50vh;
         padding: 12px;
+        margin: auto;
+        border-radius: 5px;
+
+}
+.formWrapper{
+        display: inline-flex;
+        flex-direction: column;
+}
+.formBlock{
+        display: inline-flex;
+        flex-direction: column;
 }

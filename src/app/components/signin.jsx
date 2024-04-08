@@ -19,9 +19,9 @@ export default function SignIn() {
     }
     return (
         <section className={`${styles.signInSection}`}>
-            <div className="form-wrapper">
+            <div className={`${styles.formWrapper}`}>
                 <h1 className="mt-60 mb-30">Iniciar sesión</h1>
-                <form onSubmit={handleForm} className="form">
+                <form onSubmit={handleForm} className={`${styles.formBlock}`}>
                     <label htmlFor="email">
                         <p>Correo Electrónico</p>
                         <input onChange={(e) => setEmail(e.target.value)} required type="email" name="email" id="email" placeholder="ejemplo@mail.com" />
