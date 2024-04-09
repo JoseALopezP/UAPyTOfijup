@@ -1,17 +1,58 @@
 .signInSection{
+        align-self: center;
         background-color: #375166;
-        width: 50vw;
+        width: fit-content;
         height: 50vh;
         padding: 12px;
         margin: auto;
         border-radius: 5px;
-
+        display: inline-flex;
+        flex-direction: row;
 }
 .formWrapper{
         display: inline-flex;
         flex-direction: column;
+        padding: 30px;
 }
 .formBlock{
         display: inline-flex;
         flex-direction: column;
+}
+.corteLogo{
+        padding: 20px;
+        margin: auto 0;
+}
+
+.labelSquare{
+        border-radius: 2px;
+        margin: 0 0 10px 0;
+        background-color: white;
+        height: 40px;
+        width: 240px;
+        display: inline-flex;
+        flex-direction: row;
+        vertical-align: middle;
+        align-self: center;
+        justify-content: space-between;
+}
+.loginIcon{
+        fill: #375166;
+        width: 24px;
+        height: 24px;
+        padding: 6px;
+        margin: auto 0;
+}
+.inputBlock{
+        background-color: transparent;
+        border: none transparent;
+        width: 100%;
+}
+.inputBlock:focus-visible{
+        border: none;
+
+}
+.loginButton{
+        background-color: white;
+        font-weight: 700;
+        font-size: 14px;
 }

@@ -1,12 +1,12 @@
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { titillium } from "./ui/fonts";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "UAPyT",
   description: "Tablero de horarios Audiencias",
+  icons: {
+    icon: '/favicon.png',
+  }
 };
 
 export default function RootLayout({ children }) {
