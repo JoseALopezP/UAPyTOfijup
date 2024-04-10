@@ -1,1 +1,38 @@
+.tableSection{
+    width: 100%;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    color: white;
+}
+.table{
+    width: 100%;
+    border: none;   
+}
+.tableHead{
+    background-color: white;
+    color: #375166;
+}
+.tableBody tr{
+    height: 70px;
+    line-height: 20px;
+}
+.tableBody, .tableBody th, .tableBody td{
+    border-collapse: collapse;
+    margin: 0;
+}
 
+.tableBody tr:nth-child(odd){
+    background-color: #375166;
+}
+.tableBody tr:nth-child(even){
+    background-color: #475f74;
+}
+
+.infoSection{
+    width: 100%;
+    background-color: white;
+    height: 220px;
+    overflow: hidden;
+
+}

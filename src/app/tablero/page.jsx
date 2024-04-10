@@ -1,10 +1,14 @@
+import { InformationSection } from "./components/InformationSection";
+import { ScheduleTable } from "./components/ScheduleTable";
 
 export default function Tablero() {
-    useEffect(() => {
+    /*useEffect(() => {
       if (user == null) router.push("/signin")
-    }, [user])
+    }, [user])*/
     return (
       <>
+        <InformationSection/>
+        <ScheduleTable/>
       </>
     )
 }

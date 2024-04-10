@@ -20,6 +20,7 @@ export default function SignIn() {
         return router.push("/admin")
     }
     return (
+        <div className={`${styles.signinBody}`}>
         <section className={`${styles.signInSection}`}>
             <Image
                 className={`${styles.corteLogo}`}
@@ -27,6 +28,7 @@ export default function SignIn() {
                 width={227}
                 height={212}
                 alt="Logo Corte de Justicia"
+                priority={false}
             />
             <div className={`${styles.formWrapper}`}>
                 <h1 className="mt-60 mb-30">Iniciar sesión</h1>
@@ -47,5 +49,6 @@ export default function SignIn() {
                 </form>
             </div>
         </section>
+        </div>
     );
 }
