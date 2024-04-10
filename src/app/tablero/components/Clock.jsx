@@ -6,7 +6,7 @@ export function Clock () {
     const [date, setDate] = useState(new Date());
 
     useEffect(() => {
-    const timerID = setInterval(() => tick(), 1000);
+    const timerID = setInterval(() => tick(), 60000);
 
     return function cleanup() {
         clearInterval(timerID);
@@ -14,11 +14,12 @@ export function Clock () {
     });
 
     function tick() {
-    setDate(new Date());
+        setDate(new Date());
     }
     return(
         <div className={`${styles.clockBlock}`}>
-            {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            <p className={`${styles.clockDigits}`}>{date.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</p>
+            <img className={`${styles.corteLogo}`} src="/cortelogo.png"/>
         </div>
     )
 }

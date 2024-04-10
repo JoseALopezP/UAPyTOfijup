@@ -8,14 +8,16 @@
         margin: 0;
 }
 .signInSection{
-        background-color: #375166;
+        background-color: #fffffff0;
         width: fit-content;
-        height: 50vh;
+        height: 380px;
         margin: auto;
         border-radius: 5px;
         display: inline-flex;
         flex-direction: row;
-        color: white;
+        color: #375166;
+        margin-top: 50px;
+        padding: 0 75px;
 }
 .formWrapper{
         display: inline-flex;

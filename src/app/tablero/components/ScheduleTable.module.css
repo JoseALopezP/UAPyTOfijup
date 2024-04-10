@@ -32,7 +32,120 @@
 .infoSection{
     width: 100%;
     background-color: white;
-    height: 220px;
+    height: 70px;
     overflow: hidden;
+    display: inline-flex;
+    flex-direction: row;
+}
+.infoSection:hover{
+    animation: headerExpand 0.5s;
+    animation-fill-mode: both;
+}
 
+
+.clockBlock{
+    font-weight: 700;
+    font-size: 48px;
+    width: 180px;
+    padding: 0 40px;
+    letter-spacing: 3px;
+    display: inline-flex;
+    flex-direction: column;
+}
+.clockDigits{
+    margin: auto;
+    width: 135px;
+}
+.corteLogo{
+    width: 135px;
+    height: auto;
+    margin: 0 auto;
+}
+
+.infoBlock{
+    border: solid #bf906d;
+    border-width: 8px 0 8px 0;
+    height: 50px;
+    width: 100%;
+    margin-left: 10px;
+    clip-path: polygon(40px 0%, 100% 0%, 100% 100%, 0% 100%);
+    display: inline-flex;
+    flex-direction: row;
+}
+
+.infoBlock img{
+    opacity: 0%;
+    width: 300px;
+    clip-path: polygon(40px 0%, 100% 0%, 260px 100%, 0% 100%);
+}
+.textBlock{
+    display: inline-flex;
+    flex-direction: column;
+    padding: 0 20% 0 20px;
+}
+.newsTitle{
+    opacity: 0%;
+    font-size: 32px;
+    line-height: 20px;
+}
+.newsBody{
+    opacity: 0%;
+    font-size: 24px;
+    line-height: 24px;
+    margin: 0;
+}
+.infoSection:hover .infoBlock{
+    animation: blockExpand 0.5s;
+    animation-fill-mode: both;
+}
+.infoSection:hover .infoBlock img, .infoSection:hover .infoBlock .newsTitle, .infoSection:hover .infoBlock .newsBody{
+    animation: infoAppear 1s;
+    animation-fill-mode: both;
+}
+.infoSection:hover .infoBlock .ofijupTitle{
+    animation: infodisappear 1s;
+    animation-fill-mode: both;
+}
+.ofijupTitle{
+    position: fixed;
+    left: 40%;
+    height: 0px;
+    z-index: 50;
+    font-size: 32px;
+    line-height: 0;
+}
+
+@keyframes infoAppear {
+    0% {
+    }
+    50%{
+      opacity: 0%;
+    }
+    100%{
+      opacity: 100%;
+    }
+}
+@keyframes headerExpand {
+    to {
+      height: 220px;
+    }
+}
+@keyframes infodisappear {
+    0% {
+        opacity: 100%;
+    }
+    50%{
+        opacity: 0%;
+    }
+    100%{
+        opacity: 0%;
+    }
+}
+@keyframes blockExpand {
+    0% {
+        height: 70px;
+    }
+    100%{
+        height: 200px;
+    }
 }

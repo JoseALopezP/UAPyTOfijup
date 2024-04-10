@@ -3,7 +3,7 @@ import styles from './ScheduleTable.module.css'
 export function ScheduleTable () {
     return(
         <section className={`${styles.tableSection}`}>
-            <table className={`${styles.table}`} cellspacing="0" cellpadding="0">
+            <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
                     <tr>
                         <th>HORA</th>
@@ -31,14 +31,14 @@ export function ScheduleTable () {
                     <tr>
                         <td>8:00</td>
                         <td>MPF-SJ-00552-2024</td>
-                        <td>DEBATE DEL JUICIO ORAL</td>
+                        <td>TRÁMITES DE EJECUCIÓN</td>
                         <td>MEGLIOLI, JUAN GABRIEL</td>
                         <td>SUSPENDIDA</td>
                     </tr>
                     <tr>
                         <td>8:00</td>
                         <td>MPF-SJ-04173-2024</td>
-                        <td>TRÁMITES DE EJECUCIÓN</td>
+                        <td>DEBATE DEL JUICIO ORAL</td>
                         <td>MOYA, MABEL IRENE <br/>
                             LEON, PABLO LEONARDO <br/>
                             ALLENDE, FLAVIA GABRIELA</td>
