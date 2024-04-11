@@ -1,9 +1,9 @@
 import { AddBlock } from "./components/addBlock";
 
 export default function Admin() {
-    useEffect(() => {
+    /*useEffect(() => {
       if (user == null) router.push("/signin")
-    }, [user])
+    }, [user])*/
     return (
       <>
         <AddBlock/>

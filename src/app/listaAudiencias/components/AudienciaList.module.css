@@ -1,0 +1,115 @@
+.tableSection{
+    width: 100%;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    overflow-x: hidden;
+}
+.table{
+    width: 100%;
+    border: none;   
+}
+.tableHead{
+    background-color: white;
+    color: #375166;
+}
+.tableBody tr{
+    height: 70px;
+    line-height: 20px;
+}
+.tableBody tr:hover{
+    height: 70px;
+    line-height: 20px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+.tableBody, .tableBody th, .tableBody td{
+    border-collapse: collapse;
+    margin: 0;
+}
+.tableBody td{
+    padding-left: 20px;
+}
+
+.tableBody tr:nth-child(odd){
+    background-color: #375166;
+}
+.tableBody tr:nth-child(even){
+    background-color: #475f74;
+}
+
+.buttonsBlock{
+    width: 40%;
+    height: 64%;
+    margin: auto;
+    left: 30%;
+    top: 10%;
+    position: fixed;
+    z-index: 50;
+    background-color: #ffffffe3;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 20px;
+    justify-content: flex-start;
+    border-radius: 5px;
+}
+.stateButton{
+    font-size: 24px;
+    background-color: #375166;
+    color: white;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+.stateButtonFinalizarcuarto{
+    background-color: #20c997;
+    height: 60%;
+}
+.stateButtonIniciar{
+    background-color: #28a745;
+    height: 25%;
+}
+.stateButtonSuspender{
+    background-color: #fd7e14;
+    height: 15%;
+}   
+.stateButtonFinalizar{
+    background-color: #dc3545;
+    height: 30%;
+}
+.stateButtonCuarto{
+    background-color: #6c757d;
+    height: 30%;
+}
+
+.stateButtonCancelar{
+    position: fixed;
+    background-color: #fff;
+    color: #000;
+    width: 40%;
+    height: 20%;
+    z-index: 51;
+    top: 56%;
+    left: calc(30% + 20px);
+}
+.changeBlock{
+    display: inline-flex;
+    flex-direction: row;
+    height: 15%;
+    width: 100%;
+}
+.stateButtonChange{
+    background-color: #6c757d;
+    height: 100%;
+    width: 80%;
+}
+.salaSelector{
+    width: 20%;
+    height: 100%;
+    font-size: 24px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-size: 32px;
+    text-align: center;
+}

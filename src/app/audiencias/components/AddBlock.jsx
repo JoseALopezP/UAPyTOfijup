@@ -1,4 +1,4 @@
-import styles from './AddBlock.module.css'
+import styles from './audiencia.module.css'
 
 export function AddBlock () {
     return(

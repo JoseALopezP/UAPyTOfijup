@@ -1,10 +1,12 @@
+import { AudienciaList } from "./components/AudienciaList";
 
 export default function listaAudiencias() {
-  useEffect(() => {
+  /*useEffect(() => {
     if (user == null) router.push("/signin")
-  }, [user]) 
+  }, [user]) */
   return (
     <>
+      <AudienciaList/>
     </>
   )
 }

@@ -2,7 +2,6 @@
     width: 100%;
     font-size: 20px;
     font-weight: 700;
-    text-align: center;
     color: white;
 }
 .table{
@@ -20,6 +19,9 @@
 .tableBody, .tableBody th, .tableBody td{
     border-collapse: collapse;
     margin: 0;
+}
+.tableBody td{
+    padding-left: 20px;
 }
 
 .tableBody tr:nth-child(odd){
