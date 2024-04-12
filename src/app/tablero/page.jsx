@@ -1,5 +1,7 @@
+'use client'
 import { InformationSection } from "./components/InformationSection";
 import { ScheduleTable } from "./components/ScheduleTable";
+import { DataContextProvider } from "@/context/DataContext";
 
 export default function Tablero() {
     /*useEffect(() => {
@@ -7,8 +9,10 @@ export default function Tablero() {
     }, [user])*/
     return (
       <>
-        <InformationSection/>
-        <ScheduleTable/>
+        <DataContextProvider>
+          <InformationSection/>
+          <ScheduleTable/>
+        </DataContextProvider>
       </>
     )
 }

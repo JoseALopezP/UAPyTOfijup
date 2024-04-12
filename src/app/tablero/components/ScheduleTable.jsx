@@ -1,6 +1,31 @@
+import { useContext, useEffect, useState } from 'react'
 import styles from './ScheduleTable.module.css'
+import { DataContext } from '@/context/DataContext'
 
 export function ScheduleTable () {
+    const {updateToday, today} = useContext(DataContext);
+    const {shown, setShown} = useState([]);
+    const getMinutes = (dateObject) =>{
+        return (parseInt(new Date()).toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"}) * 60 + parseInt(new Date()).toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"}))
+    }
+    useEffect(() =>{
+        updateToday();
+        setShown(shown.filter((item) =>{
+            const min = getMinutes(new Date())
+            const itemMinute = getMinutes(item.hora)
+            if((itemMinute - min >  120) | (itemMinute - min <  -60)){
+                if(item.estado == 'SUSPENDIDA'){
+                    return true
+                }else if((itemMinute - min <  -60) & (item.estado == 'INICIADA' | item.estado == 'CUARTO INTERMEDIO' | item.estado == 'EN ESPERA')){
+                    return true
+                }else{
+                    return false
+                }
+            }else{
+                return false
+            }
+        }));
+    }, [])
     return(
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
@@ -15,6 +40,18 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
+                    {shown.map((el)=>{
+                        return(
+                            <tr>
+                                <td>{el.hora.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>
+                                <td>SALA {el.sala}</td>
+                                <td>{el.numeroLeg}</td>
+                                <td>{el.tipo}</td>
+                                <td>{el.juez}</td>
+                                <td>{el.estado}</td>
+                            </tr>
+                        )
+                    })}
                     <tr>
                         <td>7:30</td>
                         <td>SALA 5</td>

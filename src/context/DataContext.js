@@ -6,6 +6,7 @@ import addData from "@/firebase/firestore/addData";
 import removeData from "@/firebase/firestore/removeData";
 import getDocument from "@/firebase/firestore/getDocument";
 import checkDoc from "@/firebase/firestore/checkDoc";
+import updateDocument from "@/firebase/firestore/updateDocument";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
@@ -14,7 +15,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
-    const [date, setdate] = useState('');
+    const [date, setDate] = useState('');
 
     const updateToday = async(id) => {
         const dateT = date.toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
@@ -29,138 +30,61 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateDate = async(date) =>{
         setDate(date)
     }
-    const updateState = async(id, state) =>{
-        await updateToday()
-        await 
+    const updateState = async(state, num) =>{
+        await updateByDate()
+        const aux = bydate
+        const index = aux.findIndex((element) => element.numeroLeg == num)
+        aux[index].estado = state
+        await updateDocument("audiencias", aux, date)
+    }
+    const saveDate = async(dateX) => {
+        setDate(dateX)
     }
     const docExists = async(id) =>{
-        return checkDoc(id)
+        return (checkDoc(id)>0 ? true : false)
     }
     const addAudiencia = async(data) =>{
+        await updateByDate()
+        if(bydate){
+            const aux = bydate
+            aux.push(data)
+            await updateDocument("audiencias", aux, date)
+        }else{
+            addData('audiencias', data)
+        }
+    }
+    const deleteAudiencia = async(num) =>{
+        await updateByDate()
+        const aux = bydate
+        const index = aux.findIndex((element) => element.numeroLeg == num)
+        aux.splice(index, 1)
+        await updateDocument("audiencias", aux, date)
+    }
 
-    }
-    const deleteAudiencia = async(id) =>{
-        
-    }
     const addInfo = async(data) =>{
-        
+        addData('informacion', data)
     }
     const deleteInfo = async(id) =>{
-        
-    }
-    
-
-    const updateGifts = async() => {
-        setGifts(await getCollection('giftList'))
-    }
-    const updateNotes = async() => {
-        setNotes(await getCollection('notesList'))
-    }
-    const updateGifteds = async() => {
-        setGifteds(await getCollection('giftedList'))
-    }
-    const updateTransfers = async() => {
-        setTransfers(await getCollection('transferedList'))
-    }
-    const updateGuests = async() => {
-        setGuests((await getCollection('guestList')).sort((a,b)=>(a.date.toDate() - b.date.toDate())));
-        let d = 0; 
-        let a = 0;
-        guests.forEach(el =>{
-            if(el.after){
-                a += el.guests.length
-            }else{
-                d += el.guests.length
-            }
-        });
-        setDinner(d);
-        setAfterDinner(a);
-
+        await removeData('informacion', id)
     }
 
-    const selectId = async(id) =>{
-        if(id === idSelected){
-            setIdSelected('');
-            setGift('');
-        }else{
-            setIdSelected(id);
-            setGift(gifts.find(x => x.id == id));
-        }
-        
-    }
-    
-    const selectGift = async(data, oldStock) => {
-        const result = doc(db, "giftList", idSelected);
-        await updateDoc(result, {
-        stock: (oldStock - 1)
-        });
-        addGifted(data)
-    }
-
-    const addGift = (data) => {
-        addData('giftList', data)
-    }
-    const addNote = (data) => {
-        addData('notesList', data)
-    }
-    const addGifted = (data) => {
-        addData('giftedList', data)
-    }
-    const addTransfered = (data) => {
-        addData('transferedList', data)
-    }
-    const addGuest = (data) => {
-        addData('guestList', data)
-    }
-
-    const removeGift = (id) => {
-        removeData('giftList', id)
-    }
-    const removeNote = async (id) => {
-        removeData('notesList', id)
-    }
-    const removeGifted = async (id, oldStock) => {
-        const result1 = doc(db, "giftedList", id);
-        const result2 = doc(db, "giftList", result1.gid);
-        await updateDoc(result2, {
-        stock: ServerValue.increment(1)
-        });
-        await removeData('giftedList', id)
-    }
-    const removeTransfered = (id) => {
-        removeData('transferedList', id)
-    }
-    const removeGuest = (id) => {
-        removeData('guestList', id)
-    }
 
     const context = {
-        updateGifts,
-        updateNotes,
-        updateGifteds,
-        updateTransfers,
-        updateGuests,
-        selectId,
-        selectGift,
-        addGift,
-        addNote,
-        addGifted,
-        addTransfered,
-        addGuest,
-        removeGift,
-        removeNote,
-        removeGifted,
-        removeTransfered,
-        removeGuest,
-        gift,
-        gifts,
-        notes,
-        gifteds,
-        transfers,
-        guests,
-        idSelected,
-        dinner,
-        afterDinner
+        updateToday,
+        updateByDate,
+        updateInformacion,
+        updateDate,
+        updateState,
+        saveDate,
+        docExists,
+        addAudiencia,
+        deleteAudiencia,
+        addInfo,
+        deleteInfo,
+        today,
+        bydate,
+        informacion,
+        date
     }
     return(
         <>
