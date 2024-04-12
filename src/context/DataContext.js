@@ -1,43 +1,48 @@
 import React, { createContext, useState} from "react";
-import {doc, updateDoc, getFirestore, increment} from 'firebase/firestore';
+import {doc, updateDoc, getFirestore} from 'firebase/firestore';
 import firebase_app from "@/firebase/config";
 import getCollection from "@/firebase/firestore/getCollection";
 import addData from "@/firebase/firestore/addData";
 import removeData from "@/firebase/firestore/removeData";
+import getDocument from "@/firebase/firestore/getDocument";
+import checkDoc from "@/firebase/firestore/checkDoc";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
 const db = getFirestore(firebase_app)
 export const DataContextProvider = ({defaultValue = [], children}) => {
-    const [gifts, setGifts] = useState(defaultValue);
-    const [dinner, setDinner] = useState(0);
-    const [afterDinner, setAfterDinner] = useState(0);
-    const [gift, setGift] = useState(defaultValue);
-    const [notes, setNotes] = useState(defaultValue);
-    const [gifteds, setGifteds] = useState(defaultValue);
-    const [transfers, setTransfers] = useState(defaultValue);
-    const [guests, setGuests] = useState(defaultValue);
-    const [idSelected, setIdSelected] = useState('');
+    const [today, setToday] = useState(defaultValue);
+    const [bydate, setBydate] = useState(defaultValue);
+    const [informacion, setInformacion] = useState(defaultValue);
+    const [date, setdate] = useState('');
 
-    const [day, setDay] = useState(defaultValue);
-    const [info, setInfo] = useState(defaultValue);
-
-    const updateDay = async(date) => {
-        
+    const updateToday = async(id) => {
+        const dateT = date.toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
+        setToday(await getDocument('audiencias', dateT))
     }
-    const updateInfo = async() => {
-
+    const updateByDate = async() => {
+        setBydate(await getDocument('audiencias', date))
     }
-    const selectAudiencia = async(id) =>{
-
+    const updateInformacion = async() =>{
+        setInformacion(await getCollection('informacion'))
     }
-    const addAudiencia = async(data, date) =>{
-
+    const updateDate = async(date) =>{
+        setDate(date)
     }
-    const addInfo = async(data) =>{
+    const updateState = async(id, state) =>{
+        await updateToday()
+        await 
+    }
+    const docExists = async(id) =>{
+        return checkDoc(id)
+    }
+    const addAudiencia = async(data) =>{
 
     }
     const deleteAudiencia = async(id) =>{
+        
+    }
+    const addInfo = async(data) =>{
         
     }
     const deleteInfo = async(id) =>{
