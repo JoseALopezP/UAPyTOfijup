@@ -5,7 +5,9 @@ const db = getFirestore(firebase_app)
 export default async function getDocument(colllectionName, id) {
     let result = null;
     try {
-        await getDoc(doc(db, colllectionName, id));
+        const document = doc(db, colllectionName, id)
+        const col = await getDoc(document)
+        result = await col.data().list
     } catch (e) {
         console.log(e)
     }

@@ -4,15 +4,15 @@ import { DataContext } from '@/context/DataContext'
 
 export function ScheduleTable () {
     const {updateToday, today} = useContext(DataContext);
-    const {shown, setShown} = useState([]);
+    const [shown, setShown] = useState([]);
     const getMinutes = (dateObject) =>{
-        return (parseInt(new Date()).toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"}) * 60 + parseInt(new Date()).toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"}))
+        return (parseInt(dateObject.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(dateObject.toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
     }
     useEffect(() =>{
         updateToday();
-        setShown(shown.filter((item) =>{
+        setShown(today.filter((item) =>{
             const min = getMinutes(new Date())
-            const itemMinute = getMinutes(item.hora)
+            const itemMinute = getMinutes(item.hora.toDate())
             if((itemMinute - min >  120) | (itemMinute - min <  -60)){
                 if(item.estado == 'SUSPENDIDA'){
                     return true
@@ -40,15 +40,15 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {shown.map((el)=>{
+                    {today.map((el)=>{
                         return(
-                            <tr>
-                                <td>{el.hora.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>
+                            <tr key={el.numeroLeg}> 
+                                <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>
                                 <td>SALA {el.sala}</td>
                                 <td>{el.numeroLeg}</td>
                                 <td>{el.tipo}</td>
-                                <td>{el.juez}</td>
-                                <td>{el.estado}</td>
+                                <td>{el.juez.split('+').map(e => <>{e}<br/></>)}</td>
+                                <td>{(el.estado == 'PROGRAMADA' & getMinutes(new Date()) > getMinutes(el.hora.toDate())) ? 'DEMORADA' : el.estado}</td>
                             </tr>
                         )
                     })}

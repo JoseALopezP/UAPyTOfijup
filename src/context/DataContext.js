@@ -17,9 +17,11 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [informacion, setInformacion] = useState(defaultValue);
     const [date, setDate] = useState('');
 
-    const updateToday = async(id) => {
-        const dateT = date.toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
+    const updateToday = async() => {
+        const dateT = '08042024' //(new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
+        console.log(dateT)
         setToday(await getDocument('audiencias', dateT))
+        console.log(today)
     }
     const updateByDate = async() => {
         setBydate(await getDocument('audiencias', date))
@@ -34,7 +36,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         await updateByDate()
         const aux = bydate
         const index = aux.findIndex((element) => element.numeroLeg == num)
-        aux[index].estado = state
+        aux[index].estado =
+         state
         await updateDocument("audiencias", aux, date)
     }
     const saveDate = async(dateX) => {
