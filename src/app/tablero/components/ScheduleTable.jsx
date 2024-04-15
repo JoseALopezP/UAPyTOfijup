@@ -4,13 +4,45 @@ import { DataContext } from '@/context/DataContext'
 
 export function ScheduleTable () {
     const {updateToday, today} = useContext(DataContext);
-    const [shown, setShown] = useState([]);
+    const [filtered, setFiltered] = useState([]);
+    const [show, setShow] = useState([]);
+    const [part, setPart] = useState(0);
+    const [showInfo, setShowInfo] = useState(false);
     const getMinutes = (dateObject) =>{
         return (parseInt(dateObject.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(dateObject.toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
     }
+    function tick() {
+        let aux = filtered
+        if(part == 0){
+            if(show == false){
+                setShow(aux.splice(0,15));
+                setPart(1)
+            }else{
+                setShow(aux.splice(0,13));
+                setPart(1)
+            }
+        }else{
+            if(showInfo == false){
+                setShow(aux.splice(15,15));
+                setPart(0)
+                setShowInfo(true)
+            }else{
+                setShow(aux.splice(13,13));
+                setPart(0)
+                setShowInfo(false)
+            }
+        }
+        
+    }
+    useEffect(() => {
+        const timerID = setInterval(() => tick(), 15000);
+        return function cleanup() {
+            clearInterval(timerID);
+        };
+    });
     useEffect(() =>{
         updateToday();
-        setShown(today.filter((item) =>{
+        setFiltered(today.filter((item) =>{
             const min = getMinutes(new Date())
             const itemMinute = getMinutes(item.hora.toDate())
             if((itemMinute - min >  120) | (itemMinute - min <  -60)){
@@ -40,7 +72,7 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today.map((el)=>{
+                    {show.map((el)=>{
                         return(
                             <tr key={el.numeroLeg}> 
                                 <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>
@@ -75,6 +107,96 @@ export function ScheduleTable () {
                         <td>TRÁMITES DE EJECUCIÓN</td>
                         <td>MEGLIOLI, JUAN GABRIEL</td>
                         <td>SUSPENDIDA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
+                    </tr>
+                    <tr>
+                        <td>8:00</td>
+                        <td>SALA 6</td>
+                        <td>MPF-SJ-04173-2024</td>
+                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>MOYA, MABEL IRENE <br/>
+                            LEON, PABLO LEONARDO <br/>
+                            ALLENDE, FLAVIA GABRIELA</td>
+                        <td>EN ESPERA</td>
                     </tr>
                     <tr>
                         <td>8:00</td>

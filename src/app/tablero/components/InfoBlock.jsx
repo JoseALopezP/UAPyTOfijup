@@ -1,5 +1,6 @@
 import styles from './ScheduleTable.module.css'
 
+
 export function InfoBlock () {
     return(
         <div className={`${styles.infoBlock}`}>

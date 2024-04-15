@@ -3,6 +3,7 @@
     font-size: 20px;
     font-weight: 700;
     color: white;
+    overflow: hidden;
 }
 .table{
     width: 100%;
@@ -11,6 +12,7 @@
 .tableHead{
     background-color: white;
     color: #375166;
+    position: sticky;
 }
 .tableBody tr{
     height: 70px;
@@ -39,11 +41,6 @@
     display: inline-flex;
     flex-direction: row;
 }
-.infoSection:hover{
-    animation: headerExpand 0.5s;
-    animation-fill-mode: both;
-}
-
 
 .clockBlock{
     font-weight: 700;
@@ -96,18 +93,58 @@
     line-height: 24px;
     margin: 0;
 }
-.infoSection:hover .infoBlock{
-    animation: blockExpand 0.6s;
+
+.infoSectionShow{
+    animation: headerExpand 0.5s steps(50);
     animation-fill-mode: both;
+    -webkit-animation: headerExpand 0.5s;
+    -webkit-animation-fill-mode: both;
 }
-.infoSection:hover .infoBlock img, .infoSection:hover .infoBlock .newsTitle, .infoSection:hover .infoBlock .newsBody{
-    animation: infoAppear 1s;
+.infoSectionShow .infoBlock{
+    animation: blockExpand 0.6s steps(50);
     animation-fill-mode: both;
+    -webkit-animation: blockExpand 0.6s;
+    -webkit-animation-fill-mode: both;
 }
-.infoSection:hover .infoBlock .ofijupTitle{
+.infoSectionShow .infoBlock img, .infoSectionShow .infoBlock .newsTitle, .infoSectionShow .infoBlock .newsBody{
+    animation: infoAppear 1s steps(50);
+    animation-fill-mode: both;
+    -webkit-animation: infoAppear 1s;
+    -webkit-animation-fill-mode: both;
+}
+.infoSectionShow .infoBlock .ofijupTitle{
     animation: infodisappear 1s;
     animation-fill-mode: both;
+    -webkit-animation: infodisappear 1s;
+    -webkit-animation-fill-mode: both;
 }
+
+.infoSectionNotShow{
+    animation: headerExpand 0.5s steps(50);
+    animation-fill-mode: both;
+    -webkit-animation: headerExpand2 0.5s;
+    -webkit-animation-fill-mode: both;
+}
+.infoSectionNotShow .infoBlock{
+    animation: blockExpand 0.6s steps(50);
+    animation-fill-mode: both;
+    -webkit-animation: blockExpand2 0.6s;
+    -webkit-animation-fill-mode: both;
+}
+.infoSectionNotShow .infoBlock img, .infoSectionNotShow .infoBlock .newsTitle, .infoSectionNotShow .infoBlock .newsBody{
+    animation: infoAppear 1s steps(50);
+    animation-fill-mode: both;
+    -webkit-animation: infoAppear2 1s;
+    -webkit-animation-fill-mode: both;
+}
+.infoSectionNotShow .infoBlock .ofijupTitle{
+    animation: infodisappear 1s;
+    animation-fill-mode: both;
+    -webkit-animation: infodisappear2 1s;
+    -webkit-animation-fill-mode: both;
+}
+
+
 .ofijupTitle{
     position: fixed;
     left: 40%;
@@ -128,7 +165,10 @@
     }
 }
 @keyframes headerExpand {
-    to {
+    0%{
+        height: 70px;
+    }
+    100% {
       height: 220px;
     }
 }
@@ -149,5 +189,45 @@
     }
     100%{
         height: 200px;
+    }
+}
+
+
+@keyframes infoAppear2 {
+    0% {
+        opacity: 100%;
+    }
+    50%{
+      opacity: 0%;
+    }
+    100%{
+      opacity: 0%;
+    }
+}
+@keyframes headerExpand2 {
+    0%{
+        height: 220px;
+    }
+    100% {
+      height: 70px;
+    }
+}
+@keyframes infodisappear2 {
+    0% {
+        opacity: 0%;
+    }
+    50%{
+        opacity: 0%;
+    }
+    100%{
+        opacity: 100%;
+    }
+}
+@keyframes blockExpand2 {
+    0% {
+        height: 200px;
+    }
+    100%{
+        height: 50px;
     }
 }
