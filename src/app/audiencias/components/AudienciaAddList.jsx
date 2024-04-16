@@ -3,7 +3,7 @@ import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
 import { AddBlock } from './AddBlock';
 
-export function AudienciaAddList () {
+export function AudienciaAddList ({date}) {
     const {updateToday, today} = useContext(DataContext);
     
 
@@ -15,19 +15,17 @@ export function AudienciaAddList () {
             <table className={`${styles.audienciaListTable}`}>
                 <thead>
                     <tr>
-                        <form>
                         <th>HORA</th>
                         <th>SALA</th>
                         <th>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
                         <th>JUEZ</th>
                         <th>ACCIÓN</th>
-                        </form>
                     </tr>
                 </thead>
                 <tbody>
-                    <AddBlock/>
-                    {today.map((el)=>{
+                    <AddBlock date={date}/>
+                    {today.sort((a,b)=>(a.hora.toDate() - b.hora.toDate())).map((el)=>{
                         return(
                             <tr key={el.numeroLeg}> 
                                 <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>

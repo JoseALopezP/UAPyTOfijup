@@ -18,7 +18,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [show, setShow] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
-    const [date, setDate] = useState('');
 
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
@@ -30,16 +29,13 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateTiposAudiencias = async() => {
         setTiposAudiencias(await getDocument('audiencias', 'tiposaudiencia'))
     }
-    const updateByDate = async() => {
+    const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))
     }
     const updateInformacion = async() =>{
         setInformacion(await getCollection('informacion'))
     }
-    const updateDate = async(date) =>{
-        setDate(date)
-    }
-    const updateState = async(state, num) =>{
+    const updateState = async(state, num, date) =>{
         await updateByDate()
         const aux = bydate
         const index = aux.findIndex((element) => element.numeroLeg == num)
@@ -47,13 +43,10 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
          state
         await updateDocument("audiencias", aux, date)
     }
-    const saveDate = async(dateX) => {
-        setDate(dateX)
-    }
     const docExists = async(id) =>{
         return (checkDoc(id)>0 ? true : false)
     }
-    const addAudiencia = async(data) =>{
+    const addAudiencia = async(data, date) =>{
         await updateByDate()
         if(bydate){
             const aux = bydate
@@ -83,9 +76,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateToday,
         updateByDate,
         updateInformacion,
-        updateDate,
         updateState,
-        saveDate,
         docExists,
         addAudiencia,
         deleteAudiencia,
@@ -96,7 +87,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         today,
         bydate,
         informacion,
-        date,
         show,
         tiposAudiencias,
         jueces
