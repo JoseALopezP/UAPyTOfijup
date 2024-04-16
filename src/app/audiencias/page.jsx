@@ -1,4 +1,6 @@
-import { AddBlock } from "./components/addBlock";
+'use client'
+import { AudienciaAddList } from "./components/AudienciaAddList";
+import { DataContextProvider } from "@/context/DataContext";
 
 export default function Admin() {
     /*useEffect(() => {
@@ -6,7 +8,9 @@ export default function Admin() {
     }, [user])*/
     return (
       <>
-        <AddBlock/>
+          <DataContextProvider>
+            <AudienciaAddList/>
+          </DataContextProvider>
       </>
     )
 }

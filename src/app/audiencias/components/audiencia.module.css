@@ -1,0 +1,15 @@
+.audienciaListSection{
+    width: 100%;
+}
+.audienciaListTable{
+    width: 100%;
+}
+.legajoInput{
+    display: inline-flex;
+    flex-direction: row;
+}
+.addAudienciaRow{
+    height: 80px;
+    vertical-align: middle;
+    padding: auto;
+}
