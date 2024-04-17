@@ -1,6 +1,6 @@
 import { Clock } from './Clock'
 import styles from './ScheduleTable.module.css'
-import { InfoBlock } from './infoBlock'
+import { InfoBlock } from './InfoBlock'
 import { useState, useEffect } from 'react';
 
 export function InformationSection () {

@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import styles from './AudienciaList.module.css'
-import { ButtonsAudiencia } from './buttonsAudiencia';
+import { ButtonsAudiencia } from './ButtonsAudiencia';
 
 export function AudienciaList () {
     const [show, setShow] = useState('');
