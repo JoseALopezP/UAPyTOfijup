@@ -38,23 +38,19 @@ export function AddBlock () {
         }else{
             juez ? setJuezError(false) : setJuezError(true);
         }
-        
     }
 
-    const handleSubmit = async() => {
-        console.log(hora)
-        console.log(sala)
-        console.log(legajo1)
-        console.log(legajo2)
-        console.log(legajo3)
-        console.log(tipo)
-        console.log(colegiado)
-        console.log(juez)
-        console.log(juez2)
-        console.log(juez3)
-        errorChecking()
+    const handleSubmit = () =>{
+        const newAudiencia = {
+            hora: hora,
+            sala: sala,
+            numeroLeg: (legajo1 + "-" + legajo2 + "-" + legajo3),
+            tipo: tipo,
+            juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
+            estado: "PROGRAMADA",
+            
+        }
     }
-
 
     return(
         <tr className={`${styles.addAudienciaRow}`}>
@@ -116,7 +112,7 @@ export function AddBlock () {
                 </>
             )}
             </td>
-            <td className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={handleSubmit}>AGREGAR</button></td>
+            <td className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={handleSubmit()}>AGREGAR</button></td>
         </tr>
     )
 }

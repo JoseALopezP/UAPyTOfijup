@@ -54,7 +54,7 @@ export function AudienciaList () {
                         <td>8:00</td>
                         <td>SALA 6</td>
                         <td>MPF-SJ-04173-2024</td>
-                        <td>DEBATE DEL JUICIO ORAL</td> 
+                        <td>DEBATE DE JUICIO ORAL</td> 
                         <td>MOYA, MABEL IRENE <br/>
                             LEON, PABLO LEONARDO <br/>
                             ALLENDE, FLAVIA GABRIELA</td>
