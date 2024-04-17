@@ -1,8 +1,8 @@
 
 export default function Informacion() {
-    useEffect(() => {
+    /*useEffect(() => {
       if (user == null) router.push("/signin")
-    }, [user])
+    }, [user])*/
     return (
       <>
       </>
