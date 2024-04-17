@@ -5,18 +5,20 @@ import { DataContext } from '@/context/DataContext';
 export function AddBlock () {
     const {updateTiposAudiencias, tiposAudiencias, jueces, updateJueces} = useContext(DataContext);
     const [hora, setHora] = useState(null)
-    const [sala, setSala] = useState('')
-    const [legajo1, setLegajo1] = useState('')
-    const [legajo2, setLegajo2] = useState('')
-    const [legajo3, setLegajo3] = useState('')
-    const [tipo, setTipo] = useState('')
-    const [juez, setJuez] = useState('')
+    const [sala, setSala] = useState(null)
+    const [legajo1, setLegajo1] = useState(null)
+    const [legajo2, setLegajo2] = useState(null)
+    const [legajo3, setLegajo3] = useState(null)
+    const [tipo, setTipo] = useState(null)
+    const [colegiado, setColegiado] = useState(false)
+    const [juez, setJuez] = useState(null)
+    const [juez2, setJuez2] = useState(null)
+    const [juez3, setJuez3] = useState(null)
 
     const [horaError, setHoraError] = useState(false)
     const [salaError, setSalaError] = useState(false)
-    const [legajo1Error, setLegajo1Error] = useState(false)
-    const [legajo2Error, setLegajo2Error] = useState(false)
-    const [legajoError3, setLegajo3Error] = useState(false)
+    const [legajo2Error, setLegajo2Error] = useState('')
+    const [legajoError3, setLegajo3Error] = useState('')
     const [tipoError, setTipoError] = useState(false)
     const [juezError, setJuezError] = useState(false)
 
@@ -27,32 +29,31 @@ export function AddBlock () {
 
     const errorChecking = () =>{
         hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
-        hora ? setHoraError(false) : setHoraError(true)
+        sala ? setSalaError(false) : setSalaError(true)
+        (legajo2.length != 5)? setLegajo2Error(false) : setLegajo2Error(true)
+        (legajo3.length != 4) ? setLegajo3Error(false) : setLegajo3Error(true)
+        tipo ? setTipoError(false) : setTipoError(true)
+        if(colegiado){
+            (juez | juez2 | juez3) ? setJuezError(false) : setJuezError(true)
+        }else{
+            juez ? setJuezError(false) : setJuezError(true)
+        }
+        
     }
 
     const handleSubmit = async(event) => {
-        hora
         event.preventDefault();
         const now = new Date()
         const timestamp = Timestamp.fromDate(now);
-        const newGuest = {
-            name: name,
-            lastName: lastName,
-            dni: dni,
-            diet: diet
+        const data = {
+            estado: 'PROGRAMADA',
+            hora: hora,
+            juez: juez,
+            numeroLeg: legajo1+'-'+legajo2+'-'+legajo3,
+            sala: sala,
+            tipo: tipo
         }
-        const data = await {
-            "date": timestamp,
-            "after": (dinner == 'dcena' ? true : false),
-            "guests": [...guests, newGuest]
-        }
-        await addGuest(data);
+        await addGuest(data, date);
         setSentStatus(false);
         setleft(left -1)
     }
@@ -95,7 +96,26 @@ export function AddBlock () {
                         <option value={el}>{el}</option>
                     )
                 })}
-            </select></td>
+            </select>
+            {(colegiado) && (
+                <>
+                <select onChange={(e)=>{setJuez2(e.target.value)}}>
+                {jueces.sort().map((el) =>{
+                    return(
+                        <option value={el}>{el}</option>
+                    )
+                })}
+                </select>
+                <select onChange={(e)=>{setJuez3(e.target.value)}}>
+                    {jueces.sort().map((el) =>{
+                        return(
+                            <option value={el}>{el}</option>
+                        )
+                    })}
+                </select>
+                </>
+            )}
+            </td>
             <td><button type="submit" className={`${styles.submitButton}`}>AGREGAR</button></td>
         </tr>
     )

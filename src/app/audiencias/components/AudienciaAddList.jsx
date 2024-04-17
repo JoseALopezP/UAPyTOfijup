@@ -4,11 +4,9 @@ import { DataContext } from '@/context/DataContext';
 import { AddBlock } from './AddBlock';
 
 export function AudienciaAddList ({date}) {
-    const {updateToday, today} = useContext(DataContext);
-    
-
+    const {updateByDate, bydate} = useContext(DataContext);
     useEffect(() => {
-        updateToday()
+        updateByDate(date)
     }, []);
     return(
         <section className={`${styles.audienciaListSection}`}>
@@ -25,7 +23,7 @@ export function AudienciaAddList ({date}) {
                 </thead>
                 <tbody>
                     <AddBlock date={date}/>
-                    {today.sort((a,b)=>(a.hora.toDate() - b.hora.toDate())).map((el)=>{
+                    {bydate.sort((a,b)=>(a.hora.toDate() - b.hora.toDate())).map((el)=>{
                         return(
                             <tr key={el.numeroLeg}> 
                                 <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>

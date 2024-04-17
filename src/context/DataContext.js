@@ -36,7 +36,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         setInformacion(await getCollection('informacion'))
     }
     const updateState = async(state, num, date) =>{
-        await updateByDate()
+        await updateByDate(date)
         const aux = bydate
         const index = aux.findIndex((element) => element.numeroLeg == num)
         aux[index].estado =
@@ -47,7 +47,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         return (checkDoc(id)>0 ? true : false)
     }
     const addAudiencia = async(data, date) =>{
-        await updateByDate()
+        await updateByDate(date)
         if(bydate){
             const aux = bydate
             aux.push(data)
@@ -57,7 +57,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         }
     }
     const deleteAudiencia = async(num) =>{
-        await updateByDate()
+        await updateByDate(date)
         const aux = bydate
         const index = aux.findIndex((element) => element.numeroLeg == num)
         aux.splice(index, 1)
