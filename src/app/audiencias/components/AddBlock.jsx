@@ -6,9 +6,9 @@ export function AddBlock () {
     const {updateTiposAudiencias, tiposAudiencias, jueces, updateJueces} = useContext(DataContext);
     const [hora, setHora] = useState(null)
     const [sala, setSala] = useState(null)
-    const [legajo1, setLegajo1] = useState(null)
-    const [legajo2, setLegajo2] = useState(null)
-    const [legajo3, setLegajo3] = useState(null)
+    const [legajo1, setLegajo1] = useState('MPF-SJ')
+    const [legajo2, setLegajo2] = useState('')
+    const [legajo3, setLegajo3] = useState('')
     const [tipo, setTipo] = useState(null)
     const [colegiado, setColegiado] = useState(false)
     const [juez, setJuez] = useState(null)
@@ -17,8 +17,8 @@ export function AddBlock () {
 
     const [horaError, setHoraError] = useState(false)
     const [salaError, setSalaError] = useState(false)
-    const [legajo2Error, setLegajo2Error] = useState('')
-    const [legajoError3, setLegajo3Error] = useState('')
+    const [legajo2Error, setLegajo2Error] = useState(false)
+    const [legajo3Error, setLegajo3Error] = useState(false)
     const [tipoError, setTipoError] = useState(false)
     const [juezError, setJuezError] = useState(false)
 
@@ -28,41 +28,41 @@ export function AddBlock () {
     }, []);
 
     const errorChecking = () =>{
-        hora ? setHoraError(false) : setHoraError(true)
-        sala ? setSalaError(false) : setSalaError(true)
-        (legajo2.length != 5)? setLegajo2Error(false) : setLegajo2Error(true)
-        (legajo3.length != 4) ? setLegajo3Error(false) : setLegajo3Error(true)
-        tipo ? setTipoError(false) : setTipoError(true)
+        hora ? setHoraError(false) : setHoraError(true);
+        sala ? setSalaError(false) : setSalaError(true);
+        (`${legajo2}`.length == 5) ? setLegajo2Error(false) : setLegajo2Error(true);
+        (`${legajo3}`.length == 4) ? setLegajo3Error(false) : setLegajo3Error(true);    
+        tipo ? setTipoError(false) : setTipoError(true);
         if(colegiado){
-            (juez | juez2 | juez3) ? setJuezError(false) : setJuezError(true)
+            (juez | juez2 | juez3) ? setJuezError(false) : setJuezError(true);
         }else{
-            juez ? setJuezError(false) : setJuezError(true)
+            juez ? setJuezError(false) : setJuezError(true);
         }
         
     }
 
-    const handleSubmit = async(event) => {
-        event.preventDefault();
-        const now = new Date()
-        const timestamp = Timestamp.fromDate(now);
-        const data = {
-            estado: 'PROGRAMADA',
-            hora: hora,
-            juez: juez,
-            numeroLeg: legajo1+'-'+legajo2+'-'+legajo3,
-            sala: sala,
-            tipo: tipo
-        }
-        await addGuest(data, date);
-        setSentStatus(false);
-        setleft(left -1)
+    const handleSubmit = async() => {
+        console.log(hora)
+        console.log(sala)
+        console.log(legajo1)
+        console.log(legajo2)
+        console.log(legajo3)
+        console.log(tipo)
+        console.log(colegiado)
+        console.log(juez)
+        console.log(juez2)
+        console.log(juez3)
+        errorChecking()
     }
 
 
     return(
         <tr className={`${styles.addAudienciaRow}`}>
-            <td><input type="time" id="IngresarNombre" onChange={e => setHora(e.target.value)}/></td>
-            <td><select onChange={(e)=>{setSala(e.target.value)}}>
+            <td className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
+                <input  type="time" id="IngresarHora" onChange={e => setHora(e.target.value)}/>
+            </td>
+            <td className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputSalaBlock} ${styles.inputItemBlock}` }>
+                <select  onChange={(e)=>{setSala(e.target.value)}}>
                     <option value={"-"}>-</option>
                     <option value={"1"}>SALA 1</option>
                     <option value={"2"}>SALA 2</option>
@@ -75,25 +75,25 @@ export function AddBlock () {
                     <option value={"9"}>SALA 9</option>
                 </select>
             </td>
-            <td className={`${styles.legajoInput}`}>
+            <td className={`${styles.inputLegajoBlock} ${styles.inputItemBlock}`}>
                 <select onChange={(e)=>{setLegajo1(e.target.value)}}>
                     <option value={"MPF-SJ"}>MPF-SJ</option>
                     <option value={"OJU-SJ"}>OJU-SJ</option>
                 </select>
-                <input type="text" id="IngresarNombre" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
-                <input type="text" id="IngresarNombre" placeholder="0000" onChange={e => setLegajo3(e.target.value)}/>
+                <input className={legajo2Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}` } type="text" id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
+                <input className={legajo3Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}`} type="text" id="IngresarAno" placeholder="0000" onChange={e => setLegajo3(e.target.value)}/>
             </td>
-            <td><select onChange={(e)=>{setTipo(e.target.value)}}>
+            <td className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputTipoBlock} ${styles.inputItemBlock}`}><select onChange={(e)=>{setTipo(e.target.value)}}>
                 {tiposAudiencias.sort().map((el) =>{
                     return(
-                        <option value={el}>{el}</option>
+                        <option key={el} value={el}>{el}</option>
                     )
                 })}
             </select></td>
-            <td><select onChange={(e)=>{setJuez(e.target.value)}}>
+            <td className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputJuezBlock} ${styles.inputItemBlock}`}><select onChange={(e)=>{setJuez(e.target.value)}}>
                 {jueces.sort().map((el) =>{
                     return(
-                        <option value={el}>{el}</option>
+                        <option key={el} value={el}>{el}</option>
                     )
                 })}
             </select>
@@ -102,21 +102,21 @@ export function AddBlock () {
                 <select onChange={(e)=>{setJuez2(e.target.value)}}>
                 {jueces.sort().map((el) =>{
                     return(
-                        <option value={el}>{el}</option>
+                        <option key={el} value={el}>{el}</option>
                     )
                 })}
                 </select>
                 <select onChange={(e)=>{setJuez3(e.target.value)}}>
                     {jueces.sort().map((el) =>{
                         return(
-                            <option value={el}>{el}</option>
+                            <option key={el} value={el}>{el}</option>
                         )
                     })}
                 </select>
                 </>
             )}
             </td>
-            <td><button type="submit" className={`${styles.submitButton}`}>AGREGAR</button></td>
+            <td className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={handleSubmit}>AGREGAR</button></td>
         </tr>
     )
 }

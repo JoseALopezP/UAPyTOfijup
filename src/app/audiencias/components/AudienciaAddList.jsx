@@ -5,6 +5,7 @@ import { AddBlock } from './AddBlock';
 
 export function AudienciaAddList ({date}) {
     const {updateByDate, bydate} = useContext(DataContext);
+    
     useEffect(() => {
         updateByDate(date)
     }, []);
@@ -12,7 +13,7 @@ export function AudienciaAddList ({date}) {
         <section className={`${styles.audienciaListSection}`}>
             <table className={`${styles.audienciaListTable}`}>
                 <thead>
-                    <tr>
+                    <tr className={`${styles.audienciaListTableHead}`}>
                         <th>HORA</th>
                         <th>SALA</th>
                         <th>LEGAJO</th>

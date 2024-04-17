@@ -4,7 +4,10 @@
 .audienciaListTable{
     width: 100%;
 }
-.legajoInput{
+.audienciaListTableHead{
+    width: 100%;
+}
+.inputLegajoBlock{
     display: inline-flex;
     flex-direction: row;
 }
@@ -12,4 +15,41 @@
     height: 80px;
     vertical-align: middle;
     padding: auto;
+    width: 100%;
+}
+
+.addAudienciaRow select, .addAudienciaRow input, .addAudienciaRow button{
+    height: 40px;
+    font-size: 18px;
+    border-radius: 5px;
+    margin: 0 2px;
+    border: none;
+    padding: 0;
+}
+.addAudienciaRow input:focus-visible{
+    outline: none;
+}
+
+.inputItemBlock{
+    padding: 20px 5px;
+    width: fit-content;
+}
+
+.inputLegajoBlock input{
+    width: 160px;
+}
+
+.inputTipoBlock input{
+    width: 100%;
+}
+.inputJuezBlock select{
+    width: 100%;
+}
+.inputSubmitBlock button{
+    padding: 4px;
+}
+
+.inputError select, .inputError input, .inputAreaError{
+    border: 2px red solid;
+    outline: 2px red solid;
 }
