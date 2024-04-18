@@ -1,14 +1,13 @@
 import firebase_app from "../config";
-import { getFirestore, getCountFromServer, collection } from "firebase/firestore";
+import { getFirestore, getDocs, collection, query, where } from "firebase/firestore";
 
 const db = getFirestore(firebase_app)
 export default async function checkDoc(colllectionName, id) {
     let result = null;
     try {
         const q = query(collection(db, colllectionName), where("id", "==", id));
-        await getCountFromServer(q).data().count
-        const snapshot = await getCountFromServer(q);
-        result = snapshot.data().count
+        const snapshot = await getDocs(q);
+        result = snapshot.size
     } catch (e) {
         console.log(e)
     }

@@ -1,11 +1,12 @@
 import React, { createContext, useState} from "react";
-import {doc, updateDoc, getFirestore} from 'firebase/firestore';
+import {doc, updateDoc, getFirestore, setDoc} from 'firebase/firestore';
 import firebase_app from "@/firebase/config";
 import getCollection from "@/firebase/firestore/getCollection";
 import addData from "@/firebase/firestore/addData";
 import removeData from "@/firebase/firestore/removeData";
 import getDocument from "@/firebase/firestore/getDocument";
 import checkDoc from "@/firebase/firestore/checkDoc";
+import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument";
 import updateDocument from "@/firebase/firestore/updateDocument";
 export const DataContext = createContext({});
 
@@ -15,19 +16,22 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
     const [jueces, setJueces] = useState(defaultValue);
-    const [show, setShow] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
 
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
     }
-    const updateToday = async() => {
-        const dateT = '15042024' //await (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
-        setToday(await getDocument('audiencias', dateT))
-    }
     const updateTiposAudiencias = async() => {
         setTiposAudiencias(await getDocument('audiencias', 'tiposaudiencia'))
+    }
+    const updateToday = async() => {
+        const dateT = await (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
+        if(await docExists(date)){
+            setToday(await getDocument('audiencias', dateT))
+        }else{
+            return []
+        }
     }
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))
@@ -37,24 +41,18 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const updateState = async(state, num, date) =>{
         await updateByDate(date)
-        const aux = bydate
+        const aux = await bydate
         const index = aux.findIndex((element) => element.numeroLeg == num)
         aux[index].estado =
          state
         await updateDocument("audiencias", aux, date)
     }
     const docExists = async(id) =>{
-        return (checkDoc(id)>0 ? true : false)
+        return checkDoc('audiencias',id)
     }
     const addAudiencia = async(data, date) =>{
-        await updateByDate(date)
-        if(bydate){
-            const aux = bydate
-            aux.push(data)
-            await updateDocument("audiencias", aux, date)
-        }else{
-            addData('audiencias', data)
-        }
+        await console.log("hasta acá llegaste")
+        await addOrUpdateDocument('audiencias', date, data)
     }
     const deleteAudiencia = async(num) =>{
         await updateByDate(date)
@@ -81,13 +79,13 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         addAudiencia,
         deleteAudiencia,
         addInfo,
+        addAudiencia,
         deleteInfo,
         updateTiposAudiencias,
         updateJueces,
         today,
         bydate,
         informacion,
-        show,
         tiposAudiencias,
         jueces
     }

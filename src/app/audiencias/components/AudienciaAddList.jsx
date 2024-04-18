@@ -24,7 +24,7 @@ export function AudienciaAddList ({date}) {
                 </thead>
                 <tbody>
                     <AddBlock date={date}/>
-                    {bydate && bydate.sort((a,b)=>(a.hora.toDate() - b.hora.toDate())).map((el)=>{
+                    {bydate && bydate.sort((a,b)=>(a.hora - b.hora)).map((el)=>{
                         return(
                             <tr key={el.numeroLeg}> 
                                 <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>

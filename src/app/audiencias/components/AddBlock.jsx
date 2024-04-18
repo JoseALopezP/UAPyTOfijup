@@ -2,8 +2,8 @@ import styles from './audiencia.module.css'
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 
-export function AddBlock () {
-    const {updateTiposAudiencias, tiposAudiencias, jueces, updateJueces} = useContext(DataContext);
+export function AddBlock ({date}) {
+    const {updateTiposAudiencias, tiposAudiencias, jueces, updateJueces, addAudiencia} = useContext(DataContext);
     const [hora, setHora] = useState(null)
     const [sala, setSala] = useState(null)
     const [legajo1, setLegajo1] = useState('MPF-SJ')
@@ -22,11 +22,6 @@ export function AddBlock () {
     const [tipoError, setTipoError] = useState(false)
     const [juezError, setJuezError] = useState(false)
 
-    useEffect(() => {
-        updateTiposAudiencias()
-        updateJueces()
-    }, []);
-
     const errorChecking = () =>{
         hora ? setHoraError(false) : setHoraError(true);
         sala ? setSalaError(false) : setSalaError(true);
@@ -34,23 +29,35 @@ export function AddBlock () {
         (`${legajo3}`.length == 4) ? setLegajo3Error(false) : setLegajo3Error(true);    
         tipo ? setTipoError(false) : setTipoError(true);
         if(colegiado){
-            (juez | juez2 | juez3) ? setJuezError(false) : setJuezError(true);
+            (juez || juez2 || juez3) ? setJuezError(false) : setJuezError(true);
         }else{
             juez ? setJuezError(false) : setJuezError(true);
         }
+        console.log(horaError, salaError, legajo2Error, legajo3Error, tipoError, juezError)
     }
 
-    const handleSubmit = () =>{
-        const newAudiencia = {
-            hora: hora,
-            sala: sala,
-            numeroLeg: (legajo1 + "-" + legajo2 + "-" + legajo3),
-            tipo: tipo,
-            juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
-            estado: "PROGRAMADA",
-            
+    const handleSubmit = async() =>{
+        errorChecking()
+        if(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError){
+
+        }else{
+            const newAudiencia = {
+                hora: hora,
+                sala: sala,
+                numeroLeg: (legajo1 + "-" + legajo2 + "-" + legajo3),
+                tipo: tipo,
+                juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
+                estado: "PROGRAMADA",
+            }
+            await addAudiencia(newAudiencia, `${date}`)
+            console.log('se mandó')
         }
     }
+
+    useEffect(() => {
+        updateTiposAudiencias()
+        updateJueces()
+    }, [])
 
     return(
         <tr className={`${styles.addAudienciaRow}`}>
@@ -112,7 +119,7 @@ export function AddBlock () {
                 </>
             )}
             </td>
-            <td className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={handleSubmit()}>AGREGAR</button></td>
+            <td className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={handleSubmit}>AGREGAR</button></td>
         </tr>
     )
 }
