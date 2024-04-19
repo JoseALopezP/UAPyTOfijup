@@ -15,6 +15,7 @@ const db = getFirestore(firebase_app)
 export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
+    const [años, setAños] = useState(defaultValue);
     const [jueces, setJueces] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
@@ -24,6 +25,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const updateTiposAudiencias = async() => {
         setTiposAudiencias(await getDocument('audiencias', 'tiposaudiencia'))
+    }
+    const updateAños = async() => {
+        setAños(await getDocument('audiencias', 'años'))
     }
     const updateToday = async() => {
         const dateT = await (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
@@ -83,6 +87,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         deleteInfo,
         updateTiposAudiencias,
         updateJueces,
+        updateAños,
+        años,
         today,
         bydate,
         informacion,

@@ -86,10 +86,10 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {filterToday().sort((a,b)=>(a.hora.toDate() - b.hora.toDate())).map((el)=>{
+                    {filterToday().sort((a,b)=>(a.split(':').join('') - b.split(':').join(''))).map((el)=>{
                         return(
                             <tr key={el.numeroLeg}> 
-                                <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>
+                                <td>{el.hora}</td>
                                 <td>SALA {el.sala}</td>
                                 <td>{el.numeroLeg}</td>
                                 <td>{el.tipo}</td>

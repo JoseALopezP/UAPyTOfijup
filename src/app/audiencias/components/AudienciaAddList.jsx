@@ -11,33 +11,29 @@ export function AudienciaAddList ({date}) {
     }, []);
     return(
         <section className={`${styles.audienciaListSection}`}>
-            <table className={`${styles.audienciaListTable}`}>
-                <thead>
-                    <tr className={`${styles.audienciaListTableHead}`}>
-                        <th>HORA</th>
-                        <th>SALA</th>
-                        <th>LEGAJO</th>
-                        <th>TIPO DE AUDIENCIA</th>
-                        <th>JUEZ</th>
-                        <th>ACCIÓN</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <AddBlock date={date}/>
-                    {bydate && bydate.sort((a,b)=>(a.hora - b.hora)).map((el)=>{
-                        return(
-                            <tr key={el.numeroLeg}> 
-                                <td>{el.hora.toDate().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</td>
-                                <td>SALA {el.sala}</td>
-                                <td>{el.numeroLeg}</td>
-                                <td>{el.tipo}</td>
-                                <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-                                <td><button>ELIMINAR</button></td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
+            <div className={`${styles.audienciaListTable}`}>
+                <div className={`${styles.audienciaListTableHead} ${styles.tableRow}`}>
+                    <span className={`${styles.tableCell}`}>HORA</span>
+                    <span className={`${styles.tableCell}`}>SALA</span>
+                    <span className={`${styles.tableCell}`}>LEGAJO</span>
+                    <span className={`${styles.tableCell}`}>TIPO DE AUDIENCIA</span>
+                    <span className={`${styles.tableCell}`}>JUEZ</span>
+                    <span className={`${styles.tableCell}`}>ACCIÓN</span>
+                </div>
+                <AddBlock date={date}/>
+                {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
+                    return(
+                        <div key={el.numeroLeg + el.hora} className={`${styles.tableRow} ${styles.audienciaList}`}> 
+                            <span className={`${styles.tableCell}`}>{el.hora}</span>
+                            <span className={`${styles.tableCell}`}>SALA {el.sala}</span>
+                            <span className={`${styles.tableCell}`}>{el.numeroLeg}</span>
+                            <span className={`${styles.tableCell}`}>{el.tipo}</span>
+                            <span className={`${styles.tableCell}`}>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</span>
+                            <span className={`${styles.tableCell} ${styles.deleteButtonBlock}`}><button className={`${styles.deleteButton}`}>ELIMINAR</button></span>
+                        </div>
+                    )
+                })}
+            </div>
         </section>
     )
 }
