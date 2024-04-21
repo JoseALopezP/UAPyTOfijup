@@ -3,7 +3,7 @@ import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 
 export function AddBlock ({date}) {
-    const {updateTiposAudiencias, tiposAudiencias, jueces, updateJueces, addAudiencia, updateAños, años} = useContext(DataContext);
+    const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateJueces, addAudiencia, updateAños, años} = useContext(DataContext);
     const [hora, setHora] = useState(null)
     const [sala, setSala] = useState(null)
     const [legajo1, setLegajo1] = useState('MPF-SJ')
@@ -25,7 +25,7 @@ export function AddBlock ({date}) {
     const errorChecking = () =>{
         hora ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
-        (`${legajo2}`.length == 5) ? setLegajo2Error(false) : setLegajo2Error(true);
+        (legajo2 & (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
         (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
         if(colegiado){
@@ -50,6 +50,7 @@ export function AddBlock ({date}) {
         }
         await addAudiencia(newAudiencia, `${date}`)
         document.getElementById('addingForm').reset();
+        await updateByDate(date)
     }
 
     const handleSubmit = async(event) =>{
@@ -73,10 +74,10 @@ export function AddBlock ({date}) {
             (<div className={`${styles.errorMessage}`}>DATOS INSUFICIENTES O INCORRECTOS</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
         <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
-            <input  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value); errorChecking()}}/>
+            <input  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
         </span>
         <span className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputSalaBlock} ${styles.inputItemBlock}` }>
-            <select  onChange={(e)=>{setSala(e.target.value); errorChecking()}}>
+            <select  onChange={(e)=>{setSala(e.target.value)}}>
                 <option value={"-"}>-</option>
                 <option value={"1"}>SALA 1</option>
                 <option value={"2"}>SALA 2</option>
@@ -96,7 +97,7 @@ export function AddBlock ({date}) {
             </select>
             <input className={legajo2Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}` } type="text" id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
             <select className={legajo3Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}`} onChange={(e)=>{setLegajo3(e.target.value)}}>
-                {años.map(el =>{
+                {años && años.map(el =>{
                     return(
                         <option key={el} value={el}>{el}</option>
                     )
@@ -104,15 +105,16 @@ export function AddBlock ({date}) {
             </select>
         </span>
         <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}><select onChange={(e)=>{setTipo(e.target.value)}}>
-            {tiposAudiencias.sort().map((el) =>{
+            {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
                 )
             })}
         </select></span>
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
-            <select onChange={(e)=>{setJuez(e.target.value)}}>
-            {jueces.sort().map((el) =>{
+        <button onClick={() => setColegiado(!colegiado)}>Colegiado</button>
+        <select onChange={(e)=>{setJuez(e.target.value)}}>
+            {jueces && jueces.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
                 )
@@ -121,14 +123,14 @@ export function AddBlock ({date}) {
         {(colegiado) && (
             <>
             <select onChange={(e)=>{setJuez2(e.target.value)}}>
-            {jueces.sort().map((el) =>{
+            {jueces && jueces.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
                 )
             })}
             </select>
             <select onChange={(e)=>{setJuez3(e.target.value)}}>
-                {jueces.sort().map((el) =>{
+                {jueces && jueces.sort().map((el) =>{
                     return(
                         <option key={el} value={el}>{el}</option>
                     )

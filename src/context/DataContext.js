@@ -31,7 +31,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const updateToday = async() => {
         const dateT = await (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
-        if(await docExists(date)){
+        if(await docExists(dateT)){
             setToday(await getDocument('audiencias', dateT))
         }else{
             return []
@@ -46,7 +46,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateState = async(state, num, date) =>{
         await updateByDate(date)
         const aux = await bydate
-        const index = aux.findIndex((element) => element.numeroLeg == num)
+        const index = await aux.findIndex((element) => element.numeroLeg == num)
         aux[index].estado =
          state
         await updateDocument("audiencias", aux, date)

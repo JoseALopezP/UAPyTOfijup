@@ -1,17 +1,18 @@
 .audienciaListSection{
-    width: 100%;
+    width: 100vw;
 }
 .audienciaListTable{
-    width: 100%;
+    width: 100vw;
     display: table;
 }
 .audienciaListTableHead{
-    width: 100%;
+    width: 100vw;
     text-align: center;
 }
 .inputLegajoBlock{
     display: inline-flex;
     flex-direction: row;
+    width: fit-content;
 }
 .addAudienciaRow{
     height: 80px;
@@ -32,29 +33,35 @@
 
 .addAudienciaRow select, .addAudienciaRow input, .addAudienciaRow button{
     height: 40px;
-    font-size: 18px;
+    font-size: 16px;
     border-radius: 5px;
     margin: 0 2px;
     border: none;
     padding: 0;
 }
 .addAudienciaRow input:focus-visible{
-    outline: none;
+    outline: 2px #dcc635 solid;
+}
+.inputLegajoBlock{
+    min-width: 235px;
+    width: fit-content;
 }
 
 .inputItemBlock{
     padding: 20px 5px;
-    width: fit-content;
     display: table-cell;
 }
-
+.inputTipoBlock{
+    width: 80px;
+}
 .inputLegajoBlock input{
-    width: 160px;
+    width: 48px;
+    padding: 0 6px;
+}
+.inputLegajoBlock select{
+    padding: 0 6px;
 }
 
-.inputTipoBlock input{
-    width: 100%;
-}
 .inputJuezBlock select{
     width: 100%;
 }
@@ -71,6 +78,9 @@
     color: white;
 }
 
+.submitButton:focus-visible{
+    outline: 2px #dcc635 solid;
+}
 .inputError select, .inputError input, .inputAreaError{
     outline: 4px #dc3545 solid;
 }
