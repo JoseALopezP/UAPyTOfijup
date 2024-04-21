@@ -29,9 +29,9 @@ export function AddBlock ({date}) {
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
         (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
         if(colegiado){
-            ((juez || tipo == '-') & (juez2 || tipo == '-') & (juez3 || tipo == '-')) ? setJuezError(false) : setJuezError(true);
+            ((juez || juez == '-') || (juez2 || juez == '-') || (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
         }else{
-            (juez || tipo == '-') ? setJuezError(false) : setJuezError(true);
+            (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
     }
     function newFunction(){
@@ -112,7 +112,7 @@ export function AddBlock ({date}) {
             })}
         </select></span>
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
-        <button onClick={() => setColegiado(!colegiado)}>Colegiado</button>
+        <button type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>Colegiado</button>
         <select onChange={(e)=>{setJuez(e.target.value)}}>
             {jueces && jueces.sort().map((el) =>{
                 return(
