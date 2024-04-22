@@ -30,12 +30,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         setAños(await getDocument('audiencias', 'años'))
     }
     const updateToday = async() => {
-        const dateT = await (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('');
-        if(await docExists(dateT)){
-            setToday(await getDocument('audiencias', dateT))
-        }else{
-            return []
-        }
+        setToday(await getDocument('audiencias', (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')))
     }
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))

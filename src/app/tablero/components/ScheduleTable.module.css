@@ -154,6 +154,26 @@
     line-height: 0;
 }
 
+.DEMORADA{
+    color: #fd7e14;
+    font-size: 32px;
+}
+.PROGRAMADA{
+    color: #007bff;
+}
+.EN_CURSO{
+    color: #17a2b8;
+}
+.CANCELADA{
+    color: #dc3545;    
+}
+.CUARTO_INTERMEDIO{
+    color: #ffc107;
+}
+.FINALIZADA {
+    color: #28a745;
+}
+
 @keyframes infoAppear {
     0% {
     }

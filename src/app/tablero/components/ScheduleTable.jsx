@@ -7,27 +7,27 @@ export function ScheduleTable () {
     const [part, setPart] = useState(0)
     const [showInfo, setShowInfo] = useState(0)
     const getMinutes = (dateObject) =>{
-        return (parseInt(dateObject.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(dateObject.toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
+        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
+        const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
+        return (timeComparison - nowTime)
     }
     function filterToday() {
         const aux2 = []
         if(today){
             today.forEach((item) =>{
-                const min = getMinutes(new Date())
-                const itemMinute = getMinutes(item.hora.toDate())
-                switch (item.estado){
+                switch(item.estado){
                     case 'INICIADA':
-                        if(itemMinute - min < 120){
+                        if(getMinutes(item.hora) < 120){
                             aux2.push(item)
                         }
                         break;
                     case 'PROGRAMADA':
-                        if(itemMinute - min < 120){
+                        if(getMinutes(item.hora) < 120){
                             aux2.push(item)
                         }
                         break;
                     case 'CUARTO INTERMEDIO':
-                        if(itemMinute - min < 120){
+                        if(getMinutes(item.hora) < 120){
                             aux2.push(item)
                         }
                         break;
@@ -35,7 +35,7 @@ export function ScheduleTable () {
                         aux2.push(item)
                         break;
                     case 'FINALIZADA':
-                        if(itemMinute - min < 120 & itemMinute - min > -60){
+                        if(getMinutes(item.hora) < 120 & getMinutes(item.hora) > -60){
                             aux2.push(item)
                         }
                         break;
@@ -86,15 +86,15 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {filterToday().sort((a,b)=>(a.split(':').join('') - b.split(':').join(''))).map((el)=>{
+                    {today && filterToday().sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                         return(
-                            <tr key={el.numeroLeg}> 
+                            <tr key={el.numeroLeg} > 
                                 <td>{el.hora}</td>
                                 <td>SALA {el.sala}</td>
                                 <td>{el.numeroLeg}</td>
                                 <td>{el.tipo}</td>
                                 <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-                                <td>{(el.estado == 'PROGRAMADA' & getMinutes(new Date()) > getMinutes(el.hora.toDate())) ? 'DEMORADA' : el.estado}</td>
+                                {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
                             </tr>
                         )
                     })}
