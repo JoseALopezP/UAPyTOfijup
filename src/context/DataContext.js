@@ -3,11 +3,13 @@ import {doc, updateDoc, getFirestore, setDoc} from 'firebase/firestore';
 import firebase_app from "@/firebase/config";
 import getCollection from "@/firebase/firestore/getCollection";
 import addData from "@/firebase/firestore/addData";
+import removeFromArray from "@/firebase/firestore/removeFromArray";
 import removeData from "@/firebase/firestore/removeData";
 import getDocument from "@/firebase/firestore/getDocument";
 import checkDoc from "@/firebase/firestore/checkDoc";
 import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument";
 import updateDocument from "@/firebase/firestore/updateDocument";
+import updateListItem from "@/firebase/firestore/updateListItem";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
@@ -46,19 +48,17 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
          state
         await updateDocument("audiencias", aux, date)
     }
+    const updateData = async(date, searchValLeg, searchValHora, property, newValue) =>{
+        return updateListItem('audiencias', date, searchValLeg, searchValHora, property, newValue)
+    }
     const docExists = async(id) =>{
         return checkDoc('audiencias',id)
     }
     const addAudiencia = async(data, date) =>{
-        await console.log("hasta acá llegaste")
         await addOrUpdateDocument('audiencias', date, data)
     }
-    const deleteAudiencia = async(num) =>{
-        await updateByDate(date)
-        const aux = bydate
-        const index = aux.findIndex((element) => element.numeroLeg == num)
-        aux.splice(index, 1)
-        await updateDocument("audiencias", aux, date)
+    const deleteAudiencia = async(date, searchValLeg, searchValHora) =>{
+        await removeFromArray('audiencias', date, searchValLeg, searchValHora)
     }
 
     const addInfo = async(data) =>{
@@ -83,6 +83,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateTiposAudiencias,
         updateJueces,
         updateAños,
+        updateData,
         años,
         today,
         bydate,

@@ -43,7 +43,7 @@
     outline: 2px #dcc635 solid;
 }
 .inputLegajoBlock{
-    min-width: 235px;
+    min-width: 260px;
     width: fit-content;
 }
 
@@ -63,7 +63,7 @@
 }
 
 .inputJuezBlock select{
-    width: 100%;
+   width: calc(100% - 50px);
 }
 .inputSubmitBlock{
     padding: 0 10px 0 8px;
@@ -71,7 +71,7 @@
 .submitButton{
     width: 100%;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 32px;
     outline: none;
     border: none;
     background-color: #007bff;
@@ -84,7 +84,6 @@
 .inputError select, .inputError input, .inputAreaError{
     outline: 4px #dc3545 solid;
 }
-
 .audienciaListTable{
     color: white;
     font-weight: 700;
@@ -117,7 +116,7 @@
 
 .deleteButton{
     width: 100%;
-    height: 80px;
+    height: 40px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -129,7 +128,98 @@
 .deleteButtonBlock{
     padding: 8px;
 }
+.juecesButtonBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: calc(100% - 50px);
+}
+.inputJuezBlock{
+    max-width: 500px;
+}
+.tableCellJuez{
+    font-size: 18px;
+    min-width: 200px;
+}
+.editButton{
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #17a2b8;
+    margin-top: 2px;
+}
+.editButtonNot{
+    opacity: .3;
+}
 
+.inputSituacion{
+    padding: 0 5px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 40px;
+}
+.tableCellSituacion{
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px;
+}
+.inputSituacionEdit{
+    padding: 0 5px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 80px;
+    color: #fff;
+    font-size: 20px;
+    background-color: transparent;
+}
+.inputSituacionEdit::placeholder{
+    color: #fff;
+    font-size: 20px;
+}
+
+.selectSalaEdit{
+    appearance: none;
+    width: 80px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: none;
+    background-color: transparent;
+    color: #fff;
+}
+.selectSalaEdit option{
+    color: black;
+}
+.tableCellJuezN{
+    width: 80px;
+}
+.tableCellJuezN select{
+    width: 80px;
+    appearance: none;
+    font-size: 22px;
+    background-color: transparent;
+    border: white solid 1px;
+    border-radius: 5px;
+    font-weight: 700;
+    color: #fff;
+    padding: 5px;
+}
+.tableCellJuezN option{
+    color: #000;
+}
+.colegiadoButton{
+    background-color: #dcc635;
+    width: 60px;
+    padding: 10px;
+    font-weight: 700;
+}
 @keyframes errorMessage {
     0% {
         display: none;

@@ -14,6 +14,7 @@ export function AddBlock ({date}) {
     const [juez, setJuez] = useState(null)
     const [juez2, setJuez2] = useState(null)
     const [juez3, setJuez3] = useState(null)
+    const [situacion, setSituacion] = useState(null)
 
     const [horaError, setHoraError] = useState(false)
     const [salaError, setSalaError] = useState(false)
@@ -34,11 +35,6 @@ export function AddBlock ({date}) {
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
     }
-    function newFunction(){
-        var element = document.getElementById(" form_id ");
-         element.reset()
-      }
-
     const addToFirebase = async() =>{
         const newAudiencia = {
             hora: hora,
@@ -47,12 +43,12 @@ export function AddBlock ({date}) {
             tipo: tipo,
             juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
             estado: "PROGRAMADA",
+            situacion: (situacion ? situacion : '')
         }
         await addAudiencia(newAudiencia, `${date}`)
         document.getElementById('addingForm').reset();
         await updateByDate(date)
     }
-
     const handleSubmit = async(event) =>{
         event.preventDefault();
         errorChecking()
@@ -61,13 +57,11 @@ export function AddBlock ({date}) {
             await addToFirebase()
         }
     }
-
     useEffect(() => {
         updateTiposAudiencias()
         updateJueces()
         updateAños()
     }, [])
-
     return(
         <>
         {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError) && 
@@ -112,14 +106,16 @@ export function AddBlock ({date}) {
             })}
         </select></span>
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
-        <button type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>Colegiado</button>
-        <select onChange={(e)=>{setJuez(e.target.value)}}>
-            {jueces && jueces.sort().map((el) =>{
-                return(
-                    <option key={el} value={el}>{el}</option>
-                )
-            })}
-        </select>
+            <span className={`${styles.juecesButtonBlock}`}>
+            <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>COL</button>
+            <select onChange={(e)=>{setJuez(e.target.value)}}>
+                {jueces && jueces.sort().map((el) =>{
+                    return(
+                        <option key={el} value={el}>{el}</option>
+                    )
+                })}
+            </select>
+            </span>
         {(colegiado) && (
             <>
             <select onChange={(e)=>{setJuez2(e.target.value)}}>
@@ -138,6 +134,11 @@ export function AddBlock ({date}) {
             </select>
             </>
         )}
+        </span>
+        <span className={`${styles.inputItemBlock} ${styles.tableCell}`}>
+        </span>
+        <span className={`${styles.inputItemBlock} ${styles.tableCell}`}>
+            <input className={`${styles.inputArea} ${styles.inputSituacion}`} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
         </span>
         <span className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}  ${styles.tableCell}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></span>
         </form>

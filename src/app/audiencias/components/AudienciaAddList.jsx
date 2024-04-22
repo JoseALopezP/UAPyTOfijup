@@ -1,11 +1,11 @@
-import { useEffect, useContext } from 'react'
+import { useEffect, useContext} from 'react'
 import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
 import { AddBlock } from './AddBlock';
+import { AudienciaIndiv } from './AudienciaIndiv';
 
 export function AudienciaAddList ({date}) {
     const {updateByDate, bydate} = useContext(DataContext);
-    
     useEffect(() => {
         updateByDate(date)
     }, []);
@@ -18,19 +18,14 @@ export function AudienciaAddList ({date}) {
                     <span className={`${styles.tableCell}`}>LEGAJO</span>
                     <span className={`${styles.tableCell}`}>TIPO DE AUDIENCIA</span>
                     <span className={`${styles.tableCell}`}>JUEZ</span>
+                    <span className={`${styles.tableCell}`}>NAT</span>
+                    <span className={`${styles.tableCell}`}>SIT. CORPORAL</span>
                     <span className={`${styles.tableCell}`}>ACCIÓN</span>
                 </div>
                 <AddBlock date={date}/>
                 {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                     return(
-                        <div key={el.numeroLeg + el.hora} className={`${styles.tableRow} ${styles.audienciaList}`}> 
-                            <span className={`${styles.tableCell}`}>{el.hora}</span>
-                            <span className={`${styles.tableCell}`}>SALA {el.sala}</span>
-                            <span className={`${styles.tableCell}`}>{el.numeroLeg}</span>
-                            <span className={`${styles.tableCell}`}>{el.tipo}</span>
-                            <span className={`${styles.tableCell}`}>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</span>
-                            <span className={`${styles.tableCell} ${styles.deleteButtonBlock}`}><button className={`${styles.deleteButton}`}>ELIMINAR</button></span>
-                        </div>
+                        <AudienciaIndiv date={date} element={el}/>
                     )
                 })}
             </div>
