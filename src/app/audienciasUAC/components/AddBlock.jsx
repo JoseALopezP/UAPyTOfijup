@@ -140,6 +140,8 @@ export function AddBlock ({date}) {
         <span className={`${styles.inputItemBlock} ${styles.tableCell}`}>
             <input className={`${styles.inputArea} ${styles.inputSituacion}`} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
         </span>
+        <span className={`${styles.inputItemBlock} ${styles.tableCell}`}>
+        </span>
         <span className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}  ${styles.tableCell}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></span>
         </form>
         </>

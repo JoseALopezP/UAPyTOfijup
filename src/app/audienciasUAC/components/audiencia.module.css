@@ -125,9 +125,7 @@
     font-size: 20px;
     background-color: #dc3545;
 }
-.deleteButtonBlock{
-    padding: 8px;
-}
+
 .juecesButtonBlock{
     display: inline-flex;
     flex-direction: row;
@@ -164,7 +162,7 @@
     height: 40px;
 }
 .tableCellSituacion{
-    display: inline-flex;
+    display: table-cell;
     flex-direction: column;
     justify-content: center;
     padding: 5px;
@@ -174,7 +172,8 @@
     border-radius: 5px;
     border: none;
     font-size: 16px;
-    height: 80px;
+    height: 100%;
+    width: 100%;
     color: #fff;
     font-size: 20px;
     background-color: transparent;
@@ -182,6 +181,25 @@
 .inputSituacionEdit::placeholder{
     color: #fff;
     font-size: 20px;
+}
+.inputResultadoEdit{
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    font-size: 20px;
+    background-color: transparent;
+}
+.inputResultadoEdit::placeholder{
+    color: #fff;
+    font-size: 20px;
+}
+.tableCellResultado{
+    display: table-cell;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .selectSalaEdit{
@@ -230,9 +248,24 @@
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
+.deleteButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
 .audienciaCancelada{
     color: #dcc635;
     font-size: 16px;
+}
+.deleteButtonBlock{
+    padding: 20px 8px;
+    height: 100%;
+    width: 150px
+}
+.toDelete{
+    color: #dc3545;
+}
+.toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
+    color: #dc3545;
 }
 @keyframes errorMessage {
     0% {

@@ -20,6 +20,7 @@ export function AudienciaAddList ({date}) {
                     <span className={`${styles.tableCell}`}>JUEZ</span>
                     <span className={`${styles.tableCell}`}>NAT</span>
                     <span className={`${styles.tableCell}`}>SIT. CORPORAL</span>
+                    <span className={`${styles.tableCell}`}>RESULTADO</span>
                     <span className={`${styles.tableCell}`}>ACCIÓN</span>
                 </div>
                 <AddBlock date={date}/>

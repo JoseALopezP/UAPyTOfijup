@@ -220,6 +220,16 @@
     padding: 10px;
     font-weight: 700;
 }
+.deleteButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.toDelete{
+    color: #dc3545;
+}
+.toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
+    color: #dc3545;
+}
 @keyframes errorMessage {
     0% {
         display: none;

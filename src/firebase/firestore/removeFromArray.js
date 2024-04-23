@@ -7,10 +7,10 @@ export default async function removeFromArray(collectionName, documentId, search
     try {
         const docRef = doc(db, collectionName, documentId);
         const docSnapshot = await getDoc(docRef);
-
+        console.log(collectionName, documentId, searchValue1, searchValue2)
         if (docSnapshot.exists()) {
             const { list } = docSnapshot.data();
-            const indexToDelete = list.findIndex(item => item.value1 === searchValue1 && item.value2 === searchValue2);
+            const indexToDelete = list.findIndex(item => item.numeroLeg === searchValue1 && item.hora === searchValue2);
             if (indexToDelete !== -1) {
                 list.splice(indexToDelete, 1);
                 await updateDoc(docRef, { list });
