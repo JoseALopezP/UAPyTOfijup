@@ -17,14 +17,11 @@
 }
 .tableRow{
     height: 60px;
-<<<<<<< HEAD
 }
 .tableRowFinalizada{
     background-color: #fd7e14;
-=======
     outline: #375166 solid 2px;
     border: #396637 solid 2px;  
->>>>>>> f6bc6f6b5a3457c855039a202cc1c48064e0cfc0
 }
 .tableRow td{
     padding: 0 5px;

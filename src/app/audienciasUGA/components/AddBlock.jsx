@@ -67,6 +67,7 @@ export function AddBlock ({date}) {
         {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError) && 
             (<div className={`${styles.errorMessage}`}>DATOS INSUFICIENTES O INCORRECTOS</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
+        <span className={`${styles.tableCell}`}></span>
         <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
             <input  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
         </span>

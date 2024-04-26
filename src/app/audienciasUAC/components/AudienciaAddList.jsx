@@ -13,6 +13,7 @@ export function AudienciaAddList ({date}) {
         <section className={`${styles.audienciaListSection}`}>
             <div className={`${styles.audienciaListTable}`}>
                 <div className={`${styles.audienciaListTableHead} ${styles.tableRow}`}>
+                    <span className={`${styles.tableCell}`}>ADMIN</span>
                     <span className={`${styles.tableCell}`}>HORA</span>
                     <span className={`${styles.tableCell}`}>SALA</span>
                     <span className={`${styles.tableCell}`}>LEGAJO</span>

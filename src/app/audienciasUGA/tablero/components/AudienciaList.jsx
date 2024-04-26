@@ -13,11 +13,17 @@ export function AudienciaList ({date}) {
             clearInterval(timerID);
         };
     }, [])
+    const getMinutes = (dateObject) =>{
+        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
+        const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
+        return (timeComparison - nowTime)
+    }
     return(
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
                     <tr>
+                        <th>HORA</th>
                         <th>OPERADOR</th>
                         <th>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
@@ -29,15 +35,14 @@ export function AudienciaList ({date}) {
                 <tbody className={`${styles.tableBody}`}>
                     {today && today.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                         return(
-                            <tr key={el.numeroLeg + el.hora} className={el.estado == 'FINALIZADA' ? `${styles.tableRow} ${styles.tableRowFinalizada}` : `${styles.tableRow}`}> 
-                                <td>{el.admin && el.admin}</td>
+                            <tr key={el.numeroLeg + el.hora} className={`${styles.tableRow}`}> 
+                                <td>{el.hora}</td>
+                                <td>{el.operador && el.operador}</td>
                                 <td>{el.numeroLeg}</td>
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo}</td>
                                 <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-                                <td className={`${styles.tableCellJuezN}`}>{el.juezN && el.juezN.split(' ').map((word, i) => (i == 0) ?  `${word}` + ' ' : word.substring(0, 1))}</td>
                                 <td>{el.situacion && el.situacion}</td>
-                                <td>{el.resultado && el.resultado}</td>
-                                <td>{(el.hito && el.estado == "FINALIZADA") && el.hito[el.hito.length() - 1].split('|')[0]}</td>
+                                {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
                             </tr>
                         )
                     })}

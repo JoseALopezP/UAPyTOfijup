@@ -57,31 +57,32 @@
     font-size: 24px;
     background-color: #375166;
     color: white;
+    height: 100%;
+    width: 100%;
     border-radius: 5px;
     margin: 10px 0;
 }
 .stateButtonFinalizarcuarto{
     background-color: #20c997;
-    height: 60%;
 }
 .stateButtonIniciar{
     background-color: #28a745;
-    height: 25%;
 }
 .stateButtonSuspender{
     background-color: #fd7e14;
-    height: 15%;
 }   
 .stateButtonFinalizar{
     background-color: #dc3545;
-    height: 30%;
 }
 .stateButtonCuarto{
     background-color: #6c757d;
-    height: 30%;
+}
+.buttonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
 
-.stateButtonCancelar{
+.stateButtonCerrar{
     position: fixed;
     background-color: #fff;
     color: #000;
@@ -93,14 +94,12 @@
 }
 .changeBlock{
     display: inline-flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 15%;
     width: 100%;
 }
 .stateButtonChange{
     background-color: #6c757d;
-    height: 100%;
-    width: 80%;
 }
 .salaSelector{
     width: 20%;

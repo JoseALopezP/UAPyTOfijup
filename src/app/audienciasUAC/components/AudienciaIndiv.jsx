@@ -6,6 +6,7 @@ export function AudienciaIndiv ({date, element}) {
     const {updateByDate, jueces, updateData, deleteAudiencia} = useContext(DataContext);
     const [editable, setEditable] = useState(false)
     const [situacion, setSituacion] = useState(null)
+    const [admin, setAdmin] = useState(null)
     const [resultado, setResultado] = useState(null)
     const [cancelar, setCancelar] = useState(false)
     const [juezN, setJuezN] = useState(null)
@@ -18,6 +19,9 @@ export function AudienciaIndiv ({date, element}) {
             }
             if(!(!situacion | situacion == '-' | situacion == '')){
                 await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
+            }
+            if(!(!admin | admin == '')){
+                await updateData(date, element.numeroLeg, element.hora, 'admin', admin)
             }
             if(!(!juezN | juezN == '-' | juezN == '' | element.juezN == juezN)){
                 await updateData(date, element.numeroLeg, element.hora, 'juezN', juezN)
@@ -34,7 +38,7 @@ export function AudienciaIndiv ({date, element}) {
         }
     }
     const checkEditing = () =>{
-        if((!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud)){
+        if((!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud)){
             setEditable(false)
         }else{
             setEditable(true)
@@ -43,6 +47,9 @@ export function AudienciaIndiv ({date, element}) {
     useEffect(() => {
         checkEditing()
     }, [deleteAud]);
+    useEffect(() => {
+        checkEditing()
+    }, [admin]);
     useEffect(() => {
         checkEditing()
     }, [resultado]);
@@ -60,6 +67,9 @@ export function AudienciaIndiv ({date, element}) {
     }, []);
     return(
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
+            <span className={`${styles.tableCell}`}>
+                <input type='text' className={`${styles.inputSituacionEdit}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
+            </span>
             <span className={`${styles.tableCell}`}>{element.hora}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 {element.estado == 'CANCELADA' ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>:
@@ -83,7 +93,7 @@ export function AudienciaIndiv ({date, element}) {
                 <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellResultado}`}>
-                <textarea onChange={(e)=>{setResultado(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.resultado} className={`${styles.inputResultadoEdit}`}/>
+                <textarea onChange={(e)=>{setResultado(e.target.value)}} type="text" id="ingresarResultado" placeholder={element.resultado} className={`${styles.inputResultadoEdit}`}/>
             </span>
             <span className={`${styles.tableCell} ${styles.deleteButtonBlock}`}>
                 <button type="button" className={deleteAud ? `${styles.deleteButton} ${styles.deleteButtonClicked}` : `${styles.deleteButton}`} onClick={()=> setDeleteAud(!deleteAud)}>ELIMINAR</button>
