@@ -18,14 +18,12 @@ export function AudienciaList ({date}) {
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
                     <tr>
-                        <th>ADMIN</th>
+                        <th>OPERADOR</th>
                         <th>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
                         <th>JUEZ</th>
-                        <th>NATURAL</th>
                         <th>SITUACIÓN</th>
-                        <th>RESULTADO</th>
-                        <th>FINALIZADA</th>
+                        <th>ESTADO</th>
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
