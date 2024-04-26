@@ -267,6 +267,9 @@
 .toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
     color: #dc3545;
 }
+.inputAdmin{
+    border: solid white 1px;
+}
 @keyframes errorMessage {
     0% {
         display: none;

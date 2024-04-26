@@ -68,7 +68,7 @@ export function AudienciaIndiv ({date, element}) {
     return(
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
             <span className={`${styles.tableCell}`}>
-                <input type='text' className={`${styles.inputSituacionEdit}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
+                <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
             </span>
             <span className={`${styles.tableCell}`}>{element.hora}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>

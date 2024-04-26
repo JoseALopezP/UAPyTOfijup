@@ -234,6 +234,9 @@
     width: 80px;
     height: 40px;
 }
+.operadorInput{
+    border: solid white 1px;
+}
 @keyframes errorMessage {
     0% {
         display: none;
