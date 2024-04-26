@@ -18,7 +18,10 @@ export function AudienciaList ({date}) {
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
                     <tr>
+<<<<<<< HEAD
                         <th>ADMIN</th>
+=======
+>>>>>>> f6bc6f6b5a3457c855039a202cc1c48064e0cfc0
                         <th>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
                         <th>JUEZ</th>
@@ -31,8 +34,12 @@ export function AudienciaList ({date}) {
                 <tbody className={`${styles.tableBody}`}>
                     {today && today.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                         return(
+<<<<<<< HEAD
                             <tr key={el.numeroLeg + el.hora} className={el.estado == 'FINALIZADA' ? `${styles.tableRow} ${styles.tableRowFinalizada}` : `${styles.tableRow}`}> 
                                 <td>{el.admin && el.admin}</td>
+=======
+                            <tr key={el.numeroLeg + el.hora} className={el.estado == 'FINALIZADA' ? `${styles.tableRow}` : `${styles.tableRow} ${styles.tableRowFinalizada}`}> 
+>>>>>>> f6bc6f6b5a3457c855039a202cc1c48064e0cfc0
                                 <td>{el.numeroLeg}</td>
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo}</td>
                                 <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
