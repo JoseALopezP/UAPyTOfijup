@@ -25,7 +25,7 @@ export default function MenuSelector() {
             &nbsp;/&nbsp;
             <input onChange={(e)=>{setYearUGA(e.target.value)}} type='number' min={2021} max={2025} className={`${styles.inputYear}`}/>
           </span>
-          <Link href={'/audienciasUAC/' + dayUGA + monthUGA + yearUGA} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>
+          <Link href={'/audienciasUGA/' + dayUGA + monthUGA + yearUGA} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>
           <Link href="/audienciasUGA/listaAudiencias" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
           <Link href="/audienciasUAC/tablero" className={`${styles.linkRedirection}`}>UAC TABLERO</Link>
           <span className={`${styles.linkRedirection} ${styles.inputDate}`}>
