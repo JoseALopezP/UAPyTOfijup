@@ -52,7 +52,12 @@
     display: table-cell;
 }
 .inputTipoBlock{
-    width: 80px;
+    max-width: 40%;
+    font-size: 20px;
+}
+.inputTipoBlock option{
+    font-size: 20px;
+    max-width: 40%;
 }
 .inputLegajoBlock input{
     width: 48px;
