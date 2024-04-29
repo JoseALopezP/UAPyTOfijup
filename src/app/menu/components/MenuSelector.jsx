@@ -25,7 +25,8 @@ export default function MenuSelector() {
             &nbsp;/&nbsp;
             <input onChange={(e)=>{setYearUGA(e.target.value)}} type='number' min={2021} max={2025} className={`${styles.inputYear}`}/>
           </span>
-          <Link href={'/audienciasUGA/' + dayUGA + monthUGA + yearUGA} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>
+          {(dayUGA && monthUGA && yearUGA)&&
+          (<Link href={'/audienciasUGA/' + dayUGA.padStart(2,'0') + monthUGA.padStart(2,'0') + yearUGA.padStart(4,'20')} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>)}
           <Link href="/audienciasUGA/listaAudiencias" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
           <Link href="/audienciasUAC/tablero" className={`${styles.linkRedirection}`}>UAC TABLERO</Link>
           <span className={`${styles.linkRedirection} ${styles.inputDate}`}>
@@ -35,7 +36,8 @@ export default function MenuSelector() {
             &nbsp;/&nbsp;
             <input onChange={(e)=>{setYearUAC(e.target.value)}} type='number' min={2021} max={2025} className={`${styles.inputYear}`}/>
           </span>
-          <Link href={'/audienciasUAC/' + dayUAC + monthUAC + yearUAC} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
+          {(dayUAC && monthUAC && yearUAC)&&
+          (<Link href={'/audienciasUAC/' + dayUAC + monthUAC + yearUAC} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>)}
         </div>
       </section>
     )
