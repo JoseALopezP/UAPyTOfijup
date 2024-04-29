@@ -74,7 +74,7 @@
 
 .infoBlock img{
     opacity: 0%;
-    width: 300px;
+    max-width: 100%;
     clip-path: polygon(40px 0%, 100% 0%, 260px 100%, 0% 100%);
 }
 .textBlock{

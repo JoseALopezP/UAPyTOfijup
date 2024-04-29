@@ -24,13 +24,19 @@ export function AddBlock ({date}) {
     const [juezError, setJuezError] = useState(false)
 
     const errorChecking = () =>{
+        setHoraError(false)
+        setSalaError(false)
+        setLegajo2Error(false)
+        setLegajo3Error(false)
+        setTipoError(false)
+        setJuezError(false)
         hora ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
         (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
         if(colegiado){
-            ((juez || juez == '-') || (juez2 || juez == '-') || (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
+            ((juez || juez == '-' ) && (juez2 || juez == '-') && (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
