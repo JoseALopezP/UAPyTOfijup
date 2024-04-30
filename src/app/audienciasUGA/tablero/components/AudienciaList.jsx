@@ -8,7 +8,7 @@ export function AudienciaList ({date}) {
         updateToday();     
     }
     useEffect(() =>{
-        const timerID = setInterval(() => tick(), 5000);  
+        const timerID = setInterval(() => tick(), 30000);  
         return function cleanup() {
             clearInterval(timerID);
         };
@@ -23,11 +23,11 @@ export function AudienciaList ({date}) {
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
                     <tr>
-                        <th>HORA</th>
-                        <th>OPERADOR</th>
-                        <th>LEGAJO</th>
+                        <th className={`${styles.tableCellHora}`}>HORA</th>
+                        <th className={`${styles.tableCellOperador}`}>OPERADOR</th>
+                        <th className={`${styles.tableCellLeg}`}>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
-                        <th>JUEZ</th>
+                        <th className={`${styles.tableCellJuez}`}>JUEZ</th>
                         <th>SITUACIÓN</th>
                         <th>ESTADO</th>
                     </tr>
@@ -36,12 +36,12 @@ export function AudienciaList ({date}) {
                     {today && today.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                         return(
                             <tr key={el.numeroLeg + el.hora} className={`${styles.tableRow}`}> 
-                                <td>{el.hora}</td>
-                                <td>{el.operador && el.operador}</td>
-                                <td>{el.numeroLeg}</td>
+                                <td className={`${styles.tableCellHora}`}>{el.hora}</td>
+                                <td className={`${styles.tableCellOperador}`}>{el.operador && el.operador}</td>
+                                <td className={`${styles.tableCellLeg}`}>{el.numeroLeg}</td>
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo}</td>
-                                <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-                                <td>{el.situacion && el.situacion}</td>
+                                <td className={`${styles.tableCellJuez}`}>{el.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(0,3).join(' ')}<br/></span>)}</td>
+                                <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>
                                 {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
                             </tr>
                         )

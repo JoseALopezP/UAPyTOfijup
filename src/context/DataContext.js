@@ -9,6 +9,7 @@ import getDocument from "@/firebase/firestore/getDocument";
 import checkDoc from "@/firebase/firestore/checkDoc";
 import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument";
 import updateDocument from "@/firebase/firestore/updateDocument";
+import pushToHitos from "@/firebase/firestore/pushToHitos";
 import updateListItem from "@/firebase/firestore/updateListItem";
 export const DataContext = createContext({});
 
@@ -41,7 +42,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         setInformacion(await getCollection('informacion'))
     }
     const pushtToArray = async(date, searchValLeg, searchValHora, property, newValue) => {
-        await pushToHitosInList('audiencias', date, searchValLeg, searchValHora, property, newValue)
+        await pushToHitos('audiencias', date, searchValLeg, searchValHora, property, newValue)
     }
     const updateState = async(state, num, date) =>{
         await updateByDate(date)

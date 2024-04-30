@@ -4,6 +4,7 @@
 }
 .table{
     width: 100%;
+    table-layout: fixed;
 }
 .tableHead{
     font-size: 32px;
@@ -24,9 +25,23 @@
 .tableRow td{
     padding: 0 5px;
 }
+.tableCellHora{
+    width: 120px;
+    text-align: center;
+}
+.tableCellOperador{
+    width: 180px;
+    text-align: center;
+}
+.tableCellLeg{
+    width: 250px;
+    text-align: center;
+}
 .tableCellTipo{
     text-align: center;
-    font-size: 20px;
+}
+.tableCellJuez{
+    width: 400px;
 }
 .tableCellJuezN{
     text-align: center;

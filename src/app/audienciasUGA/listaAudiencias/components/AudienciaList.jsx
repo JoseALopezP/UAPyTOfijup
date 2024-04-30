@@ -6,9 +6,15 @@ import { DataContext } from '@/context/DataContext';
 
 export function AudienciaList () {
     const {updateToday, today} = useContext(DataContext);
-    useEffect(() => {
-        updateToday()
-    }, []);
+    function tick() {
+        updateToday();     
+    }
+    useEffect(() =>{
+        const timerID = setInterval(() => tick(), 5000);  
+        return function cleanup() {
+            clearInterval(timerID);
+        };
+    }, [])
     return(
         <>
         <section className={`${styles.tableSection}`}>
