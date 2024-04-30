@@ -3,7 +3,7 @@ import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);
 
-export default async function pushToHitos(collectionName, documentId, searchValue1, searchValue2, newHitosItems) {
+export default async function pushToHitos(collectionName, documentId, searchValue1, searchValue2, newHitosItem) {
     try {
         const docRef = doc(db, collectionName, documentId);
         const docSnapshot = await getDoc(docRef);
@@ -16,7 +16,7 @@ export default async function pushToHitos(collectionName, documentId, searchValu
                     listItem.hitos = [];
                 }
                 let { hitos } = listItem;
-                hitos.push(...newHitosItems);
+                hitos.push(newHitosItem);
                 listItem.hitos = hitos;
                 list[list.indexOf(listItem)] = listItem;
                 await updateDoc(docRef, { list });

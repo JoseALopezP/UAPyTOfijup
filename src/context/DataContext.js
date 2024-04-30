@@ -41,8 +41,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateInformacion = async() =>{
         setInformacion(await getCollection('informacion'))
     }
-    const pushtToArray = async(date, searchValLeg, searchValHora, property, newValue) => {
-        await pushToHitos('audiencias', date, searchValLeg, searchValHora, property, newValue)
+    const pushtToArray = async(date, searchValLeg, searchValHora, newValue) => {
+        await pushToHitos('audiencias', date, searchValLeg, searchValHora, newValue)
     }
     const updateState = async(state, num, date) =>{
         await updateByDate(date)
