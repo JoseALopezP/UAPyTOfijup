@@ -176,9 +176,6 @@
 .tableCellTipo option{
     font-size: 14px;
 }
-.tableCellJuez{
-    max-width: 300px;
-}
 .editButton{
     width: 100%;
     height: 40px;

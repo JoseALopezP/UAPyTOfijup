@@ -67,18 +67,18 @@ export function AudienciaIndiv ({date, element}) {
     }, []);
     return(
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
-            <span className={`${styles.tableCell}`}>
+            <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
                 <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
             </span>
-            <span className={`${styles.tableCell}`}>{element.hora}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellHora}`}>{element.hora}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 {element.estado == 'CANCELADA' ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>:
                     <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button>
                 }
             </span>
-            <span className={`${styles.tableCell}`}>{element.numeroLeg}</span>
-            <span className={`${styles.tableCell}`}>{element.tipo}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellJuez}`}>{element.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>
                 <select onChange={(e)=>{setJuezN(e.target.value)}}>
                     {element.juezN ? <option key={element.juezN} value={element.juezN}>{element.juezN.split(' ').map(word => word.substring(0, 1))}</option> : <option></option>}
@@ -89,13 +89,13 @@ export function AudienciaIndiv ({date, element}) {
                     })}
                 </select>
             </span>
-            <span className={`${styles.tableCell} ${styles.tableCellSituacion}`}>
+            <span className={`${styles.tableCell} ${styles.tableCellSituacion} ${styles.tableCellSituacionIndiv}`}>
                 <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
             </span>
-            <span className={`${styles.tableCell} ${styles.tableCellResultado}`}>
+            <span className={`${styles.tableCell} ${styles.tableCellResultado} ${styles.tableCellResultadoIndiv}`}>
                 <textarea onChange={(e)=>{setResultado(e.target.value)}} type="text" id="ingresarResultado" placeholder={element.resultado} className={`${styles.inputResultadoEdit}`}/>
             </span>
-            <span className={`${styles.tableCell} ${styles.deleteButtonBlock}`}>
+            <span className={`${styles.tableCell} ${styles.deleteButtonBlock} ${styles.tableCellAction}`}>
                 <button type="button" className={deleteAud ? `${styles.deleteButton} ${styles.deleteButtonClicked}` : `${styles.deleteButton}`} onClick={()=> setDeleteAud(!deleteAud)}>ELIMINAR</button>
                 <button type="submit" className={editable ? `${styles.editButton}` : `${styles.editButton} ${styles.editButtonNot}`}>EDITAR</button>
             </span>
