@@ -73,8 +73,8 @@ export function AddBlock ({date}) {
         {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError) && 
             (<div className={`${styles.errorMessage}`}>DATOS INSUFICIENTES O INCORRECTOS</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
-        <span className={`${styles.tableCell}`}></span>
-        <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
+        <span className={`${styles.tableCell} ${styles.tableCellOP}`}></span>
+        <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableHora}` : `${styles.tableCell} ${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.tableCellHora}`}>
             <input  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
         </span>
         <span className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputSalaBlock} ${styles.inputItemBlock}` }>
@@ -92,7 +92,7 @@ export function AddBlock ({date}) {
                 <option value={"10"}>SALA 10</option>
             </select>
         </span>
-        <span className={`${styles.inputLegajoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
+        <span className={`${styles.inputLegajoBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellLegajo}`}>
             <select onChange={(e)=>{setLegajo1(e.target.value)}}>
                 <option value={"MPF-SJ"}>MPF-SJ</option>
                 <option value={"OJU-SJ"}>OJU-SJ</option>
@@ -106,17 +106,17 @@ export function AddBlock ({date}) {
                 })}
             </select>
         </span>
-        <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}><select onChange={(e)=>{setTipo(e.target.value)}}>
+        <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellTipo}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellTipo}`}><select onChange={(e)=>{setTipo(e.target.value)}}>
             {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
                 )
             })}
         </select></span>
-        <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
+        <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellJuez}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellJuez}`}>
             <span className={`${styles.juecesButtonBlock}`}>
-            <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>COL</button>
-            <select onChange={(e)=>{setJuez(e.target.value)}}>
+            <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>{colegiado ? 'COL' : 'UNI'}</button>
+            <select className={`${styles.uniSelect}`} onChange={(e)=>{setJuez(e.target.value)}}>
                 {jueces && jueces.sort().map((el) =>{
                     return(
                         <option key={el} value={el}>{el}</option>
@@ -126,14 +126,14 @@ export function AddBlock ({date}) {
             </span>
         {(colegiado) && (
             <>
-            <select onChange={(e)=>{setJuez2(e.target.value)}}>
+            <select className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez2(e.target.value)}}>
             {jueces && jueces.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
                 )
             })}
             </select>
-            <select onChange={(e)=>{setJuez3(e.target.value)}}>
+            <select className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez3(e.target.value)}}>
                 {jueces && jueces.sort().map((el) =>{
                     return(
                         <option key={el} value={el}>{el}</option>
@@ -143,10 +143,10 @@ export function AddBlock ({date}) {
             </>
         )}
         </span>
-        <span className={`${styles.inputItemBlock} ${styles.tableCell}`}>
+        <span className={`${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellSituacion}`}>
             <input className={`${styles.inputArea} ${styles.inputSituacion}`} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
         </span>
-        <span className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}  ${styles.tableCell}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></span>
+        <span className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}  ${styles.tableCell}  ${styles.tableCellAction}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></span>
         </form>
         </>
     )
