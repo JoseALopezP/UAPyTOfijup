@@ -1,4 +1,7 @@
+'use client'
 import { AudienciaList } from "./components/AudienciaList";
+import { useContext } from "react";
+import { DataContextProvider } from "@/context/DataContext";
 
 export default function listaAudiencias() {
   /*useEffect(() => {
@@ -6,7 +9,10 @@ export default function listaAudiencias() {
   }, [user]) */
   return (
     <>
+    <DataContextProvider>
       <AudienciaList/>
+    </DataContextProvider>
+      
     </>
   )
 }

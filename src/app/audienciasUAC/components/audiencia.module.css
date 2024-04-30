@@ -1,0 +1,355 @@
+.audienciaListSection{
+    width: 100vw;
+}
+.audienciaListTable{
+    width: 100vw;
+    display: table;
+    table-layout: fixed;
+}
+.audienciaListTableHead{
+    width: 100vw;
+    text-align: center;
+}
+.inputLegajoBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: fit-content;
+}
+.addAudienciaRow{
+    height: 80px;
+    vertical-align: middle;
+    padding: auto;
+    width: 100%;
+    display: table-row;
+
+}
+
+.tableRow{
+    display: table-row;
+}
+.tableCell{
+    display: table-cell;
+    padding: 0 8px;
+    overflow: hidden;
+}
+
+.addAudienciaRow select, .addAudienciaRow input, .addAudienciaRow button{
+    height: 40px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 2px;
+    border: none;
+    padding: 0;
+}
+.addAudienciaRow input:focus-visible{
+    outline: 2px #dcc635 solid;
+}
+.inputLegajoBlock{
+    min-width: 260px;
+    width: fit-content;
+}
+
+.inputItemBlock{
+    padding: 20px 5px;
+    display: table-cell;
+}
+.inputTipoBlock{
+    width: 80px;
+}
+.inputLegajoBlock input{
+    width: 48px;
+    padding: 0 6px;
+}
+.inputLegajoBlock select{
+    padding: 0 6px;
+}
+
+.inputJuezBlock select{
+   width: calc(100% - 50px);
+}
+.inputSubmitBlock{
+    padding: 0 10px 0 8px;
+}
+.submitButton{
+    width: 100%;
+    font-weight: 700;
+    font-size: 32px;
+    outline: none;
+    border: none;
+    background-color: #007bff;
+    color: white;
+}
+
+.submitButton:focus-visible{
+    outline: 2px #dcc635 solid;
+}
+.inputError select, .inputError input, .inputAreaError{
+    outline: 4px #dc3545 solid;
+}
+.audienciaListTable{
+    color: white;
+    font-weight: 700;
+    font-size: 24px;
+}
+.audienciaList{
+    height: 80px;
+}
+.audienciaListTable .audienciaList:nth-child(odd){
+    background-color: #475f74;
+}
+.audienciaListTable .audienciaList:nth-child(even){
+    background-color: #375166;
+}
+
+.errorMessage{
+    position:fixed;
+    width: 100%;
+    text-align: center;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 80px;
+    background-color: #dc3545;
+    animation: errorMessage 2s;
+    animation-fill-mode: both;
+    -webkit-animation: errorMessage 2s;
+    -webkit-animation-fill-mode: both;
+}
+
+.deleteButton{
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #dc3545;
+}
+
+.juecesButtonBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: calc(100% - 50px);
+}
+.inputJuezBlock{
+    max-width: 500px;
+}
+.tableCellJuez{
+    font-size: 18px;
+    min-width: 200px;
+}
+.editButton{
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #17a2b8;
+    margin-top: 2px;
+}
+.editButtonNot{
+    opacity: .3;
+}
+
+.inputSituacion{
+    padding: 0 5px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 40px;
+}
+.tableCellSituacion{
+    display: table-cell;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px;
+}
+.inputSituacionEdit{
+    padding: 0 5px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    font-size: 20px;
+    background-color: transparent;
+}
+.inputSituacionEdit::placeholder{
+    color: #fff;
+    font-size: 20px;
+}
+.inputResultadoEdit{
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    font-size: 20px;
+    background-color: transparent;
+}
+.inputResultadoEdit::placeholder{
+    color: #fff;
+    font-size: 20px;
+}
+.tableCellResultado{
+    display: table-cell;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.selectSalaEdit{
+    appearance: none;
+    width: 80px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: none;
+    background-color: transparent;
+    color: #fff;
+}
+.selectSalaEdit option{
+    color: black;
+}
+.tableCellJuezN{
+    width: 95%;
+}
+.tableCellJuezN select{
+    width: 95%;
+    appearance: none;
+    font-size: 22px;
+    background-color: transparent;
+    border: white solid 1px;
+    border-radius: 5px;
+    font-weight: 700;
+    color: #fff;
+    padding: 5px;
+}
+.tableCellJuezN option{
+    color: #000;
+}
+.colegiadoButton{
+    background-color: #dcc635;
+    width: 60px;
+    padding: 10px;
+    font-weight: 700;
+}
+.cancelarButton{
+    background-color: #fd7e14;
+    border-radius: 5px;
+    border: none;
+    height: 60px;
+}
+.cancelarButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.deleteButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.audienciaCancelada{
+    color: #dcc635;
+    font-size: 16px;
+}
+.deleteButtonBlock{
+    padding: 20px 8px;
+    height: 100%;
+    width: 150px
+}
+.toDelete{
+    color: #dc3545;
+}
+.toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
+    color: #dc3545;
+}
+.inputAdmin{
+    border: solid white 1px;
+}
+.juecesButtonBlock{
+    width: 100%;
+}
+.tableCell input{
+    width: 95%;
+}
+.tableCell select{
+    width: 100%;
+}
+.inputItemBlock select{
+    width: 100%;
+}
+.inputItemBlock input{
+    width: 100%;
+}
+.inputSituacionEdit{
+    width: 100%;
+    height: 30px;
+}
+.tableCell .operadorInput{
+    width: 80px;
+    height: 40px;
+}
+.operadorInputBlock{
+    width: 80px;
+}
+.tableCellJuez{
+    font-size: 14px;
+}
+.tableCellNumeroLeg{
+    font-size: 20px;
+}
+.tableCellTipo{
+    font-size: 20px;
+}
+.operadorInputBlock{
+    width: 60px;
+}
+.selectSalaEdit{
+    font-size: 18px;
+}
+.tableCellHora{
+    font-size: 22px;
+}
+.deleteButton, .editButton{
+    font-size: 16px;
+}
+.audienciaListTableHead{
+    font-size: 20px;
+}
+
+@keyframes errorMessage {
+    0% {
+        display: none;
+    }
+    1%{
+        display: inline-flex;
+    }
+    50%{
+      opacity: 100%;
+    }
+    99%{
+      opacity: 0%;
+    }
+    100%{
+        display: none;
+    }
+}
+@media (max-width: 1200px) {
+    .audienciaList .tableCell{
+        padding: 0 8px;
+    }
+    .tableCellJuezN{
+        width: 80px;
+        font-size: 14px;
+    }
+    .tableCellJuezN select{
+        width: 100px;
+        font-size: 14px;
+    }
+}

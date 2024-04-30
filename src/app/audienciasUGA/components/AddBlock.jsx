@@ -14,6 +14,7 @@ export function AddBlock ({date}) {
     const [juez, setJuez] = useState(null)
     const [juez2, setJuez2] = useState(null)
     const [juez3, setJuez3] = useState(null)
+    const [situacion, setSituacion] = useState(null)
 
     const [horaError, setHoraError] = useState(false)
     const [salaError, setSalaError] = useState(false)
@@ -23,22 +24,23 @@ export function AddBlock ({date}) {
     const [juezError, setJuezError] = useState(false)
 
     const errorChecking = () =>{
+        setHoraError(false)
+        setSalaError(false)
+        setLegajo2Error(false)
+        setLegajo3Error(false)
+        setTipoError(false)
+        setJuezError(false)
         hora ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
         (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
         if(colegiado){
-            ((juez || juez == '-') || (juez2 || juez == '-') || (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
+            ((juez || juez == '-' ) && (juez2 || juez == '-') && (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
     }
-    function newFunction(){
-        var element = document.getElementById(" form_id ");
-         element.reset()
-      }
-
     const addToFirebase = async() =>{
         const newAudiencia = {
             hora: hora,
@@ -47,12 +49,12 @@ export function AddBlock ({date}) {
             tipo: tipo,
             juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
             estado: "PROGRAMADA",
+            situacion: (situacion ? situacion : '')
         }
         await addAudiencia(newAudiencia, `${date}`)
         document.getElementById('addingForm').reset();
         await updateByDate(date)
     }
-
     const handleSubmit = async(event) =>{
         event.preventDefault();
         errorChecking()
@@ -61,18 +63,17 @@ export function AddBlock ({date}) {
             await addToFirebase()
         }
     }
-
     useEffect(() => {
         updateTiposAudiencias()
         updateJueces()
         updateAños()
     }, [])
-
     return(
         <>
         {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError) && 
             (<div className={`${styles.errorMessage}`}>DATOS INSUFICIENTES O INCORRECTOS</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
+        <span className={`${styles.tableCell} ${styles.tableCellOP}`}></span>
         <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
             <input  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
         </span>
@@ -88,6 +89,7 @@ export function AddBlock ({date}) {
                 <option value={"7"}>SALA 7</option>
                 <option value={"8"}>SALA 8</option>
                 <option value={"9"}>SALA 9</option>
+                <option value={"10"}>SALA 10</option>
             </select>
         </span>
         <span className={`${styles.inputLegajoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
@@ -95,7 +97,7 @@ export function AddBlock ({date}) {
                 <option value={"MPF-SJ"}>MPF-SJ</option>
                 <option value={"OJU-SJ"}>OJU-SJ</option>
             </select>
-            <input className={legajo2Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}` } type="text" id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
+            <input className={legajo2Error ? `${styles.inputAreaError} ${styles.inputArea} ${styles.legajoInput}` : `${styles.inputArea} ${styles.legajoInput}` } type="text" id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
             <select className={legajo3Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}`} onChange={(e)=>{setLegajo3(e.target.value)}}>
                 {años && años.map(el =>{
                     return(
@@ -112,14 +114,16 @@ export function AddBlock ({date}) {
             })}
         </select></span>
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
-        <button type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>Colegiado</button>
-        <select onChange={(e)=>{setJuez(e.target.value)}}>
-            {jueces && jueces.sort().map((el) =>{
-                return(
-                    <option key={el} value={el}>{el}</option>
-                )
-            })}
-        </select>
+            <span className={`${styles.juecesButtonBlock}`}>
+            <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>COL</button>
+            <select onChange={(e)=>{setJuez(e.target.value)}}>
+                {jueces && jueces.sort().map((el) =>{
+                    return(
+                        <option key={el} value={el}>{el}</option>
+                    )
+                })}
+            </select>
+            </span>
         {(colegiado) && (
             <>
             <select onChange={(e)=>{setJuez2(e.target.value)}}>
@@ -138,6 +142,9 @@ export function AddBlock ({date}) {
             </select>
             </>
         )}
+        </span>
+        <span className={`${styles.inputItemBlock} ${styles.tableCell}`}>
+            <input className={`${styles.inputArea} ${styles.inputSituacion}`} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
         </span>
         <span className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}  ${styles.tableCell}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></span>
         </form>

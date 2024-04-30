@@ -1,0 +1,64 @@
+.tableSection{
+    width: calc(100vw - 100% + 100%);
+    color: white;
+}
+.table{
+    width: 100%;
+}
+.tableHead{
+    font-size: 32px;
+    font-weight: 700;
+    width: 100%;
+    background-color: white;
+    color: #375166;
+}
+.tableBody{
+    font-size: 24px;
+}
+.tableRow{
+    height: 60px;
+}
+.tableRowFinalizada{
+    background-color: #fd7e14;
+}
+.tableRow td{
+    padding: 0 5px;
+}
+.tableCellTipo{
+    text-align: center;
+    font-size: 20px;
+}
+.tableCellJuezN{
+    text-align: center;
+}
+.tableBody tr:nth-child(odd){
+    background-color: #375166;
+}
+.tableBody tr:nth-child(even){
+    background-color: #475f74;
+}
+
+.DEMORADA{
+    background-color: #fd7e14;
+    text-align: center;
+}
+.PROGRAMADA{
+    text-align: center;
+    background-color: #007bff;
+}
+.EN_CURSO{
+    background-color: #17a2b8;
+    text-align: center;
+}
+.CANCELADA{
+    background-color: #dc3545; 
+    text-align: center;
+}
+.CUARTO_INTERMEDIO{
+    background-color: #ffc107;
+    text-align: center;
+}
+.FINALIZADA {
+    background-color: #28a745;
+    text-align: center;
+}

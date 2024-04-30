@@ -16,7 +16,7 @@ export function ScheduleTable () {
         if(today){
             today.forEach((item) =>{
                 switch(item.estado){
-                    case 'INICIADA':
+                    case 'EN_CURSO':
                         if(getMinutes(item.hora) < 120){
                             aux2.push(item)
                         }
@@ -26,7 +26,7 @@ export function ScheduleTable () {
                             aux2.push(item)
                         }
                         break;
-                    case 'CUARTO INTERMEDIO':
+                    case 'CUARTO_INTERMEDIO':
                         if(getMinutes(item.hora) < 120){
                             aux2.push(item)
                         }
@@ -35,7 +35,7 @@ export function ScheduleTable () {
                         aux2.push(item)
                         break;
                     case 'FINALIZADA':
-                        if(getMinutes(item.hora) < 120 & getMinutes(item.hora) > -60){
+                        if(getMinutes(item.hora) < 120 & getMinutes(item.hora) > -120){
                             aux2.push(item)
                         }
                         break;

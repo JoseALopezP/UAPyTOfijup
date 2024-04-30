@@ -74,7 +74,7 @@
 
 .infoBlock img{
     opacity: 0%;
-    width: 300px;
+    max-width: 100%;
     clip-path: polygon(40px 0%, 100% 0%, 260px 100%, 0% 100%);
 }
 .textBlock{
@@ -155,23 +155,28 @@
 }
 
 .DEMORADA{
-    color: #fd7e14;
-    font-size: 32px;
+    background-color: #fd7e14;
+    text-align: center;
 }
 .PROGRAMADA{
-    color: #007bff;
+    text-align: center;
+    background-color: #007bff;
 }
 .EN_CURSO{
-    color: #17a2b8;
+    background-color: #17a2b8;
+    text-align: center;
 }
 .CANCELADA{
-    color: #dc3545;    
+    background-color: #dc3545; 
+    text-align: center;
 }
 .CUARTO_INTERMEDIO{
-    color: #ffc107;
+    background-color: #ffc107;
+    text-align: center;
 }
 .FINALIZADA {
-    color: #28a745;
+    background-color: #28a745;
+    text-align: center;
 }
 
 @keyframes infoAppear {

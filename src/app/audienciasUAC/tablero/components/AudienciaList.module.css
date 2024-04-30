@@ -1,0 +1,41 @@
+.tableSection{
+    width: calc(100vw - 100% + 100%);
+    color: white;
+}
+.table{
+    width: 100%;
+}
+.tableHead{
+    font-size: 32px;
+    font-weight: 700;
+    width: 100%;
+    background-color: white;
+    color: #375166;
+}
+.tableBody{
+    font-size: 24px;
+}
+.tableRow{
+    height: 60px;
+}
+.tableRowFinalizada{
+    background-color: #fd7e14;
+    outline: #375166 solid 2px;
+    border: #396637 solid 2px;  
+}
+.tableRow td{
+    padding: 0 5px;
+}
+.tableCellTipo{
+    text-align: center;
+    font-size: 20px;
+}
+.tableCellJuezN{
+    text-align: center;
+}
+.tableBody tr:nth-child(odd){
+    background-color: #375166;
+}
+.tableBody tr:nth-child(even){
+    background-color: #475f74;
+}
