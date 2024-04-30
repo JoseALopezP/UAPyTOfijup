@@ -222,6 +222,10 @@
 }
 .tableCellJuezN select{
     width: 95%;
+    width: 80px;
+}
+.tableCellJuezN select{
+    width: 80px;
     appearance: none;
     font-size: 22px;
     background-color: transparent;
@@ -322,7 +326,6 @@
 .audienciaListTableHead{
     font-size: 20px;
 }
-
 @keyframes errorMessage {
     0% {
         display: none;
