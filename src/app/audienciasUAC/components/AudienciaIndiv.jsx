@@ -78,7 +78,7 @@ export function AudienciaIndiv ({date, element}) {
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span>
             <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(0,3).join(' ')}<br/></span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>
                 <select onChange={(e)=>{setJuezN(e.target.value)}}>
                     {element.juezN ? <option key={element.juezN} value={element.juezN}>{element.juezN.split(' ').map(word => word.substring(0, 1))}</option> : <option></option>}

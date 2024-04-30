@@ -75,9 +75,9 @@ export function AudienciaIndiv ({date, element}) {
                     <option value={"10"} >SALA 10</option>
                 </select>
             </span>
-            <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellLegajo}`}>{element.numeroLeg}</span>
             <span className={`${styles.tableCell} ${styles.tableCellTipo} ${styles.tableCellTipoIndiv}`}>{element.tipo}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(0,3).join(' ')}<br/></span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSituacion} ${styles.tableCellSituacionIndiv}`}>
                 <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
             </span>
