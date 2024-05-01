@@ -4,13 +4,14 @@
 }
 .table{
     width: 100%;
+    table-layout: fixed;
 }
 .tableHead{
     font-size: 32px;
     font-weight: 700;
     width: 100%;
     background-color: white;
-    color: #375166;
+    color: #375166; 
 }
 .tableBody{
     font-size: 24px;
@@ -25,6 +26,7 @@
 }
 .tableRow td{
     padding: 0 5px;
+    overflow: hidden;
 }
 .tableCellTipo{
     text-align: center;
