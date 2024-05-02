@@ -153,3 +153,13 @@
         top: 10%;
     }
 }
+@media (max-width: 800px) {
+    .tableSection{
+        font-size: 18px;
+    }
+}
+@media (max-width: 720px) {
+    .tableSection{
+        font-size: 16px;
+    }
+}
