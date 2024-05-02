@@ -26,8 +26,6 @@ export function AudienciaList () {
                         <th>OPERADOR</th>
                         <th>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
-                        <th>JUEZ</th>
-                        <th>SITUACIÓN</th>
                         <th>ESTADO</th>
                     </tr>
                 </thead>
