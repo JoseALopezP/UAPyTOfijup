@@ -9,6 +9,7 @@ export function ButtonsAudiencia ({element}) {
     const [editable, setEditable] = useState(false)
     const [actionAud, setActionAud] = useState(null)
     const [sala, setSala] = useState(null)
+    const [resuelvo, setResuelvo] = useState(false)
     const handleSubmit = async(event) =>{
         event.preventDefault();
         if(actionAud){
@@ -25,9 +26,16 @@ export function ButtonsAudiencia ({element}) {
             await updateToday()
             await setEditable(false)
         }
+        if(resuelvo){
+            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
+            await updateData(date, element.numeroLeg, element.hora, 'resuelvo', resuelvo)
+            await updateToday()
+            await setResuelvo(false)
+            await setEditable(false)
+        }
     }
     const checkEditing = () =>{
-        if(actionAud || sala){
+        if(actionAud || sala || resuelvo){
             setEditable(true)
         }else{
             setEditable(false)
@@ -41,6 +49,9 @@ export function ButtonsAudiencia ({element}) {
     useEffect(() => {
         checkEditing()
     }, [actionAud]);
+    useEffect(() => {
+        checkEditing()
+    }, [resuelvo]);
     useEffect(() => {
         checkEditing()
     }, [sala]);
@@ -72,7 +83,12 @@ export function ButtonsAudiencia ({element}) {
                     <><button type="button" onClick={() => actionAud == 'FINALIZADA' ? setActionAud(null) : setActionAud('FINALIZADA')} className={actionAud == 'FINALIZADA' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizar}`}> ⏹ FINALIZAR</button>
                     <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}> ⏸ CUARTO INTERMEDIO</button></>}
                 {(element.estado == 'FINALIZADA') &&
+                    <>
                     <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ INICIAR NUEVAMENTE</button>
+                    {(element.resuelvo) ? <button className={`${styles.stateButton} ${styles.stateButtonSubido}`} type='button'>SUBIDO</button>
+                    : <button type="button" className={resuelvo ? `${styles.stateButton} ${styles.stateButtonResuelvo} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonResuelvo}`} onClick={() => setResuelvo(!resuelvo)}> RESUELVO SUBIDO</button>
+                    }
+                    </>
                 }
                 <button type="submit" className={editable ? `${styles.editButton} ${styles.stateButton}` : `${styles.editButton} ${styles.editButtonNot} ${styles.stateButton}`}>EDITAR</button>
                 <button type="button" onClick={() => setShow(false)} className={`${styles.stateButton} ${styles.stateButtonCerrar}`}>X CERRAR</button>

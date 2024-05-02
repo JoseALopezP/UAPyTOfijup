@@ -144,13 +144,21 @@
     background-color: #28a745;
     text-align: center;
 }
-
+.stateButtonResuelvo{
+    background-color: #dcc635;
+}
+.stateButtonSubido{
+    opacity: 0.1;
+}
+.editButtonNot{
+    background-color: #6c757d;
+}
 @media (max-width: 900px) {
     .buttonsBlock{
         height: 80%;
         width: 80%;
-        left: 10%;
-        top: 10%;
+        left: 5%;
+        top: 5%;
     }
     .tableBody td{
         padding-left: 10px;

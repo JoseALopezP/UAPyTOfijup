@@ -39,7 +39,7 @@ export function AudienciaList ({date}) {
                                 <td className={`${styles.tableCellJuezN}`}>{el.juezN && el.juezN.split(' ').map((word, i) => (i == 0) ?  `${word}` + ' ' : word.substring(0, 1))}</td>
                                 <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>
                                 <td className={`${styles.tableCellResultado}`}>{el.resultado && el.resultado}</td>
-                                <td className={`${styles.tableCellEstado}`}>{(el.hitos && el.estado == "FINALIZADA") && el.hitos[el.hitos.length - 1].split('|')[0]}</td>
+                                <td className={el.estado == 'FINALIZADA' ? `${styles.tableCellEstado} ${styles.tableCellEstadoFINALIZADA}` : `${styles.tableCellEstado}`}>{(el.hitos && el.estado == "FINALIZADA") && el.hitos[el.hitos.length - 1].split('|')[0]}</td>
                             </tr>
                         )
                     })}

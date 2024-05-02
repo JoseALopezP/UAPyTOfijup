@@ -269,6 +269,7 @@
 .operadorInput{
     border: solid white 1px;
 }
+
 @keyframes errorMessage {
     0% {
         display: none;

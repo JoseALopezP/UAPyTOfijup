@@ -30,7 +30,6 @@
 }
 .tableCellTipo{
     text-align: center;
-    font-size: 20px;
 }
 .tableCellJuezN{
     text-align: center;
@@ -40,4 +39,10 @@
 }
 .tableBody tr:nth-child(even){
     background-color: #475f74;
+}
+.tableCellEstadoFINALIZADA{
+    background-color: #dc3545;;
+}
+.tableCellEstado{
+    text-align: center;
 }
