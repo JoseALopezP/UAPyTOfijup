@@ -7,7 +7,7 @@
     table-layout: fixed;
 }
 .tableHead{
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
     width: 100%;
     background-color: white;
@@ -33,6 +33,7 @@
 }
 .tableCellJuezN{
     text-align: center;
+    width: 40px;
 }
 .tableBody tr:nth-child(odd){
     background-color: #375166;

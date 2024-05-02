@@ -20,7 +20,7 @@ export function AudienciaList ({date}) {
                     <tr>
                         <th className={`${styles.tableHeadCell} ${styles.tableCellAdmin}`}>ADMIN</th>
                         <th className={`${styles.tableHeadCell} ${styles.tableCellLeg}`}>LEGAJO</th>
-                        <th className={`${styles.tableHeadCell} ${styles.tableCellTipo}`}>TIPO DE AUDIENCIA</th>
+                        <th className={`${styles.tableHeadCell} ${styles.tableCellTipo}`}>TIPO</th>
                         <th className={`${styles.tableHeadCell} ${styles.tableCellJuez}`}>JUEZ</th>
                         <th className={`${styles.tableHeadCell} ${styles.tableCellJuezN}`}>NATURAL</th>
                         <th className={`${styles.tableHeadCell} ${styles.tableCellSituacion}`}>SITUACIÓN</th>
