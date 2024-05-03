@@ -7,7 +7,6 @@ export default async function addOrUpdateDocument(collectionName, documentId, da
     try {
         const docRef = doc(db, collectionName, documentId);
         const docSnapshot = await getDoc(docRef);
-
         if (docSnapshot.exists()) {
             await updateDoc(docRef, {
                 list: arrayUnion(data)

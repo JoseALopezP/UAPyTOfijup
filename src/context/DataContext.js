@@ -1,6 +1,4 @@
 import React, { createContext, useState} from "react";
-import {doc, updateDoc, getFirestore, setDoc} from 'firebase/firestore';
-import firebase_app from "@/firebase/config";
 import getCollection from "@/firebase/firestore/getCollection";
 import addData from "@/firebase/firestore/addData";
 import removeFromArray from "@/firebase/firestore/removeFromArray";
@@ -14,7 +12,6 @@ import updateListItem from "@/firebase/firestore/updateListItem";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
-const db = getFirestore(firebase_app)
 export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
@@ -22,6 +19,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [jueces, setJueces] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
+    const [userType, setUsertype] = useState('')
 
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
@@ -71,6 +69,14 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const deleteInfo = async(id) =>{
         await removeData('informacion', id)
     }
+    const addUser = async(data) =>{
+        await addOrUpdateDocument('users', 'listaUsuarios', data)
+    }
+    const checkUserType = async(userId) =>{
+        const userList = await getDocument('users', 'listaUsuarios')
+        console.log(userList)
+        await setUsertype(userList.find(item => item['userId'] === userId).type)
+    }
 
 
     const context = {
@@ -89,6 +95,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateAños,
         updateData,
         pushtToArray,
+        addUser,
+        checkUserType,
+        userType,
         años,
         today,
         bydate,

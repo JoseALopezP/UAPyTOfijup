@@ -20,8 +20,6 @@ export const AuthContextProvider = ({
         const unsubscribe = onAuthStateChanged(auth, async(user) => {
             if (user) {
                 setUser(user);
-                const userType = user?.claims?.userType;
-                console.log('User Type:', userType);
             } else {
                 setUser(null);
             }
