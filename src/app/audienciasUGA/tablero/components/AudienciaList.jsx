@@ -49,7 +49,7 @@ export function AudienciaList ({date}) {
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo}</td>
                                 <td className={`${styles.tableCellJuez}`}>{el.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(0,3).join(' ')}<br/></span>)}</td>
                                 <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>
-                                {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
+                                {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<>{element.resuelvo ? <td className={`${styles[el.estado]} `}>SUBIDO</td> : <td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>}</>)}
                             </tr>
                         )
                     })}

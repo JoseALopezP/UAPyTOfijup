@@ -44,7 +44,7 @@ export default function MenuSelector() {
             (<Link href={'/audienciasUGA/' + dayUGA.padStart(2,'0') + monthUGA.padStart(2,'0') + yearUGA.padStart(4,'20')} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>)}
             </>
           )}
-          {(userType == 'admin' || userType == 'uapyt' || userType == 'operador')&&(
+          {(userType == 'admin' || userType == 'ugaadmin' || userType == 'operador')&&(
             <Link href="/audienciasUGA/listaAudiencias" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
           )}
           {(userType == 'admin' || userType == 'uac')&&(
