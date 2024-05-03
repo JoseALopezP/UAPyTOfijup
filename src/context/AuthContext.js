@@ -17,9 +17,11 @@ export const AuthContextProvider = ({
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async(user) => {
             if (user) {
                 setUser(user);
+                const userType = user?.claims?.userType;
+                console.log('User Type:', userType);
             } else {
                 setUser(null);
             }

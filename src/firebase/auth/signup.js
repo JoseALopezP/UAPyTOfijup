@@ -9,7 +9,7 @@ admin.initializeApp({
 
 const auth = getAuth(firebase_app);
 
-async function signUp(email, password, logName, userType) {
+export default async function signUp(email, password, logName, userType) {
     let result = null,
         error = null;
     try {
@@ -18,7 +18,6 @@ async function signUp(email, password, logName, userType) {
         const uid = user.uid;
         await admin.auth().setCustomUserClaims(uid, { userType: userType });
         result = { uid, email, username };
-        
     } catch (error) {
         console.error('Error creating user:', error);
         error = error.message;
