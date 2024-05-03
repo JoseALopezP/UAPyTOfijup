@@ -1,6 +1,8 @@
 import styles from './AudienciaList.module.css'
 import { useContext, useEffect } from 'react';
 import { DataContext } from '@/context/DataContext';
+import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/context/AuthContext';
 
 export function AudienciaList ({date}) {
     const {updateToday, today} = useContext(DataContext);
@@ -18,6 +20,11 @@ export function AudienciaList ({date}) {
         const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
         return (timeComparison - nowTime)
     }
+    const { user } = useAuthContext()
+    const router = useRouter()
+    useEffect(() => {
+      if (user == null) router.push("/signin")
+    }, [user])
     return(
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">

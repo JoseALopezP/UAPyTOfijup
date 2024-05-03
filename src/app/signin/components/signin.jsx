@@ -17,7 +17,7 @@ export default function SignIn() {
         if (error) {
             return console.log(error)
         }
-        return router.push("/admin")
+        return router.push("/")
     }
     return (
         <div className={`${styles.signinBody}`}>
@@ -28,10 +28,10 @@ export default function SignIn() {
                 width={227}
                 height={212}
                 alt="Logo Corte de Justicia"
-                priority={false}
+                priority={true}
             />
             <div className={`${styles.formWrapper}`}>
-                <h1 className="mt-60 mb-30">Iniciar sesión</h1>
+                <h1>Iniciar sesión</h1>
                 <form onSubmit={handleForm} className={`${styles.formBlock}`}>
                     <label htmlFor="email" className={`${styles.labelSquare}`}>
                         <input className={`${styles.inputBlock}`} onChange={(e) => setEmail(e.target.value)} required type="email" name="email" id="email" placeholder="ejemplo@mail.com" />

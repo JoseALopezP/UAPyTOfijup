@@ -2,17 +2,16 @@
 import { AudienciaList } from "./components/AudienciaList";
 import { useContext } from "react";
 import { DataContextProvider } from "@/context/DataContext";
+import { AuthContextProvider } from "@/context/AuthContext";
 
 export default function listaAudiencias() {
-  /*useEffect(() => {
-    if (user == null) router.push("/signin")
-  }, [user]) */
   return (
     <>
-    <DataContextProvider>
-      <AudienciaList/>
-    </DataContextProvider>
-      
+      <AuthContextProvider>
+      <DataContextProvider>
+        <AudienciaList/>
+      </DataContextProvider>
+      </AuthContextProvider>
     </>
   )
 }

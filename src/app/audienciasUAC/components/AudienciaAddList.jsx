@@ -3,12 +3,19 @@ import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
 import { AddBlock } from './AddBlock';
 import { AudienciaIndiv } from './AudienciaIndiv';
+import { useAuthContext } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export function AudienciaAddList ({date}) {
     const {updateByDate, bydate} = useContext(DataContext);
     useEffect(() => {
         updateByDate(date)
     }, []);
+    const { user } = useAuthContext()
+    const router = useRouter()
+    useEffect(() => {
+      if (user == null) router.push("/signin")
+    }, [user])
     return(
         <section className={`${styles.audienciaListSection}`}>
             <div className={`${styles.audienciaListTable}`}>

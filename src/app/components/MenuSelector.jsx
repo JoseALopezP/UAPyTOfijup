@@ -1,7 +1,9 @@
 'use client'
 import Link from 'next/link'
 import styles from './Selector.module.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuthContext } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export default function MenuSelector() {
     const [dayUGA, setDayUGA] = useState(null)
@@ -10,9 +12,11 @@ export default function MenuSelector() {
     const [dayUAC, setDayUAC] = useState(null)
     const [monthUAC, setMonthUAC] = useState(null)
     const [yearUAC, setYearUAC] = useState(null)
-    /*useEffect(() => {
+    const { user } = useAuthContext()
+    const router = useRouter()
+    useEffect(() => {
       if (user == null) router.push("/signin")
-    }, [user])*/
+    }, [user])
     return (
       <section className={`${styles.selectorSection}`}>
         <div className={`${styles.selectorBody}`}>
