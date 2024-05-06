@@ -16,9 +16,8 @@
     width: fit-content;
 }
 .addAudienciaRow{
-    height: 80px;
+    height: 50px;
     vertical-align: middle;
-    padding: auto;
     width: 100%;
     display: table-row;
 }
@@ -36,7 +35,7 @@
 }
 .tableCellAdmin input{
     width: 90%;
-    height: 30px;
+    height: 25px;
 }
 .tableCellHora{
     align-items: center;
@@ -83,7 +82,9 @@
     flex-direction: column;
 }
 .tableCellJuezList{
-    font-size: 18px;
+    font-size: 14px;
+    text-align: center;
+    
 }
 .addAudienciaRow select, .addAudienciaRow input, .addAudienciaRow button{
     height: 40px;
@@ -137,10 +138,7 @@
 .audienciaListTable{
     color: white;
     font-weight: 700;
-    font-size: 24px;
-}
-.audienciaList{
-    height: 80px;
+    font-size: 20px;
 }
 .audienciaListTable .audienciaList:nth-child(odd){
     background-color: #475f74;
@@ -166,7 +164,7 @@
 
 .deleteButton{
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -177,7 +175,7 @@
 }
 .editButton{
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -195,8 +193,7 @@
     width: 95%;
     border-radius: 5px;
     border: none;
-    font-size: 16px;
-    height: 40px;
+    height: 50px;
 }
 .tableCellSituacion{
     width: 180px;
@@ -207,22 +204,22 @@
     flex-direction: column;
     text-align: center;
     vertical-align: middle;
+    font-size: 10px;
 }
 .inputSituacionEdit{
     width: 95%;
     padding: 5px;
     border-radius: 5px;
     border: none;
-    font-size: 16px;
-    height: 80px;
+    height: 50px;
     color: #fff;
-    font-size: 20px;
     background-color: transparent;
-    max-height: 80px;
+    max-height: 50px;
+    font-size: 16px;
 }
 .inputSituacionEdit::placeholder{
     color: #fff;
-    font-size: 20px;
+    font-size: 16px;
 }
 .inputResultadoEdit{
     border-radius: 5px;
@@ -291,7 +288,7 @@
     background-color: #fd7e14;
     border-radius: 5px;
     border: none;
-    height: 60px;
+    height: 50px;
 }
 .cancelarButtonClicked{
     transform: scale(0.98); 
@@ -306,9 +303,9 @@
     font-size: 16px;
 }
 .deleteButtonBlock{
-    padding: 20px 8px;
+    padding: 4px;
     height: 100%;
-    width: 150px
+    width: 80px
 }
 .toDelete{
     color: #dc3545;
