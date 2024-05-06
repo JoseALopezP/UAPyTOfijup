@@ -58,7 +58,7 @@ export default function MenuSelector() {
               <input onChange={(e)=>{setYearUAC(e.target.value)}} type='number' min={2021} max={2025} className={`${styles.inputYear}`}/>
             </span>
             {(dayUAC && monthUAC && yearUAC)&&
-            (<Link href={'/audienciasUAC/' + dayUAC + monthUAC + yearUAC} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>)}
+            (<Link href={'/audienciasUAC/' + dayUAC.padStart(2,'0') + monthUAC.padStart(2,'0') + yearUAC.padStart(4,'20')} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>)}
             </>
           )}
           {(userType == 'admin')&&(
