@@ -72,21 +72,19 @@ export function AudienciaIndiv ({date, element}) {
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellHora}`}>{element.hora}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
-                {(element.estado == 'PROGRAMADA') ? 
-                <p className={`${styles.audienciaCancelada}`}>INICIADA</p> :
-                <>{(element.estado == 'CANCELADA') ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p> :
-                <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button>
-                }</>}
+                {(element.estado == 'PROGRAMADA') ? <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button> : 
+                <>{(element.estado == 'CANCELADA') ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>  : <p className={`${styles.audienciaCancelada}`}>INICIADA</p>}
+                </>}
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span>
             <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(0,3).join(' ')}<br/></span>)}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(1,3).join(' ')}<br/></span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>
                 <select onChange={(e)=>{setJuezN(e.target.value)}}>
-                    {element.juezN ? <option key={element.juezN} value={element.juezN}>{element.juezN.split(' ').map(word => word.substring(0, 1))}</option> : <option></option>}
+                    {element.juezN ? <option key={element.juezN} value={element.juezN}>{element.juezN.split(' ').slice(1,4).map(word => word.substring(0, 1))}</option> : <option></option>}
                     {jueces && jueces.sort().map((el) =>{
                         return(
-                            <option key={el} value={el}>{el}</option>
+                            <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
                         )
                     })}
                 </select>
