@@ -1,12 +1,12 @@
 .tableSection{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     font-size: 20px;
     font-weight: 700;
     color: white;
     overflow: hidden;
 }
 .table{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     border: none;   
 }
 .tableHead{

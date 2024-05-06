@@ -3,13 +3,13 @@
     color: white;
 }
 .table{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     table-layout: fixed;
 }
 .tableHead{
     font-size: 32px;
     font-weight: 700;
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     background-color: white;
     color: #375166;
 }
@@ -41,7 +41,7 @@
     text-align: center;
 }
 .tableCellJuez{
-    width: 400px;
+    width: 380px;
 }
 .tableCellJuezN{
     text-align: center;
