@@ -41,7 +41,7 @@ export function AudienciaList ({date}) {
                             <tr key={el.numeroLeg + el.hora} className={el.estado == 'FINALIZADA' ? `${styles.tableRow} ${styles.tableRowFinalizada}` : `${styles.tableRow}`}> 
                                 <td className={`${styles.tableCellAdmin}`}>{el.admin && el.admin}</td>
                                 <td className={`${styles.tableCellLeg}`}>{el.numeroLeg}</td>
-                                <td className={`${styles.tableCellTipo}`}>{el.tipo}</td>
+                                <td className={`${styles.tableCellTipo}`}>{el.tipo} {el.tipo2 && '+ ' + element.tipo2}</td>
                                 <td className={`${styles.tableCellJuez}`}>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
                                 <td className={`${styles.tableCellJuezN}`}>{el.juezN && el.juezN.split(' ').map((word, i) => (i == 0) ?  `${word}` + ' ' : word.substring(0, 1))}</td>
                                 <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>

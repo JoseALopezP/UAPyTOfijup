@@ -10,6 +10,7 @@ export function AddBlock ({date}) {
     const [legajo2, setLegajo2] = useState('')
     const [legajo3, setLegajo3] = useState('')
     const [tipo, setTipo] = useState(null)
+    const [tipo2, setTipo2] = useState(null)
     const [colegiado, setColegiado] = useState(false)
     const [juez, setJuez] = useState(null)
     const [juez2, setJuez2] = useState(null)
@@ -47,6 +48,7 @@ export function AddBlock ({date}) {
             sala: sala,
             numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
             tipo: tipo,
+            tipo2: (tipo2 == '-' ? '' : tipo2),
             juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
             estado: "PROGRAMADA",
             situacion: (situacion ? situacion : '')
@@ -106,13 +108,22 @@ export function AddBlock ({date}) {
                 })}
             </select>
         </span>
-        <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}><select onChange={(e)=>{setTipo(e.target.value)}}>
-            {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
-                return(
-                    <option key={el} value={el}>{el}</option>
-                )
-            })}
-        </select></span>
+        <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
+            <select onChange={(e)=>{setTipo(e.target.value)}}>
+                {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
+                    return(
+                        <option key={el} value={el}>{el}</option>
+                    )
+                })}
+            </select>
+            <select onChange={(e)=>{setTipo2(e.target.value)}}>
+                {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
+                    return(
+                        <option key={el} value={el}>{el}</option>
+                    )
+                })}
+            </select>
+        </span>
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellJuez}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellJuez}`}>
             <span className={`${styles.juecesButtonBlock}`}>
             <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>{colegiado ? 'COL' : 'UNI'}</button>

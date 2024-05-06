@@ -49,6 +49,9 @@
 .tableCellSala{
     width: 80px;
 }
+.tableCellLegajo{
+    width: 250px;
+}
 .tableCellAction{
     display:table-cell;
     overflow: hidden;
