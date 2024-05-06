@@ -37,7 +37,7 @@ export function AudienciaList () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today && today.map((el =>{
+                    {today && today.map.filter(el => el.estado != 'CANCELADA')((el =>{
                         return(
                             <ButtonsAudiencia element={el}/>
                         )

@@ -15,6 +15,7 @@ export function AddBlock ({date}) {
     const [juez, setJuez] = useState(null)
     const [juez2, setJuez2] = useState(null)
     const [juez3, setJuez3] = useState(null)
+
     const [situacion, setSituacion] = useState(null)
     const [horaError, setHoraError] = useState(false)
     const [salaError, setSalaError] = useState(false)
@@ -56,6 +57,19 @@ export function AddBlock ({date}) {
         document.getElementById('addingForm').reset();
         await updateByDate(date)
     }
+    const restore = () =>{
+        setHora(null);
+        setSalta(null);
+        setLegajo1('MPF-SJ');
+        setLegajo2('');
+        setLegajo3('');
+        setTipo(null)
+        setTipo2(null)
+        setColegiado(false)
+        setJuez(null)
+        setJuez2(null)
+        setJuez3(null)
+    }
     const handleSubmit = async(event) =>{
         event.preventDefault();
         errorChecking()
@@ -63,6 +77,7 @@ export function AddBlock ({date}) {
         if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError)){
             await addToFirebase()
         }
+        await restore()
     }
     useEffect(() => {
         updateTiposAudiencias()
