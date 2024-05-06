@@ -41,6 +41,19 @@ export function AddBlock ({date}) {
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
     }
+    const restore = () =>{
+        setHora(null);
+        setSalta(null);
+        setLegajo1('MPF-SJ');
+        setLegajo2('');
+        setLegajo3('');
+        setTipo(null)
+        setTipo2(null)
+        setColegiado(false)
+        setJuez(null)
+        setJuez2(null)
+        setJuez3(null)
+    }
     const addToFirebase = async() =>{
         const newAudiencia = {
             hora: hora,
@@ -63,6 +76,7 @@ export function AddBlock ({date}) {
         if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError)){
             await addToFirebase()
         }
+        await restore()
     }
     useEffect(() => {
         updateTiposAudiencias()
