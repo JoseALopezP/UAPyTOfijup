@@ -130,7 +130,7 @@ export function AddBlock ({date}) {
             <select className={`${styles.uniSelect}`} onChange={(e)=>{setJuez(e.target.value)}}>
                 {jueces && jueces.sort().map((el) =>{
                     return(
-                        <option key={el} value={el}>{el}</option>
+                        <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
                     )
                 })}
             </select>
@@ -140,14 +140,14 @@ export function AddBlock ({date}) {
             <select className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez2(e.target.value)}}>
             {jueces && jueces.sort().map((el) =>{
                 return(
-                    <option key={el} value={el}>{el}</option>
+                    <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
                 )
             })}
             </select>
             <select className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez3(e.target.value)}}>
                 {jueces && jueces.sort().map((el) =>{
                     return(
-                        <option key={el} value={el}>{el}</option>
+                        <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
                     )
                 })}
             </select>
