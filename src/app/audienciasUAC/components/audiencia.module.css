@@ -1,13 +1,13 @@
 .audienciaListSection{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
 }
 .audienciaListTable{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     display: table;
     table-layout: fixed;
 }
 .audienciaListTableHead{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     text-align: center;
 }
 .inputLegajoBlock{
@@ -18,7 +18,7 @@
 .addAudienciaRow{
     height: 50px;
     vertical-align: middle;
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     display: table-row;
 }
 
