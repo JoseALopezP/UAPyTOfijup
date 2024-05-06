@@ -21,7 +21,9 @@
     width: calc(100vw - (100vw - 100%));
     display: table-row;
 }
-
+.true{
+    color: #dcc635;
+}
 .tableRow{
     display: table-row;
 }

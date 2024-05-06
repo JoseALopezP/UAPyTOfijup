@@ -28,6 +28,7 @@ export function AudienciaIndiv ({date, element}) {
             if(deleteAud){
                 await deleteAudiencia(date, element.numeroLeg, element.hora)
             }
+            await setDeleteAud(false)
             await setEditable(false)
             await updateByDate(date)
         }
