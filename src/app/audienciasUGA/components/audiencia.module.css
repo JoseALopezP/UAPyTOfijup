@@ -14,7 +14,7 @@
     flex-direction: row;
 }
 .addAudienciaRow{
-    height: 80px;
+    height: 50px;
     vertical-align: middle;
     padding: auto;
     width: 100%;
@@ -66,10 +66,10 @@
 .audienciaListTable{
     color: white;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 20px;
 }
 .audienciaList{
-    height: 80px;
+    height: 50px;
 }
 .audienciaListTable .audienciaList:nth-child(odd){
     background-color: #475f74;
@@ -85,7 +85,7 @@
     display: inline-flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 80px;
+    height: 50px;
     background-color: #dc3545;
     animation: errorMessage 2s;
     animation-fill-mode: both;
@@ -130,7 +130,7 @@
 }
 .deleteButton{
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -140,7 +140,9 @@
     background-color: #dc3545;
 }
 .deleteButtonBlock{
-    padding: 8px;
+    padding: 4px;
+    height: 100%;
+    width: 80px;
 }
 .juecesButtonBlock{
     display: inline-flex;
@@ -178,7 +180,7 @@
 }
 .editButton{
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -216,11 +218,11 @@
     border-radius: 5px;
     border: none;
     font-size: 16px;
-    height: 80px;
+    height: 50px;
     color: #fff;
     font-size: 20px;
     background-color: transparent;
-    max-height: 80px;
+    max-height: 50px;
 }
 .inputSituacionEdit::placeholder{
     color: #fff;
@@ -264,10 +266,13 @@
 }
 .operadorInput{
     width: 80px;
-    height: 40px;
+    height: 30px;
 }
 .operadorInput{
     border: solid white 1px;
+}
+.tableCellOPIndiv{
+    padding: 5px;
 }
 
 @keyframes errorMessage {

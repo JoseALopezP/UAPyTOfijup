@@ -43,7 +43,7 @@ export function AddBlock ({date}) {
     }
     const restore = () =>{
         setHora(null);
-        setSalta(null);
+        setSala(null);
         setLegajo1('MPF-SJ');
         setLegajo2('');
         setLegajo3('');

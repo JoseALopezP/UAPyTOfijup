@@ -1,13 +1,13 @@
 .audienciaListSection{
-    width: 100vw;
+    width: 100%;
 }
 .audienciaListTable{
-    width: 100vw;
+    width: 100%;
     display: table;
     table-layout: fixed;
 }
 .audienciaListTableHead{
-    width: 100vw;
+    width: 100%;
     text-align: center;
 }
 .inputLegajoBlock{
@@ -204,7 +204,6 @@
     flex-direction: column;
     text-align: center;
     vertical-align: middle;
-    font-size: 10px;
 }
 .inputSituacionEdit{
     width: 95%;

@@ -56,7 +56,7 @@ export function AudienciaIndiv ({date, element}) {
     }, []);
     return(
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
-            <span className={`${styles.tableCell} ${styles.tableCellOP}`}>
+            <span className={`${styles.tableCell} ${styles.tableCellOP} ${styles.tableCellOPIndiv}`}>
                 <input type='text' className={`${styles.inputSituacionEdit} ${styles.operadorInput}`} placeholder={element.operador} onChange={(e)=>{setOperador(e.target.value)}}></input>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellHora}`}>{element.hora}</span>
@@ -77,7 +77,7 @@ export function AudienciaIndiv ({date, element}) {
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellLegajo}`}>{element.numeroLeg}</span>
             <span className={`${styles.tableCell} ${styles.tableCellTipo} ${styles.tableCellTipoIndiv}`}>{element.tipo}{element.tipo2 && ' + ' + element.tipo2}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(1,4).join(' ')}<br/></span>)}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,4).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSituacion} ${styles.tableCellSituacionIndiv}`}>
                 <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
             </span>
