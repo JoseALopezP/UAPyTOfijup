@@ -16,7 +16,6 @@ export function AddBlock ({date}) {
     const [juez2, setJuez2] = useState(null)
     const [juez3, setJuez3] = useState(null)
     const [situacion, setSituacion] = useState(null)
-
     const [horaError, setHoraError] = useState(false)
     const [salaError, setSalaError] = useState(false)
     const [legajo2Error, setLegajo2Error] = useState(false)
