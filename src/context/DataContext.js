@@ -14,6 +14,7 @@ export const DataContext = createContext({});
 const {Provider} = DataContext;
 export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
+    const [realTime, setRealTime] = useState(null);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
     const [años, setAños] = useState(defaultValue);
     const [jueces, setJueces] = useState(defaultValue);
@@ -21,6 +22,19 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
 
+    const updateRealTime = async() =>{
+        try {
+            const response = await fetch('https://worldtimeapi.org/api/ip')
+            if (!response.ok) {
+                throw new Error('Failed to fetch server time')
+            }
+            const data = await response.json()
+            await setRealTime(new Date(data.utc_datetime).toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" }))
+        } catch (error) {
+            console.error('Error fetching server time:', error)
+            return null;
+        }
+    }
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
     }
@@ -97,6 +111,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         pushtToArray,
         addUser,
         checkUserType,
+        updateRealTime,
+        realTime,
         userType,
         años,
         today,

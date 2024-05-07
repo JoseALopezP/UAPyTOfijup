@@ -4,16 +4,17 @@ import { useEffect, useState, useContext } from 'react'
 import { DataContext } from '@/context/DataContext';
 
 export function ButtonsAudiencia ({element}) {
-    const {updateToday, updateData, pushtToArray} = useContext(DataContext);
+    const {updateToday, updateData, pushtToArray, updateRealTime, realTime} = useContext(DataContext);
     const [show, setShow] = useState(false)
     const [editable, setEditable] = useState(false)
     const [actionAud, setActionAud] = useState(null)
     const [sala, setSala] = useState(null)
     const [resuelvo, setResuelvo] = useState(false)
     const handleSubmit = async(event) =>{
+        await updateRealTime();
         event.preventDefault();
         if(actionAud){
-            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
+            const date = realTime
             await updateData(date, element.numeroLeg, element.hora, 'estado', actionAud)
             await pushtToArray(date, element.numeroLeg, element.hora, `${new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit"})} | ${actionAud}`)
             await updateToday()
@@ -21,13 +22,13 @@ export function ButtonsAudiencia ({element}) {
             await setActionAud(null)
         }
         if(sala){
-            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
+            const date = realTime
             await updateData(date, element.numeroLeg, element.hora, 'sala', sala)
             await updateToday()
             await setEditable(false)
         }
         if(resuelvo){
-            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
+            const date = realTime
             await updateData(date, element.numeroLeg, element.hora, 'resuelvo', resuelvo)
             await updateToday()
             await setResuelvo(false)
@@ -41,11 +42,6 @@ export function ButtonsAudiencia ({element}) {
             setEditable(false)
         }
     }
-    const getMinutes = (dateObject) =>{
-        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
-        const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
-        return (timeComparison - nowTime)
-    }
     useEffect(() => {
         checkEditing()
     }, [actionAud]);
@@ -55,6 +51,9 @@ export function ButtonsAudiencia ({element}) {
     useEffect(() => {
         checkEditing()
     }, [sala]);
+    useEffect(() => {
+        updateRealTime()
+    }, [])
     return(
         <>
         {show && 
@@ -101,7 +100,7 @@ export function ButtonsAudiencia ({element}) {
             <td>{element.operador && element.operador}</td>
             <td>{element.numeroLeg}</td>
             <td className={`${styles.tableCellTipo}`}>{element.tipo}</td>
-            {(element.estado == 'PROGRAMADA' & getMinutes(element.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[element.estado]} `}>{element.estado.split('_').join(' ')}</td>)}
+            {((realTime > element.hora) & element.estado == 'PROGRAMADA')  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[element.estado]} `}>{element.estado.split('_').join(' ')}</td>)}
         </tr>
         </>
     )

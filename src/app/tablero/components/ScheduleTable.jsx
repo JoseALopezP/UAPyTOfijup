@@ -3,7 +3,7 @@ import styles from './ScheduleTable.module.css'
 import { DataContext } from '@/context/DataContext'
 
 export function ScheduleTable () {
-    const {updateToday, today} = useContext(DataContext);
+    const {updateToday, today, realTime} = useContext(DataContext);
     const [part, setPart] = useState(0)
     const [showInfo, setShowInfo] = useState(0)
     const getMinutes = (dateObject) =>{
@@ -94,7 +94,7 @@ export function ScheduleTable () {
                                 <td>{el.numeroLeg}</td>
                                 <td>{el.tipo}</td>
                                 <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-                                {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
+                                {(el.estado == 'PROGRAMADA' & (realTime > el.hora))  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
                             </tr>
                         )
                     })}

@@ -11,7 +11,7 @@ export function InformationSection () {
         showInfo ? setShowInfo(false) : setShowInfo(true)
     }
     useEffect(() => {
-        const timerID = setInterval(() => tick(), 30000);
+        const timerID = setInterval(() => tick(), 60000);
         return function cleanup() {
             clearInterval(timerID);
         };

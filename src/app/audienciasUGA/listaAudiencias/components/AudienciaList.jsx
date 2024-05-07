@@ -7,7 +7,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export function AudienciaList () {
-    const {updateToday, today} = useContext(DataContext);
+    const {updateToday, today, updateRealTime} = useContext(DataContext);
     function tick() {
         updateToday();     
     }
@@ -22,6 +22,15 @@ export function AudienciaList () {
     useEffect(() => {
       if (user == null) router.push("/signin")
     }, [user])
+    async function tick() {
+        updateRealTime()
+    }
+    useEffect(() => {
+        const timerID = setInterval(() => tick(), 5000);
+        return function cleanup() {
+            clearInterval(timerID);
+        };
+    }, []);
     return(
         <>
         <section className={`${styles.tableSection}`}>
@@ -39,7 +48,7 @@ export function AudienciaList () {
                 <tbody className={`${styles.tableBody}`}>
                     {today && today.filter(el => el.estado != 'CANCELADA').sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el =>{
                         return(
-                            <ButtonsAudiencia element={el}/>
+                            <ButtonsAudiencia key={el.numeroLeg + el.hora} element={el}/>
                         )
                     }))}
                 </tbody>
