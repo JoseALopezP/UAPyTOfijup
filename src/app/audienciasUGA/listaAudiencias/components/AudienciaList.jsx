@@ -9,7 +9,8 @@ import { useRouter } from 'next/navigation';
 export function AudienciaList () {
     const {updateToday, today, updateRealTime} = useContext(DataContext);
     function tick() {
-        updateToday();     
+        updateToday();
+        updateRealTime() 
     }
     useEffect(() =>{
         const timerID = setInterval(() => tick(), 5000);  
@@ -22,15 +23,7 @@ export function AudienciaList () {
     useEffect(() => {
       if (user == null) router.push("/signin")
     }, [user])
-    async function tick() {
-        updateRealTime()
-    }
-    useEffect(() => {
-        const timerID = setInterval(() => tick(), 5000);
-        return function cleanup() {
-            clearInterval(timerID);
-        };
-    }, []);
+
     return(
         <>
         <section className={`${styles.tableSection}`}>

@@ -317,6 +317,24 @@
 .inputAdmin{
     border: solid white 1px;
 }
+.DEMORADA{
+    color: #fd7e14;
+}
+.PROGRAMADA{
+    color: #007bff;
+}
+.EN_CURSO{
+    color: #17a2b8;
+}
+.CANCELADA{
+    color: #dc3545; 
+}
+.CUARTO_INTERMEDIO{
+    color: #ffc107;
+}
+.FINALIZADA {
+    color: #28a745;
+}
 @keyframes errorMessage {
     0% {
         display: none;

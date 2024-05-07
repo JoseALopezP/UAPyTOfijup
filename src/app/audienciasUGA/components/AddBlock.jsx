@@ -75,8 +75,8 @@ export function AddBlock ({date}) {
         console.log(horaError, salaError, legajo2Error,legajo3Error,tipoError,juezError)
         if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError)){
             await addToFirebase()
+            await restore()
         }
-        await restore()
     }
     useEffect(() => {
         updateTiposAudiencias()

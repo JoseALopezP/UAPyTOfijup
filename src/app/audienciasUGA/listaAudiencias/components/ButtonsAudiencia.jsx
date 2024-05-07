@@ -11,10 +11,10 @@ export function ButtonsAudiencia ({element}) {
     const [sala, setSala] = useState(null)
     const [resuelvo, setResuelvo] = useState(false)
     const handleSubmit = async(event) =>{
-        await updateRealTime();
         event.preventDefault();
+        await updateRealTime();
         if(actionAud){
-            const date = realTime
+            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
             await updateData(date, element.numeroLeg, element.hora, 'estado', actionAud)
             await pushtToArray(date, element.numeroLeg, element.hora, `${new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit"})} | ${actionAud}`)
             await updateToday()
@@ -22,13 +22,13 @@ export function ButtonsAudiencia ({element}) {
             await setActionAud(null)
         }
         if(sala){
-            const date = realTime
+            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
             await updateData(date, element.numeroLeg, element.hora, 'sala', sala)
             await updateToday()
             await setEditable(false)
         }
         if(resuelvo){
-            const date = realTime
+            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
             await updateData(date, element.numeroLeg, element.hora, 'resuelvo', resuelvo)
             await updateToday()
             await setResuelvo(false)
