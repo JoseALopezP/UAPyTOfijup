@@ -22,6 +22,9 @@ export default function MenuSelector() {
       }else{
         console.log(user.uid)
         checkUserType(user.uid)
+        if(userType == 'operador'){
+          router.push("/uga/listaAudiencias")
+        }
       }
     }, [user])
     return (
