@@ -74,7 +74,7 @@ export function AudienciaIndiv ({date, element}) {
             <span className={`${styles.tableCell} ${styles.tableCellHora}`}>{element.hora}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 {(element.estado == 'PROGRAMADA') ? <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button> : 
-                <>{(element.estado == 'CANCELADA') ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>  : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado}</p>}
+                <>{(element.estado == 'CANCELADA') ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>  : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}
                 </>}
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span>
