@@ -33,6 +33,7 @@ export function AudienciaList () {
                         <th>SALA</th>
                         <th>OPERADOR</th>
                         <th>LEGAJO</th>
+                        <th className={`${styles.tableHeadJuez}`}>JUEZ</th>
                         <th>TIPO DE AUDIENCIA</th>
                         <th>ESTADO</th>
                     </tr>

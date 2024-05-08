@@ -31,6 +31,7 @@ export function AudienciaList ({date}) {
                 <thead className={`${styles.tableHead}`}>
                     <tr>
                         <th className={`${styles.tableCellHora}`}>HORA</th>
+                        <th className={`${styles.tableCellSala}`}>SALA</th>
                         <th className={`${styles.tableCellOperador}`}>OPERADOR</th>
                         <th className={`${styles.tableCellLeg}`}>LEGAJO</th>
                         <th>TIPO DE AUDIENCIA</th>
@@ -44,10 +45,11 @@ export function AudienciaList ({date}) {
                         return(
                             <tr key={el.numeroLeg + el.hora} className={`${styles.tableRow}`}> 
                                 <td className={`${styles.tableCellHora}`}>{el.hora}</td>
+                                <td className={`${styles.tableCellSala} ${styles.tableCellSalaIndiv}`}>{el.sala}</td>
                                 <td className={`${styles.tableCellOperador}`}>{el.operador && el.operador}</td>
                                 <td className={`${styles.tableCellLeg}`}>{el.numeroLeg}</td>
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo}</td>
-                                <td className={`${styles.tableCellJuez}`}>{el.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(0,3).join(' ')}<br/></span>)}</td>
+                                <td className={`${styles.tableCellJuez}`}>{el.juez.split('+').map(e => <span key={e}>{e.split(' ').slice(1,3).join(' ')}<br/></span>)}</td>
                                 <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>
                                 {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<>{el.resuelvo ? <td className={`${styles[el.estado]} `}>SUBIDO</td> : <td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>}</>)}
                             </tr>

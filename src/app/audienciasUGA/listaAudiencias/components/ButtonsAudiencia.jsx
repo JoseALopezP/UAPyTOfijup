@@ -99,6 +99,7 @@ export function ButtonsAudiencia ({element}) {
             <td>{element.sala}</td>
             <td>{element.operador && element.operador}</td>
             <td>{element.numeroLeg}</td>
+            <td className={`${styles.tableBodyJuez}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,3).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</td>
             <td className={`${styles.tableCellTipo}`}>{element.tipo}</td>
             {((realTime > element.hora) & element.estado == 'PROGRAMADA')  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[element.estado]} `}>{element.estado.split('_').join(' ')}</td>)}
         </tr>

@@ -13,6 +13,14 @@
     background-color: white;
     color: #375166;
 }
+.tableBodyJuez{
+    width: 120px;
+    font-size: 16px;
+    line-height: 14px;
+}
+.tableHeadJuez{
+    width: 120px;
+}
 .tableBody tr{
     height: 70px;
     line-height: 20px;
@@ -95,7 +103,9 @@
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
-
+.tableCellTipo{
+    text-align: center;
+}
 .stateButtonCerrar{
     background-color: #fff;
     color: #000;
