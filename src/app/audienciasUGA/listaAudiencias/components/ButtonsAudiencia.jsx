@@ -61,9 +61,9 @@ export function ButtonsAudiencia ({element}) {
             <h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>
             <form onSubmit={(event) => handleSubmit(event)} action="#" className={`${styles.changeBlock}`}>
                 {(element.estado == 'CUARTO_INTERMEDIO') &&
-                <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ FINALIZAR CUARTO INTERMEDIO</button>}
+                <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>FINALIZAR CUARTO INTERMEDIO</button>}
                 {(element.estado == 'PROGRAMADA') &&
-                <><button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonIniciar}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ INICIAR</button>
+                <><button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonIniciar}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>INICIAR</button>
                 <select  onChange={(e)=>{setSala(e.target.value)}} className={`${styles.selectSalaEdit} ${styles.stateButton}`}>
                     <option>SALA {element.sala}</option>
                     <option value={"1"} >SALA 1</option>
@@ -79,17 +79,17 @@ export function ButtonsAudiencia ({element}) {
                 </select>
                 </>}
                 {(element.estado == 'EN_CURSO') &&
-                    <><button type="button" onClick={() => actionAud == 'FINALIZADA' ? setActionAud(null) : setActionAud('FINALIZADA')} className={actionAud == 'FINALIZADA' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizar}`}> ⏹ FINALIZAR</button>
-                    <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}> ⏸ CUARTO INTERMEDIO</button></>}
+                    <><button type="button" onClick={() => actionAud == 'FINALIZADA' ? setActionAud(null) : setActionAud('FINALIZADA')} className={actionAud == 'FINALIZADA' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizar}`}>FINALIZAR</button>
+                    <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}>CUARTO INTERMEDIO</button></>}
                 {(element.estado == 'FINALIZADA') &&
                     <>
-                    <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ INICIAR NUEVAMENTE</button>
+                    <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>INICIAR NUEVAMENTE</button>
                     {(element.resuelvo) ? <button className={`${styles.stateButton} ${styles.stateButtonSubido}`} type='button'>SUBIDO</button>
                     : <button type="button" className={resuelvo ? `${styles.stateButton} ${styles.stateButtonResuelvo} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonResuelvo}`} onClick={() => setResuelvo(!resuelvo)}> RESUELVO SUBIDO</button>
                     }
                     </>
                 }
-                <button type="submit" className={editable ? `${styles.editButton} ${styles.stateButton}` : `${styles.editButton} ${styles.editButtonNot} ${styles.stateButton}`}>EDITAR</button>
+                <button type="submit" className={editable ? `${styles.editButton} ${styles.stateButton}` : `${styles.editButton} ${styles.editButtonNot} ${styles.stateButton}`}>GUARDAR</button>
                 <button type="button" onClick={() => setShow(false)} className={`${styles.stateButton} ${styles.stateButtonCerrar}`}>X CERRAR</button>
             </form>
         </div>}

@@ -319,10 +319,6 @@
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
-.audienciaCancelada{
-    color: #dcc635;
-    font-size: 16px;
-}
 .deleteButtonBlock{
     padding: 4px;
     height: 100%;
@@ -366,6 +362,10 @@
 .inputAdmin{
     border: solid white 1px;
 }
+.audienciaCancelada{
+    font-size: 14px;
+    text-align: center;
+}
 .DEMORADA{
     color: #fd7e14;
 }
@@ -383,6 +383,9 @@
 }
 .FINALIZADA {
     color: #28a745;
+}
+.REPROGRAMADA {
+    background-color: #6c757d;
 }
 @keyframes errorMessage {
     0% {
