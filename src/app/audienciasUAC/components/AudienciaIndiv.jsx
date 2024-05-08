@@ -33,6 +33,9 @@ export function AudienciaIndiv ({date, element}) {
             if(!(!resultado | resultado == '')){
                 await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado)
             }
+            if(hora){
+                await updateData(date, element.numeroLeg, element.hora, 'hora', hora)
+            }
             await setEditable(false)
             await setDeleteAud(false)
             await setCancelar(false)
@@ -40,7 +43,7 @@ export function AudienciaIndiv ({date, element}) {
         }
     }
     const checkEditing = () =>{
-        if((!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud)){
+        if((!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
             setEditable(false)
         }else{
             setEditable(true)
@@ -65,6 +68,9 @@ export function AudienciaIndiv ({date, element}) {
         checkEditing()
     }, [situacion]);
     useEffect(() => {
+        checkEditing()
+    }, [hora]);
+    useEffect(() => {
         updateByDate(date)
     }, []);
     return(
@@ -73,7 +79,7 @@ export function AudienciaIndiv ({date, element}) {
                 <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>
-                <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} value={element.hora}/>
+                <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} defaultValue={element.hora}/>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 {(element.estado == 'PROGRAMADA') ? <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button> : 
