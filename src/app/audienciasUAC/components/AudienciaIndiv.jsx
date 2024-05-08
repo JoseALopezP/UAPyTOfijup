@@ -8,6 +8,7 @@ export function AudienciaIndiv ({date, element}) {
     const [situacion, setSituacion] = useState(null)
     const [admin, setAdmin] = useState(null)
     const [resultado, setResultado] = useState(null)
+    const [hora, setHora] = useState(null)
     const [cancelar, setCancelar] = useState(false)
     const [juezN, setJuezN] = useState(null)
     const [deleteAud, setDeleteAud] = useState(false)
@@ -71,7 +72,9 @@ export function AudienciaIndiv ({date, element}) {
             <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
                 <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
             </span>
-            <span className={`${styles.tableCell} ${styles.tableCellHora}`}>{element.hora}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>
+                <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} value={element.hora}/>
+            </span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 {(element.estado == 'PROGRAMADA') ? <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button> : 
                 <>{(element.estado == 'CANCELADA') ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>  : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}

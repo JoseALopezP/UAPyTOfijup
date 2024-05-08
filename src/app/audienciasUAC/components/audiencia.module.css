@@ -308,6 +308,12 @@
     height: 100%;
     width: 80px
 }
+.inputHora{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
 .toDelete{
     color: #dc3545;
 }

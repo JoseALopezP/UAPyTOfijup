@@ -23,7 +23,6 @@ export function AudienciaList () {
     useEffect(() => {
       if (user == null) router.push("/signin")
     }, [user])
-
     return(
         <>
         <section className={`${styles.tableSection}`}>
