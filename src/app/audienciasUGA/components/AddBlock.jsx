@@ -90,7 +90,7 @@ export function AddBlock ({date}) {
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
         <span className={`${styles.tableCell} ${styles.tableCellOP}`}></span>
         <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableHora}` : `${styles.tableCell} ${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.tableCellHora}`}>
-            <input  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
+            <input className={`${styles.inputHora}`} type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
         </span>
         <span className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputSalaBlock} ${styles.inputItemBlock}` }>
             <select  onChange={(e)=>{setSala(e.target.value)}}>

@@ -5,6 +5,7 @@ import { DataContext } from '@/context/DataContext';
 export function AudienciaIndiv ({date, element}) {
     const {updateByDate, updateData, deleteAudiencia} = useContext(DataContext);
     const [editable, setEditable] = useState(false)
+    const [hora, setHora] = useState(null)
     const [situacion, setSituacion] = useState(null)
     const [operador, setOperador] = useState(null)
     const [sala, setSala] = useState(null)
@@ -28,13 +29,16 @@ export function AudienciaIndiv ({date, element}) {
             if(deleteAud){
                 await deleteAudiencia(date, element.numeroLeg, element.hora)
             }
+            if(hora){
+                await updateData(date, element.numeroLeg, element.hora, 'hora', hora)
+            }
             await setDeleteAud(false)
             await setEditable(false)
             await updateByDate(date)
         }
     }
     const checkEditing = () =>{
-        if((!sala | sala == '-' | sala == element.sala) & (!situacion | situacion == '-' | situacion == '') & !deleteAud & (!operador | operador == '')){
+        if((!sala | sala == '-' | sala == element.sala) & (!situacion | situacion == '-' | situacion == '') & !deleteAud & (!operador | operador == '') & (!hora)){
             setEditable(false)
         }else{
             setEditable(true)
@@ -51,6 +55,9 @@ export function AudienciaIndiv ({date, element}) {
     }, [situacion]);
     useEffect(() => {
         checkEditing()
+    }, [hora]);
+    useEffect(() => {
+        checkEditing()
     }, [operador]);
     useEffect(() => {
         updateByDate(date)
@@ -60,7 +67,9 @@ export function AudienciaIndiv ({date, element}) {
             <span className={`${styles.tableCell} ${styles.tableCellOP} ${styles.tableCellOPIndiv}`}>
                 <input type='text' className={`${styles.inputSituacionEdit} ${styles.operadorInput}`} placeholder={element.operador} onChange={(e)=>{setOperador(e.target.value)}}></input>
             </span>
-            <span className={`${styles.tableCell} ${styles.tableCellHora}`}>{element.hora}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>
+                <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} defaultValue={element.hora}/>
+            </span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 <select  onChange={(e)=>{setSala(e.target.value)}} className={`${styles.selectSalaEdit}`}>
                     <option>SALA {element.sala}</option>
