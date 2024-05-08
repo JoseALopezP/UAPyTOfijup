@@ -16,6 +16,15 @@ export function AudienciaAddList ({date}) {
     useEffect(() => {
       if (user == null) router.push("/signin")
     }, [user])
+    function tick() {
+        updateByDate(date);
+    }
+    useEffect(() =>{
+        const timerID = setInterval(() => tick(), 5000);  
+        return function cleanup() {
+            clearInterval(timerID);
+        };
+    }, [])
     return(
         <section className={`${styles.audienciaListSection}`}>
             <div className={`${styles.audienciaListTable}`}>
