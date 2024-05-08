@@ -34,6 +34,9 @@ export function ScheduleTable () {
                     case 'CANCELADA':
                         aux2.push(item)
                         break;
+                    case 'REPROGRAMADA':
+                        aux2.push(item)
+                        break;
                     case 'FINALIZADA':
                         if(getMinutes(item.hora) < 120 & getMinutes(item.hora) > -120){
                             aux2.push(item)
@@ -88,7 +91,7 @@ export function ScheduleTable () {
                 <tbody className={`${styles.tableBody}`}>
                     {today && filterToday().sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                         return(
-                            <tr key={el.numeroLeg} > 
+                            <tr key={el.numeroLeg} className={el.estado == 'REPROGRAMADA' && `${styles.filaReprogramada}`}> 
                                 <td>{el.hora}</td>
                                 <td>SALA {el.sala}</td>
                                 <td>{el.numeroLeg}</td>

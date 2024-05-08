@@ -10,6 +10,7 @@ export function AudienciaIndiv ({date, element}) {
     const [resultado, setResultado] = useState(null)
     const [hora, setHora] = useState(null)
     const [cancelar, setCancelar] = useState(false)
+    const [reprogramar, setReprogramar] = useState(false)
     const [juezN, setJuezN] = useState(null)
     const [deleteAud, setDeleteAud] = useState(false)
     const handleSubmit = async(event) =>{
@@ -17,6 +18,9 @@ export function AudienciaIndiv ({date, element}) {
         if(editable){
             if(cancelar){
                 await updateData(date, element.numeroLeg, element.hora, 'estado', 'CANCELADA')
+            }
+            if(reprogramar){
+                await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA')
             }
             if(!(!situacion | situacion == '-' | situacion == '')){
                 await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
@@ -43,10 +47,16 @@ export function AudienciaIndiv ({date, element}) {
         }
     }
     const checkEditing = () =>{
-        if((!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
+        if((!reprogramar) & (!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
             setEditable(false)
         }else{
             setEditable(true)
+        }
+        if(cancelar){
+            setReprogramar(false)
+        }
+        if(reprogramar){
+            setCancelar(false)
         }
     }
     useEffect(() => {
@@ -61,6 +71,9 @@ export function AudienciaIndiv ({date, element}) {
     useEffect(() => {
         checkEditing()
     }, [cancelar]);
+    useEffect(() => {
+        checkEditing()
+    }, [reprogramar]);
     useEffect(() => {
         checkEditing()
     }, [juezN]);
@@ -82,7 +95,9 @@ export function AudienciaIndiv ({date, element}) {
                 <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} defaultValue={element.hora}/>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
-                {(element.estado == 'PROGRAMADA') ? <button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR<br/>AUDIENCIA</button> : 
+                {(element.estado == 'PROGRAMADA') ? <><button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR</button> 
+                <button type="button" className={reprogramar ? `${styles.reprogramarButton} ${styles.reprogramarButtonClicked}` : `${styles.reprogramarButton}`} onClick={()=>setReprogramar(!reprogramar)}>REPROGRAMAR</button> 
+                </>:
                 <>{(element.estado == 'CANCELADA') ? <p className={`${styles.audienciaCancelada}`}>CANCELADA</p>  : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}
                 </>}
             </span>

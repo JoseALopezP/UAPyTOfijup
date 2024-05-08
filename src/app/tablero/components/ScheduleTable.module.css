@@ -178,7 +178,13 @@
     background-color: #28a745;
     text-align: center;
 }
-
+.REPROGRAMADA {
+    background-color: #6c757d;
+    text-align: center;
+}
+.filaReprogramada{
+    opacity: 0.8;
+}
 @keyframes infoAppear {
     0% {
     }
