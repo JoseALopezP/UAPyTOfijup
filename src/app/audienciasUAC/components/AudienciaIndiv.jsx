@@ -5,6 +5,7 @@ import { DataContext } from '@/context/DataContext';
 export function AudienciaIndiv ({date, element}) {
     const {updateByDate, jueces, updateData, deleteAudiencia} = useContext(DataContext);
     const [editable, setEditable] = useState(false)
+    const [changeButton, setChangeButton] = useState(false)
     const [situacion, setSituacion] = useState(null)
     const [admin, setAdmin] = useState(null)
     const [resultado, setResultado] = useState(null)
@@ -13,6 +14,8 @@ export function AudienciaIndiv ({date, element}) {
     const [reprogramar, setReprogramar] = useState(false)
     const [juezN, setJuezN] = useState(null)
     const [deleteAud, setDeleteAud] = useState(false)
+    const [comentario, setComentario] = useState(null)
+    const [control, setControl] = useState('nocontrolado')
     const handleSubmit = async(event) =>{
         event.preventDefault();
         if(editable){
@@ -40,14 +43,21 @@ export function AudienciaIndiv ({date, element}) {
             if(hora){
                 await updateData(date, element.numeroLeg, element.hora, 'hora', hora)
             }
+            if(comentario){
+                await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario)
+            }
+            if(control){
+                await updateData(date, element.numeroLeg, element.hora, 'control', control)
+            }
             await setEditable(false)
             await setDeleteAud(false)
             await setCancelar(false)
+            await setChangeButton(false)
             await updateByDate(date)
         }
     }
     const checkEditing = () =>{
-        if((!reprogramar) & (!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
+        if((control == 'nocontrolado') & (!comentario) & (!reprogramar) & (!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
             setEditable(false)
         }else{
             setEditable(true)
@@ -88,20 +98,49 @@ export function AudienciaIndiv ({date, element}) {
     }, []);
     return(
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
-            <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
-                <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
-            </span>
-            <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>
-                <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} defaultValue={element.hora}/>
-            </span>
-            <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
-                {(element.estado == 'PROGRAMADA') ? <><button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR</button> 
-                <button type="button" className={reprogramar ? `${styles.reprogramarButton} ${styles.reprogramarButtonClicked}` : `${styles.reprogramarButton}`} onClick={()=>setReprogramar(!reprogramar)}>REPROGRAMAR</button> 
-                </>:
-                <><p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>
-                </>}
-            </span>
-            <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span>
+            {!element.control && <>
+                <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
+                    <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
+                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={e=>setChangeButton(!changeButton)}>CTRL</button>
+                </span>
+            </>}
+            {control == 'controlado' && <>
+                <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
+                    <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdminChanges}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
+                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={e=>setChangeButton(!changeButton)}>CTRL</button>
+                </span>
+            </>}
+            {control == 'corregido' && <>
+                <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
+                    <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdminCorrect}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
+                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={e=>setChangeButton(!changeButton)}>CTRL</button>
+                </span>
+            </>}
+            {changeButton ?
+                <>
+                <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv} ${styles.tableCellWhiteLeft}`}>
+                    <button type='button' className={`${styles.buttonCorrect}`}>CORRECTO</button>
+                </span>
+                <span className={`${styles.tableCell} ${styles.tableCellSala} ${styles.tableCellWhiteMiddle}`}>
+                    <button type='button' className={`${styles.buttonToChange}`}>A CORREGIR</button>
+                </span>
+                <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv} ${styles.inputComentarioEditCell} ${styles.tableCellWhiteRight}`}>
+                    <textarea className={`${styles.inputComentarioEdit}`}></textarea>
+                </span></>
+            :
+                <>
+                <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>
+                    <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} defaultValue={element.hora}/>
+                </span>
+                <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
+                    {(element.estado == 'PROGRAMADA') ? <><button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR</button> 
+                    <button type="button" className={reprogramar ? `${styles.reprogramarButton} ${styles.reprogramarButtonClicked}` : `${styles.reprogramarButton}`} onClick={()=>setReprogramar(!reprogramar)}>REPROGRAMAR</button> 
+                    </>:
+                    <><p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>
+                    </>}
+                </span>
+                <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span></>
+            }
             <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}{element.tipo2 && ' + ' + element.tipo2}{element.tipo3 && ' + ' + element.tipo3}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,4).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>

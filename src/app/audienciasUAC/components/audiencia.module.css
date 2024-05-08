@@ -31,6 +31,7 @@
     display: table-cell;
     padding: 0 8px;
     overflow: hidden;
+    vertical-align: middle;
 }
 .tableCellAdmin{
     width: 65px;
@@ -361,6 +362,31 @@
 }
 .inputAdmin{
     border: solid white 1px;
+    font-size: 14px;
+    padding: 0 2px;
+    width: 65px;
+}
+.inputAdminChanges{
+    border: solid #dc3545 1px;
+}
+.inputAdminCorrect{
+    border: solid #28a745 1px;
+}
+.inputAdmin::placeholder{
+    font-size: 14px;
+}
+.controlButton{
+    width: 95%;
+    font-weight: 700;
+    background-color: #FFF;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.controlButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
 .audienciaCancelada{
     font-size: 14px;
@@ -386,6 +412,49 @@
 }
 .REPROGRAMADA {
     background-color: #6c757d;
+}
+.inputComentarioEdit{
+    margin: 0;
+    width: 95%;
+    background-color: transparent;
+    height: 40px;
+    border-radius: 5px;
+    padding: 5px 0 5px 5px;
+}
+.inputComentarioEditCell{
+    padding: 0;
+}
+.tableCellWhiteLeft, .tableCellWhiteMiddle, .tableCellWhiteRight{
+    background-color: #fff;
+    opacity: 1;
+    vertical-align: middle;
+    padding: 0;
+}
+.tableCellWhiteLeft{
+    border-radius: 10px 0 0 10px;
+}
+.tableCellWhiteMiddle{
+    border-radius: 0;
+
+}
+.tableCellWhiteRight{
+    border-radius: 0 10px 10px 0;
+}
+.buttonCorrect{
+    background-color: #28a745;
+    font-weight: 700;
+    color: #fff;
+    border: none;
+    outline: none;
+    padding: 8px 5px;
+}
+.buttonToChange{
+    color: #fff;
+    background-color: #fd7e14;
+    font-weight: 700;
+    padding: 8px 5px;
+    outline: none;
+    border: none;
 }
 @keyframes errorMessage {
     0% {
