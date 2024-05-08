@@ -264,10 +264,7 @@
 .toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
     color: #dc3545;
 }
-.operadorInput{
-    width: 80px;
-    height: 30px;
-}
+
 .operadorInput{
     border: solid white 1px;
 }
@@ -302,6 +299,11 @@
 }
 .inputHora::-webkit-calendar-picker-indicator{
     display: none;
+}
+.operadorInput{
+    font-size: 14px;
+    width: 75px;
+    height: 30px;
 }
 @keyframes errorMessage {
     0% {
