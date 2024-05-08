@@ -11,6 +11,7 @@ export function AddBlock ({date}) {
     const [legajo3, setLegajo3] = useState('')
     const [tipo, setTipo] = useState(null)
     const [tipo2, setTipo2] = useState(null)
+    const [tipo3, setTipo3] = useState(null)
     const [colegiado, setColegiado] = useState(false)
     const [juez, setJuez] = useState(null)
     const [juez2, setJuez2] = useState(null)
@@ -48,7 +49,8 @@ export function AddBlock ({date}) {
             sala: sala,
             numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
             tipo: tipo,
-            tipo2: (tipo2 == '-' ? '' : tipo2),
+            tipo2: ((tipo2 == '-') ? '' : tipo2),
+            tipo3: ((tipo3 == '-' | tipo2 == '-') ? '' : tipo3),
             juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
             estado: "PROGRAMADA",
             situacion: (situacion ? situacion : '')
@@ -130,13 +132,22 @@ export function AddBlock ({date}) {
                     )
                 })}
             </select>
+            {(tipo && tipo =='-') ||
             <select onChange={(e)=>{setTipo2(e.target.value)}}>
-                {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
-                    return(
-                        <option key={el} value={el}>{el}</option>
-                    )
-                })}
-            </select>
+            {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
+                return(
+                    <option key={el} value={el}>{el}</option>
+                )
+            })}
+            </select>}
+            {((tipo && tipo =='-') || (tipo2 && tipo2 =='-')) ||
+            <select onChange={(e)=>{setTipo3(e.target.value)}}>
+            {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
+                return(
+                    <option key={el} value={el}>{el}</option>
+                )
+            })}
+            </select>}
         </span>
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellJuez}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellJuez}`}>
             <span className={`${styles.juecesButtonBlock}`}>

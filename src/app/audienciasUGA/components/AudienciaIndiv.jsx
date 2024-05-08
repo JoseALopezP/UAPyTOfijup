@@ -86,7 +86,7 @@ export function AudienciaIndiv ({date, element}) {
                 </select>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellLegajo}`}>{element.numeroLeg}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellTipo} ${styles.tableCellTipoIndiv}`}>{element.tipo}{element.tipo2 && ' + ' + element.tipo2}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}{element.tipo2 && ' + ' + element.tipo2}{element.tipo3 && ' + ' + element.tipo3}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,4).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSituacion} ${styles.tableCellSituacionIndiv}`}>
                 <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
