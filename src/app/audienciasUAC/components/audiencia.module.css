@@ -367,10 +367,24 @@
     width: 65px;
 }
 .inputAdminChanges{
-    border: solid #dc3545 1px;
+    border: solid #dcc635 1px;
+    color: #dcc635;
+    font-size: 14px;
+    padding: 0 2px;
+    width: 65px;
+}
+.inputAdminChanges::placeholder{
+    color: #dcc635;
 }
 .inputAdminCorrect{
     border: solid #28a745 1px;
+    color: #28a745;
+    font-size: 14px;
+    padding: 0 2px;
+    width: 65px;
+}
+.inputAdminCorrect::placeholder{
+    color: #28a745;
 }
 .inputAdmin::placeholder{
     font-size: 14px;
@@ -429,6 +443,7 @@
     opacity: 1;
     vertical-align: middle;
     padding: 0;
+    text-align: center;
 }
 .tableCellWhiteLeft{
     border-radius: 10px 0 0 10px;
@@ -447,6 +462,11 @@
     border: none;
     outline: none;
     padding: 8px 5px;
+    border-radius: 5px;
+}
+.buttonCorrectClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
 .buttonToChange{
     color: #fff;
@@ -455,6 +475,11 @@
     padding: 8px 5px;
     outline: none;
     border: none;
+    border-radius: 5px;
+}
+.buttonToChangeClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
 @keyframes errorMessage {
     0% {

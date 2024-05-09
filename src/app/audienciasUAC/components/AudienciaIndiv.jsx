@@ -46,8 +46,9 @@ export function AudienciaIndiv ({date, element}) {
             if(comentario){
                 await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario)
             }
-            if(control){
+            if(control != 'nocontrolado'){
                 await updateData(date, element.numeroLeg, element.hora, 'control', control)
+                await setControl('nocontrolado')
             }
             await setEditable(false)
             await setDeleteAud(false)
@@ -69,9 +70,20 @@ export function AudienciaIndiv ({date, element}) {
             setCancelar(false)
         }
     }
+    const openCloseControl = () =>{
+        setChangeButton(!changeButton)
+        setComentario(null)
+        setControl('nocontrolado')
+    }
     useEffect(() => {
         checkEditing()
     }, [deleteAud]);
+    useEffect(() => {
+        checkEditing()
+    }, [comentario]);
+    useEffect(() => {
+        checkEditing()
+    }, [control]);
     useEffect(() => {
         checkEditing()
     }, [admin]);
@@ -101,31 +113,31 @@ export function AudienciaIndiv ({date, element}) {
             {!element.control && <>
                 <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
                     <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdmin}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
-                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={e=>setChangeButton(!changeButton)}>CTRL</button>
+                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={()=>openCloseControl()}>CTRL</button>
                 </span>
             </>}
-            {control == 'controlado' && <>
+            {element.control == 'controlado' && <>
                 <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
                     <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdminChanges}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
-                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={e=>setChangeButton(!changeButton)}>CTRL</button>
+                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={()=>openCloseControl()}>CTRL</button>
                 </span>
             </>}
-            {control == 'corregido' && <>
+            {element.control == 'correcto' && <>
                 <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
                     <input type='text' className={`${styles.inputSituacionEdit} ${styles.inputAdminCorrect}`} placeholder={element.admin} onChange={(e)=>{setAdmin(e.target.value)}}></input>
-                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={e=>setChangeButton(!changeButton)}>CTRL</button>
+                    <button type='button' className={changeButton ? `${styles.controlButton} ${styles.controlButtonClicked}` : `${styles.controlButton}`} onClick={()=>openCloseControl()}>CTRL</button>
                 </span>
             </>}
             {changeButton ?
                 <>
                 <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv} ${styles.tableCellWhiteLeft}`}>
-                    <button type='button' className={`${styles.buttonCorrect}`}>CORRECTO</button>
+                    <button type='button' onClick={e=>setControl(control == 'nocontrolado' ? 'correcto' : 'nocontrolado')} className={control == 'correcto' ? `${styles.buttonCorrect} ${styles.buttonCorrectClicked}` :`${styles.buttonCorrect}`}>CORRECTO</button>
                 </span>
                 <span className={`${styles.tableCell} ${styles.tableCellSala} ${styles.tableCellWhiteMiddle}`}>
-                    <button type='button' className={`${styles.buttonToChange}`}>A CORREGIR</button>
+                    <button type='button' onClick={e=>setControl(control == 'nocontrolado' ? 'controlado' : 'nocontrolado')} className={control == 'controlado' ? `${styles.buttonToChange} ${styles.buttonToChangeClicked}` :`${styles.buttonToChange}`}>CORREGIR</button>
                 </span>
                 <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv} ${styles.inputComentarioEditCell} ${styles.tableCellWhiteRight}`}>
-                    <textarea className={`${styles.inputComentarioEdit}`}></textarea>
+                    <textarea onChange={(e)=>{setComentario(e.target.value)}} placeholder={element.comentario} className={`${styles.inputComentarioEdit}`} ></textarea>
                 </span></>
             :
                 <>
