@@ -5,18 +5,19 @@ import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 
 export function AudienciaList ({date}) {
-    const {updateToday, today} = useContext(DataContext);
+    const {updateToday, today, updateRealTime, realTime} = useContext(DataContext);
     function tick() {
-        updateToday();     
+        updateToday();
+        updateRealTime()    
     }
     useEffect(() =>{
-        const timerID = setInterval(() => tick(), 30000);  
+        const timerID = setInterval(() => tick(), 5000);
         return function cleanup() {
             clearInterval(timerID);
         };
     }, [])
     const getMinutes = (dateObject) =>{
-        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
+        const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
         const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
         return (timeComparison - nowTime)
     }
@@ -30,7 +31,7 @@ export function AudienciaList ({date}) {
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
                     <tr>
-                        <th className={`${styles.tableCellHora}`}>HORA</th>
+                        <th className={`${styles.tableCellHora}`}>{realTime}</th>
                         <th className={`${styles.tableCellSala}`}>SALA</th>
                         <th className={`${styles.tableCellOperador}`}>OPERADOR</th>
                         <th className={`${styles.tableCellLeg}`}>LEGAJO</th>

@@ -7,7 +7,7 @@ export function ScheduleTable () {
     const [part, setPart] = useState(0)
     const [showInfo, setShowInfo] = useState(0)
     const getMinutes = (dateObject) =>{
-        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
+        const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
         const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
         return (timeComparison - nowTime)
     }
