@@ -48,8 +48,9 @@ export function AddBlock ({date}) {
         setLegajo1('MPF-SJ');
         setLegajo2('');
         setLegajo3('');
-        setTipo(null)
-        setTipo2(null)
+        setTipo('-')
+        setTipo2('-')
+        setTipo3('-')
         setColegiado(false)
         setJuez(null)
         setJuez2(null)

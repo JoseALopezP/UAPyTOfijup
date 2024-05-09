@@ -36,7 +36,7 @@ export function AddBlock ({date}) {
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
-        (tipo || !(tipo == '-')) ? setTipoError(false) : setTipoError(true);
+        (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
         if(colegiado){
             ((juez || juez == '-' ) && (juez2 || juez == '-') && (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
         }else{
