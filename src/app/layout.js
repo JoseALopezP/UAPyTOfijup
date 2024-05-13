@@ -2,7 +2,7 @@ import "./globals.css";
 import { titillium } from "./ui/fonts";
 
 export const metadata = {
-  title: "UAPyT",
+  title: "OFIJUPenal",
   description: "Tablero de horarios Audiencias",
   icons: {
     icon: '/favicon.png',
