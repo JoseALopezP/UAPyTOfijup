@@ -9,9 +9,9 @@ export function AddBlock ({date}) {
     const [legajo1, setLegajo1] = useState('MPF-SJ')
     const [legajo2, setLegajo2] = useState('')
     const [legajo3, setLegajo3] = useState('')
-    const [tipo, setTipo] = useState(null)
-    const [tipo2, setTipo2] = useState(null)
-    const [tipo3, setTipo3] = useState(null)
+    const [tipo, setTipo] = useState('-')
+    const [tipo2, setTipo2] = useState('-')
+    const [tipo3, setTipo3] = useState('-')
     const [colegiado, setColegiado] = useState(false)
     const [juez, setJuez] = useState(null)
     const [juez2, setJuez2] = useState(null)
@@ -42,6 +42,22 @@ export function AddBlock ({date}) {
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
     }
+    const addToFirebase = async() =>{
+        const newAudiencia = {
+            hora: hora,
+            sala: sala,
+            numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
+            tipo: tipo,
+            tipo2: ((tipo2 == '-') ? '' : tipo2),
+            tipo3: ((tipo3 == '-' | tipo2 == '-') ? '' : tipo3),
+            juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
+            estado: "PROGRAMADA",
+            situacion: (situacion ? situacion : '')
+        }
+        await addAudiencia(newAudiencia, `${date}`)
+        document.getElementById('addingForm').reset();
+        await updateByDate(date)
+    }
     const restore = () =>{
         setHora(null);
         setSala(null);
@@ -55,22 +71,6 @@ export function AddBlock ({date}) {
         setJuez(null)
         setJuez2(null)
         setJuez3(null)
-    }
-    const addToFirebase = async() =>{
-        const newAudiencia = {
-            hora: hora,
-            sala: sala,
-            numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
-            tipo: tipo,
-            tipo2: (tipo2 == '-' ? '' : tipo2),
-            tipo3: ((tipo3 == '-' | tipo2 == '-') ? '' : tipo3),
-            juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
-            estado: "PROGRAMADA",
-            situacion: (situacion ? situacion : '')
-        }
-        await addAudiencia(newAudiencia, `${date}`)
-        document.getElementById('addingForm').reset();
-        await updateByDate(date)
     }
     const handleSubmit = async(event) =>{
         event.preventDefault();
@@ -124,15 +124,24 @@ export function AddBlock ({date}) {
                 })}
             </select>
         </span>
-        <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellTipo}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellTipo}`}><select onChange={(e)=>{setTipo(e.target.value)}}>
+        <span className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell}` : `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.tableCell}`}>
+            <select onChange={(e)=>{setTipo(e.target.value)}}>
+                {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
+                    return(
+                        <option key={el} value={el}>{el}</option>
+                    )
+                })}
+            </select>
+            {(tipo && tipo =='-') ||
+            <select onChange={(e)=>{setTipo2(e.target.value)}}>
             {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
                 )
             })}
-        </select>
-        {(tipo && tipo =='-') ||
-        <select onChange={(e)=>{setTipo2(e.target.value)}}>
+            </select>}
+            {((tipo && tipo =='-') || (tipo2 && tipo2 =='-')) ||
+            <select onChange={(e)=>{setTipo3(e.target.value)}}>
             {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                 return(
                     <option key={el} value={el}>{el}</option>
@@ -140,14 +149,6 @@ export function AddBlock ({date}) {
             })}
             </select>}
         </span>
-        {((tipo && tipo =='-') || (tipo2 && tipo2 =='-')) ||
-        <select onChange={(e)=>{setTipo3(e.target.value)}}>
-            {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
-                return(
-                    <option key={el} value={el}>{el}</option>
-                )
-            })}
-        </select>}
         <span className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellJuez}` : `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellJuez}`}>
             <span className={`${styles.juecesButtonBlock}`}>
             <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>{colegiado ? 'COL' : 'UNI'}</button>
