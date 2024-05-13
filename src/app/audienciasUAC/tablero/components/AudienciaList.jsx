@@ -10,7 +10,8 @@ export function AudienciaList ({date}) {
         updateToday();     
     }
     useEffect(() =>{
-        const timerID = setInterval(() => tick(), 5000);  
+        tick()
+        const timerID = setInterval(() => tick(), 30000);  
         return function cleanup() {
             clearInterval(timerID);
         };
