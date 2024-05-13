@@ -20,7 +20,6 @@ export default function MenuSelector() {
       if (user == null){
         router.push("/signin")
       }else{
-        console.log(user.uid)
         checkUserType(user.uid)
         if(userType == 'operador'){
           router.push("/audienciasUGA/listaAudiencias")

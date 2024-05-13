@@ -88,7 +88,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const checkUserType = async(userId) =>{
         const userList = await getDocument('users', 'listaUsuarios')
-        console.log(userList)
         await setUsertype(userList.find(item => item['userId'] === userId).type)
     }
 

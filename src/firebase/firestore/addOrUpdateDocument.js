@@ -11,12 +11,10 @@ export default async function addOrUpdateDocument(collectionName, documentId, da
             await updateDoc(docRef, {
                 list: arrayUnion(data)
             });
-            console.log("Document updated successfully!");
         } else {
             await setDoc(docRef, {
                 list: [data]
             });
-            console.log("Document created successfully!");
         }
     } catch (e) {
         console.error(e);

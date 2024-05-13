@@ -32,11 +32,12 @@ export function AudienciaList () {
                     <tr>
                         <th>HORA</th>
                         <th>SALA</th>
-                        <th>OPERADOR</th>
-                        <th>LEGAJO</th>
+                        <th>OP</th>
+                        <th>LEG</th>
                         <th className={`${styles.tableHeadJuez}`}>JUEZ</th>
-                        <th>TIPO DE AUDIENCIA</th>
-                        <th>ESTADO</th>
+                        <th>TIPO</th>
+                        <th>SIT</th>
+                        <th>EST</th>
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>

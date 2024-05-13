@@ -12,7 +12,6 @@ export default async function signUp(email, password, userType){
         const user = userCredential.user;
         const uid = user.uid;
         result = { uid, email};
-        console.log(user)
         const data = {
             id: uid,
             type: userType

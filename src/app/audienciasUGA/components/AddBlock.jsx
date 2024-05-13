@@ -75,7 +75,6 @@ export function AddBlock ({date}) {
     const handleSubmit = async(event) =>{
         event.preventDefault();
         errorChecking()
-        console.log(horaError, salaError, legajo2Error,legajo3Error,tipoError,juezError)
         if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError)){
             await addToFirebase()
             await restore()
