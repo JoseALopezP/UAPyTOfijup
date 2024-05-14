@@ -42,6 +42,7 @@ export function AddBlock ({date}) {
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
+        console.log(horaError, salaError, legajo2Error, legajo3Error, tipoError, juezError)
     }
     const addToFirebase = async() =>{
         const newAudiencia = {
