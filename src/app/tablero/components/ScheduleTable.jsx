@@ -54,7 +54,7 @@ export function ScheduleTable () {
     }
     useEffect(() =>{
         tick()
-        const timerID = setInterval(() => tick(), 5000);  
+        const timerID = setInterval(() => tick(), 30000);  
         return function cleanup() {
             clearInterval(timerID);
         };
