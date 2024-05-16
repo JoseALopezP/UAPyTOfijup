@@ -5,11 +5,11 @@ import { DataContext } from '@/context/DataContext'
 
 export function Clock () {
     const {updateRealTime, realTime} = useContext(DataContext);
-
     async function tick() {
         updateRealTime()
     }
     useEffect(() => {
+        tick()
         const timerID = setInterval(() => tick(), 5000);
         return function cleanup() {
             clearInterval(timerID);

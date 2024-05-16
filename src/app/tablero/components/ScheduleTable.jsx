@@ -5,7 +5,8 @@ import { DataContext } from '@/context/DataContext'
 export function ScheduleTable () {
     const {updateToday, today, realTime} = useContext(DataContext);
     const [part, setPart] = useState(0)
-    const [showInfo, setShowInfo] = useState(0)
+    const [showInfo, setShowInfo] = useState(false)
+    const [aux, setAux] = useState([])
     const getMinutes = (dateObject) =>{
         const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
         const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
@@ -14,7 +15,7 @@ export function ScheduleTable () {
     function filterToday() {
         const aux2 = []
         if(today){
-            today.forEach((item) =>{
+            today.forEach((item, i) =>{
                 switch(item.estado){
                     case 'EN_CURSO':
                         if(getMinutes(item.hora) < 120){
@@ -45,31 +46,14 @@ export function ScheduleTable () {
                 }
             });
         }
-        /*if(part == 0){
-            if(showInfo == false){
-                aux2.splice(0,15);
-                setPart(1)
-            }else{
-                aux2.splice(0,13);
-                setPart(1)
-            }
-        }else{
-            if(showInfo == false){
-                aux2.splice(15,15);
-                setPart(0)
-                setShowInfo(true)
-            }else{
-                aux2.splice(13,13);
-                setPart(0)
-                setShowInfo(false)
-            }
-        }*/
         return aux2
     }
     function tick() {
-        updateToday();       
+        setShowInfo(!showInfo)  
+        updateToday();
     }
     useEffect(() =>{
+        tick()
         const timerID = setInterval(() => tick(), 5000);  
         return function cleanup() {
             clearInterval(timerID);
@@ -89,7 +73,7 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today && filterToday().sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
+                    {today && filterToday().splice(0,10).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                         return(
                             <tr key={el.numeroLeg} className={el.estado == 'REPROGRAMADA' && `${styles.filaReprogramada}`}> 
                                 <td>{el.hora}</td>

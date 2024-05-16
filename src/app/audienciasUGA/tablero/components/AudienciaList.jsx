@@ -18,9 +18,12 @@ export function AudienciaList ({date}) {
         };
     }, [])
     const getMinutes = (dateObject) =>{
-        const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
-        const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
-        return (timeComparison - nowTime)
+        if(realTime){
+            const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
+            const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
+            return (timeComparison - nowTime)
+        }
+        
     }
     const { user } = useAuthContext()
     const router = useRouter()
