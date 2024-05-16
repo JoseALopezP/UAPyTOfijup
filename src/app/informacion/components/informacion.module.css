@@ -1,0 +1,12 @@
+.informacionBlock{
+    display: inline-flex;
+    flex-direction: row;
+}
+.cargaSection{
+    width: 50vw;
+    background-color: beige;
+    height: 100vh;
+}
+.listSection{
+    height: calc(100vh - (100vh - 100%));
+}

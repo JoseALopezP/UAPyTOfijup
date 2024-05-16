@@ -26,12 +26,6 @@ export function AddBlock ({date}) {
     const [juezError, setJuezError] = useState(false)
 
     const errorChecking = () =>{
-        setHoraError(false)
-        setSalaError(false)
-        setLegajo2Error(false)
-        setLegajo3Error(false)
-        setTipoError(false)
-        setJuezError(false)
         hora ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
@@ -56,8 +50,8 @@ export function AddBlock ({date}) {
             situacion: (situacion ? situacion : '')
         }
         await addAudiencia(newAudiencia, `${date}`)
-        document.getElementById('addingForm').reset();
         await updateByDate(date)
+        document.getElementById('addingForm').reset();
     }
     const restore = () =>{
         setHora(null);
@@ -78,8 +72,8 @@ export function AddBlock ({date}) {
         errorChecking()
         if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError)){
             await addToFirebase()
+            await restore()
         }
-        await restore()
     }
     useEffect(() => {
         updateTiposAudiencias()

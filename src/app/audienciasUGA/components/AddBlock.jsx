@@ -25,12 +25,6 @@ export function AddBlock ({date}) {
     const [juezError, setJuezError] = useState(false)
 
     const errorChecking = () =>{
-        setHoraError(false)
-        setSalaError(false)
-        setLegajo2Error(false)
-        setLegajo3Error(false)
-        setTipoError(false)
-        setJuezError(false)
         hora ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
