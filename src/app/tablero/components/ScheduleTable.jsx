@@ -3,10 +3,7 @@ import styles from './ScheduleTable.module.css'
 import { DataContext } from '@/context/DataContext'
 
 export function ScheduleTable () {
-    const {updateToday, today, realTime} = useContext(DataContext);
-    const [part, setPart] = useState(0)
-    const [showInfo, setShowInfo] = useState(false)
-    const [aux, setAux] = useState([])
+    const {updateToday, today, realTime, updateTick, audSize, partShow} = useContext(DataContext);
     const getMinutes = (dateObject) =>{
         const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
         const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
@@ -49,13 +46,13 @@ export function ScheduleTable () {
         return aux2
     }
     function tick() {
-        setShowInfo(!showInfo)  
-        updateToday();
+        updateTick(filterToday().splice(0,10).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))))
+        updateToday();  
     }
     useEffect(() =>{
         tick()
         const timerID = setInterval(() => tick(), 30000);  
-        return function cleanup() {
+        return () => {
             clearInterval(timerID);
         };
     }, [])
@@ -73,16 +70,19 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today && filterToday().splice(0,10).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
+                    {today && filterToday().splice(0,10).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el,i)=>{
                         return(
-                            <tr key={el.numeroLeg} className={el.estado == 'REPROGRAMADA' && `${styles.filaReprogramada}`}> 
+                            <>
+                            {(partShow ? (i > audSize & i < (audSize*2)) : (i <= audSize)) &&
+                            <tr key={el.numeroLeg} className={`${styles["fila" + el.estado]}`}> 
                                 <td>{el.hora}</td>
                                 <td>SALA {el.sala}</td>
                                 <td>{el.numeroLeg}</td>
                                 <td>{el.tipo}</td>
                                 <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
                                 {(el.estado == 'PROGRAMADA' & (realTime > el.hora))  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
-                            </tr>
+                            </tr>}
+                            </>
                         )
                     })}
                 </tbody>
