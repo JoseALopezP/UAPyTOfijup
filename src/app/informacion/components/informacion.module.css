@@ -4,10 +4,23 @@
     padding: 0;
 }
 .cargaSection{
-    width: 50vw;
+    width: 46vw;
     background-color: beige;
-    height: 100vh;
+    height: 90vh;
+    margin: 5vh 2vw;
+    border-radius: 5px;
 }
 .listSection{
     height: 99vh;
+    width: 50vw;
+}
+.inputDiv{
+    width: 80%;
+    padding: 10%;
+    justify-content: center;
+    text-align: center;
+}
+.inputForm{
+    display: inline-flex;
+    flex-direction: column;
 }
