@@ -42,7 +42,7 @@ export function AudienciaAddList ({date}) {
                 <AddBlock date={date}/>
                 {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                     return(
-                        <AudienciaIndiv date={date} element={el}/>
+                        <AudienciaIndiv date={date} element={el} key={el.numeroLeg + el.hora}/>
                     )
                 })}
             </div>
