@@ -3,8 +3,9 @@ import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 
 export function AddBlock ({date}) {
-    const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateJueces, addAudiencia, updateAños, años} = useContext(DataContext);
+    const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateJueces, addAudiencia, updateAños, años, bydate} = useContext(DataContext);
     const [hora, setHora] = useState(null)
+    const [hora2, setHora2] = useState(null)
     const [sala, setSala] = useState(null)
     const [legajo1, setLegajo1] = useState('MPF-SJ')
     const [legajo2, setLegajo2] = useState('')
@@ -24,6 +25,7 @@ export function AddBlock ({date}) {
     const [legajo3Error, setLegajo3Error] = useState(false)
     const [tipoError, setTipoError] = useState(false)
     const [juezError, setJuezError] = useState(false)
+    const [dupliCheck, setDupliCheck] = useState(false)
 
     const errorChecking = () =>{
         hora ? setHoraError(false) : setHoraError(true);
@@ -36,10 +38,15 @@ export function AddBlock ({date}) {
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
+        if(bydate.some(el => el.hora === `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`) & bydate.some(el => el.hora === `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`)){
+            setDupliCheck(true)
+        }else{
+            setDupliCheck(false)
+        }
     }
     const addToFirebase = async() =>{
         const newAudiencia = {
-            hora: hora,
+            hora: `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`,
             sala: sala,
             numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
             tipo: tipo,
@@ -70,7 +77,7 @@ export function AddBlock ({date}) {
     const handleSubmit = async(event) =>{
         event.preventDefault();
         errorChecking()
-        if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError)){
+        if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck)){
             await addToFirebase()
             await restore()
         }
@@ -82,12 +89,15 @@ export function AddBlock ({date}) {
     }, [])
     return(
         <>
-        {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError) && 
-            (<div className={`${styles.errorMessage}`}>DATOS INSUFICIENTES O INCORRECTOS</div>)}
+        {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck) && 
+            (<div className={`${styles.errorMessage}`}>{dupliCheck ? 'AUDIENCIA DUPLICADA' : 'DATOS INSUFICIENTES O INCORRECTOS'}</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
         <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}></span>
         <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellHora}` : `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.tableCellHora}`}>
-            <input className={`${styles.inputHora}`} type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}}/>
+            <span className={`${styles.inputTimeBlock}`}>
+                <input type='number' placeholder='00' min='0' max='24' onChange={e => {setHora(e.target.value)}}/>:
+                <input type='number' placeholder='00' min='0' max='59' onChange={e => {setHora2(e.target.value)}}/>
+            </span>
         </span>
         <span className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellSala}` : `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.tableCellSala}` }>
             <select  onChange={(e)=>{setSala(e.target.value)}}>
@@ -109,7 +119,7 @@ export function AddBlock ({date}) {
                 <option value={"MPF-SJ"}>MPF-SJ</option>
                 <option value={"OJU-SJ"}>OJU-SJ</option>
             </select>
-            <input className={legajo2Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}` } type="text" id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
+            <input className={legajo2Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}` } type='number' min='1' max='99999' id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
             <select className={legajo3Error ? `${styles.inputAreaError} ${styles.inputArea}` : `${styles.inputArea}`} onChange={(e)=>{setLegajo3(e.target.value)}}>
                 {años && años.map(el =>{
                     return(

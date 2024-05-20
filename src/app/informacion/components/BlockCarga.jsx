@@ -1,6 +1,9 @@
 import styles from './informacion.module.css'
 
 export function BlockCarga () {
+    const handleSubmit = () =>{
+
+    }
     return(
         <section className={`${styles.cargaSection}`}>
             <div className={`${styles.inputDiv}`}>
@@ -12,6 +15,7 @@ export function BlockCarga () {
                 <label>IMÁGEN</label>
                 <label>FECHA INICIO</label>
                 <label>FECHA FIN</label>
+                <button type="submit" className={`${styles.submitButton}`}>AGREGAR</button>
             </form>
             </div>
         </section>

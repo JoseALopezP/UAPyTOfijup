@@ -481,6 +481,30 @@
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
+.inputTimeBlock{
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #fff;
+    border-radius: 5px;
+    color: #375166;
+    height: 34px;
+    padding: 3px 0;
+    max-width: 80px;
+}
+.inputTimeBlock input{
+    margin: 0;
+    padding: 2px;
+    height: 30px;
+    text-align: center;
+}
+.inputTimeBlock input:focus-visible{
+    border: none;
+    outline: none;
+}
+.inputTimeBlock input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 @keyframes errorMessage {
     0% {
         display: none;

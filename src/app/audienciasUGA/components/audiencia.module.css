@@ -305,6 +305,29 @@
     width: 75px;
     height: 30px;
 }
+.inputTimeBlock{
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #fff;
+    border-radius: 5px;
+    color: #375166;
+    height: 34px;
+    padding: 3px 0;
+}
+.inputTimeBlock input{
+    margin: 0;
+    padding: 2px;
+    height: 30px;
+    text-align: center;
+}
+.inputTimeBlock input:focus-visible{
+    border: none;
+    outline: none;
+}
+.inputTimeBlock input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 @keyframes errorMessage {
     0% {
         display: none;
