@@ -16,7 +16,7 @@ export function BlockCarga () {
                 <label>IMÁGEN</label>
                 <input type="file" />
                 <label>FECHA INICIO</label>
-                <input type="time" />
+                <input type="date" />
                 <label>FECHA FIN</label>
                 <button type="submit" className={`${styles.submitButton}`}>AGREGAR</button>
             </form>
