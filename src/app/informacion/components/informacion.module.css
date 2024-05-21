@@ -24,3 +24,45 @@
     display: inline-flex;
     flex-direction: column;
 }
+.inputFile{
+    display:none;
+}
+.inputTitle{
+    font-weight: 700;
+    font-size: 32px;
+}
+.inputText{
+    border-radius: 5px;
+    border: 0;
+    outline: 0;
+    font-family:inherit;
+}
+.inputText::-webkit-calendar-picker-indicator{
+    display: none;
+}
+.inputButton{
+    font-weight: 700;
+    border: 5px;
+    height: 40px;
+}
+.listSection{
+    display: table;
+    width: 46vw;
+    height: 90vh;
+    margin: 5vh 2vw;
+    border-radius: 5px;
+}
+.tableRow{
+    display: table-row;
+    background-color: white;
+    height: 200px;
+    border: 5px;
+}
+.tableCell{
+    display: table-cell ;
+}
+
+.infoImg{
+    width: 200px;
+    border-radius: 5px;
+}
