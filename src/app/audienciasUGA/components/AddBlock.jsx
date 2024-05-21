@@ -36,7 +36,7 @@ export function AddBlock ({date}) {
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
-        if(bydate.some(el => el.hora === `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`) & bydate.some(el => el.hora === `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`)){
+        if(bydate.some(el => el.hora === `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`) & bydate.some(el => el.numeroLeg === (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3))){
             setDupliCheck(true)
         }else{
             setDupliCheck(false)
