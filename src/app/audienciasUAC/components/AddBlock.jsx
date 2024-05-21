@@ -28,7 +28,7 @@ export function AddBlock ({date}) {
     const [dupliCheck, setDupliCheck] = useState(false)
 
     const errorChecking = () =>{
-        hora ? setHoraError(false) : setHoraError(true);
+        (hora && hora2) ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
