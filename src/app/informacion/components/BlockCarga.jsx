@@ -11,14 +11,14 @@ export function BlockCarga () {
     return(
         <section className={`${styles.cargaSection}`}>
             <div className={`${styles.inputDiv}`}>
-            <h2>AGREGAR UN NUEVO DOCUMENTO</h2>
+            <h2 className={`${styles.inputPresentation}`}>AGREGAR UN NUEVO DOCUMENTO</h2>
             <form action="" className={`${styles.inputForm}`}>
                 <label className={`${styles.inputTitle}`}>TÍTULO</label>
                 <input type="text" className={`${styles.inputText}`}/>
                 <label className={`${styles.inputTitle}`}>CUERPO</label>
                 <input type="textarea" className={`${styles.inputText}`}/>
                 <label className={`${styles.inputTitle}`}>IMÁGEN</label>
-                <button type='button' onClick={() => handleFileClick()} className={`${styles.inputButton}`}>Your text here</button>
+                <button type='button' onClick={() => handleFileClick()} className={`${styles.inputButton}`}>SUBIR IMÁGEN</button>
                 <input type="file" id='getFile' className={`${styles.inputFile}`}/>
                 <label className={`${styles.inputTitle}`}>FECHA INICIO</label>
                 <input type="date" className={`${styles.inputText}`}/>
