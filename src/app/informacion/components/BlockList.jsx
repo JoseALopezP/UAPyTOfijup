@@ -4,8 +4,8 @@ export function BlockList () {
     return(
         <section className={`${styles.listSection}`}>
             <div className={`${styles.tableBlock}`}>
-            {[...Array(10)].map(()=>{
-                return(<div className={`${styles.tableRow}`}>
+            {[...Array(10)].map((el,i)=>{
+                return(<div className={`${styles.tableRow}`} key={i}>
                     <span className={`${styles.tableCell}`}>
                         <img src='https://dipascuale.com/wp-content/uploads/2013/05/DiPascuale-Foto-Lapana-05.jpg' className={`${styles.tableCell} ${styles.infoImg}`}/>
                     </span>
