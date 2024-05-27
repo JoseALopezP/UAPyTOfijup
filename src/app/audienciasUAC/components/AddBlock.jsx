@@ -38,11 +38,10 @@ export function AddBlock ({date}) {
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
-        if(bydate.some(el => el.hora === `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`) && bydate.some(el => el.numeroLeg === (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3))){
-            setDupliCheck(true)
-        }else{
-            setDupliCheck(false)
-        }
+        const formattedHora = `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`;
+        const formattedNumeroLeg = `${legajo1}-${legajo2.padStart(5,'0')}-${legajo3}`;
+        const isDuplicate = bydate.some(el => el.hora === formattedHora && el.numeroLeg === formattedNumeroLeg);
+        setDupliCheck(isDuplicate);
     }
     const addToFirebase = async() =>{
         const newAudiencia = {
