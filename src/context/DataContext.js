@@ -16,9 +16,6 @@ const {Provider} = DataContext;
 export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
     const [desplegables, setDesplegables] = useState(defaultValue);
-    const [showInfo, setShowInfo] = useState(false);
-    const [audSize, setAudSize] = useState(14);
-    const [partShow, setPartShow] = useState(false);
     const [realTime, setRealTime] = useState(null);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
     const [años, setAños] = useState(defaultValue);
@@ -27,13 +24,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
     const refShowInfo = useRef();
-    useEffect(() => {
-        refShowInfo.current = showInfo;
-    }, [showInfo]);
-    const refPartShow = useRef();
-    useEffect(() => {
-        refPartShow.current = partShow;
-    }, [partShow]);
     const updateRealTime = async() =>{
         try {
             const response = await fetch('https://worldtimeapi.org/api/ip')
@@ -47,20 +37,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
             return null;
         }
     }
-    const updateTick = (filtered) => {
-        if (refShowInfo.current) {
-            setAudSize(12);
-            setShowInfo(false);
-        } else {
-            setAudSize(14);
-            setShowInfo(true);
-            if (filtered.length > 14) {
-                setPartShow(!refPartShow.current);
-            } else {
-                setPartShow(false);
-            }
-        }
-    };
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
     }
@@ -144,12 +120,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         addUser,
         checkUserType,
         updateRealTime,
-        updateTick,
         updateDesplegables,
         desplegables,
-        showInfo,
-        audSize,
-        partShow,
         realTime,
         userType,
         años,

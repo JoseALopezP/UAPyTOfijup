@@ -3,8 +3,10 @@ import styles from './ScheduleTable.module.css';
 import { DataContext } from '@/context/DataContext';
 
 export function ScheduleTable() {
-    const { updateToday, today, realTime, audSize } = useContext(DataContext);
+    const { updateToday, today, realTime} = useContext(DataContext);
     const [partShow, setPartShow] = useState(false);
+    const [audSize, setAudSize] = useState(12);
+    const [tickCount, setTickCount] = useState(0);
     const refPartShow = useRef(partShow);
 
     const getMinutes = (dateObject) => {
@@ -37,6 +39,14 @@ export function ScheduleTable() {
     }
 
     const updateTick = (filtered) => {
+        setTickCount(prevCount => prevCount + 1);
+        const newTickCount = tickCount + 1;
+        if (newTickCount % 2 === 0) {
+            setAudSize(audSize === 12 ? 14 : 12);
+        }
+        if (newTickCount >= 10) {
+            setTickCount(0);
+        }
         if (filtered.length > audSize) {
             setPartShow(!refPartShow.current);
         } else {
@@ -56,7 +66,7 @@ export function ScheduleTable() {
 
     useEffect(() => {
         tick();
-        const timerID = setInterval(() => tick(), 5000);
+        const timerID = setInterval(() => tick(), 30000);
         return () => {
             clearInterval(timerID);
         };
@@ -80,7 +90,7 @@ export function ScheduleTable() {
                         filterToday()
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
                             .map((el, i) => {
-                                const shouldDisplay = partShow ? (i >= audSize) : (i < audSize);
+                                const shouldDisplay = partShow ? (i >= audSize && i < audSize * 2) : (i < audSize);
                                 if (shouldDisplay) {
                                     return (
                                         <tr key={el.numeroLeg} className={`${styles["fila" + el.estado]}`}>
