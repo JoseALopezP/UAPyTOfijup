@@ -2,10 +2,12 @@
 import styles from './AudienciaList.module.css'
 import { useEffect, useState, useContext } from 'react'
 import { DataContext } from '@/context/DataContext';
+import { Resuelvo } from './Resuelvo';
 
 export function ButtonsAudiencia ({element}) {
     const {updateToday, updateData, pushtToArray, updateRealTime, realTime} = useContext(DataContext);
     const [show, setShow] = useState(false)
+    const [showResuelvo, setShowResuelvo] = useState(false)
     const [editable, setEditable] = useState(false)
     const [actionAud, setActionAud] = useState(null)
     const [sala, setSala] = useState(null)
@@ -56,9 +58,11 @@ export function ButtonsAudiencia ({element}) {
     }, [])
     return(
         <>
-        {show && 
+        {show &&
         <div className={`${styles.buttonsBlock}`}>
-            <h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>
+            {showResuelvo ?
+            <Resuelvo item={element}/> :
+            <><h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>
             <form onSubmit={(event) => handleSubmit(event)} action="#" className={`${styles.changeBlock}`}>
                 {(element.estado == 'CUARTO_INTERMEDIO') &&
                 <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>FINALIZAR CUARTO INTERMEDIO</button>}
@@ -90,9 +94,12 @@ export function ButtonsAudiencia ({element}) {
                     </>
                 }
                 <button type="submit" className={editable ? `${styles.editButton} ${styles.stateButton}` : `${styles.editButton} ${styles.editButtonNot} ${styles.stateButton}`}>GUARDAR</button>
+            </form></>}
+            <span className={`${styles.stateButtonBlock}`}>
+                <button type="button" onClick={() => setShowResuelvo(!showResuelvo)} className={`${styles.stateButton} ${styles.stateButtonResuelvoBlock}`}>RESUELVO</button>
                 <button type="button" onClick={() => setShow(false)} className={`${styles.stateButton} ${styles.stateButtonCerrar}`}>X CERRAR</button>
-            </form>
-        </div>}
+            </span>
+            </div>}
         
         <tr key={element.numeroLeg + element.hora} className={`${styles.tableRow}`} onClick={() => setShow(true)}> 
             <td>{element.hora}</td>

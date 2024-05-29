@@ -23,9 +23,6 @@ export function AudienciaIndiv ({date, element}) {
             if(!(!situacion | situacion == '-' | situacion == '')){
                 await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
             }
-            if(!(!situacion | situacion == '-' | situacion == '')){
-                await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
-            }
             if(deleteAud){
                 await deleteAudiencia(date, element.numeroLeg, element.hora)
             }

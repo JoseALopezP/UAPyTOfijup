@@ -9,13 +9,15 @@ import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument";
 import updateDocument from "@/firebase/firestore/updateDocument";
 import pushToHitos from "@/firebase/firestore/pushToHitos";
 import updateListItem from "@/firebase/firestore/updateListItem";
+import getList from "@/firebase/firestore/getList";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
 export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
+    const [desplegables, setDesplegables] = useState(defaultValue);
     const [showInfo, setShowInfo] = useState(false);
-    const [audSize, setAudSize] = useState(null);
+    const [audSize, setAudSize] = useState(14);
     const [partShow, setPartShow] = useState(false);
     const [realTime, setRealTime] = useState(null);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
@@ -45,20 +47,20 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
             return null;
         }
     }
-    const updateTick = (filtered) =>{
-        if(refShowInfo.current == true){
-            setAudSize(12)
-            setShowInfo(false)
-        }else{
-            setAudSize(14)
-            setShowInfo(true)
-            if(filtered.length > 14){
-                setPartShow(!refPartShow.current)
-            }else{
-                setPartShow(false)
+    const updateTick = (filtered) => {
+        if (refShowInfo.current) {
+            setAudSize(12);
+            setShowInfo(false);
+        } else {
+            setAudSize(14);
+            setShowInfo(true);
+            if (filtered.length > 14) {
+                setPartShow(!refPartShow.current);
+            } else {
+                setPartShow(false);
             }
         }
-    }
+    };
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
     }
@@ -77,6 +79,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateInformacion = async() =>{
         setInformacion(await getCollection('informacion'))
     }
+    const updateDesplegables = async() =>{
+        setDesplegables(await getList('desplegables', 'desplegables'))
+    }
     const pushtToArray = async(date, searchValLeg, searchValHora, newValue) => {
         await pushToHitos('audiencias', date, searchValLeg, searchValHora, newValue)
     }
@@ -90,6 +95,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const updateData = async(date, searchValLeg, searchValHora, property, newValue) =>{
         return updateListItem('audiencias', date, searchValLeg, searchValHora, property, newValue)
+    }
+    const updateDataToday = async(searchValLeg, searchValHora, property, newValue) =>{
+        return updateListItem('audiencias', (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''), searchValLeg, searchValHora, property, newValue)
     }
     const docExists = async(id) =>{
         return checkDoc('audiencias',id)
@@ -131,11 +139,14 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateJueces,
         updateAños,
         updateData,
+        updateDataToday,
         pushtToArray,
         addUser,
         checkUserType,
         updateRealTime,
         updateTick,
+        updateDesplegables,
+        desplegables,
         showInfo,
         audSize,
         partShow,

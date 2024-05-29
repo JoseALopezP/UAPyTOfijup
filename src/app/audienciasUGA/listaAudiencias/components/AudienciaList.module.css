@@ -107,7 +107,20 @@
     text-align: center;
 }
 .stateButtonCerrar{
-    background-color: #fff;
+    background-color: #dc3545;
+    color: #000;
+}
+.stateButtonBlock{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.stateButtonCerrar, .stateButtonResuelvoBlock{
+    width: 48%;
+    height: 50px;
+}
+.stateButtonResuelvoBlock{
+    background-color: #dcc635;
     color: #000;
 }
 .changeBlock{

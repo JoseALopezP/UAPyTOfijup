@@ -1,0 +1,95 @@
+.buttonsBlockResuelvo{
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.resuelvoForm{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    color: #000;
+}
+.optionSelect{
+    color: #000;
+}
+.imputadoButtons{
+    width: 100%;
+    display: inline-flex;
+    justify-content: center;
+}
+.imputadoButton{
+    width: 40%;
+    margin: 2px;
+}
+.condenadoButton{
+    width: 40%;
+    margin: 2px;
+}
+.imputadoCondenado{
+    width: 100%;
+    padding: 0 0 4px 0;
+}
+.formButton{
+    font-weight: 700;
+    background-color: #375166;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    padding: 4px;
+    cursor: pointer;
+}
+.condenadoInput{
+    background-color: #fd7d1450; 
+}
+.imputadoInput{
+    background-color: #ffc10750;
+}
+.condenadoButton{
+    background-color: #fd7e14; 
+}
+.imputadoButton{
+    background-color: #ffc107;
+}
+
+.removeButton{
+    background-color: #dc3545;
+    padding: 4px;
+    width: 12%;
+    margin: 2px;
+}
+.inputResuelvo{
+    width: 25%;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    padding: 4px;
+    margin: 2px;
+}
+.inputCaratula{
+    width: 100%;
+    align-self: center;
+}
+.inputText{
+    border: none;
+}
+.inputResuelvo3{
+    width: 29.5%;
+}
+.inputResuelvo2{
+    width: 41%;
+}
+.inputResuelvo1{
+    width: 86%;
+}
+.inputRow{
+    display: inline-flex;
+    justify-content: space-between;
+}
+.guardarButton{
+    font-size: 18px;
+    padding: 8px;
+    margin: 10px 0;
+    background-color: #1b344a;
+    cursor: pointer;
+}
