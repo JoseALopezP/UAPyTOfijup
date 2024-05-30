@@ -2,6 +2,7 @@
 import styles from './Resuelvo.module.css'
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
+import { copyResuelvoToClipboard } from '@/utils/resuelvoUtils';
 
 export function Resuelvo({ item }) {
     const [caratula2, setCaratula2] = useState('');
@@ -10,12 +11,12 @@ export function Resuelvo({ item }) {
     const [imputado2, setImputado2] = useState([]);
     const [resuelvo2, setResuelvo2] = useState('');
     const [partes2, setPartes2] = useState([]);
-    const { updateDesplegables, desplegables, updateDataToday} = useContext(DataContext);
+    const { updateDesplegables, desplegables, updateDataToday, updateToday} = useContext(DataContext);
     const [caratula, setCaratula] = useState('');
     const [mpf, setMpf] = useState([]);
     const [defensa, setDefensa] = useState([]);
     const [imputado, setImputado] = useState([]);
-    const [resuelvo, setResuelvo] = useState('');
+    const [resuelvo, setResuelvo] = useState('El Sr. Juez MOTIVA Y RESUELVE (Minuto 00:00:00/ 00:00:00 Video 1): ');
     const [partes, setPartes] = useState([]);
     const [guardarInc, setGuardarInc] = useState(false);
 
@@ -41,6 +42,7 @@ export function Resuelvo({ item }) {
         if (!deepEqual(imputado2, imputado)) await updateDataToday(item.numeroLeg, item.hora, 'imputado', imputado);
         if (!deepEqual(resuelvo2, resuelvo)) await updateDataToday(item.numeroLeg, item.hora, 'resuelvoText', resuelvo);
         if (!deepEqual(partes2, partes)) await updateDataToday(item.numeroLeg, item.hora, 'partes', partes);
+        await updateToday()
     };
     const checkGuardar = () => {
         if (!deepEqual(caratula2, caratula) || !deepEqual(mpf2, mpf) || !deepEqual(defensa2, defensa) || !deepEqual(imputado2, imputado) || !deepEqual(resuelvo2, resuelvo) || !deepEqual(partes2, partes)) {
@@ -166,7 +168,7 @@ export function Resuelvo({ item }) {
                             value={input.imputado}
                             onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}
                         >
-                            <option value=""></option>
+                            <option value="">imputado - (opcional)</option>
                             {imputado.map(option => (
                                 <option key={option.nombre} value={option.nombre}>
                                     {option.nombre}
@@ -208,6 +210,7 @@ export function Resuelvo({ item }) {
                 <textarea rows="10" value={resuelvo} onChange={(e) => setResuelvo(e.target.value)} />
                 {guardarInc && <input className={`${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR"/>}
             </form>
+            <button onClick={() => copyResuelvoToClipboard(item,(new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''))}>COPIAR</button>
         </div>
     );
 }

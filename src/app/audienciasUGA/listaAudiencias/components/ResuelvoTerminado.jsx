@@ -39,8 +39,6 @@ export function Resuelvo (item) {
             setImputado([...newInputs, { id: imputado.length + 1, nombre: '', dni: ''}]);
           }
     }
-
-    //a terminar facha
     const handleChangesDefensaNombre = (index, e) => {
         const newInputs = [...defensa];
         newInputs[index].dni = e.target.value;
@@ -50,7 +48,6 @@ export function Resuelvo (item) {
             setDefensa([...newInputs, { id: defensa.length + 1, nombre: '', dni: ''}]);
           }
     }
-    //a terminar facha
     const handleChangesDefensaTipo = (index, e) => {
         const newInputs = [...defensa];
         newInputs[index].dni = e.target.value;
@@ -60,7 +57,6 @@ export function Resuelvo (item) {
             setDefensa([...newInputs, { id: defensa.length + 1, nombre: '', dni: ''}]);
           }
     }
-    //a terminar facha
     const handleChangesDefensaImputado = (index, e) => {
         const newInputs = [...defensa];
         newInputs[index].dni = e.target.value;

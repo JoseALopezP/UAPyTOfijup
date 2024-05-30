@@ -10,6 +10,7 @@ import updateDocument from "@/firebase/firestore/updateDocument";
 import pushToHitos from "@/firebase/firestore/pushToHitos";
 import updateListItem from "@/firebase/firestore/updateListItem";
 import getList from "@/firebase/firestore/getList";
+import addStringToList from "@/firebase/firestore/addStringToList";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
@@ -81,6 +82,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const addAudiencia = async(data, date) =>{
         await addOrUpdateDocument('audiencias', date, data)
     }
+    const addDesplegable = async(type, data) =>{
+        await addStringToList('desplegables', 'desplegables', type, data)
+    }
     const deleteAudiencia = async(date, searchValLeg, searchValHora) =>{
         await removeFromArray('audiencias', date, searchValLeg, searchValHora)
     }
@@ -121,6 +125,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         checkUserType,
         updateRealTime,
         updateDesplegables,
+        addDesplegable,
         desplegables,
         realTime,
         userType,

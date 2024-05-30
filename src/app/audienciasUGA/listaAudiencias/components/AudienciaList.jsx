@@ -43,7 +43,7 @@ export function AudienciaList () {
                 <tbody className={`${styles.tableBody}`}>
                     {today && today.filter(el => (el.estado != 'CANCELADA' | el.estado != 'REPROGRAMADA')).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el =>{
                         return(
-                            <ButtonsAudiencia key={el.numeroLeg + el.hora} element={el}/>
+                            <ButtonsAudiencia key={el.numeroLeg + el.hora} element={el} date={el}/>
                         )
                     }))}
                 </tbody>
