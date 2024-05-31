@@ -57,3 +57,10 @@ Fundamentos y Resolución: ${item.resuelvoText}`
 export function copyResuelvoToClipboard(item, date){
     navigator.clipboard.writeText(generateResuelvo(item, date));
 }
+export function checkForResuelvo(item){
+    if(item.imputado && item.defensa && item.caratula && item.mpf && item.resuelvoText){
+        return(true)
+    }else{
+        return(false)
+    }
+}

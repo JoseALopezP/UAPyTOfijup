@@ -1,6 +1,7 @@
 import { useEffect, useContext, useState } from 'react'
 import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
+import { checkForResuelvo, copyResuelvoToClipboard } from '@/utils/resuelvoUtils';
 
 export function AudienciaIndiv ({date, element}) {
     const {updateByDate, jueces, updateData, deleteAudiencia} = useContext(DataContext);
@@ -148,7 +149,7 @@ export function AudienciaIndiv ({date, element}) {
                     {(element.estado == 'PROGRAMADA') ? <><button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR</button> 
                     <button type="button" className={reprogramar ? `${styles.reprogramarButton} ${styles.reprogramarButtonClicked}` : `${styles.reprogramarButton}`} onClick={()=>setReprogramar(!reprogramar)}>REPROGRAMAR</button> 
                     </>:
-                    <><p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>
+                    <>{checkForResuelvo(element) ? <button className={`${styles.controlButton}`} onClick={()=>copyResuelvoToClipboard(element, date)}>COPIAR RESUELVO</button> : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}
                     </>}
                 </span>
                 <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span></>
