@@ -1,9 +1,20 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
+export const cuartoCalculator = (aud) =>{
+    let aux = 0
+    aud.hitos.forEach((el, index) =>{
+        if(el.split(' | ')[1] === 'CUARTO_INTERMEDIO'){
+            const inicio = (parseInt(el.split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(el.split(' | ')[0].split(':')[1].join('')))
+            const fin = (parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1].join('')))
+            aux = aux + (fin - inicio)
+        }
+    })
+    return(aux)
+}
 export const generateExcel = async (data, date) => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Sheet 1');
+    const worksheet = workbook.addWorksheet(`${date}`);
     worksheet.columns = [
         { header: 'NUMERO DE LEGAJO', key: 'numeroLeg', width: 128 },
         { header: 'CANTIDAD DE AUDIENCIAS POR LEGAJO', key: 'cantAud', width: 70 },
@@ -35,8 +46,39 @@ export const generateExcel = async (data, date) => {
         { header: 'DEFENSOR INTERVINIENTE', key: 'defensor', width: 163 },
         { header: 'JUEZ', key: 'juez', width: 171 }
     ];
-    data.forEach((item) => {
-        worksheet.addRow(item);
+    data.forEach((item, i) => {
+        worksheet.addRow({
+            id: `${i}`
+            ,numeroLeg: `${item.numeroLeg}`
+            ,cantAud: ''
+            ,tipoAud: `${element.tipo}${element.tipo2 && ' + ' + element.tipo2}${element.tipo3 && ' + ' + element.tipo3}`
+            ,ufi: item.mpf[0].nombre.split(' - ')[1]
+            ,solicitud: ''
+            ,agendamiento: ''
+            ,solAgen: ''
+            ,noti: ''
+            ,program: `${date.split('')[0].splice(0,2).join('')}/${date.split('')[0].splice(2,2).join('')}/${date.split('')[0].splice(4,4).join('')} ${item.hora}`
+            ,inicioReal: `${date.split('')[0].splice(0,2).join('')}/${date.split('')[0].splice(2,2).join('')}/${date.split('')[0].splice(4,4).join('')} ${item.hitos[0].split(' | ')[0]}`
+            ,demora: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1].join(''))) - (parseInt(item.hora.split(':')[0].join('')) * 60 + parseInt(item.hora.split(':')[1].join('')))}`
+            ,motivoDem: ''
+            ,observDem: ''
+            ,durProg: ''
+            ,durReal: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1].join(''))) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1].join('')))}`
+            ,cuartoTeo: ''
+            ,cuartoReal: cuartoCalculator(item)
+            ,cuartoRealOtr: ''
+            ,final: ''
+            ,horaResuelvo: ''
+            ,horaMinuta: ''
+            ,demoraMinuta: ''
+            ,cantidadImp: `${item.imputado.length}`
+            ,tipoVict: ''
+            ,sala: `${item.sala}`
+            ,operador: `${item.operador}`
+            ,fiscal: `${item.fiscal.nombre[0]}`
+            ,defensor: `${item.defensa.nombre[0]}`
+            ,juez: `${item.juez}`
+        });
     });
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
