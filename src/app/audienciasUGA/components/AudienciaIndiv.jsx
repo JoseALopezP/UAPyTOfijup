@@ -3,7 +3,7 @@ import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
 
 export function AudienciaIndiv ({date, element}) {
-    const {updateByDate, updateData, deleteAudiencia} = useContext(DataContext);
+    const {updateByDate, updateData, deleteAudiencia, updateDesplegables, desplegables} = useContext(DataContext);
     const [editable, setEditable] = useState(false)
     const [hora, setHora] = useState(null)
     const [situacion, setSituacion] = useState(null)
@@ -58,11 +58,17 @@ export function AudienciaIndiv ({date, element}) {
     }, [operador]);
     useEffect(() => {
         updateByDate(date)
+        updateDesplegables()
     }, []);
     return(
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
             <span className={`${styles.tableCell} ${styles.tableCellOP} ${styles.tableCellOPIndiv}`}>
-                <input type='text' className={`${styles.inputSituacionEdit} ${styles.operadorInput}`} placeholder={element.operador} onChange={(e)=>{setOperador(e.target.value)}}></input>
+                <select className={`${styles.inputSituacionEdit} ${styles.operadorInput}`}>
+                    <option value={element.operador}>{element.operador}</option>
+                    {desplegables.operador && desplegables.operador.map((el)=>(
+                        <option value={el}>{`${el.split(' ')[el.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${el.split('')[0]}.`}</option>
+                    ))}
+                </select>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>
                 <input  className={`${styles.inputHora} ${styles.inputHoraBlock}`}  type="time" id="IngresarHora" onChange={e => {setHora(e.target.value)}} defaultValue={element.hora}/>

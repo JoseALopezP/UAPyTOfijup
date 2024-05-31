@@ -95,15 +95,16 @@ export function Resuelvo({ item }) {
                 <label>Ministerio Público Fiscal</label>
                 {mpf.map((input, index) => (
                     <div key={input.id} className={`${styles.inputRow}`}>
-                        <select className={`${styles.inputResuelvo} ${styles.inputResuelvo1} ${styles.inputSelect}`}
+                        <input list='mpf' className={`${styles.inputResuelvo} ${styles.inputResuelvo1} ${styles.inputSelect}`}
                             value={input.nombre}
-                            onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
-                        ><option value=""></option>
-                        {desplegables.fiscal && desplegables.fiscal.map(option => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}</select>
+                            onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}/>
+                        <datalist id='mpf'>
+                            {desplegables.fiscal && desplegables.fiscal.map(option => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </datalist>
                         <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setMpf, index)}>QUITAR</button>
                     </div>
                 ))}

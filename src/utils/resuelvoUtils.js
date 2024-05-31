@@ -8,28 +8,28 @@ function capitalizeFirst(sentence){
 }
 function listFiscal(arr){
     let aux = ''
-    arr.forEach((el,i) =>{
+    arr && arr.forEach((el,i) =>{
         aux = `${aux}Ministerio Público Fiscal: ${el.nombre.split(' - ')[0]}  UFI:${el.nombre.split(' - ')[1]} ${(arr.length !== i+1) ? '\n' : ''}`
     })
     return aux
 }
 function listDefensa(arr){
     let aux = ''
-    arr.forEach((el,i) =>{
+    arr && arr.forEach((el,i) =>{
         aux = `${aux}Defensa ${el.tipo}: ${el.nombre} ${(arr.length !== i+1) ? '\n' : ''}`
     })
     return aux
 }
 function listImputado(arr){
     let aux = ''
-    arr.forEach((el,i) =>{
+    arr && arr.forEach((el,i) =>{
         aux = `${aux}${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°:${el.dni} ${(arr.length !== i+1) ? '\n' : ''}`
     })
     return aux
 }
 function listPartes(arr){
     let aux = ''
-    arr.forEach((el,i) =>{
+    arr && arr.forEach((el,i) =>{
         aux = `${aux}${el.role}: ${el.name} ${(arr.length !== i+1) ? '\n' : ''}`
     })
     return aux

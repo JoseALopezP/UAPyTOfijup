@@ -267,6 +267,8 @@
 
 .operadorInput{
     border: solid white 1px;
+    color: #000;
+    background-color: #fff;
 }
 .tableCellOPIndiv{
     padding: 5px;
