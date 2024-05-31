@@ -5,6 +5,7 @@ import { useState, useEffect, useContext } from 'react'
 import { useRouter } from 'next/navigation'
 import { DataContext } from '@/context/DataContext'
 import { AuthContext } from '@/context/AuthContext'
+import { generateExcel } from '@/utils/excelUtils'
 
 export default function MenuSelector() {
     const [dayUGA, setDayUGA] = useState(null)
@@ -13,7 +14,10 @@ export default function MenuSelector() {
     const [dayUAC, setDayUAC] = useState(null)
     const [monthUAC, setMonthUAC] = useState(null)
     const [yearUAC, setYearUAC] = useState(null)
-    const {checkUserType, userType} = useContext(DataContext);
+    const [dayXLXS, setDayXLXS] = useState(null)
+    const [monthXLXS, setMonthXLXS] = useState(null)
+    const [yearXLXS, setYearXLXS] = useState(null)
+    const {checkUserType, userType, updateByDate, bydate} = useContext(DataContext);
     const {user} = useContext(AuthContext);
     const router = useRouter()
     useEffect(() => {
@@ -26,6 +30,10 @@ export default function MenuSelector() {
         }
       }
     }, [user])
+    const generateXLXS = async() =>{
+      await updateByDate(`${dayXLXS}${monthXLXS}${yearXLXS}`)
+      await generateExcel(bydate, `${dayXLXS}${monthXLXS}${yearXLXS}`)
+    }
     return (
       <section className={`${styles.selectorSection}`}>
         <div className={`${styles.selectorBody}`}>
@@ -65,6 +73,19 @@ export default function MenuSelector() {
           )}
           {(userType == 'admin')&&(
             <Link href="/signup" className={`${styles.linkRedirection}`}>CONTROL USUARIOS</Link>
+          )}
+          {(userType == 'admin')&&(
+            <>
+            <h1>ETAPA EN DESARROLLO...</h1>
+            <span className={`${styles.linkRedirection} ${styles.inputDate}`}>
+              <input onChange={(e)=>{setDayXLXS(e.target.value)}} type='number' min={1} max={31} className={`${styles.inputDay}`}/>
+              &nbsp;/&nbsp;
+              <input onChange={(e)=>{setMonthXLXS(e.target.value)}} type='number' min={1} max={12} className={`${styles.inputMonth}`}/>
+              &nbsp;/&nbsp;
+              <input onChange={(e)=>{setYearXLXS(e.target.value)}} type='number' min={2021} max={2025} className={`${styles.inputYear}`}/>
+            </span>
+            <button onClick={()=> generateXLXS()} className={`${styles.linkRedirection}`}>DESCARGAR XLXS</button>
+            </>
           )}
         </div>
       </section>

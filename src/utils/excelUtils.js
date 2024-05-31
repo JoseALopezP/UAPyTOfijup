@@ -5,8 +5,8 @@ export const cuartoCalculator = (aud) =>{
     let aux = 0
     aud.hitos.forEach((el, index) =>{
         if(el.split(' | ')[1] === 'CUARTO_INTERMEDIO'){
-            const inicio = (parseInt(el.split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(el.split(' | ')[0].split(':')[1].join('')))
-            const fin = (parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1].join('')))
+            const inicio = (parseInt(el.split(' | ')[0].split(':')[0]) * 60 + parseInt(el.split(' | ')[0].split(':')[1]))
+            const fin = (parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1]))
             aux = aux + (fin - inicio)
         }
     })
@@ -51,19 +51,19 @@ export const generateExcel = async (data, date) => {
             id: `${i}`
             ,numeroLeg: `${item.numeroLeg}`
             ,cantAud: ''
-            ,tipoAud: `${element.tipo}${element.tipo2 && ' + ' + element.tipo2}${element.tipo3 && ' + ' + element.tipo3}`
-            ,ufi: item.mpf[0].nombre.split(' - ')[1]
+            ,tipoAud: `${item.tipo}${item.tipo2 && ' + ' + item.tipo2}${item.tipo3 && ' + ' + item.tipo3}`
+            ,ufi: item.mpf ? item.mpf[0].nombre.split(' - ')[1] : ''
             ,solicitud: ''
             ,agendamiento: ''
             ,solAgen: ''
             ,noti: ''
-            ,program: `${date.split('')[0].splice(0,2).join('')}/${date.split('')[0].splice(2,2).join('')}/${date.split('')[0].splice(4,4).join('')} ${item.hora}`
-            ,inicioReal: `${date.split('')[0].splice(0,2).join('')}/${date.split('')[0].splice(2,2).join('')}/${date.split('')[0].splice(4,4).join('')} ${item.hitos[0].split(' | ')[0]}`
-            ,demora: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1].join(''))) - (parseInt(item.hora.split(':')[0].join('')) * 60 + parseInt(item.hora.split(':')[1].join('')))}`
+            ,program: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hora}`
+            ,inicioReal: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hitos[0].split(' | ')[0]}`
+            ,demora: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))}`
             ,motivoDem: ''
             ,observDem: ''
             ,durProg: ''
-            ,durReal: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1].join(''))) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0].join('')) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1].join('')))}`
+            ,durReal: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1]))}`
             ,cuartoTeo: ''
             ,cuartoReal: cuartoCalculator(item)
             ,cuartoRealOtr: ''
@@ -71,12 +71,12 @@ export const generateExcel = async (data, date) => {
             ,horaResuelvo: ''
             ,horaMinuta: ''
             ,demoraMinuta: ''
-            ,cantidadImp: `${item.imputado.length}`
+            ,cantidadImp: item.imputado ? `${item.imputado.length}` : ''
             ,tipoVict: ''
             ,sala: `${item.sala}`
             ,operador: `${item.operador}`
-            ,fiscal: `${item.fiscal.nombre[0]}`
-            ,defensor: `${item.defensa.nombre[0]}`
+            ,fiscal: item.fiscal ? `${item.fiscal[0].nombre}` : ''
+            ,defensor: item.defensa ? `${item.defensa[0].nombre}` : ''
             ,juez: `${item.juez}`
         });
     });
