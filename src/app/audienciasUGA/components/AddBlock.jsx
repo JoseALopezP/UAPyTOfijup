@@ -135,7 +135,7 @@ export function AddBlock ({date}) {
                     )
                 })}
             </datalist>
-            {(tipo && tipo =='-') ||
+            {(tipo && tipo =='-' || tipo =='') ||
             <>
                 <input list="tipo2" onChange={(e)=>{setTipo2(e.target.value)}}/>
                 <datalist id='tipo2'>
@@ -146,7 +146,7 @@ export function AddBlock ({date}) {
                     })}
                 </datalist>
             </>}
-            {((tipo && tipo =='-') || (tipo2 && tipo2 =='-')) ||
+            {((tipo && tipo =='-' || tipo =='') || (tipo2 && tipo2 =='-' || tipo2 =='')) ||
                 <>
                 <input list="tipo3" onChange={(e)=>{setTipo3(e.target.value)}}/>
                 <datalist id='tipo3'>
