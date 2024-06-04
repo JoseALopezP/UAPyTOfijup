@@ -151,7 +151,46 @@
     font-weight: 700;
     color: #375166;
 }
-
+.tiempoCuarto{
+    background-color: #fff;
+    border-radius: 5px;
+    display: inline-flex;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: space-between;
+    color: #000;
+    font-size: 38px;
+}
+.pidienteSelector{
+    outline: none;
+    border: none;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: inherit;
+    width: 100%;
+    text-align: center;
+}
+.tiempoPedido{
+    font-size: 32px;
+    line-height: 0px;
+    padding: 0 20px;
+}
+.tiempoCuarto button{
+    height: 60px;
+    width: 60px;
+    font-weight: 700;
+    font-size: 30px;
+    color: #1d1d1d;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+}
+.tiempoMasCuarto{
+    background-color: #28a745;
+}
+.tiempoMenosCuarto{
+    background-color: #fd7e14;
+}
 .DEMORADA{
     background-color: #fd7e14;
     text-align: center;

@@ -10,6 +10,8 @@ export function ButtonsAudiencia ({element}) {
     const [showResuelvo, setShowResuelvo] = useState(false)
     const [editable, setEditable] = useState(false)
     const [actionAud, setActionAud] = useState(null)
+    const [tiempoPedido, setTiempoPedido] = useState(0)
+    const [pidiente, setPidiente] = useState(null)
     const [sala, setSala] = useState(null)
     const [resuelvo, setResuelvo] = useState(false)
     const handleSubmit = async(event) =>{
@@ -18,7 +20,11 @@ export function ButtonsAudiencia ({element}) {
         if(actionAud){
             const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
             await updateData(date, element.numeroLeg, element.hora, 'estado', actionAud)
-            await pushtToArray(date, element.numeroLeg, element.hora, `${realTime} | ${actionAud}`)
+            if(actionAud == 'CUARTO_INTERMEDIO'){
+                await pushtToArray(date, element.numeroLeg, element.hora, `${realTime} | ${actionAud} | ${tiempoPedido} | ${pidiente}`)
+            }else{
+                await pushtToArray(date, element.numeroLeg, element.hora, `${realTime} | ${actionAud}`)
+            }
             await updateToday()
             await setEditable(false)
             await setActionAud(null)
@@ -32,6 +38,8 @@ export function ButtonsAudiencia ({element}) {
         if(resuelvo){
             const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
             await updateData(date, element.numeroLeg, element.hora, 'resuelvo', resuelvo)
+            await updateRealTime()
+            await updateData(date, element.numeroLeg, element.hora, 'horaMinuta', realTime)
             await updateToday()
             await setResuelvo(false)
             await setEditable(false)
@@ -64,6 +72,7 @@ export function ButtonsAudiencia ({element}) {
             <Resuelvo item={element}/> :
             <><h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>
             <form onSubmit={(event) => handleSubmit(event)} action="#" className={`${styles.changeBlock}`}>
+                
                 {(element.estado == 'CUARTO_INTERMEDIO') &&
                 <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>FINALIZAR CUARTO INTERMEDIO</button>}
                 {(element.estado == 'PROGRAMADA') &&
@@ -84,7 +93,17 @@ export function ButtonsAudiencia ({element}) {
                 </>}
                 {(element.estado == 'EN_CURSO') &&
                     <><button type="button" onClick={() => actionAud == 'FINALIZADA' ? setActionAud(null) : setActionAud('FINALIZADA')} className={actionAud == 'FINALIZADA' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizar}`}>FINALIZAR</button>
-                    <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}>CUARTO INTERMEDIO</button></>}
+                    <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}>CUARTO INTERMEDIO</button>
+                    <span className={`${styles.tiempoCuarto}`}><button type='button' className={`${styles.tiempoMenosCuarto}`} onClick={()=>setTiempoPedido(tiempoPedido - 5)}>-</button>
+                    <p className={`${styles.tiempoPedido}`}>{tiempoPedido}</p>
+                    <button type='button' className={`${styles.tiempoMasCuarto}`} onClick={()=>setTiempoPedido(tiempoPedido + 5)}>+</button>
+                    <select name="" id="" onChange={(e)=>{setPidiente(e.target.value)}} className={`${styles.pidienteSelector}`}>
+                        <option value={'juez'}>JUEZ</option>
+                        <option value={'defensa'}>DEFENSA</option>
+                        <option value={'fiscal'}>FISCAL</option>
+                        <option value={'otro'}>OTRO</option>
+                    </select>
+                    </span></>}
                 {(element.estado == 'FINALIZADA') &&
                     <>
                     <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>INICIAR NUEVAMENTE</button>
@@ -104,7 +123,7 @@ export function ButtonsAudiencia ({element}) {
         <tr key={element.numeroLeg + element.hora} className={`${styles.tableRow}`} onClick={() => setShow(true)}> 
             <td>{element.hora}</td>
             <td>{element.sala}</td>
-            <td>{element.operador && element.operador}</td>
+            <td>{element.operador && `${element.operador.split(' ')[element.operador.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${element.operador.split('')[0]}.`}</td>
             <td>{element.numeroLeg}</td>
             <td className={`${styles.tableBodyJuez}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,3).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</td>
             <td className={`${styles.tableCellTipo}`}>{element.tipo}</td>

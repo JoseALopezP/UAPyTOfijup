@@ -2,7 +2,7 @@
 import styles from './Resuelvo.module.css'
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
-import { copyResuelvoToClipboard } from '@/utils/resuelvoUtils';
+import { copyResuelvoToClipboard, checkForResuelvo } from '@/utils/resuelvoUtils';
 
 export function Resuelvo({ item }) {
     const [caratula2, setCaratula2] = useState('');
@@ -11,8 +11,10 @@ export function Resuelvo({ item }) {
     const [imputado2, setImputado2] = useState([]);
     const [resuelvo2, setResuelvo2] = useState('');
     const [partes2, setPartes2] = useState([]);
-    const { updateDesplegables, desplegables, updateDataToday, updateToday} = useContext(DataContext);
+    const { updateDesplegables, desplegables, updateDataToday, updateToday, updateRealTime, realTime} = useContext(DataContext);
     const [caratula, setCaratula] = useState('');
+    const [razonDemora, setRazonDemora] = useState('');
+    const [razonDemora2, setRazonDemora2] = useState('');
     const [mpf, setMpf] = useState([]);
     const [defensa, setDefensa] = useState([]);
     const [imputado, setImputado] = useState([]);
@@ -42,7 +44,12 @@ export function Resuelvo({ item }) {
         if (!deepEqual(imputado2, imputado)) await updateDataToday(item.numeroLeg, item.hora, 'imputado', imputado);
         if (!deepEqual(resuelvo2, resuelvo)) await updateDataToday(item.numeroLeg, item.hora, 'resuelvoText', resuelvo);
         if (!deepEqual(partes2, partes)) await updateDataToday(item.numeroLeg, item.hora, 'partes', partes);
+        if (!deepEqual(razonDemora2, razonDemora)) await updateDataToday(item.numeroLeg, item.hora, 'razonDemora', razonDemora);
         await updateToday()
+        if(await checkForResuelvo(item)){
+            await updateRealTime()
+            await updateDataToday(item.numeroLeg, item.hora, 'horaResuelvo', realTime)
+        }
     };
     const checkGuardar = () => {
         if (!deepEqual(caratula2, caratula) || !deepEqual(mpf2, mpf) || !deepEqual(defensa2, defensa) || !deepEqual(imputado2, imputado) || !deepEqual(resuelvo2, resuelvo) || !deepEqual(partes2, partes)) {
@@ -51,6 +58,11 @@ export function Resuelvo({ item }) {
             setGuardarInc(false);
         }
     };
+    const checkHoraDiff = () =>{
+        const hora1 = parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1])
+        const hora2 = parseInt(item.hitos[0].split('|')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split('|')[0].split(':')[1])
+        return hora2 - hora1
+    }
     useEffect(() => {
         updateDesplegables();
     }, []);
@@ -81,6 +93,10 @@ export function Resuelvo({ item }) {
         if (item.partes){
             setPartes(item.partes)
             setPartes2(item.partes)
+        } 
+        if (item.razonDemora){
+            setRazonDemora(item.razonDemora)
+            setRazonDemora2(item.razonDemora)
         } 
     }, [item]);
     return (
@@ -209,6 +225,22 @@ export function Resuelvo({ item }) {
 
                 <label>Fundamentos y Resolución</label>
                 <textarea rows="10" value={resuelvo} onChange={(e) => setResuelvo(e.target.value)} />
+                {(item.hora && item.hitos && checkHoraDiff() > 5) &&
+                <><label>RAZÓN DEMORA ({checkHoraDiff()}min)</label>
+                <select onChange={(e) => setRazonDemora(e.target.value)} className={`${styles.inputResuelvo} ${styles.inputResuelvoDemora}`}>
+                    <option value={razonDemora}>{razonDemora.toUpperCase()}</option>
+                    <option value={'juez'}>JUEZ</option>
+                    <option value={'fiscal'}>FISCAL</option>
+                    <option value={'defensa'}>DEFENSA</option>
+                    <option value={'imputado'}>IMPUTADO</option>
+                    <option value={'audPrevia'}>AUDIENCIA PREVIA</option>
+                    <option value={'victima'}>VICTIMA</option>
+                    <option value={'querella'}>QUERELLA</option>
+                    <option value={'traslado'}>TRASLADO DETENIDO</option>
+                    <option value={'problemasTec'}>PROBLEMAS TÉCNICOS</option>
+                    <option value={'demoraOp'}>DEMORA OPERADOR</option>
+                    <option value={'ofijup'}>OFIJUP</option>
+                </select></>}
                 {guardarInc && <input className={`${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR"/>}
             </form>
             <button onClick={() => copyResuelvoToClipboard(item,(new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''))}>COPIAR</button>

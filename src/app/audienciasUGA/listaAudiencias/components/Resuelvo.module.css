@@ -93,3 +93,9 @@
     background-color: #1b344a;
     cursor: pointer;
 }
+.inputResuelvoDemora{
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
