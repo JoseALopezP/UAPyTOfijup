@@ -32,7 +32,7 @@ export default function MenuSelector() {
     }, [user])
     const generateXLXS = async() =>{
       await updateByDate(`${dayXLXS}${monthXLXS}${yearXLXS}`)
-      await setTimeout(generateExcel(bydate, `${dayXLXS}${monthXLXS}${yearXLXS}`), 1000)
+      await setTimeout(generateExcel(bydate, `${dayXLXS}${monthXLXS}${yearXLXS}`), 3000)
     }
     return (
       <section className={`${styles.selectorSection}`}>

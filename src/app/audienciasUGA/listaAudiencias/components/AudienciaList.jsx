@@ -1,5 +1,5 @@
 'use client'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import styles from './AudienciaList.module.css'
 import { ButtonsAudiencia } from './ButtonsAudiencia';
 import { DataContext } from '@/context/DataContext';
@@ -7,12 +7,14 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export function AudienciaList () {
-    const {updateToday, today, updateRealTime} = useContext(DataContext);
+    const [operadorF, setOperadorF] = useState('')
+    const {updateToday, today, updateRealTime, updateDesplegables, desplegables} = useContext(DataContext);
     function tick() {
         updateToday();
         updateRealTime() 
     }
     useEffect(() =>{
+        updateDesplegables()
         tick()
         const timerID = setInterval(() => tick(), 30000);  
         return function cleanup() {
@@ -32,7 +34,12 @@ export function AudienciaList () {
                     <tr>
                         <th>HORA</th>
                         <th>SALA</th>
-                        <th>OP</th>
+                        <th><select className={`${styles.operadorList}`} onChange={(e)=>{setOperadorF(e.target.value)}}>
+                            <option value={''}>TODOS</option>
+                            {desplegables.operador && desplegables.operador.map((el)=>(
+                                <option value={el}>{`${el.split(' ')[el.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${el.split('')[0]}.`}</option>
+                            ))}
+                        </select></th>
                         <th>LEG</th>
                         <th className={`${styles.tableHeadJuez}`}>JUEZ</th>
                         <th>TIPO</th>
@@ -41,7 +48,7 @@ export function AudienciaList () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today && today.filter(el => (el.estado != 'CANCELADA' | el.estado != 'REPROGRAMADA')).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el =>{
+                    {today && today.filter(el => (el.estado != 'CANCELADA' | el.estado != 'REPROGRAMADA')).filter(el => (el.operador == operadorF || operadorF === '')).sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el =>{
                         return(
                             <ButtonsAudiencia key={el.numeroLeg + el.hora} element={el} date={el}/>
                         )
