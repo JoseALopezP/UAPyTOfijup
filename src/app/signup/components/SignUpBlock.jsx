@@ -2,6 +2,7 @@
 import { useState, useContext } from 'react';
 import signUp from '@/firebase/auth/signup';
 import { DataContext } from '@/context/DataContext';
+import { generatePDF } from '@/utils/pdfUtils';
 
 export function SignUpBlock () {
     const {addUser} = useContext(DataContext);
@@ -58,6 +59,7 @@ export function SignUpBlock () {
             <br />
             <button type="submit">Add User</button>
         </form>
+        <button onClick={()=>(generatePDF())}>GenerarPDF</button>
         </div>
     )
 }
