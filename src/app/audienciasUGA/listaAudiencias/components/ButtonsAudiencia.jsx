@@ -67,7 +67,7 @@ export function ButtonsAudiencia ({element}) {
     return(
         <>
         {show &&
-        <div className={`${styles.buttonsBlock}`}>
+        <div className={showResuelvo ? `${styles.buttonsBlock} ${styles.buttonsBlockResuelvo}` : `${styles.buttonsBlock}`}>
             {showResuelvo ?
             <Resuelvo item={element}/> :
             <><h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>

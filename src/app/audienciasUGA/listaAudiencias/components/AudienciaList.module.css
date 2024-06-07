@@ -61,6 +61,13 @@
     justify-content: flex-start;
     border-radius: 5px;
 }
+.buttonsBlockResuelvo{
+    width: 96%;
+    height: 96%;
+    left: 2%;
+    top: 2%;
+    font-size: 26px;
+}
 .stateButton{
     font-size: 24px;
     background-color: #375166;
@@ -227,6 +234,8 @@
 .editButtonNot{
     background-color: #6c757d;
 }
+
+
 @media (max-width: 900px) {
     .buttonsBlock{
         height: 80%;

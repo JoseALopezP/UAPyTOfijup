@@ -66,9 +66,12 @@ export function AudienciaIndiv ({date, element}) {
             <span className={`${styles.tableCell} ${styles.tableCellOP} ${styles.tableCellOPIndiv}`}>
                 <select className={`${styles.inputSituacionEdit} ${styles.operadorInput}`} onChange={(e)=>{setOperador(e.target.value)}}>
                     <option value={element.operador}>{element.operador}</option>
-                    {desplegables.operador && desplegables.operador.map((el)=>(
-                        <option value={el}>{`${el.split(' ')[el.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${el.split('').splice(0,2).join('').toUpperCase()}.`}</option>
-                    ))}
+                    {desplegables.operador && desplegables.operador.map((el)=>{
+                        const nameOPShort = el.split(' ')[el.split(' ').length-1].toUpperCase().split('')
+                        return(
+                            <option value={el}>{`${nameOPShort.length === 5 ? nameOPShort.join('') : nameOPShort.splice(0,4).join('')} ${el.split('').splice(0,2).join('').toUpperCase()}.`}</option>
+                        )
+                    })}
                 </select>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellHora} ${styles.tableCellHoraIndiv}`}>

@@ -31,6 +31,7 @@
 }
 .formButton{
     font-weight: 700;
+    font-size: 24px;
     background-color: #375166;
     outline: none;
     border: none;
@@ -40,9 +41,11 @@
     cursor: pointer;
 }
 .condenadoInput{
+    padding: 4px;
     background-color: #fd7d1450; 
 }
 .imputadoInput{
+    padding: 4px;
     background-color: #ffc10750;
 }
 .condenadoButton{
@@ -65,6 +68,7 @@
     border-radius: 5px;
     padding: 4px;
     margin: 2px;
+    font-size: 24px;
 }
 .inputCaratula{
     width: 100%;
@@ -87,7 +91,7 @@
     justify-content: space-between;
 }
 .guardarButton{
-    font-size: 18px;
+    font-size: 26px;
     padding: 8px;
     margin: 10px 0;
     background-color: #1b344a;
@@ -96,6 +100,17 @@
 .inputResuelvoDemora{
     width: 100%;
     text-align: center;
-    font-size: 18px;
+    font-size: 26px;
     font-weight: 700;
+}
+.textArea{
+    padding: 6px;
+    font-size: 24px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.insertarModeloBlock{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 0 0 0;
 }
