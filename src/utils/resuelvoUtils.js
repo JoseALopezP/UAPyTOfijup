@@ -71,11 +71,13 @@ export function generateResuelvoSection(item, date){
     listDefensa(item.defensa).split('\n').forEach(d => sections.push({title: `${d.split(':')[0]}`, text: `${d.split(':')[1]}`}))
     listImputado(item.imputado).split('\n').forEach(i => sections.push({title: `${i.split(':')[0]}`, text: `${i.split(':')[1]}`}))
     listPartes(item.partes).split('\n').forEach(p => sections.push({title: `${p.split(':')[0]}`, text: `${p.split(':')[1]}`}))
-    sections.push({title: 'Operador:', text: `${item.operador}`})
+    sections.push({title: 'Operador', text: `${item.operador}`})
+    sections.push({text: ''})
     return sections
 }
 export function generateMinutaSection(minuta){
     const sections = []
+    sections.push({title: 'Hora programada', text: ''})
     minuta.split('\n').forEach(m => sections.push({text: `${m.split(')').join(')\n')}`}))
     return sections
 }
