@@ -2,9 +2,11 @@ import { useEffect, useContext, useState } from 'react'
 import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
 import { checkForResuelvo, copyResuelvoToClipboard } from '@/utils/resuelvoUtils';
+import { Oficio } from './Oficio';
 
 export function AudienciaIndiv ({date, element}) {
     const {updateByDate, jueces, updateData, deleteAudiencia} = useContext(DataContext);
+    const [oficio, setOficio] = useState(false)
     const [editable, setEditable] = useState(false)
     const [changeButton, setChangeButton] = useState(false)
     const [situacion, setSituacion] = useState(null)
@@ -110,6 +112,7 @@ export function AudienciaIndiv ({date, element}) {
         updateByDate(date)
     }, []);
     return(
+        <>{oficio ? <Oficio item={element} date={date}/> : <></>}
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
             {!element.control && <>
                 <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
@@ -149,7 +152,7 @@ export function AudienciaIndiv ({date, element}) {
                     {(element.estado == 'PROGRAMADA') ? <><button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR</button> 
                     <button type="button" className={reprogramar ? `${styles.reprogramarButton} ${styles.reprogramarButtonClicked}` : `${styles.reprogramarButton}`} onClick={()=>setReprogramar(!reprogramar)}>REPROGRAMAR</button> 
                     </>:
-                    <>{checkForResuelvo(element) ? <button className={`${styles.controlButton}`} onClick={()=>copyResuelvoToClipboard(element, date)}>COPIAR RESUELVO</button> : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}
+                    <>{checkForResuelvo(element) ? <button className={oficio ? `${styles.controlButton} ${styles.controlButtonOficio} ${styles.controlButtonOficioClicked}` : `${styles.controlButton} ${styles.controlButtonOficio}`} onClick={() => setOficio(!oficio)}>OFICIO</button> : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}
                     </>}
                 </span>
                 <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span></>
@@ -177,5 +180,6 @@ export function AudienciaIndiv ({date, element}) {
                 <button type="submit" className={editable ? `${styles.editButton}` : `${styles.editButton} ${styles.editButtonNot}`}>EDITAR</button>
             </span>
         </form>
+        </>
     )
 }

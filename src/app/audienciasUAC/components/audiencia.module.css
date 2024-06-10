@@ -505,6 +505,52 @@
     -webkit-appearance: none;
     margin: 0;
   }
+.controlButtonOficio{
+    background-color: #007bff;
+    color: #fff;
+    border: #fff 2px solid;
+}
+.controlButtonOficioClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.resuelvoBlock{
+    width: 50%;
+}
+.oficiadosBlock{
+    width: 50%;
+}
+.oficioBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 90%;
+    height: 85%;
+    margin: auto;
+    left: 5%;
+    top: 5%;
+    position: fixed;
+    z-index: 50;
+    background-color: #ffffffe3;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 20px;
+    justify-content: flex-start;
+    border-radius: 5px;
+}
+.oficioInput{
+    border: solid 2px #375166;
+    outline: none;
+    width: 100%;
+    border-radius: 5px;
+    padding: 4px;
+}
+.controlButtonQuitar{
+    width: 20%;
+    padding: 4px;
+    background-color: #dc3545;
+    color: #fff;
+}
+
 @keyframes errorMessage {
     0% {
         display: none;
