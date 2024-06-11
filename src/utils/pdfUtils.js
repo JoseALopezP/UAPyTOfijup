@@ -5,7 +5,7 @@ export const generatePDF = async (item, date) => {
     const doc = new jsPDF('p', 'mm', 'a4');
     const headerImage = '/pdf/header.jpg';
     const footerImage = '/pdf/footer.jpg';
-    const sections = generateMinutaSection(item, date)
+    const sections = generateMinutaSection(item, date);
 
     const topMargin = 40;
     const bottomMargin = 40;
@@ -15,43 +15,57 @@ export const generatePDF = async (item, date) => {
     const sectionSpacingWithTitle = 1;
     const sectionSpacingWithoutTitle = 6;
 
-    const addTextWithLineBreaks = (textLines, initialX, initialY) => {
+    const addTextWithLineBreaks = (textLines, initialX, initialY, align = 'left') => {
       textLines.forEach(line => {
         if (currentY > (pageHeight - bottomMargin)) {
           doc.addPage();
           currentY = topMargin;
         }
-        doc.text(line, initialX, currentY);
+        if (align === 'right') {
+          doc.text(line, initialX, currentY, { align: 'right' });
+        } else {
+          doc.text(line, initialX, currentY);
+        }
         currentY += lineHeight;
       });
     };
 
-    sections.forEach((section) => {
-      let textLines = doc.splitTextToSize(section.text, 160);
-      
-      if (section.title) {
-        const title = `${section.title}: `;
-        const titleWidth = doc.getTextWidth(title);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        if (currentY > (pageHeight - bottomMargin)) {
-          doc.addPage();
-          currentY = topMargin;
+    const processSections = (sections) => {
+      sections.forEach((section) => {
+        let textLines = doc.splitTextToSize(section.text, 160);
+        
+        if (section.right) {
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
+          addTextWithLineBreaks(textLines, doc.internal.pageSize.getWidth() - 20, currentY, 'right');
+          currentY += sectionSpacingWithoutTitle;
+        } else if (section.title) {
+          const title = `${section.title}: `;
+          const titleWidth = doc.getTextWidth(title);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "bold");
+          if (currentY > (pageHeight - bottomMargin)) {
+            doc.addPage();
+            currentY = topMargin;
+          }
+          doc.text(title, 20, currentY);
+          doc.setFont("helvetica", "normal");
+          const firstLineText = textLines.shift();
+          doc.text(firstLineText, 25 + titleWidth, currentY);
+          currentY += lineHeight;
+          addTextWithLineBreaks(textLines, 20, currentY);
+          currentY += sectionSpacingWithTitle;
+        } else {
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
+          addTextWithLineBreaks(textLines, 20, currentY);
+          currentY += sectionSpacingWithoutTitle;
         }
-        doc.text(title, 20, currentY);
-        doc.setFont("helvetica", "normal");
-        const firstLineText = textLines.shift();
-        doc.text(firstLineText, 25 + titleWidth, currentY);
-        currentY += lineHeight;
-        addTextWithLineBreaks(textLines, 20, currentY);
-        currentY += sectionSpacingWithTitle;
-      } else {
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        addTextWithLineBreaks(textLines, 20, currentY);
-        currentY += sectionSpacingWithoutTitle;
-      }
-    });
+      });
+    };
+
+    processSections(sections);
+
     for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
         doc.setPage(i);
         await doc.addImage(headerImage, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), 30);
@@ -60,6 +74,6 @@ export const generatePDF = async (item, date) => {
         const footerX = doc.internal.pageSize.getWidth() - footerWidth;
         const footerY = doc.internal.pageSize.getHeight() - footerHeight;
         await doc.addImage(footerImage, 'JPEG', footerX, footerY, footerWidth, footerHeight);
-      }
+    }
     doc.save('document.pdf');
-}
+};

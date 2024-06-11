@@ -1,10 +1,12 @@
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 import styles from './audiencia.module.css'
+import { generateResuelvoSection } from '@/utils/resuelvoUtils';
 
 export function Oficio ({item, date}) {
     const {updateDesplegables, desplegables} = useContext(DataContext);
-    const [inputList, setInputList] = useState([{ value: '' }]);
+    const [traslado, setTraslado] = useState(`Se informa que la fecha de detención del Sr. XXX fue el día XXXX, habiendo intervenido Comisaría XXX; por lo que se solicita que cuando se efectivice el traslado del mencionado al SERVICIO PENITENCIARIO PROVINCIAL, se informe dicha circunstancia a la Oficina Judicial Penal al correo: casosofijup@jussanjuan.gov.ar y/o al teléfono 2644554725 de la Unidad de Administración de Casos.`)
+    const [inputList, setInputList] = useState([]);
         const handleInputChange = (e, index) => {
             const { value } = e.target;
             const list = [...inputList];
@@ -28,6 +30,11 @@ export function Oficio ({item, date}) {
     }, []);
     return (
         <div className={`${styles.oficioBlock}`}>
+          <div className={`${styles.resuelvoBlock}`}>
+            {generateResuelvoSection(item, date).map(el=>(
+              <>{el.title ? <p><strong>{el.title}</strong> {el.text}</p> : <p>{el.text}</p>}</>
+            ))}
+          </div>
         <form className={`${styles.oficiadosBlock}`} onSubmit={submitHandler}>
           {inputList.map((input, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
@@ -48,11 +55,9 @@ export function Oficio ({item, date}) {
             </div>
           ))}
           <button className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
-          <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit" style={{ marginTop: '10px' }}>DESCARGAR</button>
+          <textarea className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
+          <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit">DESCARGAR</button>
         </form>
-        <div className={`${styles.resuelvoBlock}`}>
-
-        </div>
         </div>
       );
 }
