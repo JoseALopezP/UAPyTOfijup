@@ -121,10 +121,12 @@
 }
 
 .inputResuelvoDemora{
-    width: 100%;
+    width: 98%;
+    align-self: center;
     text-align: center;
     font-size: 26px;
     font-weight: 700;
+    border: #375166 solid 2px;
 }
 .textArea{
     padding: 6px;

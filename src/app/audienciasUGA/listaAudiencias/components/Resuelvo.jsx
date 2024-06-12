@@ -29,6 +29,10 @@ export function Resuelvo({ item }) {
     const [partes, setPartes] = useState([]);
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
+    const [removedMpf, setRemovedMpf] = useState([]);
+    const [removedDefensa, setRemovedDefensa] = useState([]);
+    const [removedImputado, setRemovedImputado] = useState([]);
+    const [removedPartes, setRemovedPartes] = useState([]);
 
     const deepEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -39,14 +43,16 @@ export function Resuelvo({ item }) {
             return parts;
         });
     };
-
+    
     const addNewInput = (setter, template) => {
         setter(prev => [...prev, { ...template, id: prev.length + 1 }]);
     };
 
-    const removeInput = (setter, index) => {
+    const removeInput = (setter, index, removedSetter, items) => {
         setter(prev => prev.filter((_, i) => i !== index));
+        removedSetter(prev => [...prev, items[index]]);
     };
+    
     const updateComparisson = () =>{
         if (item.fiscal) {
             setMpf(item.fiscal);
@@ -93,6 +99,22 @@ export function Resuelvo({ item }) {
     const handleSubmit = async (event) => {
         setGuardando(true)
         event.preventDefault();
+        const handleRemove = async (itemList, removedList, field) => {
+            for (const item of removedList) {
+                if (itemList.includes(item)) {
+                    console.log(`removing from ${field}`);
+                    await updateDataToday(item.numeroLeg, item.hora, field, itemList.filter(i => i !== item));
+                }
+            }
+        }
+        await handleRemove(mpf, removedMpf, 'mpf');
+        await handleRemove(defensa, removedDefensa, 'defensa');
+        await handleRemove(imputado, removedImputado, 'imputado');
+        await handleRemove(partes, removedPartes, 'partes');
+        setRemovedMpf([]);
+        setRemovedDefensa([]);
+        setRemovedImputado([]);
+        setRemovedPartes([]);
         if (!deepEqual(caratula2, caratula)){
             console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'caratula', caratula);
@@ -200,7 +222,7 @@ export function Resuelvo({ item }) {
                                     </option>
                                 ))}
                             </datalist>
-                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setMpf, index)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}>QUITAR</button>
                         </div>
                     ))}
                     <button className={styles.formButton} type="button" onClick={() => addNewInput(setMpf, { nombre: '' })}>+ FISCAL</button>
@@ -222,7 +244,7 @@ export function Resuelvo({ item }) {
                                 onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
                                 placeholder="DNI"
                             />
-                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setImputado, index)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}>QUITAR</button>
                         </div>
                     ))}
                     <span className={styles.imputadoButtons}>
@@ -277,7 +299,7 @@ export function Resuelvo({ item }) {
                                     </option>
                                 ))}
                             </select>
-                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setDefensa, index)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}>QUITAR</button>
                         </div>
                     ))}
                     <button className={styles.formButton} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '' })}>+ DEFENSA</button>
@@ -305,7 +327,7 @@ export function Resuelvo({ item }) {
                                 onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)}
                                 placeholder="Name"
                             />
-                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setPartes, index)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}>QUITAR</button>
                         </div>
                     ))}
                     <button className={styles.formButton} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '' })}>+ PARTE</button>

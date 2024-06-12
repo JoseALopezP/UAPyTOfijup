@@ -2,10 +2,13 @@ import { jsPDF } from 'jspdf';
 import { generateMinutaSection } from './resuelvoUtils';
 
 export const generatePDF = async (item, date) => {
+  PDFGenerator(generateMinutaSection(item, date));
+}
+
+export const PDFGenerator = async (sections) => {
     const doc = new jsPDF('p', 'mm', 'a4');
     const headerImage = '/pdf/header.jpg';
     const footerImage = '/pdf/footer.jpg';
-    const sections = generateMinutaSection(item, date);
 
     const topMargin = 40;
     const bottomMargin = 40;

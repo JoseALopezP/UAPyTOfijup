@@ -1,3 +1,5 @@
+import { PDFGenerator } from "./pdfUtils";
+
 function getMonthName(number){
     const date = new Date(0, number - 1);
     return date.toLocaleString('es-AR', { month: 'long' });
@@ -82,21 +84,22 @@ function juecesPart(jueces){
     if(jueces.split('+').length > 1){
         aux = 'el Tribunal Colegiado compuesto por'
         jueces.split('+').forEach((juez, index) =>{
-            aux += (juez.split('.')[0] === 'DR' ? `Sr. Juez ${juez.map(j => capitalizeFirst(j.toLowerCase()))}` : `Sra. Jueza ${juez.map(j => capitalizeFirst(j.toLowerCase()))}`)
+            aux += (juez.split('.')[0] === 'DR' ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`)
             if(index != 2) aux += ', '
         })
     }else{
-        aux = (juez.split('.')[0] === 'DR' ? `El Sr. Juez ${juez.map(j => capitalizeFirst(j.toLowerCase()))}` : `La Sra. Jueza ${juez.map(j => capitalizeFirst(j.toLowerCase()))}`)
+        aux = (jueces.split('.')[0] === 'DR' ? `El Sr. Juez ${capitalizeFirst(jueces.toLowerCase())}` : `La Sra. Jueza ${capitalizeFirst(jueces.toLowerCase())}`)
     }
 }
 export function generateOficioSection(item, date, traslado, oficiados){
     const sections = []
     sections.push({right: `San Juan, ${date.split('').splice(0,2).join('')} de ${capitalizeFirst(getMonthName(date.split('').splice(2,2).join('')))} de ${date.split('').splice(4,4).join('')}.`})
     oficiados.forEach(el => sections.push({title: `${el}`}))
-    oficiados.push({text: `          Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado "${item.caratula}"; a fin de informarles que en Audiencia de ${item.tipo} - ${item.tipo2} - ${item.tipo3} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: "${item.resuelvo.split('):')[1]}".
-          En la presente audiencia intervinieron ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${el.nombre.split('-')[1]}.`)} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`)} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'}: ${el.nombre} D.N.I.N°: ${el.dni}.`)} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`) : ''}. Operador: ${el.operador}.
+    oficiados.push({text: `          Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado "${item.caratula}"; a fin de informarles que en Audiencia de ${item.tipo} - ${item.tipo2} - ${item.tipo3} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: "${item.resuelvoText.split('):')[1]}".
+          En la presente audiencia intervinieron ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${el.nombre.split('-')[1]}.`)} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`)} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'}: ${el.nombre} D.N.I.N°: ${el.dni}.`)} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`) : ''}. Operador: ${item.operador}.
           ${traslado}
                             Saluda atte.`})
+    PDFGenerator(sections)
 }
 export function generateMinutaSection(item, date){
     const sections = []

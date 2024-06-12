@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 import styles from './audiencia.module.css'
-import { generateResuelvoSection } from '@/utils/resuelvoUtils';
+import { generateMinutaSection, generateOficioSection, generateResuelvoSection } from '@/utils/resuelvoUtils';
 
 export function Oficio ({item, date}) {
     const {updateDesplegables, desplegables} = useContext(DataContext);
@@ -23,7 +23,7 @@ export function Oficio ({item, date}) {
         };
         const submitHandler = (e) => {
             e.preventDefault();
-            
+            generateOficioSection(item,date,traslado,inputList)
         };
     useEffect(() => {
         updateDesplegables()
@@ -35,7 +35,7 @@ export function Oficio ({item, date}) {
               <>{el.title ? <p><strong>{el.title}</strong> {el.text}</p> : <p>{el.text}</p>}</>
             ))}
           </div>
-        <form className={`${styles.oficiadosBlock}`} onSubmit={submitHandler}>
+        <form className={`${styles.oficiadosBlock}`} onSubmit={(event) => submitHandler(event)}>
           {inputList.map((input, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
               <input className={`${styles.oficioInput}`}
@@ -57,7 +57,7 @@ export function Oficio ({item, date}) {
           <button className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
           <button></button>
           <textarea className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
-          <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit">DESCARGAR</button>
+          <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit" >DESCARGAR</button>
         </form>
         </div>
       );
