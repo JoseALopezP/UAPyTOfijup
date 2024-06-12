@@ -65,11 +65,11 @@ export function AudienciaIndiv ({date, element}) {
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
             <span className={`${styles.tableCell} ${styles.tableCellOP} ${styles.tableCellOPIndiv}`}>
                 <select className={`${styles.inputSituacionEdit} ${styles.operadorInput}`} onChange={(e)=>{setOperador(e.target.value)}}>
-                    <option value={element.operador}>{element.operador}</option>
+                    <option key={element.operador + 1} value={element.operador}>{element.operador}</option>
                     {desplegables.operador && desplegables.operador.map((el)=>{
                         const nameOPShort = el.split(' ')[el.split(' ').length-1].toUpperCase().split('')
                         return(
-                            <option value={el}>{`${nameOPShort.length === 5 ? nameOPShort.join('') : nameOPShort.splice(0,4).join('')} ${el.split('').splice(0,2).join('').toUpperCase()}.`}</option>
+                            <option key={el} value={el}>{`${nameOPShort.length === 5 ? nameOPShort.join('') : nameOPShort.splice(0,4).join('')} ${el.split('').splice(0,2).join('').toUpperCase()}.`}</option>
                         )
                     })}
                 </select>

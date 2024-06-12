@@ -94,8 +94,21 @@
     font-size: 26px;
     padding: 8px;
     margin: 10px 0;
-    background-color: #1b344a;
+    background-color: #28a745;
     cursor: pointer;
+    position: fixed;
+    align-self: end;
+    height: 100px;
+    width: 19-0px;
+}
+.guardar{
+    display: none;
+}
+.guardarButton:hover .guardar{
+    display: block;
+}
+.guardarButton:hover .sinGuardar{
+    display: none;
 }
 .inputResuelvoDemora{
     width: 100%;
@@ -113,4 +126,7 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 10px 0 0 0;
+}
+.descargarButton{
+    background-color: #20c997;
 }

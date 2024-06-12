@@ -37,7 +37,7 @@ export function AudienciaList () {
                         <th><select className={`${styles.operadorList}`} onChange={(e)=>{setOperadorF(e.target.value)}}>
                             <option value={''}>TODOS</option>
                             {desplegables.operador && desplegables.operador.map((el)=>(
-                                <option value={el}>{`${el.split(' ')[el.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${el.split('')[0]}.`}</option>
+                                <option key={el} value={el}>{`${el.split(' ')[el.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${el.split('')[0]}.`}</option>
                             ))}
                         </select></th>
                         <th>LEG</th>

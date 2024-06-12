@@ -92,48 +92,56 @@ export function Resuelvo({ item }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!deepEqual(caratula2, caratula)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'caratula', caratula);
-            await setCaratula2(caratula)
+            setCaratula2(caratula)
         } 
         if (!deepEqual(mpf2, mpf)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'mpf', mpf);
-            await setMpf2(mpf)
+            setMpf2(mpf)
         } 
         if (!deepEqual(defensa2, defensa)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'defensa', defensa);
-            await setDefensa2(defensa)
+            setDefensa2(defensa)
         }
         if (!deepEqual(imputado2, imputado)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'imputado', imputado);
-            await setImputado2(imputado)
+            setImputado2(imputado)
         }
         if (!deepEqual(resuelvo2, resuelvo)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'resuelvoText', resuelvo);
-            await setResuelvo2(resuelvo)
+            setResuelvo2(resuelvo)
         }
         if (!deepEqual(partes2, partes)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'partes', partes);
-            await setPartes2(partes)
+            setPartes2(partes)
         }
         if (!deepEqual(razonDemora2, razonDemora)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'razonDemora', razonDemora);
-            await setRazonDemora2(razonDemora)   
+            setRazonDemora2(razonDemora)   
         }
         if (!deepEqual(minuta2, minuta)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'minuta', minuta);
-            await setMinuta2(minuta)
+            setMinuta2(minuta)
         }
         if (!deepEqual(cierre2, cierre)){
+            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'cierre', cierre);
-            await setCierre2(cierre)
+            setCierre2(cierre)
         }
         await updateToday();
         if (await checkForResuelvo(item)) {
             await updateRealTime();
             await updateDataToday(item.numeroLeg, item.hora, 'horaResuelvo', realTime);
         }
-        await checkGuardar()
-        checkGuardar()
+        await setGuardarInc(false)
     };
 
     const checkGuardar = () => {
@@ -142,6 +150,7 @@ export function Resuelvo({ item }) {
         } else {
             setGuardarInc(false);
         }
+        console.log('checkGuardar')
     };
 
     const checkHoraDiff = () => {
@@ -149,7 +158,6 @@ export function Resuelvo({ item }) {
         const hora2 = parseInt(item.hitos[0].split('|')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split('|')[0].split(':')[1]);
         return hora2 - hora1;
     };
-
     useEffect(() => {
         updateDesplegables();
     }, []);
@@ -159,6 +167,9 @@ export function Resuelvo({ item }) {
     useEffect(() => {
         updateComparisson()
     }, []);
+    useEffect(() => {
+        checkGuardar();
+    }, [guardarInc]);
     return (
         <>
             <div className={`${styles.buttonsBlock} ${styles.buttonsBlockResuelvo}`}>
@@ -351,11 +362,10 @@ export function Resuelvo({ item }) {
                             </select>
                         </>
                     }
-                    {guardarInc && <input className={`${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR" />}
+                    {guardarInc && <button className={`${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR"><span className={`${styles.sinGuardar}`}>CAMBIOS SIN<br/>GUARDAR</span><span className={`${styles.guardar}`}>GUARDAR</span></button>}
                 </form>
-                <button onClick={() => copyResuelvoToClipboard(item, (new Date()).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).split('/').join(''))}>COPIAR</button>
             </div>
-            <button type='button' onClick={async() => await generatePDF(item,(new Date()).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).split('/').join(''))}>Descargar pdf</button>        
+            <button type='button' className={`${styles.formButton} ${styles.descargarButton}`} onClick={async() => await generatePDF(item,(new Date()).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).split('/').join(''))}>Descargar PDF</button>        
             </>
     );
 }
