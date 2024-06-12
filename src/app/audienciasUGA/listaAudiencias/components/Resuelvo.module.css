@@ -110,6 +110,16 @@
 .guardarButton:hover .sinGuardar{
     display: none;
 }
+.guardando{
+    display: none;
+}
+.guardandoButton .guardando{
+    display: block;
+}
+.guardandoButton .guardar, .guardandoButton .sinGuardar, .guardandoButton:hover .guardar{
+    display: none;
+}
+
 .inputResuelvoDemora{
     width: 100%;
     text-align: center;

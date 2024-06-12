@@ -28,6 +28,7 @@ export function Resuelvo({ item }) {
     const [cierre2, setCierre2] = useState('');
     const [partes, setPartes] = useState([]);
     const [guardarInc, setGuardarInc] = useState(false);
+    const [guardando, setGuardando] = useState(false);
 
     const deepEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -90,6 +91,7 @@ export function Resuelvo({ item }) {
         setResuelvo(modeloMinuta(modeloSelector).resuelvo)
     }
     const handleSubmit = async (event) => {
+        setGuardando(true)
         event.preventDefault();
         if (!deepEqual(caratula2, caratula)){
             console.log('guardar')
@@ -142,6 +144,7 @@ export function Resuelvo({ item }) {
             await updateDataToday(item.numeroLeg, item.hora, 'horaResuelvo', realTime);
         }
         await setGuardarInc(false)
+        await setGuardando(false)
     };
 
     const checkGuardar = () => {
@@ -362,7 +365,11 @@ export function Resuelvo({ item }) {
                             </select>
                         </>
                     }
-                    {guardarInc && <button className={`${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR"><span className={`${styles.sinGuardar}`}>CAMBIOS SIN<br/>GUARDAR</span><span className={`${styles.guardar}`}>GUARDAR</span></button>}
+                    {guardarInc && <button className={guardando ? `${styles.formButton} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR">
+                        <span className={`${styles.sinGuardar}`}>CAMBIOS SIN<br/>GUARDAR</span>
+                        <span className={`${styles.guardar}`}>GUARDAR</span>
+                        <span className={`${styles.guardando}`}>GUARDANDO...</span>
+                    </button>}
                 </form>
             </div>
             <button type='button' className={`${styles.formButton} ${styles.descargarButton}`} onClick={async() => await generatePDF(item,(new Date()).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).split('/').join(''))}>Descargar PDF</button>        
