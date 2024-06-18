@@ -106,6 +106,7 @@ export function generateMinutaSection(item, date){
     const sections = []
     sections.push(...generateResuelvoSection(item,date))
     sections.push({text: item.minuta})
+    sections.push({text: item.resuelvoText})
     sections.push({text: item.cierre})
     return sections
 }
