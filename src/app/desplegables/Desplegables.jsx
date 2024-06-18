@@ -22,7 +22,6 @@ export default function Desplegables() {
     }
     useEffect(() => {
         updateDesplegables();
-        console.log(desplegables)
     }, []);
     return (
         <>

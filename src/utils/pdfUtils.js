@@ -35,15 +35,19 @@ export const PDFGenerator = async (sections) => {
 
     const processSections = (sections) => {
       sections.forEach((section) => {
-        let textLines = doc.splitTextToSize(section.text, 160);
-        
+        let textLines = doc.splitTextToSize(section.text, 170);
         if (section.right) {
           doc.setFontSize(10);
           doc.setFont("helvetica", "normal");
-          addTextWithLineBreaks(textLines, doc.internal.pageSize.getWidth() - 20, currentY, 'right');
+          addTextWithLineBreaks(doc.splitTextToSize(section.right, 160), doc.internal.pageSize.getWidth() - 20, currentY, 'right');
           currentY += sectionSpacingWithoutTitle;
         } else if (section.title) {
-          const title = `${section.title}: `;
+          let title = ''
+          if(section.text){
+            title = `${section.title}: `;
+          }else{
+            title = `${section.title}`
+          }
           const titleWidth = doc.getTextWidth(title);
           doc.setFontSize(10);
           doc.setFont("helvetica", "bold");

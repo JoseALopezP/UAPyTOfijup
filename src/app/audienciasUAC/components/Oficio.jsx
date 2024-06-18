@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 import styles from './audiencia.module.css'
-import { generateMinutaSection, generateOficioSection, generateResuelvoSection } from '@/utils/resuelvoUtils';
+import { generateOficioSection, generateResuelvoSection } from '@/utils/resuelvoUtils';
 
 export function Oficio ({item, date}) {
     const {updateDesplegables, desplegables} = useContext(DataContext);
@@ -49,13 +49,12 @@ export function Oficio ({item, date}) {
                   <option key={i} value={option} />
                 ))}
               </datalist>
-              <button className={`${styles.controlButton} ${styles.controlButtonQuitar}`} onClick={() => handleRemoveInput(index)} style={{ marginLeft: '10px' }}>
+              <button type='button' className={`${styles.controlButton} ${styles.controlButtonQuitar}`} onClick={() => handleRemoveInput(index)} style={{ marginLeft: '10px' }}>
                 QUITAR
               </button>
             </div>
           ))}
-          <button className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
-          <button></button>
+          <button type='button' className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
           <textarea className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
           <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit" >DESCARGAR</button>
         </form>

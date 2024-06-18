@@ -102,7 +102,6 @@ export function Resuelvo({ item }) {
         const handleRemove = async (itemList, removedList, field) => {
             for (const item of removedList) {
                 if (itemList.includes(item)) {
-                    console.log(`removing from ${field}`);
                     await updateDataToday(item.numeroLeg, item.hora, field, itemList.filter(i => i !== item));
                 }
             }
@@ -116,47 +115,38 @@ export function Resuelvo({ item }) {
         setRemovedImputado([]);
         setRemovedPartes([]);
         if (!deepEqual(caratula2, caratula)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'caratula', caratula);
             setCaratula2(caratula)
         } 
         if (!deepEqual(mpf2, mpf)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'mpf', mpf);
             setMpf2(mpf)
         } 
         if (!deepEqual(defensa2, defensa)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'defensa', defensa);
             setDefensa2(defensa)
         }
         if (!deepEqual(imputado2, imputado)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'imputado', imputado);
             setImputado2(imputado)
         }
         if (!deepEqual(resuelvo2, resuelvo)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'resuelvoText', resuelvo);
             setResuelvo2(resuelvo)
         }
         if (!deepEqual(partes2, partes)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'partes', partes);
             setPartes2(partes)
         }
         if (!deepEqual(razonDemora2, razonDemora)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'razonDemora', razonDemora);
             setRazonDemora2(razonDemora)   
         }
         if (!deepEqual(minuta2, minuta)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'minuta', minuta);
             setMinuta2(minuta)
         }
         if (!deepEqual(cierre2, cierre)){
-            console.log('guardar')
             await updateDataToday(item.numeroLeg, item.hora, 'cierre', cierre);
             setCierre2(cierre)
         }
@@ -175,7 +165,6 @@ export function Resuelvo({ item }) {
         } else {
             setGuardarInc(false);
         }
-        console.log('checkGuardar')
     };
 
     const checkHoraDiff = () => {
