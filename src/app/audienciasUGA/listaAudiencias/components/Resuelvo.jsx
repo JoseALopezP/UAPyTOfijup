@@ -19,6 +19,8 @@ export function Resuelvo({ item }) {
     const [razonDemora, setRazonDemora] = useState('');
     const [razonDemora2, setRazonDemora2] = useState('');
     const [mpf, setMpf] = useState([]);
+    const [ufi, setUfi] = useState('');
+    const [ufi2, setUfi2] = useState('');
     const [defensa, setDefensa] = useState([]);
     const [imputado, setImputado] = useState([]);
     const [resuelvo, setResuelvo] = useState('');
@@ -35,7 +37,11 @@ export function Resuelvo({ item }) {
     const [removedPartes, setRemovedPartes] = useState([]);
 
     const deepEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-
+    const checkUFI = () =>{
+        if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
+            setUfi(mpf[0].nombre.split(' - ')[1])
+        }
+    }
     const handleInputChange = (setter, index, key, value) => {
         setter(prev => {
             const parts = [...prev];
@@ -54,9 +60,9 @@ export function Resuelvo({ item }) {
     };
     
     const updateComparisson = () =>{
-        if (item.fiscal) {
-            setMpf(item.fiscal);
-            setMpf2(item.fiscal);
+        if (item.mpf) {
+            setMpf(item.mpf);
+            setMpf2(item.mpf);
         }
         if (item.imputado) {
             setImputado(item.imputado);
@@ -89,6 +95,10 @@ export function Resuelvo({ item }) {
         if (item.cierre) {
             setCierre(item.cierre);
             setCierre2(item.cierre);
+        }
+        if (item.ufi) {
+            setUfi(item.ufi);
+            setUfi2(item.ufi);
         }
     }
     const insertarModelo = () =>{
@@ -150,6 +160,10 @@ export function Resuelvo({ item }) {
             await updateDataToday(item.numeroLeg, item.hora, 'cierre', cierre);
             setCierre2(cierre)
         }
+        if (!deepEqual(ufi2, ufi)){
+            await updateDataToday(item.numeroLeg, item.hora, 'ufi', ufi);
+            setUfi2(ufi)
+        }
         await updateToday();
         if (await checkForResuelvo(item)) {
             await updateRealTime();
@@ -160,7 +174,7 @@ export function Resuelvo({ item }) {
     };
 
     const checkGuardar = () => {
-        if (!deepEqual(caratula2, caratula) || !deepEqual(mpf2, mpf) || !deepEqual(razonDemora2, razonDemora) || !deepEqual(defensa2, defensa) || !deepEqual(imputado2, imputado) || !deepEqual(resuelvo2, resuelvo) || !deepEqual(partes2, partes) || !deepEqual(minuta2, minuta) || !deepEqual(cierre2, cierre)) {
+        if (!deepEqual(caratula2, caratula) || !deepEqual(mpf2, mpf) || !deepEqual(razonDemora2, razonDemora) || !deepEqual(defensa2, defensa) || !deepEqual(imputado2, imputado) || !deepEqual(resuelvo2, resuelvo) || !deepEqual(partes2, partes) || !deepEqual(minuta2, minuta) || !deepEqual(cierre2, cierre) || !deepEqual(ufi2, ufi)) {
             setGuardarInc(true);
         } else {
             setGuardarInc(false);
@@ -173,11 +187,14 @@ export function Resuelvo({ item }) {
         return hora2 - hora1;
     };
     useEffect(() => {
+        checkUFI()
+    }, [mpf])
+    useEffect(() => {
         updateDesplegables();
     }, []);
     useEffect(() => {
         checkGuardar();
-    }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora]);
+    }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi]);
     useEffect(() => {
         updateComparisson()
     }, []);
@@ -215,7 +232,22 @@ export function Resuelvo({ item }) {
                         </div>
                     ))}
                     <button className={styles.formButton} type="button" onClick={() => addNewInput(setMpf, { nombre: '' })}>+ FISCAL</button>
-
+                    <span><label>UFI:</label><input
+                                list='ufi'
+                                className={`${styles.inputResuelvo} ${styles.inputResuelvo1} ${styles.inputUfi}`}
+                                value={ufi}
+                                onChange={(e) => setUfi(e.target.value)}
+                            />
+                            <datalist id='ufi'>
+                                <option>CAVIG</option>
+                                <option>ANIVI</option>
+                                <option>DELITOS ESPECIALES</option>
+                                <option>DELITOS CONTRA LA PROPIEDAD</option>
+                                <option>DELITOS INFORMÁTICOS Y ESTAFAS</option>
+                                <option>GENÉRICA</option>
+                                <option>SOLUCIONES ALTERNATIVAS</option>
+                                <option>FLAGRANCIA</option>
+                            </datalist></span>
                     <label>Imputados</label>
                     {imputado.map((input, index) => (
                         <div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
@@ -254,18 +286,19 @@ export function Resuelvo({ item }) {
                             </select>
                             {input.tipo && (
                                 input.tipo === 'Oficial' ? (
-                                    <select
-                                        className={`${styles.inputResuelvo} ${styles.inputResuelvo3} ${styles.inputSelect}`}
+                                    <><input
+                                        list='oficial'
+                                        className={`${styles.inputResuelvo} ${styles.inputResuelvo1} ${styles.inputSelect}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
-                                    >
-                                        <option value=""></option>
+                                    />
+                                    <datalist id='oficial'>
                                         {desplegables.defensa && desplegables.defensa.map(option => (
                                             <option key={option} value={option}>
                                                 {option}
                                             </option>
                                         ))}
-                                    </select>
+                                    </datalist></>
                                 ) : (
                                     <input
                                         className={`${styles.inputResuelvo} ${styles.inputResuelvo3} ${styles.inputText}`}

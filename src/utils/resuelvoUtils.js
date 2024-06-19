@@ -8,10 +8,10 @@ function capitalizeFirst(sentence){
     if (!sentence) return sentence;
     return sentence.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
-function listFiscal(arr){
+function listFiscal(arr, ufi){
     let aux = ''
     arr && arr.forEach((el,i) =>{
-        aux = `${aux}Ministerio Público Fiscal: ${el.nombre.split(' - ')[0]}  UFI:${el.nombre.split(' - ')[1]} ${(arr.length !== i+1) ? '\n' : ''}`
+        aux = `${aux}Ministerio Público Fiscal: ${el.nombre.split(' - ')[0]}  UFI:${ufi} ${(arr.length !== i+1) ? '\n' : ''}`
     })
     return aux
 }
@@ -45,7 +45,7 @@ Sala de Audiencias: ${item.sala}
 Hora programada: ${item.hora} horas
 Hora real de inicio: ${item.hitos[0].split(' | ').splice(0,1)} horas
 Juez Interviniente: ${capitalizeFirst(item.juez.toLowerCase())}
-${listFiscal(item.mpf)}
+${listFiscal(item.mpf, item.ufi)}
 ${listDefensa(item.defensa)}
 ${listImputado(item.imputado)}
 ${listPartes(item.partes)}
@@ -69,7 +69,7 @@ export function generateResuelvoSection(item, date){
     }else{
         sections.push({title: 'Juez', text: `${capitalizeFirst(item.juez.toLowerCase())}`})
     }
-    if(item.mpf) {listFiscal(item.mpf).split('\n').forEach(f => sections.push({title: `${f.split(':')[0]}`, text: `${f.split('Fiscal:')[1].split('UFI:')[0]} UFI: ${f.split('UFI:')[1]}`}))}
+    if(item.mpf) {listFiscal(item.mpf).split('\n').forEach(f => sections.push({title: `${f.split(':')[0]}`, text: `${f.split('Fiscal:')[1].split('UFI:')[0]} UFI: ${item.ufi}`}))}
     if(item.defensa) {listDefensa(item.defensa).split('\n').forEach(d => sections.push({title: `${d.split(':')[0]}`, text: `${d.split(':')[1]}`}))}
     if(item.imputado) {listImputado(item.imputado).split('\n').forEach(i => sections.push({title: `${i.split(':')[0]}`, text: `${i.split(':')[1]}${i.split(':')[2]}`}))}
     if(item.partes) {listPartes(item.partes).split('\n').forEach(p => sections.push({title: `${p.split(':')[0]}`, text: `${p.split(':')[1]}`}))}
@@ -95,7 +95,7 @@ export async function generateOficioSection(item, date, traslado, oficiados){
     await sections.push({right: `San Juan, ${date.split('').splice(0,2).join('')} de ${capitalizeFirst(getMonthName(date.split('').splice(2,2).join('')))} de ${date.split('').splice(4,4).join('')}.`})
     await oficiados.forEach(el => sections.push({title: `${el.value}`, text:''}))
     await sections.push({text: `          Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - '+item.tipo2 : ''}${item.tipo3 ? ' - '+item.tipo3 : ''} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: ${item.resuelvoText.split('):')[1]}.
-          En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${el.nombre.split('-')[1]}.`)} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`)} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`)} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`) : ''} Operador: ${item.operador}.
+          En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${item.ufi}.`)} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`)} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`)} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`) : ''} Operador: ${item.operador}.
           ${traslado}
 
 
