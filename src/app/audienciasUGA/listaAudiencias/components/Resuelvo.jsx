@@ -36,7 +36,9 @@ export function Resuelvo({ item }) {
     const [removedImputado, setRemovedImputado] = useState([]);
     const [removedPartes, setRemovedPartes] = useState([]);
 
-    const deepEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const deepEqual = (a, b) =>{
+        return JSON.stringify(a) === JSON.stringify(b)
+    };
     const checkUFI = () =>{
         if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
             setUfi(mpf[0].nombre.split(' - ')[1])
@@ -194,7 +196,7 @@ export function Resuelvo({ item }) {
     }, []);
     useEffect(() => {
         checkGuardar();
-    }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi]);
+    }, [caratula, mpf[0], defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi]);
     useEffect(() => {
         updateComparisson()
     }, []);
@@ -315,9 +317,9 @@ export function Resuelvo({ item }) {
                                 onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}
                             >
                                 <option value="">imputado - (opcional)</option>
-                                {imputado.map(option => (
-                                    <option key={option.nombre} value={option.nombre}>
-                                        {option.nombre}
+                                {imputado.map(imputadoItem => (
+                                    <option key={imputadoItem.nombre} value={imputadoItem.nombre}>
+                                        {imputadoItem.nombre}
                                     </option>
                                 ))}
                             </select>
