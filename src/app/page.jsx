@@ -1,16 +1,13 @@
 'use client'
-import { AuthContextProvider} from "@/context/AuthContext";
-import MenuSelector from './components/MenuSelector'
 import { DataContextProvider } from "@/context/DataContext";
+import { AudienciaList } from "./components/audienciaList";
 
-export default function menu() {
+export default function Home() {
     return (
       <>
-      <AuthContextProvider>
-        <DataContextProvider>
-          <MenuSelector/>
-        </DataContextProvider>
-      </AuthContextProvider>
+      <DataContextProvider>
+          <AudienciaList/>
+      </DataContextProvider>
       </>
     )
 }

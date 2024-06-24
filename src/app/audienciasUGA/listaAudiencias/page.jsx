@@ -1,6 +1,5 @@
 'use client'
 import { AudienciaList } from "./components/AudienciaList";
-import { useContext } from "react";
 import { DataContextProvider } from "@/context/DataContext";
 import { AuthContextProvider } from "@/context/AuthContext";
 
