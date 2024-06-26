@@ -97,7 +97,7 @@ export function ScheduleTable() {
                                             <td>{el.hora}</td>
                                             <td>SALA {el.sala}</td>
                                             <td>{el.numeroLeg}</td>
-                                            <td>{el.tipo}</td>
+                                            <td>{el.tipo.split('').slice(0,40).join('')}{el.tipo.split('').length>39 ? '...' : ''}</td>
                                             <td>{el.juez.split('+').map(e => <span key={e}>{e}<br /></span>)}</td>
                                             {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
                                                 <td className={`${styles.DEMORADA}`}>DEMORADA</td>

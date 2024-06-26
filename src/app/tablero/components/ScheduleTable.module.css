@@ -4,6 +4,8 @@
     font-weight: 700;
     color: white;
     overflow: hidden;
+    position: relative;
+    top: 70px;
 }
 .table{
     width: calc(100vw - (100vw - 100%));
@@ -39,6 +41,8 @@
     height: 70px;
     overflow: hidden;
     display: inline-flex;
+    position: fixed;
+    z-index: 50;
     flex-direction: row;
 }
 
@@ -260,5 +264,135 @@
     }
     100%{
         height: 50px;
+    }
+}
+@media (min-width: 3000px) {
+    .infoBlock{
+        border-width: 20px 0 20px 0;
+    }
+    .tableSection{
+        width: calc(100vw - (100vw - 100%));
+        font-size: 56px;
+        font-weight: 500;
+        position: relative;
+        top: 140px;
+    }
+    .tableBody tr{
+        height: 120px;
+        line-height: 38px;
+    }
+    .DEMORADA,.PROGRAMADA,.EN_CURSO,.CANCELADA,.CUARTO_INTERMEDIO,.FINALIZADA,.REPROGRAMADA {
+        font-weight: 700;
+    }
+    .tableBody td:nth-child(1){
+        font-weight: 700;
+        font-size: 56px;
+    }
+    .tableBody td:nth-child(5){
+        font-size: 38px;
+    }
+    .clockBlock{
+        font-weight: 700;
+        font-size: 80px;
+        width: 300px;
+        padding: 10px 40px;
+        letter-spacing: 3px;
+    }
+    .clockDigits{
+        margin: 20px auto;
+        width: 220px;
+    }
+    .corteLogo{
+        width: 220px;
+        height: auto;
+        margin: 20px auto;
+    }
+    .infoSection{
+        height: 100px;
+    }
+    .ofijupTitle{
+        position: fixed;
+        left: 40%;
+        height: 0px;
+        z-index: 50;
+        font-size: 68px;
+        line-height: 0;
+    }
+    @keyframes infoAppear {
+        0% {
+        }
+        50%{
+          opacity: 0%;
+        }
+        100%{
+          opacity: 100%;
+        }
+    }
+    @keyframes headerExpand {
+        0%{
+            height: 120px;
+        }
+        100% {
+          height: 420px;
+        }
+    }
+    @keyframes infodisappear {
+        0% {
+            opacity: 100%;
+        }
+        50%{
+            opacity: 0%;
+        }
+        100%{
+            opacity: 0%;
+        }
+    }
+    @keyframes blockExpand {
+        0% {
+            height: 120px;
+        }
+        100%{
+            height: 380px;
+        }
+    }
+    
+    
+    @keyframes infoAppear2 {
+        0% {
+            opacity: 100%;
+        }
+        50%{
+          opacity: 0%;
+        }
+        100%{
+          opacity: 0%;
+        }
+    }
+    @keyframes headerExpand2 {
+        0%{
+            height: 380px;
+        }
+        100% {
+          height: 140px;
+        }
+    }
+    @keyframes infodisappear2 {
+        0% {
+            opacity: 0%;
+        }
+        50%{
+            opacity: 0%;
+        }
+        100%{
+            opacity: 100%;
+        }
+    }
+    @keyframes blockExpand2 {
+        0% {
+            height: 400px;
+        }
+        100%{
+            height: 100px;
+        }
     }
 }

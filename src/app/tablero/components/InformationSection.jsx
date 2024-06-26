@@ -1,22 +1,34 @@
 import { Clock } from './Clock'
 import styles from './ScheduleTable.module.css'
 import { InfoBlock } from './InfoBlock'
-import { useContext, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { DataContext } from '@/context/DataContext';
 
 export function InformationSection () {
-    const {showInfo} = useContext(DataContext);
-    const { user } = useAuthContext()
-    const router = useRouter()
+    const { user } = useAuthContext();
+    const router = useRouter();
+    const [showInfo2, setShowInfo2] = useState(true);
+
+    const tick = () => {
+        setShowInfo2(prevShowInfo2 => !prevShowInfo2);
+    }
+
     useEffect(() => {
-      if (user == null) router.push("/signin")
-    }, [user])
-    return(
-        <section className={showInfo ? `${styles.infoSection} ${styles.infoSectionNotShow}` : `${styles.infoSection} ${styles.infoSectionShow}`}>
-            <Clock/>
-            <InfoBlock/>
+        if (!user) router.push("/signin");
+    }, [user, router]);
+
+    useEffect(() => {
+        const timerID = setInterval(tick, 5000);
+        return () => {
+            clearInterval(timerID);
+        };
+    }, []);
+
+    return (
+        <section className={`${styles.infoSection} ${showInfo2 ? styles.infoSectionNotShow : styles.infoSectionShow}`}>
+            <Clock />
+            <InfoBlock />
         </section>
-    )
+    );
 }

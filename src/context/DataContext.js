@@ -24,7 +24,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
-    const refShowInfo = useRef();
     const updateRealTime = async() =>{
         try {
             const response = await fetch('https://worldtimeapi.org/api/ip')
