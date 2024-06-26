@@ -50,7 +50,7 @@
     font-weight: 700;
     font-size: 48px;
     width: 180px;
-    padding: 0 40px;
+    padding: 10px 40px;
     letter-spacing: 3px;
     display: inline-flex;
     flex-direction: column;
@@ -60,9 +60,9 @@
     width: 135px;
 }
 .corteLogo{
-    width: 135px;
+    width: 120px;
     height: auto;
-    margin: 0 auto;
+    margin: 10px auto;
 }
 
 .infoBlock{
@@ -88,12 +88,12 @@
 }
 .newsTitle{
     opacity: 0%;
-    font-size: 32px;
+    font-size: 100px;
     line-height: 20px;
 }
 .newsBody{
     opacity: 0%;
-    font-size: 24px;
+    font-size: 60px;
     line-height: 24px;
     margin: 0;
 }
