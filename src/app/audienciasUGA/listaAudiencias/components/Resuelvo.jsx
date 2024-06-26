@@ -1,10 +1,29 @@
 'use client'
 import styles from './Resuelvo.module.css'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useCallback } from 'react'
 import { DataContext } from '@/context/DataContext';
 import { copyResuelvoToClipboard, checkForResuelvo } from '@/utils/resuelvoUtils';
 import { listModelos, modeloMinuta } from '@/utils/modelosUtils';
 import { generatePDF } from '@/utils/pdfUtils';
+
+const deepEqual = (obj1, obj2) => {
+    if (obj1 === obj2) return true;
+
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
+        return false;
+    }
+
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) return false;
+
+    for (let key of keys1) {
+        if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) return false;
+    }
+
+    return true;
+};
 
 export function Resuelvo({ item }) {
     const [caratula2, setCaratula2] = useState('');
@@ -35,10 +54,6 @@ export function Resuelvo({ item }) {
     const [removedDefensa, setRemovedDefensa] = useState([]);
     const [removedImputado, setRemovedImputado] = useState([]);
     const [removedPartes, setRemovedPartes] = useState([]);
-
-    const deepEqual = (a, b) =>{
-        return JSON.stringify(a) === JSON.stringify(b)
-    };
     const checkUFI = () =>{
         if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
             setUfi(mpf[0].nombre.split(' - ')[1])
@@ -46,9 +61,9 @@ export function Resuelvo({ item }) {
     }
     const handleInputChange = (setter, index, key, value) => {
         setter(prev => {
-            const parts = [...prev];
-            parts[index][key] = value;
-            return parts;
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [key]: value };
+            return updated;
         });
     };
     
@@ -61,56 +76,35 @@ export function Resuelvo({ item }) {
         removedSetter(prev => [...prev, items[index]]);
     };
     
-    const updateComparisson = () =>{
-        if (item.mpf) {
-            setMpf(item.mpf);
-            setMpf2(item.mpf);
-        }
-        if (item.imputado) {
-            setImputado(item.imputado);
-            setImputado2(item.imputado);
-        }
-        if (item.defensa) {
-            setDefensa(item.defensa);
-            setDefensa2(item.defensa);
-        }
-        if (item.resuelvoText) {
-            setResuelvo(item.resuelvoText);
-            setResuelvo2(item.resuelvoText);
-        }
-        if (item.caratula) {
-            setCaratula(item.caratula);
-            setCaratula2(item.caratula);
-        }
-        if (item.partes) {
-            setPartes(item.partes);
-            setPartes2(item.partes);
-        }
-        if (item.razonDemora) {
-            setRazonDemora(item.razonDemora);
-            setRazonDemora2(item.razonDemora);
-        }
-        if (item.minuta) {
-            setMinuta(item.minuta);
-            setMinuta2(item.minuta);
-        }
-        if (item.cierre) {
-            setCierre(item.cierre);
-            setCierre2(item.cierre);
-        }
-        if (item.ufi) {
-            setUfi(item.ufi);
-            setUfi2(item.ufi);
-        }
-    }
+    const updateComparisson = () => {
+        setMpf(item.mpf ? [...item.mpf] : []);
+        setMpf2(item.mpf ? [...item.mpf] : []);
+        setImputado(item.imputado ? [...item.imputado] : []);
+        setImputado2(item.imputado ? [...item.imputado] : []);
+        setDefensa(item.defensa ? [...item.defensa] : []);
+        setDefensa2(item.defensa ? [...item.defensa] : []);
+        setResuelvo(item.resuelvoText || '');
+        setResuelvo2(item.resuelvoText || '');
+        setCaratula(item.caratula || '');
+        setCaratula2(item.caratula || '');
+        setPartes(item.partes ? [...item.partes] : []);
+        setPartes2(item.partes ? [...item.partes] : []);
+        setRazonDemora(item.razonDemora || '');
+        setRazonDemora2(item.razonDemora || '');
+        setMinuta(item.minuta || '');
+        setMinuta2(item.minuta || '');
+        setCierre(item.cierre || '');
+        setCierre2(item.cierre || '');
+        setUfi(item.ufi || '');
+        setUfi2(item.ufi || '');
+    };
     const insertarModelo = () =>{
         setCierre(modeloMinuta('cierre'))
         setMinuta(modeloMinuta(modeloSelector).cuerpo)
         setResuelvo(modeloMinuta(modeloSelector).resuelvo)
     }
-    const handleSubmit = async (event) => {
+    const updateData = async() =>{
         setGuardando(true)
-        event.preventDefault();
         const handleRemove = async (itemList, removedList, field) => {
             for (const item of removedList) {
                 if (itemList.includes(item)) {
@@ -173,15 +167,26 @@ export function Resuelvo({ item }) {
         }
         await setGuardarInc(false)
         await setGuardando(false)
+    }
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        await updateData()
     };
 
-    const checkGuardar = () => {
-        if (!deepEqual(caratula2, caratula) || !deepEqual(mpf2, mpf) || !deepEqual(razonDemora2, razonDemora) || !deepEqual(defensa2, defensa) || !deepEqual(imputado2, imputado) || !deepEqual(resuelvo2, resuelvo) || !deepEqual(partes2, partes) || !deepEqual(minuta2, minuta) || !deepEqual(cierre2, cierre) || !deepEqual(ufi2, ufi)) {
-            setGuardarInc(true);
-        } else {
-            setGuardarInc(false);
-        }
-    };
+    const checkGuardar = useCallback(() => {
+        const guardarStatus = !deepEqual(caratula2, caratula) ||
+            !deepEqual(mpf2, mpf) ||
+            !deepEqual(razonDemora2, razonDemora) ||
+            !deepEqual(defensa2, defensa) ||
+            !deepEqual(imputado2, imputado) ||
+            !deepEqual(resuelvo2, resuelvo) ||
+            !deepEqual(partes2, partes) ||
+            !deepEqual(minuta2, minuta) ||
+            !deepEqual(cierre2, cierre) ||
+            !deepEqual(ufi2, ufi);
+    
+        setGuardarInc(guardarStatus);
+    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, resuelvo, resuelvo2, partes, partes2, minuta, minuta2, cierre, cierre2, ufi, ufi2]);
 
     const checkHoraDiff = () => {
         const hora1 = parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]);
@@ -196,9 +201,9 @@ export function Resuelvo({ item }) {
     }, []);
     useEffect(() => {
         checkGuardar();
-    }, [caratula, mpf[0], defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi]);
+    }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi, checkGuardar]);
     useEffect(() => {
-        updateComparisson()
+        updateComparisson();
     }, []);
     useEffect(() => {
         checkGuardar();
@@ -231,9 +236,10 @@ export function Resuelvo({ item }) {
                                 ))}
                             </datalist>
                             <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
                         </div>
                     ))}
-                    <button className={styles.formButton} type="button" onClick={() => addNewInput(setMpf, { nombre: '' })}>+ FISCAL</button>
+                    <button className={styles.formButton} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button>
                     <span><label>UFI:</label><input
                                 list='ufi'
                                 className={`${styles.inputResuelvo} ${styles.inputResuelvo1} ${styles.inputUfi}`}
@@ -268,11 +274,12 @@ export function Resuelvo({ item }) {
                                 placeholder="DNI"
                             />
                             <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
                         </div>
                     ))}
                     <span className={styles.imputadoButtons}>
-                        <button className={`${styles.formButton} ${styles.imputadoButton}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false })}>+ IMPUTADO</button>
-                        <button className={`${styles.formButton} ${styles.condenadoButton}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true })}>+ CONDENADO</button>
+                        <button className={`${styles.formButton} ${styles.imputadoButton}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true })}>+ IMPUTADO</button>
+                        <button className={`${styles.formButton} ${styles.condenadoButton}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true })}>+ CONDENADO</button>
                     </span>
                     <label>Defensa</label>
                     {defensa.map((input, index) => (
@@ -324,10 +331,10 @@ export function Resuelvo({ item }) {
                                 ))}
                             </select>
                             <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}>QUITAR</button>
+                            <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
                         </div>
                     ))}
-                    <button className={styles.formButton} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '' })}>+ DEFENSA</button>
-
+                    <button className={styles.formButton} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true })}>+ DEFENSA</button>
                     <label>Otras Partes</label>
                     {partes.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
@@ -391,7 +398,7 @@ export function Resuelvo({ item }) {
                     />
                     {(item.hora && item.hitos && checkHoraDiff() > 5) &&
                         <>
-                            <label>RAZÓN DEMORA ({checkHoraDiff()}min)</label>
+                            <label>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
                             <select
                                 onChange={(e) => setRazonDemora(e.target.value)}
                                 className={`${styles.inputResuelvo} ${styles.inputResuelvoDemora}`}
@@ -408,6 +415,7 @@ export function Resuelvo({ item }) {
                                 <option value='PROBLEMAS TÉCNICOS'>PROBLEMAS TÉCNICOS</option>
                                 <option value='DEMORA OPERADOR'>DEMORA OPERADOR</option>
                                 <option value='OFIJUP'>OFIJUP</option>
+                                <option value='OFIJUP'>OTRO</option>
                             </select>
                         </>
                     }
