@@ -8,9 +8,9 @@ import { useRouter } from 'next/navigation';
 export function InformationSection () {
     const { user } = useAuthContext();
     const router = useRouter();
-    const [showInfo2, setShowInfo2] = useState(true);
+    const [showInfo2, setShowInfo2] = useState(false);
 
-    const tick = () => {
+    /*const tick = () => {
         setShowInfo2(prevShowInfo2 => !prevShowInfo2);
     }
 
@@ -23,7 +23,7 @@ export function InformationSection () {
         return () => {
             clearInterval(timerID);
         };
-    }, []);
+    }, []);*/
 
     return (
         <section className={`${styles.infoSection} ${showInfo2 ? styles.infoSectionNotShow : styles.infoSectionShow}`}>
