@@ -295,7 +295,7 @@
         font-weight: 700;
         font-size: 80px;
         width: 300px;
-        padding: 10px 40px;
+        padding: 0 40px;
         letter-spacing: 3px;
     }
     .clockDigits{
