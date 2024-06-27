@@ -9,7 +9,8 @@ export function InformationSection () {
     const { user } = useAuthContext();
     const router = useRouter();
     const [showInfo2, setShowInfo2] = useState(true);
-    const tick = () => {
+    /*const tick = () => {
+>>>>>>> e527ededb44a3bc4396de2111f01eb31d1cdcbd4
         setShowInfo2(prevShowInfo2 => !prevShowInfo2);
     }
     useEffect(() => {
@@ -21,7 +22,7 @@ export function InformationSection () {
         return () => {
             clearInterval(timerID);
         };
-    }, []);
+    }, []);*/
 
     return (
         <section className={`${styles.infoSection} ${showInfo2 ? styles.infoSectionNotShow : styles.infoSectionShow}`}>

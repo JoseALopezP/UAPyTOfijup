@@ -1,13 +1,18 @@
 'use client'
+import { AuthContextProvider } from "@/context/AuthContext";
+import { InformationSection } from "./tablero/components/InformationSection";
+import { ScheduleTable } from "./tablero/components/ScheduleTable";
 import { DataContextProvider } from "@/context/DataContext";
-import { AudienciaList } from "./components/AudienciaList";
 
-export default function Home() {
+export default function Tablero() {
     return (
       <>
-      <DataContextProvider>
-          <AudienciaList/>
-      </DataContextProvider>
+        <AuthContextProvider>
+        <DataContextProvider>
+          <InformationSection/>
+          <ScheduleTable/>
+        </DataContextProvider>
+        </AuthContextProvider>
       </>
     )
 }
