@@ -13,7 +13,7 @@ function capitalizeFirst(sentence) {
 function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `Ministerio Público Fiscal: ${el.nombre.split(' - ')[0]}  UFI:${ufi}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `Ministerio Público Fiscal: ${el.nombre.split(' - ')[0]}  UFI:${ufi} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -21,7 +21,7 @@ function listFiscal(arr, ufi) {
 function listDefensa(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `Defensa ${el.tipo}: ${el.nombre} ${el.imputado ? `(En representación de ${el.imputado})` : ''}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `Defensa ${el.tipo}: ${el.nombre} ${el.imputado ? `(En representación de ${el.imputado})` : ''} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -29,7 +29,7 @@ function listDefensa(arr) {
 function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -79,13 +79,13 @@ export function generateResuelvoSection(item, date) {
     }
 
     if (item.mpf) {
-        listFiscal(item.mpf, item.ufi).split('\n').forEach(f => sections.push({ title: f.split(':')[0], text: f.split('Fiscal:')[1].split('UFI:')[0] + ` UFI: ${item.ufi}`+(f.asistencia ? '' : ' (ausente)') }));
+        listFiscal(item.mpf, item.ufi).split('\n').forEach((f, indexF) => sections.push({ title: f.split(':')[0], text: f.split('Fiscal:')[1].split('UFI:')[0] + ` UFI: ${item.ufi}` + (item.mpf[indexF].asistencia ? '' : ' (ausente)')}));
     }
     if (item.defensa) {
-        listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0], text: d.split(':')[1]+(d.asistencia ? '' : ' (ausente)') }));
+        listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0], text: d.split(':')[1]}));
     }
     if (item.imputado) {
-        listImputado(item.imputado).split('\n').forEach(i => sections.push({ title: i.split(':')[0], text: i.split(':')[1] + i.split(':')[2]+(i.asistencia ? '' : ' (ausente)') }));
+        listImputado(item.imputado).split('\n').forEach(i => sections.push({ title: i.split(':')[0], text: i.split(':')[1] + i.split(':')[2]}));
     }
     if (item.partes) {
         listPartes(item.partes).split('\n').forEach(p => sections.push({ title: p.split(':')[0], text: p.split(':')[1] }));

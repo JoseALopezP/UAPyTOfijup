@@ -288,6 +288,9 @@
         font-weight: 700;
         font-size: 56px;
     }
+    .tableBody td:nth-child(3){
+        font-weight: 700;
+    }
     .tableBody td:nth-child(5){
         font-size: 38px;
     }

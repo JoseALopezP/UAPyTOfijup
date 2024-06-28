@@ -324,11 +324,13 @@ export function Resuelvo({ item }) {
                                 onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}
                             >
                                 <option value="">imputado - (opcional)</option>
-                                {imputado.map(imputadoItem => (
+                                {imputado.map(imputadoItem =>{ 
+                                
+                                return(
                                     <option key={imputadoItem.nombre} value={imputadoItem.nombre}>
                                         {imputadoItem.nombre}
                                     </option>
-                                ))}
+                                )})}
                             </select>
                             <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}>QUITAR</button>
                             <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
