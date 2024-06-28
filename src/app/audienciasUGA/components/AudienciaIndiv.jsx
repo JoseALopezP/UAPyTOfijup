@@ -8,6 +8,7 @@ export function AudienciaIndiv ({date, element}) {
     const [editable, setEditable] = useState(false)
     const [hora, setHora] = useState(null)
     const [situacion, setSituacion] = useState(null)
+    const [situacion2, setSituacion2] = useState(null)
     const [operador, setOperador] = useState(null)
     const [sala, setSala] = useState(null)
     const [deleteAud, setDeleteAud] = useState(false)
@@ -33,10 +34,11 @@ export function AudienciaIndiv ({date, element}) {
             await setDeleteAud(false)
             await setEditable(false)
             await updateByDate(date)
+            await setSituacion2(element.situacion)
         }
     }
     const checkEditing = () =>{
-        if((!sala | sala == '-' | sala == element.sala) & (!situacion | situacion == '-' | situacion == '') & !deleteAud & (!operador | operador == '') & (!hora)){
+        if((!sala | sala == '-' | sala == element.sala) & (!situacion | situacion == '-' | situacion == '' | situacion == situacion2) & !deleteAud & (!operador | operador == '') & (!hora)){
             setEditable(false)
         }else{
             setEditable(true)
@@ -44,19 +46,11 @@ export function AudienciaIndiv ({date, element}) {
     }
     useEffect(() => {
         checkEditing()
-    }, [sala]);
+    }, [sala, deleteAud, situacion, hora, operador]);
     useEffect(() => {
-        checkEditing()
-    }, [deleteAud]);
-    useEffect(() => {
-        checkEditing()
-    }, [situacion]);
-    useEffect(() => {
-        checkEditing()
-    }, [hora]);
-    useEffect(() => {
-        checkEditing()
-    }, [operador]);
+        setSituacion(element.situacion)
+        setSituacion2(element.situacion)
+    }, []);
     useEffect(() => {
         updateByDate(date)
         updateDesplegables()
@@ -96,7 +90,7 @@ export function AudienciaIndiv ({date, element}) {
             <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}{element.tipo2 && ' + ' + element.tipo2}{element.tipo3 && ' + ' + element.tipo3}</span>
             <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,4).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</span>
             <span className={`${styles.tableCell} ${styles.tableCellSituacion} ${styles.tableCellSituacionIndiv}`}>
-                <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
+                <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" value={situacion} className={`${styles.inputSituacionEdit}`}/>
             </span>
             <span className={`${styles.tableCell} ${styles.deleteButtonBlock}  ${styles.tableCellAction}`}>
                 <button type="button" className={deleteAud ? `${styles.deleteButton} ${styles.deleteButtonClicked}` : `${styles.deleteButton}`} onClick={()=> setDeleteAud(!deleteAud)}>ELIMINAR</button>

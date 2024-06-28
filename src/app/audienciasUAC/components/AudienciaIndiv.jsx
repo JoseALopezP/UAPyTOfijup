@@ -10,8 +10,10 @@ export function AudienciaIndiv ({date, element}) {
     const [editable, setEditable] = useState(false)
     const [changeButton, setChangeButton] = useState(false)
     const [situacion, setSituacion] = useState(null)
+    const [situacion2, setSituacion2] = useState(null)
     const [admin, setAdmin] = useState(null)
     const [resultado, setResultado] = useState(null)
+    const [resultado2, setResultado2] = useState(null)
     const [hora, setHora] = useState(null)
     const [cancelar, setCancelar] = useState(false)
     const [reprogramar, setReprogramar] = useState(false)
@@ -28,7 +30,7 @@ export function AudienciaIndiv ({date, element}) {
             if(reprogramar){
                 await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA')
             }
-            if(!(!situacion | situacion == '-' | situacion == '')){
+            if(!(!situacion | situacion == '-' | situacion == situacion2)){
                 await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
             }
             if(!(!admin | admin == '')){
@@ -40,7 +42,7 @@ export function AudienciaIndiv ({date, element}) {
             if(deleteAud){
                 await deleteAudiencia(date, element.numeroLeg, element.hora)
             }
-            if(!(!resultado | resultado == '')){
+            if(!(!resultado | resultado == '' | resultado==resultado2)){
                 await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado)
             }
             if(hora){
@@ -53,6 +55,8 @@ export function AudienciaIndiv ({date, element}) {
                 await updateData(date, element.numeroLeg, element.hora, 'control', control)
                 await setControl('nocontrolado')
             }
+            await setSituacion2(element.situacion)
+            await setResultado2(element.resultado)
             await setEditable(false)
             await setDeleteAud(false)
             await setCancelar(false)
@@ -61,7 +65,7 @@ export function AudienciaIndiv ({date, element}) {
         }
     }
     const checkEditing = () =>{
-        if((control == 'nocontrolado') & (!comentario) & (!reprogramar) & (!cancelar) & (!resultado | resultado == '-' | resultado == '') & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '') & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
+        if((control == 'nocontrolado') & (!comentario) & (!reprogramar) & (!cancelar) & (!resultado | resultado == '-' | resultado == '' | resultado == resultado2) & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '' | situacion == situacion2) & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
             setEditable(false)
         }else{
             setEditable(true)
@@ -80,34 +84,13 @@ export function AudienciaIndiv ({date, element}) {
     }
     useEffect(() => {
         checkEditing()
-    }, [deleteAud]);
+    }, [deleteAud,comentario,control,admin,resultado,cancelar,reprogramar,juezN,situacion,hora]);
     useEffect(() => {
-        checkEditing()
-    }, [comentario]);
-    useEffect(() => {
-        checkEditing()
-    }, [control]);
-    useEffect(() => {
-        checkEditing()
-    }, [admin]);
-    useEffect(() => {
-        checkEditing()
-    }, [resultado]);
-    useEffect(() => {
-        checkEditing()
-    }, [cancelar]);
-    useEffect(() => {
-        checkEditing()
-    }, [reprogramar]);
-    useEffect(() => {
-        checkEditing()
-    }, [juezN]);
-    useEffect(() => {
-        checkEditing()
-    }, [situacion]);
-    useEffect(() => {
-        checkEditing()
-    }, [hora]);
+        setSituacion(element.situacion)
+        setSituacion2(element.situacion)
+        setResultado(element.resultado)
+        setResultado2(element.resultado)
+    }, []);
     useEffect(() => {
         updateByDate(date)
     }, []);
@@ -170,10 +153,10 @@ export function AudienciaIndiv ({date, element}) {
                 </select>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellSituacion} ${styles.tableCellSituacionIndiv}`}>
-                <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" placeholder={element.situacion} className={`${styles.inputSituacionEdit}`}/>
+                <textarea onChange={(e)=>{setSituacion(e.target.value)}} type="text" id="ingresarSituacion" value={situacion} className={`${styles.inputSituacionEdit}`}/>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellResultado} ${styles.tableCellResultadoIndiv}`}>
-                <textarea onChange={(e)=>{setResultado(e.target.value)}} type="text" id="ingresarResultado" placeholder={element.resultado} className={`${styles.inputResultadoEdit}`}/>
+                <textarea onChange={(e)=>{setResultado(e.target.value)}} type="text" id="ingresarResultado" value={resultado} className={`${styles.inputResultadoEdit}`}/>
             </span>
             <span className={`${styles.tableCell} ${styles.deleteButtonBlock} ${styles.tableCellAction}`}>
                 <button type="button" className={deleteAud ? `${styles.deleteButton} ${styles.deleteButtonClicked}` : `${styles.deleteButton}`} onClick={()=> setDeleteAud(!deleteAud)}>ELIMINAR</button>

@@ -169,7 +169,7 @@ export function Resuelvo({ item }) {
         await setGuardando(false)
     }
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        if(event) event.preventDefault();
         await updateData()
     };
 
@@ -193,6 +193,14 @@ export function Resuelvo({ item }) {
         const hora2 = parseInt(item.hitos[0].split('|')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split('|')[0].split(':')[1]);
         return hora2 - hora1;
     };
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if(document.getElementById('submit-btn')){
+                document.getElementById('submit-btn').click();
+            }
+        }, 60000);
+        return () => clearInterval(interval);
+      }, []);
     useEffect(() => {
         checkUFI()
     }, [mpf])
@@ -421,7 +429,7 @@ export function Resuelvo({ item }) {
                             </select>
                         </>
                     }
-                    {guardarInc && <button className={guardando ? `${styles.formButton} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.formButton} ${styles.guardarButton}`} type="submit" value="GUARDAR">
+                    {guardarInc && <button className={guardando ? `${styles.formButton} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.formButton} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
                         <span className={`${styles.sinGuardar}`}>CAMBIOS SIN<br/>GUARDAR</span>
                         <span className={`${styles.guardar}`}>GUARDAR</span>
                         <span className={`${styles.guardando}`}>GUARDANDO...</span>
