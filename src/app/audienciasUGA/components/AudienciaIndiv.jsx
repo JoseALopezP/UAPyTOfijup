@@ -22,8 +22,9 @@ export function AudienciaIndiv ({date, element}) {
             if(!(!operador | operador == '')){
                 await updateData(date, element.numeroLeg, element.hora, 'operador', operador)
             }
-            if(!(!situacion | situacion == '-' | situacion == '')){
+            if(!(!situacion | situacion == '-' | situacion == '' | situacion === situacion2)){
                 await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
+                await setSituacion2(element.situacion)
             }
             if(deleteAud){
                 await deleteAudiencia(date, element.numeroLeg, element.hora)
@@ -34,7 +35,6 @@ export function AudienciaIndiv ({date, element}) {
             await setDeleteAud(false)
             await setEditable(false)
             await updateByDate(date)
-            await setSituacion2(element.situacion)
         }
     }
     const checkEditing = () =>{
@@ -46,7 +46,7 @@ export function AudienciaIndiv ({date, element}) {
     }
     useEffect(() => {
         checkEditing()
-    }, [sala, deleteAud, situacion, hora, operador]);
+    }, [sala, deleteAud, situacion, hora, operador, situacion2]);
     useEffect(() => {
         setSituacion(element.situacion)
         setSituacion2(element.situacion)

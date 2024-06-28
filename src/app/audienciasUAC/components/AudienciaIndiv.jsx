@@ -1,99 +1,110 @@
-import { useEffect, useContext, useState } from 'react'
-import styles from './audiencia.module.css'
+import { useEffect, useContext, useState } from 'react';
+import styles from './audiencia.module.css';
 import { DataContext } from '@/context/DataContext';
-import { checkForResuelvo, copyResuelvoToClipboard } from '@/utils/resuelvoUtils';
+import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { Oficio } from './Oficio';
 
-export function AudienciaIndiv ({date, element}) {
-    const {updateByDate, jueces, updateData, deleteAudiencia} = useContext(DataContext);
-    const [oficio, setOficio] = useState(false)
-    const [editable, setEditable] = useState(false)
-    const [changeButton, setChangeButton] = useState(false)
-    const [situacion, setSituacion] = useState(null)
-    const [situacion2, setSituacion2] = useState(null)
-    const [admin, setAdmin] = useState(null)
-    const [resultado, setResultado] = useState(null)
-    const [resultado2, setResultado2] = useState(null)
-    const [hora, setHora] = useState(null)
-    const [cancelar, setCancelar] = useState(false)
-    const [reprogramar, setReprogramar] = useState(false)
-    const [juezN, setJuezN] = useState(null)
-    const [deleteAud, setDeleteAud] = useState(false)
-    const [comentario, setComentario] = useState(null)
-    const [control, setControl] = useState('nocontrolado')
-    const handleSubmit = async(event) =>{
+export function AudienciaIndiv({ date, element }) {
+    const { updateByDate, jueces, updateData, deleteAudiencia } = useContext(DataContext);
+    const [oficio, setOficio] = useState(false);
+    const [editable, setEditable] = useState(false);
+    const [changeButton, setChangeButton] = useState(false);
+    const [situacion, setSituacion] = useState(element.situacion || '');
+    const [originalSituacion, setOriginalSituacion] = useState(element.situacion || '');
+    const [admin, setAdmin] = useState(element.admin || '');
+    const [originalAdmin, setOriginalAdmin] = useState(element.admin || '');
+    const [resultado, setResultado] = useState(element.resultado || '');
+    const [originalResultado, setOriginalResultado] = useState(element.resultado || '');
+    const [hora, setHora] = useState(element.hora || '');
+    const [originalHora, setOriginalHora] = useState(element.hora || '');
+    const [cancelar, setCancelar] = useState(false);
+    const [reprogramar, setReprogramar] = useState(false);
+    const [juezN, setJuezN] = useState(element.juezN || '');
+    const [originalJuezN, setOriginalJuezN] = useState(element.juezN || '');
+    const [deleteAud, setDeleteAud] = useState(false);
+    const [comentario, setComentario] = useState(element.comentario || '');
+    const [control, setControl] = useState('nocontrolado');
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if(editable){
-            if(cancelar){
-                await updateData(date, element.numeroLeg, element.hora, 'estado', 'CANCELADA')
+        if (editable) {
+            if (cancelar) {
+                await updateData(date, element.numeroLeg, element.hora, 'estado', 'CANCELADA');
             }
-            if(reprogramar){
-                await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA')
+            if (reprogramar) {
+                await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA');
             }
-            if(!(!situacion | situacion == '-' | situacion == situacion2)){
-                await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion)
+            if (situacion !== originalSituacion) {
+                await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion);
+                setOriginalSituacion(situacion);
             }
-            if(!(!admin | admin == '')){
-                await updateData(date, element.numeroLeg, element.hora, 'admin', admin)
+            if (admin !== originalAdmin) {
+                await updateData(date, element.numeroLeg, element.hora, 'admin', admin);
+                setOriginalAdmin(admin);
             }
-            if(!(!juezN | juezN == '-' | juezN == '' | element.juezN == juezN)){
-                await updateData(date, element.numeroLeg, element.hora, 'juezN', juezN)
+            if (juezN && originalJuezN !== juezN) {
+                await updateData(date, element.numeroLeg, element.hora, 'juezN', juezN);
+                setOriginalJuezN(juezN);
             }
-            if(deleteAud){
-                await deleteAudiencia(date, element.numeroLeg, element.hora)
+            if (deleteAud) {
+                await deleteAudiencia(date, element.numeroLeg, element.hora);
             }
-            if(!(!resultado | resultado == '' | resultado==resultado2)){
-                await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado)
+            if (resultado !== originalResultado) {
+                await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado);
+                setOriginalResultado(resultado);
             }
-            if(hora){
-                await updateData(date, element.numeroLeg, element.hora, 'hora', hora)
+            if (hora !== originalHora) {
+                await updateData(date, element.numeroLeg, element.hora, 'hora', hora);
+                setOriginalHora(hora);
             }
-            if(comentario){
-                await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario)
+            if (comentario) {
+                await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario);
             }
-            if(control != 'nocontrolado'){
-                await updateData(date, element.numeroLeg, element.hora, 'control', control)
-                await setControl('nocontrolado')
+            if (control !== 'nocontrolado') {
+                await updateData(date, element.numeroLeg, element.hora, 'control', control);
+                setControl('nocontrolado');
             }
-            await setSituacion2(element.situacion)
-            await setResultado2(element.resultado)
-            await setEditable(false)
-            await setDeleteAud(false)
-            await setCancelar(false)
-            await setChangeButton(false)
-            await updateByDate(date)
+            resetEditableState();
+            await updateByDate(date);
         }
-    }
-    const checkEditing = () =>{
-        if((control == 'nocontrolado') & (!comentario) & (!reprogramar) & (!cancelar) & (!resultado | resultado == '-' | resultado == '' | resultado == resultado2) & (!admin | admin == '') & (!situacion | situacion == '-' | situacion == '' | situacion == situacion2) & (!juezN | juezN == '-' | juezN == '' | element.juezN == juezN) & (!deleteAud) & (!hora)){
-            setEditable(false)
-        }else{
-            setEditable(true)
-        }
-        if(cancelar){
-            setReprogramar(false)
-        }
-        if(reprogramar){
-            setCancelar(false)
-        }
-    }
-    const openCloseControl = () =>{
-        setChangeButton(!changeButton)
-        setComentario(null)
-        setControl('nocontrolado')
-    }
+    };
+
+    const resetEditableState = () => {
+        setEditable(false);
+        setDeleteAud(false);
+        setCancelar(false);
+        setReprogramar(false);
+        setChangeButton(false);
+    };
+
+    const checkEditing = () => {
+        const isEditable = (
+            control !== 'nocontrolado' ||
+            comentario !== '' ||
+            reprogramar ||
+            cancelar ||
+            resultado !== originalResultado ||
+            admin !== originalAdmin ||
+            situacion !== originalSituacion ||
+            juezN !== originalJuezN ||
+            deleteAud ||
+            hora !== originalHora
+        );
+        setEditable(isEditable);
+        if (cancelar) setReprogramar(false);
+        if (reprogramar) setCancelar(false);
+    };
+
+    const openCloseControl = () => {
+        setChangeButton(!changeButton);
+        setComentario('');
+        setControl('nocontrolado');
+    };
+
     useEffect(() => {
-        checkEditing()
-    }, [deleteAud,comentario,control,admin,resultado,cancelar,reprogramar,juezN,situacion,hora]);
-    useEffect(() => {
-        setSituacion(element.situacion)
-        setSituacion2(element.situacion)
-        setResultado(element.resultado)
-        setResultado2(element.resultado)
-    }, []);
-    useEffect(() => {
-        updateByDate(date)
-    }, []);
+        checkEditing();
+    }, [deleteAud, comentario, control, admin, resultado, cancelar, reprogramar, juezN, situacion, hora]);
+
     return(
         <>{oficio ? <Oficio item={element} date={date}/> : <></>}
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
