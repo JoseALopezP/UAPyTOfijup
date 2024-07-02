@@ -42,10 +42,10 @@ export default function Desplegables() {
         <div className={`${styles.desplegablesList}`}>
             {desplegables.fiscal && desplegables.fiscal.map(el =>{
                 return(
-                <span key={el}>{el}</span>)
+                <span key={el}>{el}</span>)s
             })}
         </div>
-        <form  className={styles.desplegablesForm} onSubmit={(event) => submitDefensaHandler(event)}>
+        <form className={styles.desplegablesForm} onSubmit={(event) => submitDefensaHandler(event)}>
             <input type='text' onChange={(e)=>{setNewDefensa(e.target.value)}}/>
             <select onChange={(e)=>{setNewDefensaTipo(e.target.value)}}>
                 <option value={""}></option>
