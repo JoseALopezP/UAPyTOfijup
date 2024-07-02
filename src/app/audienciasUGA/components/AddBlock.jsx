@@ -20,6 +20,7 @@ export function AddBlock ({date}) {
     const [juez3, setJuez3] = useState(null)
     const [situacion, setSituacion] = useState(null)
     const [horaError, setHoraError] = useState(false)
+    const [horaProgramadaError, setHoraProgramadaError] = useState(false)
     const [salaError, setSalaError] = useState(false)
     const [legajo2Error, setLegajo2Error] = useState(false)
     const [legajo3Error, setLegajo3Error] = useState(false)
@@ -32,6 +33,7 @@ export function AddBlock ({date}) {
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
         (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
+        (horaProgramada || horaProgramada === 0) ? setHoraProgramadaError(false) : setHoraProgramadaError(true);
         if(colegiado){
             ((juez || juez == '-' ) && (juez2 || juez == '-') && (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
         }else{
@@ -78,11 +80,12 @@ export function AddBlock ({date}) {
         setJuez(null)
         setJuez2(null)
         setJuez3(null)
+        setHoraProgramada(45)
     }
     const handleSubmit = async(event) =>{
         event.preventDefault();
         errorChecking()
-        if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck)){
+        if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck || horaProgramadaError)){
             await addToFirebase()
             await restore()
         }
