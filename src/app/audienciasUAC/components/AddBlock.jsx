@@ -38,6 +38,11 @@ export function AddBlock ({date}) {
         }else{
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
+        if(colegiado){
+            ((jueces.includes(juez)) && (jueces.includes(juez2)) && (jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
+        }else{
+            jueces.includes(juez) ? setJuezError(false) : setJuezError(true);
+        }
         const formattedHora = `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`;
         const formattedNumeroLeg = `${legajo1}-${legajo2.padStart(5,'0')}-${legajo3}`;
         const isDuplicate = bydate.some(el => el.hora === formattedHora && el.numeroLeg === formattedNumeroLeg);
