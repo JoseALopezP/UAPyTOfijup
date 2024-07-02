@@ -330,6 +330,16 @@
     -webkit-appearance: none;
     margin: 0;
   }
+  .inputHoraProgramada{
+    text-align: center;
+    width: 40px;
+    padding: 10px;
+    margin: 0;
+}
+.inputHoraProgramada::-webkit-outer-spin-button,.inputHoraProgramada::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 @keyframes errorMessage {
     0% {
         display: none;

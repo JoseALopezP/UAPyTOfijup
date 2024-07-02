@@ -1,7 +1,7 @@
 import { useEffect, useContext, useState } from 'react'
 import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
-import { checkForResuelvo } from '@/utils/resuelvoUtils';
+import { nameTranslate } from '@/utils/traductorNombres';
 
 export function AudienciaIndiv ({date, element}) {
     const {updateByDate, updateData, deleteAudiencia, updateDesplegables, desplegables} = useContext(DataContext);

@@ -395,7 +395,7 @@ export function Resuelvo({ item }) {
                     <label>Fundamentos y Resolución</label>
                     <textarea
                         className={`${styles.textArea} ${styles.textAreaResuelvo}`}
-                        rows="5"
+                        rows="10"
                         value={resuelvo}
                         onChange={(e) => setResuelvo(e.target.value)}
                     />

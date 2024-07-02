@@ -5,6 +5,7 @@ import { DataContext } from '@/context/DataContext';
 export function AddBlock ({date}) {
     const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateJueces, addAudiencia, updateAños, años, bydate} = useContext(DataContext);
     const [hora, setHora] = useState(null)
+    const [horaProgramada, setHoraProgramada] = useState(45)
     const [hora2, setHora2] = useState(null)
     const [sala, setSala] = useState(null)
     const [legajo1, setLegajo1] = useState('MPF-SJ')
@@ -51,6 +52,7 @@ export function AddBlock ({date}) {
     const addToFirebase = async() =>{
         const newAudiencia = {
             hora: `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`,
+            horaProgramada: horaProgramada,
             sala: sala,
             numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
             tipo: tipo,
@@ -96,7 +98,7 @@ export function AddBlock ({date}) {
         {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck) && 
             (<div className={`${styles.errorMessage}`}>{dupliCheck ? 'AUDIENCIA DUPLICADA' : 'DATOS INSUFICIENTES O INCORRECTOS'}</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaRow}`}>
-        <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}></span>
+        <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}><input className={`${styles.inputHoraProgramada}`} type='number' value={horaProgramada} onChange={e => {setHoraProgramada(e.target.value)}}/></span>
         <span className={horaError ? `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.inputError} ${styles.tableCell} ${styles.tableCellHora}` : `${styles.inputHoraBlock} ${styles.inputItemBlock} ${styles.tableCellHora}`}>
             <span className={`${styles.inputTimeBlock}`}>
                 <input type='number' placeholder='00' min='0' max='24' onChange={e => {setHora(e.target.value)}}/>:
