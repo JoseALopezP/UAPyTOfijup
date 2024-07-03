@@ -5,6 +5,7 @@ import { DataContext } from '@/context/DataContext';
 import { copyResuelvoToClipboard, checkForResuelvo } from '@/utils/resuelvoUtils';
 import { listModelos, modeloMinuta } from '@/utils/modelosUtils';
 import { generatePDF } from '@/utils/pdfUtils';
+import { Reconversion } from './Reconversion';
 
 const deepEqual = (obj1, obj2) => {
     if (obj1 === obj2) return true;
@@ -32,6 +33,7 @@ export function Resuelvo({ item }) {
     const [defensa2, setDefensa2] = useState([]);
     const [imputado2, setImputado2] = useState([]);
     const [resuelvo2, setResuelvo2] = useState('');
+    const [showReconversion, setShowReconversion] = useState(false);
     const [partes2, setPartes2] = useState([]);
     const { updateDesplegables, desplegables, updateDataToday, updateToday, updateRealTime, realTime } = useContext(DataContext);
     const [caratula, setCaratula] = useState('');
@@ -227,6 +229,8 @@ export function Resuelvo({ item }) {
                         value={caratula}
                         onChange={(e) => setCaratula(e.target.value)}
                     />
+                    <button className={`${styles.formButton} ${styles.reconvertidaButton}`} type="button" onClick={() => setShowReconversion(!showReconversion)}>RECONVERTIDA</button>
+                    {showReconversion ? <Reconversion item={item}/> : ''}
                     <label>Ministerio Público Fiscal</label>
                     {mpf.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>

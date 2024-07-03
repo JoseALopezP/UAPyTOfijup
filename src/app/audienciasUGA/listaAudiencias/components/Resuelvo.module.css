@@ -55,11 +55,47 @@
     background-color: #ffc107;
 }
 
+.inputTipos{
+    display: inline-flex;
+    flex-direction: column;
+    width: calc(80% - 10px);
+}
 .removeButton{
     background-color: #dc3545;
     padding: 4px;
     width: 12%;
     margin: 2px;
+}
+.reconversionBlock{
+    height: fit-content;
+    display: inline-flex;
+    flex-direction: row;
+    margin: 10px 0 10px 0;
+}
+.originalTipos{
+    margin: 0;
+}
+.inputReconvertida{
+    margin: 5px 0 5px 0;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    height: 30px;
+    font-size: 24px;
+    text-align: center;
+}
+.reconvertidaButton{
+    background-color: #20c997;
+    height: 40px;
+    padding: 8px;
+    margin-top: 20px;
+}
+.guardarReconvertidaButton{
+    background-color: #fd7e14;
+    width: 20%;
+    height: 100%;
+    margin: 5px 0 5px 5px;
+    align-self: flex-end;
 }
 .inputResuelvo{
     width: 25%;
