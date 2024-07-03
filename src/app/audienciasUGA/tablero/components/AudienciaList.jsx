@@ -43,7 +43,7 @@ export function AudienciaList ({date}) {
                         <th className={`${styles.tableCellLeg}`}>LEGAJO</th>
                         <th className={`${styles.tableCellTipo}`}>TIPO</th>
                         <th className={`${styles.tableCellJuez}`}>JUEZ</th>
-                        <th className={`${styles.tableCellSituacion}`}>SIT</th>
+                        <th className={`${styles.tableCellSituacion} ${styles.tableCellSituacionTitle}`}>SIT</th>
                         <th className={`${styles.tableCellEstado}`}>EST</th>
                     </tr>
                 </thead>
@@ -56,7 +56,7 @@ export function AudienciaList ({date}) {
                                 <td className={`${styles.tableCellOperador}`}>{el.operador && nameTranslate(el.operador)}</td>
                                 <td className={`${styles.tableCellLeg}`}>{el.numeroLeg.split('-')[2]}</td>
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo.split('').slice(0,15).join('')}{el.tipo.split('').length>14 ? '...' : ''}</td>
-                                <td className={`${styles.tableCellJuez}`}>{el.juez && (el.juez.split('+').map(e => <span key={e}>{e.includes('. ') ? e.split('. ')[1].split(' ')[0].split('').slice(0,3).join('') : '' + ' ' + e.includes('. ') ? e.split('. ')[1].split(' ')[1].split('').slice(0,1).join('') : ''}<br/></span>))}</td>
+                                <td className={`${styles.tableCellJuez}`}>{el.juez && (el.juez.split('+').map(e => <span key={e}>{e.split('. ')[1].split(' ')[0].split('').slice(0,3).join('')} {e.split('. ')[1].split(' ')[1].split('').slice(0,1).join('')}<br/></span>))}</td>
                                 <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>
                                 {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA} ${styles.tableCellEstado}`}>DEM</td>) : (<>{el.resuelvo ? <td className={`${styles[el.estado]} ${styles.tableCellEstado}`}>SUB</td> : <td className={`${styles[el.estado]} ${styles.tableCellEstado}`}>{el.estado.split('_').join(' ').split('').slice(0,3).join('')}</td>}</>)}
                             </tr>
@@ -73,7 +73,7 @@ export function AudienciaList ({date}) {
                         <th className={`${styles.tableCellLeg}`}>LEGAJO</th>
                         <th>TIPO</th>
                         <th className={`${styles.tableCellJuez}`}>JUEZ</th>
-                        <th className={`${styles.tableCellSituacion}`}>SIT</th>
+                        <th className={`${styles.tableCellSituacion} ${styles.tableCellSituacionTitle}`}>SIT</th>
                         <th className={`${styles.tableCellEstado}`}>EST</th>
                     </tr>
                 </thead>
@@ -86,7 +86,7 @@ export function AudienciaList ({date}) {
                                 <td className={`${styles.tableCellOperador}`}>{el.operador && nameTranslate(el.operador)}</td>
                                 <td className={`${styles.tableCellLeg}`}>{el.numeroLeg.split('-')[2]}</td>
                                 <td className={`${styles.tableCellTipo}`}>{el.tipo.split('').slice(0,15).join('')}{el.tipo.split('').length>14 ? '...' : ''}</td>
-                                <td className={`${styles.tableCellJuez}`}>{el.juez && (el.juez.split('+').map(e => <span key={e}>{e.includes('. ') ? e.split('. ')[1].split(' ')[0].split('').slice(0,3).join('') : '' + ' ' + e.includes('. ') ? e.split('. ')[1].split(' ')[1].split('').slice(0,1).join('') : ''}<br/></span>))}</td>
+                                <td className={`${styles.tableCellJuez}`}>{el.juez && (el.juez.split('+').map(e => <span key={e}>{e.split('. ')[1].split(' ')[0].split('').slice(0,3).join('')} {e.split('. ')[1].split(' ')[1].split('').slice(0,1).join('')}<br/></span>))}</td>
                                 <td className={`${styles.tableCellSituacion}`}>{el.situacion && el.situacion}</td>
                                 {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA} ${styles.tableCellEstado}`}>DEM</td>) : (<>{el.resuelvo ? <td className={`${styles[el.estado]} ${styles.tableCellEstado}`}>SUB</td> : <td className={`${styles[el.estado]} ${styles.tableCellEstado}`}>{el.estado.split('_').join(' ').split('').slice(0,3).join('')}</td>}</>)}
                             </tr>
