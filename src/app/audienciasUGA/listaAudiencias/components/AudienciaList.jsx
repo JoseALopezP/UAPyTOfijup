@@ -5,6 +5,7 @@ import { ButtonsAudiencia } from './ButtonsAudiencia';
 import { DataContext } from '@/context/DataContext';
 import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { nameTranslate } from '@/utils/traductorNombres';
 
 export function AudienciaList () {
     const [operadorF, setOperadorF] = useState('')
@@ -37,7 +38,7 @@ export function AudienciaList () {
                         <th><select className={`${styles.operadorList}`} onChange={(e)=>{setOperadorF(e.target.value)}}>
                             <option value={''}>TODOS</option>
                             {desplegables.operador && desplegables.operador.map((el)=>(
-                                <option key={el} value={el}>{`${el.split(' ')[el.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${el.split('')[0]}.`}</option>
+                                <option key={el} value={el}>{`${nameTranslate(el)}`}</option>
                             ))}
                         </select></th>
                         <th>LEG</th>

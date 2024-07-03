@@ -139,6 +139,9 @@
 .stateButtonChange{
     background-color: #6c757d;
 }
+.salaCell{
+    text-align: center;
+}
 .salaSelector{
     height: 100%;
     font-size: 24px;

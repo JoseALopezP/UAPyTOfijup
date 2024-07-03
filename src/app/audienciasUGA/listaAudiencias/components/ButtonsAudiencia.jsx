@@ -3,6 +3,7 @@ import styles from './AudienciaList.module.css'
 import { useEffect, useState, useContext } from 'react'
 import { DataContext } from '@/context/DataContext';
 import { Resuelvo } from './Resuelvo';
+import { nameTranslate } from '@/utils/traductorNombres';
 
 export function ButtonsAudiencia ({element}) {
     const {updateToday, updateData, pushtToArray, updateRealTime, realTime} = useContext(DataContext);
@@ -122,11 +123,11 @@ export function ButtonsAudiencia ({element}) {
         
         <tr key={element.numeroLeg + element.hora} className={`${styles.tableRow}`} onClick={() => setShow(true)}> 
             <td>{element.hora}</td>
-            <td>{element.sala}</td>
-            <td>{element.operador && `${element.operador.split(' ')[element.operador.split(' ').length-1].toUpperCase().split('').splice(0,4).join('')} ${element.operador.split('')[0]}.`}</td>
+            <td className={`${styles.salaCell}`}>{element.sala}</td>
+            <td className={`${styles.tableCellTipo}`}>{element.operador && `${nameTranslate(element.operador)}`}</td>
             <td>{element.numeroLeg}</td>
             <td className={`${styles.tableBodyJuez}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,3).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</td>
-            <td className={`${styles.tableCellTipo}`}>{element.tipo}</td>
+            <td className={`${styles.tableCellTipo}`}>{element.tipo.split('').slice(0,20).join('')}{element.tipo.split('').length>19 ? '...' : ''}</td>
             <td className={`${styles.tableCellTipo}`}>{element.situacion}</td>
             {((realTime > element.hora) & element.estado == 'PROGRAMADA')  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<>{element.resuelvo ? <td className={`${styles[element.estado]} `}>SUBIDO</td> : <td className={`${styles[element.estado]} `}>{element.estado.split('_').join(' ')}</td>}</>)}
         </tr>

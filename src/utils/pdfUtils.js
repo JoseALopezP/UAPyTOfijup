@@ -20,6 +20,30 @@ export const PDFGenerator = async (sections) => {
   const sectionSpacingWithTitle = 1;
   const sectionSpacingWithoutTitle = 0;
 
+  const splitTextWithDashes = (text, maxWidth) => {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+
+    words.forEach((word, index) => {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (doc.getTextWidth(testLine) <= maxWidth) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) {
+          lines.push(currentLine + (testLine.length > maxWidth ? '-' : ''));
+        }
+        currentLine = word;
+      }
+
+      if (index === words.length - 1) {
+        lines.push(currentLine);
+      }
+    });
+
+    return lines;
+  };
+
   const addTextWithLineBreaks = (textLines, initialX, align = 'left') => {
     textLines.forEach(line => {
       if (currentY > (pageHeight - bottomMargin)) {
@@ -29,11 +53,14 @@ export const PDFGenerator = async (sections) => {
       if (align === 'right') {
         doc.text(line, initialX, currentY, { align: 'right' });
       } else if (align === 'justify') {
-        doc.text(20, currentY, line, { maxWidth: 170, align: 'justify' });
+        const justifiedLines = splitTextWithDashes(line, 170);
+        justifiedLines.forEach(justifiedLine => {
+          doc.text(justifiedLine, initialX, currentY, { maxWidth: 170 });
+          currentY += lineHeight;
+        });
       } else {
         doc.text(line, initialX, currentY, { maxWidth: 170, align: 'justify' });
       }
-      currentY += lineHeight;
     });
   };
 
@@ -62,7 +89,7 @@ export const PDFGenerator = async (sections) => {
           doc.text(title, 20, currentY);
           const titleWidth = doc.getTextWidth(title) + 3;
           doc.setFont("helvetica", "normal");
-  
+
           if (section.text) {
             const firstLineText = textLines.shift();
             doc.text(firstLineText, 20 + titleWidth, currentY, { maxWidth: textWidth, align: "justify" });
@@ -79,27 +106,28 @@ export const PDFGenerator = async (sections) => {
       }
     });
   };
-    processSections(sections);
-    if(sections[0].right){
-      for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
-        doc.setPage(i);
-        await doc.addImage(headerImageOficio, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), 30);
-        const footerWidth = (doc.internal.pageSize.getWidth() * 2) / 5;
-        const footerHeight = (footerWidth / 60) * 20;
-        const footerX = doc.internal.pageSize.getWidth() - footerWidth;
-        const footerY = doc.internal.pageSize.getHeight() - footerHeight;
-        await doc.addImage(footerImageOficio, 'JPEG', footerX, footerY, footerWidth, footerHeight);
-      }
-    }else{
-      for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
-        doc.setPage(i);
-        await doc.addImage(headerImage, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), 30);
-        const footerWidth = (doc.internal.pageSize.getWidth() * 2) / 5;
-        const footerHeight = (footerWidth / 60) * 20;
-        const footerX = doc.internal.pageSize.getWidth() - footerWidth;
-        const footerY = doc.internal.pageSize.getHeight() - footerHeight;
-        await doc.addImage(footerImage, 'JPEG', footerX, footerY, footerWidth, footerHeight);
-      }
+
+  processSections(sections);
+  if (sections[0].right) {
+    for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
+      doc.setPage(i);
+      await doc.addImage(headerImageOficio, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), 30);
+      const footerWidth = (doc.internal.pageSize.getWidth() * 2) / 5;
+      const footerHeight = (footerWidth / 60) * 20;
+      const footerX = doc.internal.pageSize.getWidth() - footerWidth;
+      const footerY = doc.internal.pageSize.getHeight() - footerHeight;
+      await doc.addImage(footerImageOficio, 'JPEG', footerX, footerY, footerWidth, footerHeight);
     }
-    doc.save('document.pdf');
+  } else {
+    for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
+      doc.setPage(i);
+      await doc.addImage(headerImage, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), 30);
+      const footerWidth = (doc.internal.pageSize.getWidth() * 2) / 5;
+      const footerHeight = (footerWidth / 60) * 20;
+      const footerX = doc.internal.pageSize.getWidth() - footerWidth;
+      const footerY = doc.internal.pageSize.getHeight() - footerHeight;
+      await doc.addImage(footerImage, 'JPEG', footerX, footerY, footerWidth, footerHeight);
+    }
+  }
+  doc.save('document.pdf');
 };
