@@ -3,7 +3,7 @@ import { DataContext } from '@/context/DataContext';
 import styles from './audiencia.module.css'
 import { generateOficioSection, generateResuelvoSection } from '@/utils/resuelvoUtils';
 
-export function Oficio ({item, date}) {
+export function Oficio ({item, date, func}) {
     const {updateDesplegables, desplegables} = useContext(DataContext);
     const [traslado, setTraslado] = useState(`Se informa que la fecha de detención del Sr. XXX fue el día XXXX, habiendo intervenido Comisaría XXX; por lo que se solicita que cuando se efectivice el traslado del mencionado al SERVICIO PENITENCIARIO PROVINCIAL, se informe dicha circunstancia a la Oficina Judicial Penal al correo: casosofijup@jussanjuan.gov.ar y/o al teléfono 2644554725 de la Unidad de Administración de Casos.`)
     const [inputList, setInputList] = useState([]);
@@ -58,6 +58,7 @@ export function Oficio ({item, date}) {
           <textarea className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
           <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit" >DESCARGAR</button>
         </form>
+          <button className={`${styles.controlButton} ${styles.controlButtonCerrar}`} type="button" onClick={() => func(false)}>CERRAR</button>
         </div>
       );
 }

@@ -106,7 +106,7 @@ export function AudienciaIndiv({ date, element }) {
     }, [deleteAud, comentario, control, admin, resultado, cancelar, reprogramar, juezN, situacion, hora]);
 
     return(
-        <>{oficio ? <Oficio item={element} date={date}/> : <></>}
+        <>{oficio ? <Oficio item={element} date={date} func={setOficio}/>: <></>}
         <form id='editingForm' onSubmit={(event) => handleSubmit(event)} key={element.numeroLeg + element.hora} className={deleteAud ? `${styles.tableRow} ${styles.audienciaList} ${styles.toDelete}` : `${styles.tableRow} ${styles.audienciaList}`}>
             {!element.control && <>
                 <span className={`${styles.tableCell} ${styles.tableCellAdmin}`}>
