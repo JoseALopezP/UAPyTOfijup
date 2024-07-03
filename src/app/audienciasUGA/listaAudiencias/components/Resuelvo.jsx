@@ -317,13 +317,20 @@ export function Resuelvo({ item }) {
                                         ))}
                                     </datalist></>
                                 ) : (
-                                    <input
+                                    <><input
+                                        list='particular'
                                         className={`${styles.inputResuelvo} ${styles.inputResuelvo3} ${styles.inputText}`}
-                                        type="text"
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
                                         placeholder="Nombre"
                                     />
+                                    <datalist id='particular'>
+                                        {desplegables.defensaParticular && desplegables.defensaParticular.map(option => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </datalist></>
                                 )
                             )}
                             <select
