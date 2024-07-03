@@ -647,7 +647,7 @@ export function SignUpBlock () {
             console.error('Error adding user:', error);
         }
       };
-    const convertNames = () =>{
+    const convertNames = async() =>{
         console.log(listaDefensa.split(/\r?\n/)).array.forEach(element => {
             await addDesplegable('defensaParticular', `${newDefensa} - ${newDefensaTipo}`)
         });

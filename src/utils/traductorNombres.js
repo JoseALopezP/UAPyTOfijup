@@ -6,6 +6,7 @@ export const nameTranslate = (operadorName) =>{
         "Martín, Juan": 'JUAN',
         "Sosa, Nahuel": 'NAHUEL',
         "Vidal, Ornela": 'ORNE',
+        "Soria, Martín": 'MARTIN',
         "Naranjo, María Agustina": 'AGUS',
         "Zamudio, Francisco": 'FRAN',
         "Narváez, Ignacio": 'IGNA',
