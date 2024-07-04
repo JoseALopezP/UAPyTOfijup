@@ -42,7 +42,7 @@ export default function Desplegables() {
         <div className={`${styles.desplegablesList}`}>
             {desplegables.fiscal && desplegables.fiscal.map(el =>{
                 return(
-                <span key={el}>{el}</span>)s
+                <span key={el}>{el}</span>)
             })}
         </div>
         <form className={styles.desplegablesForm} onSubmit={(event) => submitDefensaHandler(event)}>
