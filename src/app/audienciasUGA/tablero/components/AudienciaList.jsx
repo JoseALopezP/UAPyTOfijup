@@ -20,7 +20,7 @@ export function AudienciaList ({date}) {
         };
     }, [])
     const getMinutes = (dateObject) =>{
-        if(realTime){
+        if(realTime.includes(':')){
             const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
             const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
             return (timeComparison - nowTime)

@@ -49,6 +49,12 @@ export function Resuelvo({ item }) {
     const [minuta2, setMinuta2] = useState('');
     const [cierre, setCierre] = useState('');
     const [cierre2, setCierre2] = useState('');
+    const [tipo, setTipo] = useState('');
+    const [tipoAux, setTipoAux] = useState('');
+    const [tipo2, setTipo2] = useState('');
+    const [tipo2Aux, setTipo2Aux] = useState('');
+    const [tipo3, setTipo3] = useState('');
+    const [tipo3Aux, setTipo3Aux] = useState('');
     const [partes, setPartes] = useState([]);
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
@@ -99,6 +105,12 @@ export function Resuelvo({ item }) {
         setCierre2(item.cierre || '');
         setUfi(item.ufi || '');
         setUfi2(item.ufi || '');
+        setTipo(item.tipo || '')
+        setTipoAux(item.tipo || '')
+        setTipo2(item.tipo2 || '')
+        setTipo2Aux(item.tipo2 || '')
+        setTipo3(item.tipo3 || '')
+        setTipo3Aux(item.tipo3 || '')
     };
     const insertarModelo = () =>{
         setCierre(modeloMinuta('cierre'))
@@ -162,6 +174,29 @@ export function Resuelvo({ item }) {
             await updateDataToday(item.numeroLeg, item.hora, 'ufi', ufi);
             setUfi2(ufi)
         }
+        if(showReconversion){
+        if (!deepEqual(tipo, tipoAux)){
+            if(!deepEqual(tipo2, tipo2Aux)){
+                if(!deepEqual(tipo3, tipo3Aux)){
+                    await updateDataToday(item.numeroLeg, item.hora, 'tipo', tipo);
+                    await updateDataToday(item.numeroLeg, item.hora, 'tipo2', tipo2);
+                    await updateDataToday(item.numeroLeg, item.hora, 'tipo3', tipo3);
+                }else{
+                    await updateDataToday(item.numeroLeg, item.hora, 'tipo', tipo);
+                    await updateDataToday(item.numeroLeg, item.hora, 'tipo2', tipo2);
+                    await updateDataToday(item.numeroLeg, item.hora, 'tipo3', '');
+                }
+            }else{
+                await updateDataToday(item.numeroLeg, item.hora, 'tipo', tipo);
+                await updateDataToday(item.numeroLeg, item.hora, 'tipo2', '');
+                await updateDataToday(item.numeroLeg, item.hora, 'tipo3', '');
+            }
+            await updateDataToday(item.numeroLeg, item.hora, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
+            setTipoAux(tipo)
+            setTipo2Aux(tipo2)
+            setTipo3Aux(tipo3)
+        }
+        }
         await updateToday();
         if (await checkForResuelvo(item)) {
             await updateRealTime();
@@ -174,12 +209,20 @@ export function Resuelvo({ item }) {
         if(event) event.preventDefault();
         await updateData()
     };
-
+    const handleReconversion = () =>{   
+        setShowReconversion(!showReconversion)
+        setTipo(tipoAux)
+        setTipo2(tipo2Aux)
+        setTipo3(tipo3Aux)
+    }
     const checkGuardar = useCallback(() => {
         const guardarStatus = !deepEqual(caratula2, caratula) ||
             !deepEqual(mpf2, mpf) ||
             !deepEqual(razonDemora2, razonDemora) ||
             !deepEqual(defensa2, defensa) ||
+            (showReconversion & !deepEqual(tipoAux, tipo)) ||
+            (showReconversion & !deepEqual(tipo2Aux, tipo2)) ||
+            (showReconversion & !deepEqual(tipo3Aux, tipo3)) ||
             !deepEqual(imputado2, imputado) ||
             !deepEqual(resuelvo2, resuelvo) ||
             !deepEqual(partes2, partes) ||
@@ -188,7 +231,7 @@ export function Resuelvo({ item }) {
             !deepEqual(ufi2, ufi);
     
         setGuardarInc(guardarStatus);
-    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, resuelvo, resuelvo2, partes, partes2, minuta, minuta2, cierre, cierre2, ufi, ufi2]);
+    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, resuelvo, resuelvo2, partes, partes2, minuta, minuta2, cierre, cierre2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion]);
 
     const checkHoraDiff = () => {
         const hora1 = parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]);
@@ -211,7 +254,7 @@ export function Resuelvo({ item }) {
     }, []);
     useEffect(() => {
         checkGuardar();
-    }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi, checkGuardar]);
+    }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3]);
     useEffect(() => {
         updateComparisson();
     }, []);
@@ -229,8 +272,8 @@ export function Resuelvo({ item }) {
                         value={caratula}
                         onChange={(e) => setCaratula(e.target.value)}
                     />
-                    <button className={`${styles.formButton} ${styles.reconvertidaButton}`} type="button" onClick={() => setShowReconversion(!showReconversion)}>RECONVERTIDA</button>
-                    {showReconversion ? <Reconversion item={item}/> : ''}
+                    <button className={showReconversion ? `${styles.formButton} ${styles.reconvertidaButton} ${styles.reconvertidaButtonClicked}` : `${styles.formButton} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
+                    {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipo3={tipo3} tipoAux={tipoAux} tipo2Aux={tipo2Aux}/> : ''}
                     <label>Ministerio Público Fiscal</label>
                     {mpf.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>

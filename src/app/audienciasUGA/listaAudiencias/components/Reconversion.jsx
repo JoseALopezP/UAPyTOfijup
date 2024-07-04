@@ -4,22 +4,15 @@ import { useState, useContext, useEffect} from 'react'
 import { DataContext } from '@/context/DataContext';
 
 
-export function Reconversion({ item, funcClose }) {
+export function Reconversion({ item, setTipo, setTipo2, setTipo3, tipo, tipo2, tipo3, tipoAux, tipo2Aux}) {
     const {updateData, updateTiposAudiencias, tiposAudiencias} = useContext(DataContext);
-    const [tipo, setTipo] = useState('-')
-    const [tipo2, setTipo2] = useState('-')
-    const [tipo3, setTipo3] = useState('-')
-    const handleSubmit = (event) =>{
-        event.preventDefault()
-    }
     useEffect(() => {
         updateTiposAudiencias()
     }, [])
     return (
-    <form className={`${styles.reconversionBlock}`} onSubmit={(event) => handleSubmit(event)}>
+    <div className={`${styles.reconversionBlock}`} onSubmit={(event) => handleSubmit(event)}>
         <div className={`${styles.inputTipos}`}>
-        <h3 className={`${styles.originalTipos}`}>ACTUAL: {item.tipo}  {item.tipo2}  {item.tipo3}</h3>
-        <input list="tipo1" className={`${styles.inputReconvertida} ${styles.inputReconvertida1}`} placeholder='TIPO 1' onChange={(e)=>{setTipo(e.target.value)}}/>
+        <input list="tipo1" className={`${styles.inputReconvertida} ${styles.inputReconvertida1}`} placeholder={item.tipo} onChange={(e)=>{setTipo(e.target.value)}}/>
         <datalist id='tipo1'>
             {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                 return(
@@ -27,9 +20,9 @@ export function Reconversion({ item, funcClose }) {
                 )
             })}
         </datalist>
-        {(tipo && tipo =='-' || tipo =='') ||
+        {(tipo === tipoAux) ||
         <>
-            <input list="tipo2" className={`${styles.inputReconvertida} ${styles.inputReconvertida2}`} placeholder='TIPO 2' onChange={(e)=>{setTipo2(e.target.value)}}/>
+            <input list="tipo2" className={`${styles.inputReconvertida} ${styles.inputReconvertida2}`} placeholder={item.tipo2} onChange={(e)=>{setTipo2(e.target.value)}}/>
             <datalist id='tipo2'>
                 {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                     return(
@@ -38,9 +31,9 @@ export function Reconversion({ item, funcClose }) {
                 })}
             </datalist>
         </>}
-        {((tipo && tipo =='-' || tipo =='') || (tipo2 && tipo2 =='-' || tipo2 =='')) ||
+        {((tipo === tipoAux) || (tipo2 === tipo2Aux)) ||
             <>
-            <input list="tipo3" className={`${styles.inputReconvertida} ${styles.inputReconvertida3}`} placeholder='TIPO 3' onChange={(e)=>{setTipo3(e.target.value)}}/>
+            <input list="tipo3" className={`${styles.inputReconvertida} ${styles.inputReconvertida3}`} placeholder={item.tipo3} onChange={(e)=>{setTipo3(e.target.value)}}/>
             <datalist id='tipo3'>
                 {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                     return(
@@ -50,6 +43,5 @@ export function Reconversion({ item, funcClose }) {
             </datalist>
             </>}
             </div>
-        <button type='button' className={`${styles.formButton} ${styles.guardarReconvertidaButton}`}>GUARDAR</button>
-    </form>);
+    </div>);
 }
