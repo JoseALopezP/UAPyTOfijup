@@ -240,7 +240,7 @@ export function Resuelvo({ item }) {
     };
     useEffect(() => {
         const interval = setInterval(() => {
-            if(document.getElementById('submit-btn')){
+            if(document.getElementById('submit-btn') && !showReconversion){
                 document.getElementById('submit-btn').click();
             }
         }, 60000);
