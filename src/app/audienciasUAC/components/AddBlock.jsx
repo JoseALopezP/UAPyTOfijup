@@ -82,6 +82,7 @@ export function AddBlock ({date}) {
         setJuez2(null)
         setJuez3(null)
         setHoraProgramada(45)
+        setSituacion(null)
     }
     const handleSubmit = async(event) =>{
         event.preventDefault();

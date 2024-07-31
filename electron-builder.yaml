@@ -1,0 +1,20 @@
+appId: "OFIJUPenal"
+productName: "Gestión de Audiencias Ofijup"
+copyright: "Copyright (c) 2024 José López"
+directories:
+  output: ../dist
+win:
+  target:
+    - dir
+    - portable
+  icon: "public/favicon2.png"
+linux:
+  target:
+    - dir
+    - appimage
+  icon: "public/favicon2.png"
+mac:
+  target:
+    - dir
+    - dmg
+  icon: "public/favicon2.png"
