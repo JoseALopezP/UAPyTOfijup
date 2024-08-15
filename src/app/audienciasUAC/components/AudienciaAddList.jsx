@@ -14,6 +14,7 @@ export function AudienciaAddList ({date}) {
     const { user } = useAuthContext()
     const router = useRouter()
     useEffect(() => {
+        
       if (user == null) router.push("/signin")
     }, [user])
     function tick() {
