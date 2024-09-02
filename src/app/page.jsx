@@ -1,18 +1,16 @@
 'use client'
-import { AuthContextProvider } from "@/context/AuthContext";
-import { InformationSection } from "./tablero/components/InformationSection";
-import { ScheduleTable } from "./tablero/components/ScheduleTable";
+import { AuthContextProvider} from "@/context/AuthContext";
+import MenuSelector from './menu/components/MenuSelector'
 import { DataContextProvider } from "@/context/DataContext";
 
-export default function Tablero() {
+export default function menu() {
     return (
       <>
-        <AuthContextProvider>
+      <AuthContextProvider>
         <DataContextProvider>
-          <InformationSection/>
-          <ScheduleTable/>
+          <MenuSelector/>
         </DataContextProvider>
-        </AuthContextProvider>
+      </AuthContextProvider>
       </>
     )
 }

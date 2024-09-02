@@ -58,14 +58,14 @@ export const generateExcel = async (data, date) => {
             ,solAgen: ''
             ,noti: ''
             ,program: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hora}`
-            ,inicioReal: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hitos[0].split(' | ')[0]}`
-            ,demora: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))}`
+            ,inicioReal: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hitos ? item.hitos[0].split(' | ')[0] : ''}`
+            ,demora: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))) : ''}`
             ,motivoDem: ''
             ,observDem: ''
             ,durProg: ''
-            ,durReal: `${(parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1]))}`
+            ,durReal: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1]))) : ''}`
             ,cuartoTeo: ''
-            ,cuartoReal: cuartoCalculator(item)
+            ,cuartoReal: (item.hitos ? cuartoCalculator(item) : '')
             ,cuartoRealOtr: ''
             ,final: ''
             ,horaResuelvo: ''
