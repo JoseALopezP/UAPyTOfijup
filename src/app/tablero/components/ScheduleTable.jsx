@@ -90,24 +90,20 @@ export function ScheduleTable() {
                         filterToday()
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
                             .map((el, i) => {
-                                const shouldDisplay = partShow ? (i >= audSize && i < audSize * 2) : (i < audSize);
-                                if (shouldDisplay) {
-                                    return (
-                                        <tr key={el.numeroLeg} className={`${styles["fila" + el.estado]}`}>
-                                            <td>{el.hora}</td>
-                                            <td>SALA {el.sala}</td>
-                                            <td>{el.numeroLeg}</td>
-                                            <td>{el.tipo.split('').slice(0,40).join('')}{el.tipo.split('').length>39 ? '...' : ''}</td>
-                                            <td>{el.juez.split('+').map(e => <span key={e}>{e}<br /></span>)}</td>
-                                            {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
-                                                <td className={`${styles.DEMORADA}`}>DEMORADA</td>
-                                            ) : (
-                                                <td className={`${styles[el.estado]}`}>{el.estado.split('_').join(' ')}</td>
-                                            )}
-                                        </tr>
-                                    );
-                                }
-                                return null;
+                                return (
+                                    <tr key={el.numeroLeg} className={`${styles["fila" + el.estado]}`}>
+                                        <td>{el.hora}</td>
+                                        <td>SALA {el.sala}</td>
+                                        <td>{el.numeroLeg}</td>
+                                        <td>{el.tipo.split('').slice(0,40).join('')}{el.tipo.split('').length>39 ? '...' : ''}</td>
+                                        <td>{el.juez.split('+').map(e => <span key={e}>{e}<br /></span>)}</td>
+                                        {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
+                                            <td className={`${styles.DEMORADA}`}>DEMORADA</td>
+                                        ) : (
+                                            <td className={`${styles[el.estado]}`}>{el.estado.split('_').join(' ')}</td>
+                                        )}
+                                    </tr>
+                                );
                             })}
                 </tbody>
             </table>
