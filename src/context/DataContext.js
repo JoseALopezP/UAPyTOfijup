@@ -24,19 +24,27 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
-    const updateRealTime = async() =>{
+    const updateRealTime = async () => {
         try {
-            const response = await fetch('https://worldtimeapi.org/api/ip')
+            const response = await fetch('https://worldtimeapi.org/api/ip');
             if (!response.ok) {
-                throw new Error('Failed to fetch server time')
+                throw new Error('Failed to fetch server time');
             }
-            const data = await response.json()
-            await setRealTime(new Date(data.utc_datetime).toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" }))
+            const data = await response.json();
+            setRealTime(new Date(data.utc_datetime).toLocaleTimeString("es-AR", {
+                hourCycle: 'h23',
+                hour: "2-digit",
+                minute: "2-digit"
+            }));
         } catch (error) {
-            console.error('Error fetching server time:', error)
-            return null;
+            console.error('Error fetching server time, using local time:', error);
+            setRealTime(new Date().toLocaleTimeString("es-AR", {
+                hourCycle: 'h23',
+                hour: "2-digit",
+                minute: "2-digit"
+            }));
         }
-    }
+    };
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
     }
