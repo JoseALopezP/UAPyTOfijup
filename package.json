@@ -3,16 +3,19 @@
   "name": "uapytofijup",
   "version": "0.1.0",
   "private": true,
+  "main": "main/main.js",
   "scripts": {
-    "dev": "next dev -p 8080",
-    "build": "next build",
+    "dev": "concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev\" \"electron .\"",
+    "build": "next build && electron-builder",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^4.41.3",
+    "caniuse-lite": "^1.0.30001668",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
+    "electron-serve": "^2.1.1",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^10.10.0",
@@ -20,10 +23,14 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "next": "14.1.4",
+    "node-abi": "^3.68.0",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "concurrently": "^9.0.1",
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8",
     "node-loader": "^2.0.0"
   }
 }
