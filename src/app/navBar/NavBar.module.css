@@ -20,5 +20,6 @@
 .viewNameBlock{
     position: absolute;
     background-color: #fff;
-    left: 80px;
+    border-radius: 2px;
+    left: 2.5%;
 }
