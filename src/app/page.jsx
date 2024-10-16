@@ -5,12 +5,10 @@ import { DataContextProvider } from "@/context/DataContext";
 
 export default function menu() {
     return (
-      <>
       <AuthContextProvider>
         <DataContextProvider>
           <MenuSelector/>
         </DataContextProvider>
       </AuthContextProvider>
-      </>
     )
 }

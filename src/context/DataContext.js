@@ -11,6 +11,7 @@ import pushToHitos from "@/firebase/firestore/pushToHitos";
 import updateListItem from "@/firebase/firestore/updateListItem";
 import getList from "@/firebase/firestore/getList";
 import addStringToList from "@/firebase/firestore/addStringToList";
+import { todayFunction } from "@/utils/dateUtils";
 export const DataContext = createContext({});
 
 const {Provider} = DataContext;
@@ -55,7 +56,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         setAños(await getDocument('audiencias', 'años'))
     }
     const updateToday = async() => {
-        setToday(await getDocument('audiencias', (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')))
+        setToday(await getDocument('audiencias', todayFunction()))
     }
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))

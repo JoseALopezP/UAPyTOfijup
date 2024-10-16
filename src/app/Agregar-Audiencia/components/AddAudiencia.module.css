@@ -1,0 +1,11 @@
+.addAudienciaBlock{
+    display: inline-flex;
+    flex-direction: row;
+}
+.addAudienciaFormBlock{
+    width: 20vw;
+}
+.audienciaListSection{
+    display: inline-flex;
+    flex-direction: column;
+}
