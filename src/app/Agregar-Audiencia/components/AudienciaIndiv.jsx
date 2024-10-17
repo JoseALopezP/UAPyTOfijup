@@ -21,12 +21,11 @@ export function AddAudienciaIndiv(element) {
             <p className={`${styles.tableCell} ${styles.tableCellState}`}>●</p>
             <span className={`${styles.tableCell} ${styles.tableCellHora}`}><InputReloj horaF={setHora} minutF={setMinuto} hora={hora} minut={minuto}/></span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
-                <select onChange={e => setSala(e.target.value)}>
-                    <option>{sala}</option>
-                    {desplegables.salas.map(el =>(
+                <input list='sala' className={`${styles.salaSelect}`} onChange={e => setSala(e.target.value)}/>
+                    <datalist id='sala' className={`${styles.salaSelect}`}><option>{sala}</option>
+                    {desplegables && desplegables.salas.map(el =>(
                         <option key={el} value={el}>SALA {el}</option>
-                    ))}
-                </select>
+                    ))}</datalist>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellLegajo}`}></span>
             <span className={`${styles.tableCell} ${styles.tableCellTipo}`}></span>

@@ -21,11 +21,3 @@
     margin: 0;
     font-weight: 500;
 }
-.clockBlock input:focus-visible{
-    border: none;
-    outline: none;
-}
-.clockBlock input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
