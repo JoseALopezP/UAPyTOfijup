@@ -8,14 +8,15 @@ import { AuthContext } from '@/context/AuthContext'
 import { AddAudienciaForm } from './AddAudienciaForm'
 
 export function AddAudienciaBlock() {
+    const {updateByDate, updateDesplegables} = useContext(DataContext)
     const [dateToUse, setDateToUse] = useState(todayFunction())
-    const {updateByDate} = useContext(DataContext)
     const {user} = useContext(AuthContext);
     useEffect(() => {
         updateByDate(dateToUse)
     }, [dateToUse])
     useEffect(() => {
         updateByDate(dateToUse)
+        updateDesplegables()
     }, [])
     useEffect(() => {
         if (user == null){

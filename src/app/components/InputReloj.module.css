@@ -1,0 +1,29 @@
+.clockBlock{
+    border: solid 1px #2B2B2B;
+    border-radius: 2px;
+    display: inline-flex;
+    flex-direction: row;
+    height: 30px;
+    padding: 0;
+    background-color: #1F1F1F;
+    color: #A89E82;
+}
+.clockBlock input{
+    background-color: transparent;
+    outline: none;
+    border: none;
+    width: 30px;
+    font-size: 12px;
+}
+.inputHora{
+    
+}
+.inputSeparator{
+    height: 30px;
+    margin: 0;
+    font-weight: 500;
+    
+}
+.inputMinut{
+
+}

@@ -9,3 +9,12 @@
     display: inline-flex;
     flex-direction: column;
 }
+.audienciaListTable{
+    display: table;
+}
+.tableCell{
+    display: table-cell;
+}
+.tableRow{
+    display: table-row;
+}
