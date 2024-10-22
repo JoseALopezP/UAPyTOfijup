@@ -3,6 +3,17 @@
     flex-direction: row;
     color: #A89E82;
 }
+.tableCellInput{
+    height: 26px;
+    border: solid 1px #2B2B2B;
+    background-color: #1F1F1F;
+    margin: 0;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    color: #A89E82;
+}
 .addAudienciaFormBlock{
     width: 20vw;
 }
@@ -15,20 +26,50 @@
 }
 .tableCell{
     display: table-cell;
-    padding: 1px 0 1px 0;
-    height: 30px;
-    margin: 0;
+    height: 26px;
 }
 .tableRow{
     display: table-row;
+    height: 26px;
+    max-height: 26px;
+    overflow: hidden;
 }
 .salaSelect{
-    height: 30px;
+    height: 26px;
     appearance: none;
     background-color: #1F1F1F;
-    border: solid 1px #2B2B2B;
+    border: solid #2B2B2B;
+    border-width: 1px 1px 1px 0;
     border-radius: 2px;
-    width: 80px;
+    width: 40px;
     outline: none;
     padding: 0;
+}
+.tableCellLegajoInput{
+    width: 140px;
+    border-radius: 2px;
+    border: solid 1px #2B2B2B;
+    height: 24px;
+}
+.tableCellTipo::-webkit-scrollbar {
+    display: none;
+}
+.tableCellTipo{
+    display: inline-flex;
+    margin: 0;
+    width: 30vw;
+}
+.tableCellTipoInput{
+    width: 33%;
+}
+.tableCellState{
+    width: 26px;
+    border-radius: 13px;
+    background-color: aliceblue;
+}
+.tableCellJuez{
+    justify-content: space-around;
+}
+.tableCellJuezInput{
+    width: 15vw;
 }

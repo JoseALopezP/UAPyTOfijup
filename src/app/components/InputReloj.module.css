@@ -3,7 +3,7 @@
     border-radius: 2px;
     display: inline-flex;
     flex-direction: row;
-    height: 30px;
+    height: 26px;
     padding: 0;
     background-color: #1F1F1F;
     color: #A89E82;
@@ -13,11 +13,11 @@
     background-color: transparent;
     outline: none;
     border: none;
-    width: 30px;
-    font-size: 12px;
+    width: 20px;
+    font-size: 14px;
 }
 .inputSeparator{
-    height: 30px;
+    height: 26px;
     margin: 0;
     font-weight: 500;
 }
@@ -28,4 +28,4 @@
 .clockBlock input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
-  }
+}
