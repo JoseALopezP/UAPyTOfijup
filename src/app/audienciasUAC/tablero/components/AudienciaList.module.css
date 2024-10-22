@@ -3,14 +3,15 @@
     color: white;
 }
 .table{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
+    table-layout: fixed;
 }
 .tableHead{
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     background-color: white;
-    color: #375166;
+    color: #375166; 
 }
 .tableBody{
     font-size: 24px;
@@ -25,17 +26,24 @@
 }
 .tableRow td{
     padding: 0 5px;
+    overflow: hidden;
 }
 .tableCellTipo{
     text-align: center;
-    font-size: 20px;
 }
 .tableCellJuezN{
     text-align: center;
+    width: 40px;
 }
 .tableBody tr:nth-child(odd){
     background-color: #375166;
 }
 .tableBody tr:nth-child(even){
     background-color: #475f74;
+}
+.tableCellEstadoFINALIZADA{
+    background-color: #dc3545;;
+}
+.tableCellEstado{
+    text-align: center;
 }

@@ -1,12 +1,16 @@
-import MenuSelector from "./components/MenuSelector";
+'use client'
+import { AuthContextProvider} from "@/context/AuthContext";
+import MenuSelector from './components/MenuSelector'
+import { DataContextProvider } from "@/context/DataContext";
 
 export default function menu() {
-    /*useEffect(() => {
-      if (user == null) router.push("/signin")
-    }, [user])*/
     return (
       <>
-        <MenuSelector/>
+      <AuthContextProvider>
+        <DataContextProvider>
+          <MenuSelector/>
+        </DataContextProvider>
+      </AuthContextProvider>
       </>
     )
 }

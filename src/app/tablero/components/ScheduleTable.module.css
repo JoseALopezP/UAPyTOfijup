@@ -1,12 +1,14 @@
 .tableSection{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     font-size: 20px;
     font-weight: 700;
     color: white;
     overflow: hidden;
+    position: relative;
+    top: 70px;
 }
 .table{
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     border: none;   
 }
 .tableHead{
@@ -39,6 +41,8 @@
     height: 70px;
     overflow: hidden;
     display: inline-flex;
+    position: fixed;
+    z-index: 50;
     flex-direction: row;
 }
 
@@ -46,7 +50,7 @@
     font-weight: 700;
     font-size: 48px;
     width: 180px;
-    padding: 0 40px;
+    padding: 10px 40px;
     letter-spacing: 3px;
     display: inline-flex;
     flex-direction: column;
@@ -56,9 +60,9 @@
     width: 135px;
 }
 .corteLogo{
-    width: 135px;
+    width: 120px;
     height: auto;
-    margin: 0 auto;
+    margin: 10px auto;
 }
 
 .infoBlock{
@@ -74,8 +78,8 @@
 
 .infoBlock img{
     opacity: 0%;
-    max-width: 100%;
-    clip-path: polygon(40px 0%, 100% 0%, 260px 100%, 0% 100%);
+    background-size: contain;
+    clip-path: polygon(40px 0%, 100% 0%, 100% 100%, 0% 100%);
 }
 .textBlock{
     display: inline-flex;
@@ -84,12 +88,12 @@
 }
 .newsTitle{
     opacity: 0%;
-    font-size: 32px;
+    font-size: 100px;
     line-height: 20px;
 }
 .newsBody{
     opacity: 0%;
-    font-size: 24px;
+    font-size: 60px;
     line-height: 24px;
     margin: 0;
 }
@@ -178,7 +182,13 @@
     background-color: #28a745;
     text-align: center;
 }
-
+.REPROGRAMADA {
+    background-color: #6c757d;
+    text-align: center;
+}
+.filaREPROGRAMADA{
+    opacity: 0.8;
+}
 @keyframes infoAppear {
     0% {
     }
@@ -254,5 +264,138 @@
     }
     100%{
         height: 50px;
+    }
+}
+@media (min-width: 3000px) {
+    .infoBlock{
+        border-width: 20px 0 20px 0;
+    }
+    .tableSection{
+        width: calc(100vw - (100vw - 100%));
+        font-size: 56px;
+        font-weight: 500;
+        position: relative;
+        top: 140px;
+    }
+    .tableBody tr{
+        height: 120px;
+        line-height: 38px;
+    }
+    .DEMORADA,.PROGRAMADA,.EN_CURSO,.CANCELADA,.CUARTO_INTERMEDIO,.FINALIZADA,.REPROGRAMADA {
+        font-weight: 700;
+    }
+    .tableBody td:nth-child(1){
+        font-weight: 700;
+        font-size: 56px;
+    }
+    .tableBody td:nth-child(3){
+        font-weight: 700;
+    }
+    .tableBody td:nth-child(5){
+        font-size: 38px;
+    }
+    .clockBlock{
+        font-weight: 700;
+        font-size: 80px;
+        width: 300px;
+        padding: 0 40px;
+        letter-spacing: 3px;
+    }
+    .clockDigits{
+        margin: 20px auto;
+        width: 220px;
+    }
+    .corteLogo{
+        width: 220px;
+        height: auto;
+        margin: 20px auto;
+    }
+    .infoSection{
+        height: 100px;
+    }
+    .ofijupTitle{
+        position: fixed;
+        left: 40%;
+        height: 0px;
+        z-index: 50;
+        font-size: 68px;
+        line-height: 0;
+    }
+    @keyframes infoAppear {
+        0% {
+        }
+        50%{
+          opacity: 0%;
+        }
+        100%{
+          opacity: 100%;
+        }
+    }
+    @keyframes headerExpand {
+        0%{
+            height: 120px;
+        }
+        100% {
+          height: 420px;
+        }
+    }
+    @keyframes infodisappear {
+        0% {
+            opacity: 100%;
+        }
+        50%{
+            opacity: 0%;
+        }
+        100%{
+            opacity: 0%;
+        }
+    }
+    @keyframes blockExpand {
+        0% {
+            height: 120px;
+        }
+        100%{
+            height: 380px;
+        }
+    }
+    
+    
+    @keyframes infoAppear2 {
+        0% {
+            opacity: 100%;
+        }
+        50%{
+          opacity: 0%;
+        }
+        100%{
+          opacity: 0%;
+        }
+    }
+    @keyframes headerExpand2 {
+        0%{
+            height: 380px;
+        }
+        100% {
+          height: 140px;
+        }
+    }
+    @keyframes infodisappear2 {
+        0% {
+            opacity: 0%;
+        }
+        50%{
+            opacity: 0%;
+        }
+        100%{
+            opacity: 100%;
+        }
+    }
+    @keyframes blockExpand2 {
+        0% {
+            height: 400px;
+        }
+        100%{
+            height: 100px;
+        }
     }
 }

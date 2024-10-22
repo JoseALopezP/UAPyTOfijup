@@ -1,7 +1,29 @@
 {
   "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+      "@/*": ["src/*"]
+    },
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types"],
+    "types": [
+      "node", 
+      "body-parser", 
+      "cacheable-request", 
+      "caseless", 
+      "express", 
+      "fs-extra", 
+      "http-errors", 
+      "ms", 
+      "qs", 
+      "range-parser", 
+      "request", 
+      "send", 
+      "serve-static", 
+      "tough-cookie"
+    ]
+  },
+  "include": ["src/**/*"]
 }

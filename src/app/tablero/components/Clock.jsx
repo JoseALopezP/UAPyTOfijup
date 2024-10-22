@@ -1,23 +1,24 @@
 'use client'
 import styles from './ScheduleTable.module.css'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { DataContext } from '@/context/DataContext'
 
 export function Clock () {
-    const [date, setDate] = useState(new Date());
-
-    function tick() {
-        setDate(new Date());
+    const {updateRealTime, realTime} = useContext(DataContext);
+    async function tick() {
+        updateRealTime()
     }
     useEffect(() => {
-    const timerID = setInterval(() => tick(), 30000);
-    return function cleanup() {
-        clearInterval(timerID);
-    };
-    });
+        tick()
+        const timerID = setInterval(() => tick(), 20000);
+        return function cleanup() {
+            clearInterval(timerID);
+        };
+    }, []);
     
     return(
         <div className={`${styles.clockBlock}`}>
-            <p className={`${styles.clockDigits}`}>{date.toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit" })}</p>
+            <p className={`${styles.clockDigits}`}>{realTime && realTime}</p>
             <img className={`${styles.corteLogo}`} src="/cortelogo.png"/>
         </div>
     )

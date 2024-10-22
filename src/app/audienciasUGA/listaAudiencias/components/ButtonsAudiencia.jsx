@@ -2,19 +2,30 @@
 import styles from './AudienciaList.module.css'
 import { useEffect, useState, useContext } from 'react'
 import { DataContext } from '@/context/DataContext';
+import { Resuelvo } from './Resuelvo';
+import { nameTranslate } from '@/utils/traductorNombres';
 
 export function ButtonsAudiencia ({element}) {
-    const {updateToday, updateData, pushtToArray} = useContext(DataContext);
+    const {updateToday, updateData, pushtToArray, updateRealTime, realTime} = useContext(DataContext);
     const [show, setShow] = useState(false)
+    const [showResuelvo, setShowResuelvo] = useState(false)
     const [editable, setEditable] = useState(false)
     const [actionAud, setActionAud] = useState(null)
+    const [tiempoPedido, setTiempoPedido] = useState(0)
+    const [pidiente, setPidiente] = useState(null)
     const [sala, setSala] = useState(null)
+    const [resuelvo, setResuelvo] = useState(false)
     const handleSubmit = async(event) =>{
         event.preventDefault();
+        await updateRealTime();
         if(actionAud){
             const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
             await updateData(date, element.numeroLeg, element.hora, 'estado', actionAud)
-            await pushtToArray(date, element.numeroLeg,  element.hora, 'estado', `${new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit", minute: "2-digit"})} | ${actionAud}`)
+            if(actionAud == 'CUARTO_INTERMEDIO'){
+                await pushtToArray(date, element.numeroLeg, element.hora, `${realTime} | ${actionAud} | ${tiempoPedido} | ${pidiente}`)
+            }else{
+                await pushtToArray(date, element.numeroLeg, element.hora, `${realTime} | ${actionAud}`)
+            }
             await updateToday()
             await setEditable(false)
             await setActionAud(null)
@@ -25,34 +36,48 @@ export function ButtonsAudiencia ({element}) {
             await updateToday()
             await setEditable(false)
         }
+        if(resuelvo){
+            const date = await new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
+            await updateData(date, element.numeroLeg, element.hora, 'resuelvo', resuelvo)
+            await updateRealTime()
+            await updateData(date, element.numeroLeg, element.hora, 'horaMinuta', realTime)
+            await updateToday()
+            await setResuelvo(false)
+            await setEditable(false)
+        }
     }
     const checkEditing = () =>{
-        if(actionAud || sala){
+        if(actionAud || sala || resuelvo){
             setEditable(true)
         }else{
             setEditable(false)
         }
-    }
-    const getMinutes = (dateObject) =>{
-        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
-        const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
-        return (timeComparison - nowTime)
     }
     useEffect(() => {
         checkEditing()
     }, [actionAud]);
     useEffect(() => {
         checkEditing()
+    }, [resuelvo]);
+    useEffect(() => {
+        checkEditing()
     }, [sala]);
+    useEffect(() => {
+        updateRealTime()
+    }, [])
     return(
         <>
-        {show && 
-        <div className={`${styles.buttonsBlock}`}>
+        {show &&
+        <div className={showResuelvo ? `${styles.buttonsBlock} ${styles.buttonsBlockResuelvo}` : `${styles.buttonsBlock}`}>
+            {showResuelvo ?
+            <Resuelvo item={element}/> :
+            <><h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>
             <form onSubmit={(event) => handleSubmit(event)} action="#" className={`${styles.changeBlock}`}>
+                
                 {(element.estado == 'CUARTO_INTERMEDIO') &&
-                <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ FINALIZAR CUARTO INTERMEDIO</button>}
+                <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>FINALIZAR CUARTO INTERMEDIO</button>}
                 {(element.estado == 'PROGRAMADA') &&
-                <><button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonIniciar}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ INICIAR</button>
+                <><button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonIniciar}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>INICIAR</button>
                 <select  onChange={(e)=>{setSala(e.target.value)}} className={`${styles.selectSalaEdit} ${styles.stateButton}`}>
                     <option>SALA {element.sala}</option>
                     <option value={"1"} >SALA 1</option>
@@ -68,25 +93,43 @@ export function ButtonsAudiencia ({element}) {
                 </select>
                 </>}
                 {(element.estado == 'EN_CURSO') &&
-                    <><button type="button" onClick={() => actionAud == 'FINALIZADA' ? setActionAud(null) : setActionAud('FINALIZADA')} className={actionAud == 'FINALIZADA' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizar}`}> ⏹ FINALIZAR</button>
-                    <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}> ⏸ CUARTO INTERMEDIO</button></>}
+                    <><button type="button" onClick={() => actionAud == 'FINALIZADA' ? setActionAud(null) : setActionAud('FINALIZADA')} className={actionAud == 'FINALIZADA' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizar}`}>FINALIZAR</button>
+                    <button type="button" onClick={() => actionAud == 'CUARTO_INTERMEDIO' ? setActionAud(null) : setActionAud('CUARTO_INTERMEDIO')} className={actionAud == 'CUARTO_INTERMEDIO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonCuarto}`}>CUARTO INTERMEDIO</button>
+                    <span className={`${styles.tiempoCuarto}`}><button type='button' className={`${styles.tiempoMenosCuarto}`} onClick={()=>setTiempoPedido(tiempoPedido - 5)}>-</button>
+                    <p className={`${styles.tiempoPedido}`}>{tiempoPedido}</p>
+                    <button type='button' className={`${styles.tiempoMasCuarto}`} onClick={()=>setTiempoPedido(tiempoPedido + 5)}>+</button>
+                    <select name="" id="" onChange={(e)=>{setPidiente(e.target.value)}} className={`${styles.pidienteSelector}`}>
+                        <option value={'juez'}>JUEZ</option>
+                        <option value={'defensa'}>DEFENSA</option>
+                        <option value={'fiscal'}>FISCAL</option>
+                        <option value={'otro'}>OTRO</option>
+                    </select>
+                    </span></>}
                 {(element.estado == 'FINALIZADA') &&
-                    <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}> ⏵ INICIAR NUEVAMENTE</button>
+                    <>
+                    <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>INICIAR NUEVAMENTE</button>
+                    {(element.resuelvo) ? <button className={`${styles.stateButton} ${styles.stateButtonSubido}`} type='button'>SUBIDO</button>
+                    : <button type="button" className={resuelvo ? `${styles.stateButton} ${styles.stateButtonResuelvo} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonResuelvo}`} onClick={() => setResuelvo(!resuelvo)}> RESUELVO SUBIDO</button>
+                    }
+                    </>
                 }
-                <button type="submit" className={editable ? `${styles.editButton} ${styles.stateButton}` : `${styles.editButton} ${styles.editButtonNot} ${styles.stateButton}`}>EDITAR</button>
-            </form>
-        <button type="button" onClick={() => setShow(false)} className={`${styles.stateButton} ${styles.stateButtonCerrar}`}>X CERRAR</button>
-        </div>}
+                <button type="submit" className={editable ? `${styles.editButton} ${styles.stateButton}` : `${styles.editButton} ${styles.editButtonNot} ${styles.stateButton}`}>GUARDAR</button>
+            </form></>}
+            <span className={`${styles.stateButtonBlock}`}>
+                <button type="button" onClick={() => setShowResuelvo(!showResuelvo)} className={`${styles.stateButton} ${styles.stateButtonResuelvoBlock}`}>RESUELVO</button>
+                <button type="button" onClick={() => setShow(false)} className={`${styles.stateButton} ${styles.stateButtonCerrar}`}>X CERRAR</button>
+            </span>
+            </div>}
         
         <tr key={element.numeroLeg + element.hora} className={`${styles.tableRow}`} onClick={() => setShow(true)}> 
             <td>{element.hora}</td>
-            <td>{element.sala}</td>
-            <td>{element.operador && element.operador}</td>
+            <td className={`${styles.salaCell}`}>{element.sala}</td>
+            <td className={`${styles.tableCellTipo}`}>{element.operador && `${nameTranslate(element.operador)}`}</td>
             <td>{element.numeroLeg}</td>
-            <td className={`${styles.tableCellTipo}`}>{element.tipo}</td>
-            <td>{element.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-            <td>{element.situacion && element.situacion}</td>
-            {(element.estado == 'PROGRAMADA' & getMinutes(element.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[element.estado]} `}>{element.estado.split('_').join(' ')}</td>)}
+            <td className={`${styles.tableBodyJuez}`}>{element.juez.split('+').map((e,i)=> <span key={e}>{e.split(' ').slice(1,3).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>)}</td>
+            <td className={`${styles.tableCellTipo}`}>{element.tipo.split('').slice(0,20).join('')}{element.tipo.split('').length>19 ? '...' : ''}</td>
+            <td className={`${styles.tableCellTipo}`}>{element.situacion}</td>
+            {((realTime > element.hora) & element.estado == 'PROGRAMADA')  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<>{element.resuelvo ? <td className={`${styles[element.estado]} `}>SUBIDO</td> : <td className={`${styles[element.estado]} `}>{element.estado.split('_').join(' ')}</td>}</>)}
         </tr>
         </>
     )

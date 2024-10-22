@@ -1,34 +1,72 @@
 .tableSection{
     width: calc(100vw - 100% + 100%);
     color: white;
+    display: inline-flex;
+    flex-direction: row;
+    font-size: 38px;
 }
 .table{
-    width: 100%;
+    width: calc((100vw - (100vw - 100%))/2);
+    table-layout: fixed;
+    height: fit-content;
 }
 .tableHead{
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 700;
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     background-color: white;
     color: #375166;
 }
 .tableBody{
-    font-size: 24px;
+    font-size: 38px;
 }
 .tableRow{
-    height: 60px;
+    height: 69px;
+    max-height: 69px;
 }
 .tableRowFinalizada{
     background-color: #fd7e14;
 }
 .tableRow td{
-    padding: 0 5px;
+    padding: 0;
+    max-height: 69px;
+    overflow: hidden;
+}
+.tableCellHora{
+    font-size: 40px;
+    width: 120px;
+    text-align: center;
+}
+.tableCellSala{
+    width: 70px;
+    text-align: center;
+}
+.tableCellSalaIndiv{
+    font-weight: 700;
+    font-size: 38px;
+}
+.tableCellOperador{
+    text-align: center;
+    font-size: 38px;
+}
+.tableCellSituacion{
+    text-align: center;
+    font-size: 18px;
+    width: 120px;
+}
+.tableCellLeg{
+    width: 140px;
+    text-align: center;
+    font-size: 38px;
 }
 .tableCellTipo{
     text-align: center;
-    font-size: 20px;
+    font-size: 32px;
+    width: 350px;
 }
-.tableCellJuezN{
+.tableCellJuez{
+    width: 140px;
+    font-size: 32px;
     text-align: center;
 }
 .tableBody tr:nth-child(odd){
@@ -38,6 +76,9 @@
     background-color: #475f74;
 }
 
+.tableCellEstado{
+    width: 120px;
+}
 .DEMORADA{
     background-color: #fd7e14;
     text-align: center;
@@ -61,4 +102,10 @@
 .FINALIZADA {
     background-color: #28a745;
     text-align: center;
+}
+.REPROGRAMADA {
+    background-color: #6c757d;
+}
+.tableCellSituacionTitle{
+    font-size: 32px;
 }

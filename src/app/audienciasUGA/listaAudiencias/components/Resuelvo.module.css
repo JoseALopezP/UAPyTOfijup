@@ -1,0 +1,198 @@
+.buttonsBlockResuelvo{
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.resuelvoForm{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    color: #000;
+}
+.optionSelect{
+    color: #000;
+}
+.imputadoButtons{
+    width: 100%;
+    display: inline-flex;
+    justify-content: center;
+}
+.imputadoButton{
+    width: 40%;
+    margin: 2px;
+}
+.condenadoButton{
+    width: 40%;
+    margin: 2px;
+}
+.imputadoCondenado{
+    width: 100%;
+    padding: 0 0 4px 0;
+}
+.formButton{
+    font-weight: 700;
+    font-size: 24px;
+    background-color: #375166;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    padding: 4px;
+    cursor: pointer;
+}
+.condenadoInput{
+    padding: 4px;
+    background-color: #fd7d1450; 
+}
+.imputadoInput{
+    padding: 4px;
+    background-color: #ffc10750;
+}
+.condenadoButton{
+    background-color: #fd7e14; 
+}
+.imputadoButton{
+    background-color: #ffc107;
+}
+
+.inputTipos{
+    margin: 0 auto;
+    display: inline-flex;
+    flex-direction: column;
+    align-content: center;
+    width: calc(80% - 10px);
+}
+.removeButton{
+    background-color: #dc3545;
+    padding: 4px;
+    width: 12%;
+    margin: 2px;
+}
+.reconversionBlock{
+    height: fit-content;
+    display: inline-flex;
+    flex-direction: row;
+    margin: 10px 0 10px 0;
+    background-color: #37516679;
+    border-radius: 5px;
+    padding: 10px 0;
+}
+.originalTipos{
+    margin: 0;
+}
+.inputReconvertida{
+    margin: 5px 0 5px 0;
+    border-radius: 5px;
+    padding-top: 5px;
+    border: none;
+    outline: none;
+    height: 30px;
+    font-size: 24px;
+    text-align: center;
+}
+.reconvertidaButton{
+    background-color: #20c997;
+    height: 40px;
+    padding: 8px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+.guardarReconvertidaButton{
+    background-color: #fd7e14;
+    width: 20%;
+    height: 100%;
+    margin: 5px 0 5px 5px;
+    align-self: flex-end;
+}
+.inputResuelvo{
+    width: 25%;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    padding: 4px;
+    margin: 2px;
+    font-size: 24px;
+}
+.reconvertidaButtonClicked{
+    background-color: #dc3545;
+}
+.inputCaratula{
+    width: 100%;
+    align-self: center;
+}
+.inputText{
+    border: none;
+}
+.inputResuelvo3{
+    width: 29.5%;
+}
+.inputResuelvo2{
+    width: 41%;
+}
+.inputResuelvo1{
+    width: 86%;
+}
+.inputRow{
+    display: inline-flex;
+    justify-content: space-between;
+}
+.guardarButton{
+    font-size: 26px;
+    padding: 8px;
+    margin: 10px 0;
+    background-color: #28a745;
+    cursor: pointer;
+    position: fixed;
+    align-self: end;
+    height: 100px;
+    width: 19-0px;
+}
+.guardar{
+    display: none;
+}
+.guardarButton:hover .guardar{
+    display: block;
+}
+.guardarButton:hover .sinGuardar{
+    display: none;
+}
+.guardando{
+    display: none;
+}
+.guardandoButton .guardando{
+    display: block;
+}
+.guardandoButton .guardar, .guardandoButton .sinGuardar, .guardandoButton:hover .guardar{
+    display: none;
+}
+
+.inputResuelvoDemora{
+    width: 98%;
+    align-self: center;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    border: #375166 solid 2px;
+}
+.textArea{
+    padding: 6px;
+    font-size: 24px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.insertarModeloBlock{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 0 0 0;
+}
+.descargarButton{
+    background-color: #20c997;
+}
+.inputUfi{
+    margin-left: 20px;
+}
+.presenteButton{
+    width: 40px;
+    background-color: #fd7e14;
+    height: 40px;
+}

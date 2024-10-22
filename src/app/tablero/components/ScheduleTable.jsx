@@ -1,78 +1,78 @@
-import { useContext, useEffect, useState } from 'react'
-import styles from './ScheduleTable.module.css'
-import { DataContext } from '@/context/DataContext'
+import { useContext, useEffect, useState, useRef } from 'react';
+import styles from './ScheduleTable.module.css';
+import { DataContext } from '@/context/DataContext';
 
-export function ScheduleTable () {
-    const {updateToday, today} = useContext(DataContext);
-    const [part, setPart] = useState(0)
-    const [showInfo, setShowInfo] = useState(0)
-    const getMinutes = (dateObject) =>{
-        const nowTime = (parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', hour: "2-digit"})) * 60 + parseInt(new Date().toLocaleTimeString("es-AR",{hourCycle: 'h23', minute: "2-digit"})))
-        const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
-        return (timeComparison - nowTime)
-    }
+export function ScheduleTable() {
+    const { updateToday, today, realTime} = useContext(DataContext);
+    const [partShow, setPartShow] = useState(false);
+    const [audSize, setAudSize] = useState(12);
+    const [tickCount, setTickCount] = useState(0);
+    const refPartShow = useRef(partShow);
+
+    const getMinutes = (dateObject) => {
+        const nowTime = parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]);
+        const timeComparison = parseInt(`${dateObject}`.split(':')[0]) * 60 + parseInt(`${dateObject}`.split(':')[1]);
+        return timeComparison - nowTime;
+    };
+
     function filterToday() {
-        const aux2 = []
-        if(today){
-            today.forEach((item) =>{
-                switch(item.estado){
+        const aux2 = [];
+        if (today) {
+            today.forEach((item) => {
+                switch (item.estado) {
                     case 'EN_CURSO':
-                        if(getMinutes(item.hora) < 120){
-                            aux2.push(item)
-                        }
-                        break;
                     case 'PROGRAMADA':
-                        if(getMinutes(item.hora) < 120){
-                            aux2.push(item)
-                        }
-                        break;
                     case 'CUARTO_INTERMEDIO':
-                        if(getMinutes(item.hora) < 120){
-                            aux2.push(item)
+                    case 'FINALIZADA':
+                        if (getMinutes(item.hora) < 120 && getMinutes(item.hora) > -120) {
+                            aux2.push(item);
                         }
                         break;
                     case 'CANCELADA':
-                        aux2.push(item)
-                        break;
-                    case 'FINALIZADA':
-                        if(getMinutes(item.hora) < 120 & getMinutes(item.hora) > -120){
-                            aux2.push(item)
-                        }
+                    case 'REPROGRAMADA':
+                        aux2.push(item);
                         break;
                 }
             });
         }
-        /*if(part == 0){
-            if(showInfo == false){
-                aux2.splice(0,15);
-                setPart(1)
-            }else{
-                aux2.splice(0,13);
-                setPart(1)
-            }
-        }else{
-            if(showInfo == false){
-                aux2.splice(15,15);
-                setPart(0)
-                setShowInfo(true)
-            }else{
-                aux2.splice(13,13);
-                setPart(0)
-                setShowInfo(false)
-            }
-        }*/
-        return aux2
+        return aux2;
     }
+
+    const updateTick = (filtered) => {
+        setTickCount(prevCount => prevCount + 1);
+        const newTickCount = tickCount + 1;
+        if (newTickCount % 2 === 0) {
+            setAudSize(audSize === 12 ? 14 : 12);
+        }
+        if (newTickCount >= 10) {
+            setTickCount(0);
+        }
+        if (filtered.length > audSize) {
+            setPartShow(!refPartShow.current);
+        } else {
+            setPartShow(false);
+        }
+    };
+
     function tick() {
-        updateToday();       
+        const filtered = filterToday().sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''));
+        updateTick(filtered);
+        updateToday();
     }
-    useEffect(() =>{
-        const timerID = setInterval(() => tick(), 5000);  
-        return function cleanup() {
+
+    useEffect(() => {
+        refPartShow.current = partShow;
+    }, [partShow]);
+
+    useEffect(() => {
+        tick();
+        const timerID = setInterval(() => tick(), 30000);
+        return () => {
             clearInterval(timerID);
         };
-    }, [])
-    return(
+    }, []);
+
+    return (
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
                 <thead className={`${styles.tableHead}`}>
@@ -86,20 +86,27 @@ export function ScheduleTable () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today && filterToday().sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
-                        return(
-                            <tr key={el.numeroLeg} > 
-                                <td>{el.hora}</td>
-                                <td>SALA {el.sala}</td>
-                                <td>{el.numeroLeg}</td>
-                                <td>{el.tipo}</td>
-                                <td>{el.juez.split('+').map(e => <span key={e}>{e}<br/></span>)}</td>
-                                {(el.estado == 'PROGRAMADA' & getMinutes(el.hora) < 0)  ? (<td className={`${styles.DEMORADA}`}>DEMORADA</td>) : (<td className={`${styles[el.estado]} `}>{el.estado.split('_').join(' ')}</td>)}
-                            </tr>
-                        )
-                    })}
+                    {today &&
+                        filterToday()
+                            .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
+                            .map((el, i) => {
+                                return (
+                                    <tr key={el.numeroLeg} className={`${styles["fila" + el.estado]}`}>
+                                        <td>{el.hora}</td>
+                                        <td>SALA {el.sala}</td>
+                                        <td>{el.numeroLeg}</td>
+                                        <td>{el.tipo.split('').slice(0,40).join('')}{el.tipo.split('').length>39 ? '...' : ''}</td>
+                                        <td>{el.juez.split('+').map(e => <span key={e}>{e}<br /></span>)}</td>
+                                        {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
+                                            <td className={`${styles.DEMORADA}`}>DEMORADA</td>
+                                        ) : (
+                                            <td className={`${styles[el.estado]}`}>{el.estado.split('_').join(' ')}</td>
+                                        )}
+                                    </tr>
+                                );
+                            })}
                 </tbody>
             </table>
         </section>
-    )
+    );
 }

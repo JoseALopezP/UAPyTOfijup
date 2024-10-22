@@ -1,0 +1,25 @@
+.container{
+    width: 2.3%;
+    height: 100vh;
+    display: inline-flex;
+    flex-direction: column;
+    background-color: #181818ff;
+    padding: 0;
+}
+.navButton{
+    justify-content: center;
+    border: solid #0078d400 0px;
+    border-left-width: 2px;
+    color: #868686;
+    padding: 20% 12% 10% 10%;
+}
+.navButtonCurrent{
+    color: #d7d7d7;
+    border-left-color: #0078d4ff;
+}
+.viewNameBlock{
+    position: absolute;
+    background-color: #fff;
+    border-radius: 2px;
+    left: 2.5%;
+}

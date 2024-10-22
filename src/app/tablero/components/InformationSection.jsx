@@ -1,23 +1,19 @@
 import { Clock } from './Clock'
 import styles from './ScheduleTable.module.css'
 import { InfoBlock } from './InfoBlock'
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuthContext } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export function InformationSection () {
-    const [showInfo, setShowInfo] = useState(true);
-    function tick() {
-        showInfo ? setShowInfo(false) : setShowInfo(true)
-    }
-    useEffect(() => {
-        const timerID = setInterval(() => tick(), 5000);
-        return function cleanup() {
-            clearInterval(timerID);
-        };
-    });
-    return(
-        <section className={showInfo ? `${styles.infoSection} ${styles.infoSectionNotShow}` : `${styles.infoSection} ${styles.infoSectionShow}`}>
-            <Clock/>
-            <InfoBlock/>
+    const { user } = useAuthContext();
+    const router = useRouter();
+    const [showInfo2, setShowInfo2] = useState(true);
+
+    return (
+        <section className={`${styles.infoSection} ${showInfo2 ? styles.infoSectionNotShow : styles.infoSectionShow}`}>
+            <Clock />
+            <InfoBlock />
         </section>
-    )
+    );
 }

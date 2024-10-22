@@ -1,0 +1,34 @@
+.addAudienciaBlock{
+    display: inline-flex;
+    flex-direction: row;
+    color: #A89E82;
+}
+.addAudienciaFormBlock{
+    width: 20vw;
+}
+.audienciaListSection{
+    display: inline-flex;
+    flex-direction: column;
+}
+.audienciaListTable{
+    display: table;
+}
+.tableCell{
+    display: table-cell;
+    padding: 1px 0 1px 0;
+    height: 30px;
+    margin: 0;
+}
+.tableRow{
+    display: table-row;
+}
+.salaSelect{
+    height: 30px;
+    appearance: none;
+    background-color: #1F1F1F;
+    border: solid 1px #2B2B2B;
+    border-radius: 2px;
+    width: 80px;
+    outline: none;
+    padding: 0;
+}

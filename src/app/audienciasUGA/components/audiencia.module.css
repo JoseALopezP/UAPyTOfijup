@@ -1,25 +1,23 @@
 .audienciaListSection{
-    width: 100vw;
+    width: calc(100vw - (100vw - 100%));
 }
 .audienciaListTable{
-    width: 100vw;
+    width: calc(100vw - (100vw - 100%));
     display: table;
     table-layout: fixed;
 }
 .audienciaListTableHead{
-    width: 100vw;
+    width: calc(100vw - (100vw - 100%));
     text-align: center;
 }
 .inputLegajoBlock{
-    display: inline-flex;
     flex-direction: row;
-    width: fit-content;
 }
 .addAudienciaRow{
-    height: 80px;
+    height: 50px;
     vertical-align: middle;
     padding: auto;
-    width: 100%;
+    width: calc(100vw - (100vw - 100%));
     display: table-row;
 }
 
@@ -43,33 +41,8 @@
 .addAudienciaRow input:focus-visible{
     outline: 2px #dcc635 solid;
 }
-.inputLegajoBlock{
-    min-width: 260px;
-    width: fit-content;
-}
-
 .inputItemBlock{
     padding: 20px 5px;
-    display: table-cell;
-}
-.inputTipoBlock{
-    max-width: 40%;
-    font-size: 20px;
-}
-.inputTipoBlock option{
-    font-size: 20px;
-    max-width: 40%;
-}
-.inputLegajoBlock input{
-    width: 48px;
-    padding: 0 6px;
-}
-.inputLegajoBlock select{
-    padding: 0 6px;
-}
-
-.inputJuezBlock select{
-   width: calc(100% - 50px);
 }
 .inputSubmitBlock{
     padding: 0 10px 0 8px;
@@ -93,10 +66,10 @@
 .audienciaListTable{
     color: white;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 20px;
 }
 .audienciaList{
-    height: 80px;
+    height: 50px;
 }
 .audienciaListTable .audienciaList:nth-child(odd){
     background-color: #475f74;
@@ -112,17 +85,52 @@
     display: inline-flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 80px;
+    height: 50px;
     background-color: #dc3545;
     animation: errorMessage 2s;
     animation-fill-mode: both;
     -webkit-animation: errorMessage 2s;
     -webkit-animation-fill-mode: both;
 }
-
+.tableCellOP{
+    width: 60px;
+}
+.tableCellOP input{
+    width: 90%;
+}
+.tableCellHora{
+    align-items: center;
+    text-align: center;
+    width: 100px;
+}
+.tableCellHora input{
+    width: 90%;
+}
+.tableCellSala{
+    width: 80px;
+}
+.tableCellLegajo{
+    width: 250px;
+    max-width: 250px;
+}
+.tableCellAction{
+    display:table-cell;
+    overflow: hidden;
+    width: 150px;
+}
+.inputTipoBlock option{
+    font-size: 20px;
+}
+.inputLegajoBlock input{
+    width: 48px;
+    padding: 0 6px;
+}
+.inputLegajoBlock select{
+    padding: 4px 6px;
+}
 .deleteButton{
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -132,23 +140,47 @@
     background-color: #dc3545;
 }
 .deleteButtonBlock{
-    padding: 8px;
+    padding: 4px;
+    height: 100%;
+    width: 80px;
 }
 .juecesButtonBlock{
     display: inline-flex;
     flex-direction: row;
-    width: calc(100% - 50px);
+    width: 100%;
+    max-width: 300px;
 }
-.inputJuezBlock{
-    max-width: 500px;
+.colegiadoButton{
+    background-color: #dcc635;
+    width: 60px;
+    padding: 10px;
+    font-weight: 700;
+}
+.uniSelect{
+    width: calc(100% - 60px);
+}
+.juecesSelect{
+    width: 100%;
+    max-width: 300px;
+    margin-top: 10px;
 }
 .tableCellJuez{
+    width: 300px;
+    max-width: 300px;
+    flex-direction: column;
+}
+.tableCellJuezList{
     font-size: 18px;
-    min-width: 200px;
+}
+.tableCellTipo{
+    width: 32%;
+}
+.tableCellTipo option{
+    font-size: 14px;
 }
 .editButton{
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-radius: 5px;
     outline: none;
     border: none;
@@ -164,26 +196,33 @@
 
 .inputSituacion{
     padding: 0 5px;
+    width: 95%;
     border-radius: 5px;
     border: none;
     font-size: 16px;
     height: 40px;
 }
 .tableCellSituacion{
-    display: inline-flex;
+    width: 180px;
+    max-width: 180px;
+    padding: 0 10px;
+}
+.tableCellSituacionIndiv{
     flex-direction: column;
-    justify-content: center;
-    padding: 5px;
+    text-align: center;
+    vertical-align: middle;
 }
 .inputSituacionEdit{
-    padding: 0 5px;
+    width: 95%;
+    padding: 5px;
     border-radius: 5px;
     border: none;
     font-size: 16px;
-    height: 80px;
+    height: 50px;
     color: #fff;
     font-size: 20px;
     background-color: transparent;
+    max-height: 50px;
 }
 .inputSituacionEdit::placeholder{
     color: #fff;
@@ -192,7 +231,6 @@
 
 .selectSalaEdit{
     appearance: none;
-    width: 80px;
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -203,11 +241,7 @@
 .selectSalaEdit option{
     color: black;
 }
-.tableCellJuezN{
-    width: 80px;
-}
 .tableCellJuezN select{
-    width: 80px;
     appearance: none;
     font-size: 22px;
     background-color: transparent;
@@ -220,12 +254,6 @@
 .tableCellJuezN option{
     color: #000;
 }
-.colegiadoButton{
-    background-color: #dcc635;
-    width: 60px;
-    padding: 10px;
-    font-weight: 700;
-}
 .deleteButtonClicked{
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
@@ -236,12 +264,81 @@
 .toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
     color: #dc3545;
 }
-.operadorInput{
-    width: 80px;
-    height: 40px;
-}
+
 .operadorInput{
     border: solid white 1px;
+    color: #000;
+    background-color: #fff;
+}
+.tableCellOPIndiv{
+    padding: 5px;
+}
+.inputHora{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    width: 40px;
+    display: inline-flex;
+    flex-direction: row;
+    height: 30px;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family:inherit;
+}
+.inputHora::-webkit-datetime-edit-hour-field{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+.inputHora::-webkit-datetime-edit-text{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+.inputHora::-webkit-calendar-picker-indicator{
+    display: none;
+}
+.operadorInput{
+    font-size: 14px;
+    width: 75px;
+    height: 30px;
+}
+.inputTimeBlock{
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #fff;
+    border-radius: 5px;
+    color: #375166;
+    height: 34px;
+    padding: 3px 0;
+}
+.inputTimeBlock input{
+    margin: 0;
+    padding: 2px;
+    height: 30px;
+    text-align: center;
+}
+.inputTimeBlock input:focus-visible{
+    border: none;
+    outline: none;
+}
+.inputTimeBlock input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+.inputHoraProgramada{
+    text-align: center;
+    width: 40px;
+    padding: 10px;
+    margin: 0;
+}
+.inputHoraProgramada::-webkit-outer-spin-button,.inputHoraProgramada::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 .juecesButtonBlock{
     width: 100%;
@@ -306,5 +403,21 @@
     }
     100%{
         display: none;
+    }
+}
+@media (max-width: 1550px) {
+    .tableCellJuez{
+        width: 200px;
+        max-width: 200px;
+        flex-direction: column;
+    }
+    .tableCellSituacion{
+        width: 120px;
+    }
+    .tableCellSituacion input{
+        width: 120px;
+    }
+    .tableCellLegajo{
+        width: 150px;
     }
 }
