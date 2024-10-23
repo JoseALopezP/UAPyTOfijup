@@ -3,8 +3,6 @@ import styles from './audiencia.module.css'
 import { DataContext } from '@/context/DataContext';
 import { AddBlock } from './AddBlock';
 import { AudienciaIndiv } from './AudienciaIndiv';
-import { useAuthContext } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 
 export function AudienciaAddList ({date}) {
     const {updateByDate, bydate} = useContext(DataContext);
@@ -37,11 +35,9 @@ export function AudienciaAddList ({date}) {
                     <span className={`${styles.tableCell} ${styles.tableCellAction}`}>ACCIÓN</span>
                 </div>
                 <AddBlock date={date}/>
-                {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
-                    return(
-                        <AudienciaIndiv date={date} element={el} key={el.numeroLeg + el.hora}/>
-                    )
-                })}
+                {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el=>(
+                    <AudienciaIndiv date={date} element={el} key={el.numeroLeg + el.hora}/>
+                ))}
             </div>
         </section>
     )

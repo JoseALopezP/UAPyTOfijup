@@ -1,7 +1,8 @@
 .addAudienciaBlock{
     display: inline-flex;
     flex-direction: row;
-    color: #A89E82;
+    color: #2B79D7;
+    width: 100%;
 }
 .tableCellInput{
     height: 26px;
@@ -12,14 +13,26 @@
     font-size: 14px;
     border: none;
     outline: none;
-    color: #A89E82;
+    color: #CCCCCC;
 }
-.addAudienciaFormBlock{
+.addAudienciaRow{
     width: 20vw;
+    margin-left: 2vw;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px;
+    position: fixed;
 }
+
+
 .audienciaListSection{
     display: inline-flex;
     flex-direction: column;
+    width: 78vw;
+    margin-left: 22vw;
+}
+.tableRow:nth-child(even){
+    background-color: #ffffff03;
 }
 .audienciaListTable{
     display: table;
@@ -27,12 +40,13 @@
 .tableCell{
     display: table-cell;
     height: 26px;
+    text-align: center;
 }
 .tableRow{
     display: table-row;
     height: 26px;
     max-height: 26px;
-    overflow: hidden;
+    width: 75vw;
 }
 .salaSelect{
     height: 26px;
@@ -44,6 +58,7 @@
     width: 40px;
     outline: none;
     padding: 0;
+    text-align: center;
 }
 .tableCellLegajoInput{
     width: 140px;
@@ -61,15 +76,42 @@
 }
 .tableCellTipoInput{
     width: 33%;
+    border: solid 1px #2B2B2B;
+    border-radius: 2px;
+    height: 24px;
 }
 .tableCellState{
     width: 26px;
-    border-radius: 13px;
-    background-color: aliceblue;
+    border-radius: 2px;
 }
 .tableCellJuez{
     justify-content: space-around;
+    width: 25vw;
 }
 .tableCellJuezInput{
-    width: 15vw;
+    width: calc(33% - 6px);
+    border: solid 1px #2B2B2B;
+    border-radius: 2px;
+    height: 24px;
+}
+.DEMORADA{
+    background-color: #fd7e14;
+}
+.PROGRAMADA{
+    background-color: #007bff;
+}
+.EN_CURSO{
+    background-color: #17a2b8;
+}
+.CANCELADA{
+    background-color: #dc3545; 
+}
+.CUARTO_INTERMEDIO{
+    background-color: #ffc107;
+}
+.FINALIZADA {
+    background-color: #28a745;
+}
+.REPROGRAMADA {
+    background-color: #6c757d;
 }

@@ -4,11 +4,11 @@ import { DataContext } from '@/context/DataContext';
 import InputReloj from '@/app/components/InputReloj';
 import addAudienciaTypes, { AddAudienciaTypes } from './AddAudienciaTypes'
 
-export function AddAudienciaIndiv(element) {
+export function AddAudienciaIndiv({date, element}) {
     const { updateByDate, jueces, updateData, deleteAudiencia, desplegables } = useContext(DataContext);
     const [show, setShow] = useState(false)
-    const [hora, setHora] = useState(element.hora || '')
-    const [minuto, setMinuto] = useState(element.hora || '')
+    const [hora, setHora] = useState(element.hora.split(':')[0] || '')
+    const [minuto, setMinuto] = useState(element.hora.split(':')[1] || '')
     const [sala, setSala] = useState(element.sala || '')
     const [legajo, setLegajo]= useState(element.numeroLeg || '')
     const [tipo, setTipo]= useState(element.tipo || '')
@@ -46,10 +46,10 @@ export function AddAudienciaIndiv(element) {
 
     return(
         <form onClick={() => setShow(!show)} className={`${styles.tableRow}`}>
-            <span className={`${styles.tableCell} ${styles.tableCellState}`}></span>
+            <span className={`${styles.tableCell} ${styles.tableCellState} ${styles[element.estado]}`} title={element.estado.split('_').join(' ')}></span>
             <span className={`${styles.tableCell} ${styles.tableCellHora}`}><InputReloj horaF={setHora} minutF={setMinuto} hora={hora} minut={minuto}/></span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
-                <input list='sala' className={`${styles.tableCellInput} ${styles.salaSelect}`} onChange={e => setSala(e.target.value)}/>
+                <input list='sala' className={`${styles.tableCellInput} ${styles.salaSelect}`} value={sala} onChange={e => setSala(e.target.value)}/>
                     <datalist id='sala' className={`${styles.tableCellInput}`}><option>{sala}</option>
                     {desplegables.salas && desplegables.salas.map(el =>(
                         <option key={el} value={el}>SALA {el}</option>
@@ -59,18 +59,18 @@ export function AddAudienciaIndiv(element) {
                 <input type='string' className={`${styles.tableCellInput} ${styles.tableCellLegajoInput}`} value={legajo} onChange={e => handleLegChange(e.target.value)}/>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellTipo}`}>
-                <input list='tipo' className={`${styles.tableCellInput} ${styles.tableCellTipoInput}`} value={tipo} onChange={e => setTipo(e.target.value)}/>
-                <input list='tipo' className={`${styles.tableCellInput} ${styles.tableCellTipoInput}`} value={tipo2} onChange={e => setTipo2(e.target.value)}/>
-                <input list='tipo' className={`${styles.tableCellInput} ${styles.tableCellTipoInput}`} value={tipo3} onChange={e => setTipo3(e.target.value)}/>
+                <input list='tipo' className={`${styles.tableCellInput} ${styles.tableCellTipoInput}`} title={tipo} value={tipo} onChange={e => setTipo(e.target.value)}/>
+                <input list='tipo' className={`${styles.tableCellInput} ${styles.tableCellTipoInput}`} title={tipo2} value={tipo2} onChange={e => setTipo2(e.target.value)}/>
+                <input list='tipo' className={`${styles.tableCellInput} ${styles.tableCellTipoInput}`} title={tipo3} value={tipo3} onChange={e => setTipo3(e.target.value)}/>
                 <datalist id='tipo' className={`${styles.tableCellInput}`}>
                     {desplegables.tipos && desplegables.tipos.map(el =>(
                         <option key={el} value={el}>{el}</option>
                     ))}</datalist>
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellJuez}`}>
-                <input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} value={juez1} onChange={e => handleJuezChange(e.target.value, 0)}/>
-                {juez.split('').includes('+') && <><input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} value={juez2} onChange={e => handleJuezChange(e.target.value, 1)}/>
-                <input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} value={juez3} onChange={e => handleJuezChange(e.target.value, 2)}/></>}
+                <input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} title={juez1} value={juez1} onChange={e => handleJuezChange(e.target.value, 0)}/>
+                {juez.split('').includes('+') && <><input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} title={juez2} value={juez2} onChange={e => handleJuezChange(e.target.value, 1)}/>
+                <input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} title={juez3} value={juez3} onChange={e => handleJuezChange(e.target.value, 2)}/></>}
             </span>
             <span className={`${styles.tableCell} ${styles.tableCellAccion}`}><button>X</button></span>
         </form>

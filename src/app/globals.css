@@ -2,7 +2,7 @@ body{
     width: calc(100vw - (100vw - 100%));
     padding: 0;
     height: calc(100vh - (100vh - 100%));
-    background-color: #375166;
+    background-color: #181818;
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     display: inline-flex;

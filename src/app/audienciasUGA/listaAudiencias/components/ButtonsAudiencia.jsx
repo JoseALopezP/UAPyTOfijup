@@ -73,7 +73,6 @@ export function ButtonsAudiencia ({element}) {
             <Resuelvo item={element}/> :
             <><h2 className={`${styles.legajoTitle}`}>{element.numeroLeg}</h2>
             <form onSubmit={(event) => handleSubmit(event)} action="#" className={`${styles.changeBlock}`}>
-                
                 {(element.estado == 'CUARTO_INTERMEDIO') &&
                 <button type="button" className={actionAud == 'EN_CURSO' ? `${styles.stateButton} ${styles.stateButtonIniciar} ${styles.buttonClicked}` : `${styles.stateButton} ${styles.stateButtonFinalizarcuarto}`} onClick={() => actionAud == 'EN_CURSO' ? setActionAud(null) : setActionAud('EN_CURSO')}>FINALIZAR CUARTO INTERMEDIO</button>}
                 {(element.estado == 'PROGRAMADA') &&

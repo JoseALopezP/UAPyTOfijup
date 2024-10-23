@@ -2,6 +2,7 @@
     width: 2.3%;
     height: 100vh;
     display: inline-flex;
+    position: fixed;
     flex-direction: column;
     background-color: #181818ff;
     padding: 0;
