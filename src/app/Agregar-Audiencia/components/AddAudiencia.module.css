@@ -15,20 +15,10 @@
     outline: none;
     color: #CCCCCC;
 }
-.addAudienciaRow{
-    width: 20vw;
-    margin-left: 2vw;
-    display: inline-flex;
-    flex-direction: column;
-    padding: 10px;
-    position: fixed;
-}
-
-
 .audienciaListSection{
     display: inline-flex;
     flex-direction: column;
-    width: 78vw;
+    width: 76vw;
     margin-left: 22vw;
 }
 .tableRow:nth-child(even){
@@ -94,6 +84,9 @@
     border-radius: 2px;
     height: 24px;
 }
+.tableCellAccion{
+    width: 60px;
+}
 .DEMORADA{
     background-color: #fd7e14;
 }
@@ -114,4 +107,83 @@
 }
 .REPROGRAMADA {
     background-color: #6c757d;
+}
+
+
+.addAudienciaBlock{
+    width: 18vw;
+    margin-left: 1vw;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px;
+    position: fixed;
+    z-index: 0;
+}
+.inputProgramadaBlock{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.addAudienciaBlock input, .addAudienciaBlock select{
+    background-color: #2B2B2B;
+    outline: none;
+    border-radius: 2px;
+    border: solid 1px #2B2B2B;
+    margin-left: 1px;
+    height: 20px;
+    text-align: center;
+}
+.inputTimeBlock{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    align-self: center;
+    text-align: center;
+}
+.inputTimeBlock input{
+    width: 50%;
+    background-color: #2B2B2B;
+    text-align: center;
+}
+.inputHoraBlock{
+    width: 50%;
+    display: inline-flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+}
+.inputHoraProgramada{
+    display: inline-flex;
+    flex-direction: column;
+}
+.inputHoraProgramada input{
+    width: 30px;
+    align-self: center;
+    text-align: center;
+    z-index: 0;
+}
+.titleInput{
+    color: #CCCCCC;
+    margin: 3px 0;
+    padding: 0;
+    text-align: center;
+}
+.inputSalaBlock{
+    align-items: center;
+    justify-content: space-around;
+}
+.legajoBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+}
+.legajo1{
+    width: 40%;
+}
+.legajo2{
+    width: 60%;
+}
+.legajo2{
+    width: 30%;
 }

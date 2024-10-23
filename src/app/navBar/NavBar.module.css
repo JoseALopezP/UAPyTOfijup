@@ -6,6 +6,7 @@
     flex-direction: column;
     background-color: #181818ff;
     padding: 0;
+    z-index: 10;
 }
 .navButton{
     justify-content: center;
