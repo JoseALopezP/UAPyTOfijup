@@ -1,24 +1,26 @@
 import { useState, useContext, useEffect } from 'react';
 import styles from './AddAudiencia.module.css'
 import { DataContext } from '@/context/DataContext';
+import { AddAudienciaSelectDate } from './AddAudienciaSelectDate';
 
-export function AddAudienciaForm ({date}) {
-    const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateJueces, addAudiencia, updateAños, años, bydate} = useContext(DataContext);
-    const [hora, setHora] = useState(null)
-    const [hora2, setHora2] = useState(null)
+export function AddAudienciaForm ({dateFunction, date}) {
+    const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateDesplegables, addAudiencia, bydate, desplegables} = useContext(DataContext);
+    const [hora, setHora] = useState('-')
+    const [hora2, setHora2] = useState('-')
     const [horaProgramada, setHoraProgramada] = useState(45)
-    const [sala, setSala] = useState(null)
+    const [sala, setSala] = useState('-')
     const [legajo1, setLegajo1] = useState('MPF-SJ')
-    const [legajo2, setLegajo2] = useState('')
-    const [legajo3, setLegajo3] = useState('')
+    const [legajo2, setLegajo2] = useState('-')
+    const [legajo3, setLegajo3] = useState('-')
     const [tipo, setTipo] = useState('-')
     const [tipo2, setTipo2] = useState('-')
     const [tipo3, setTipo3] = useState('-')
     const [colegiado, setColegiado] = useState(false)
-    const [juez, setJuez] = useState(null)
-    const [juez2, setJuez2] = useState(null)
-    const [juez3, setJuez3] = useState(null)
-    const [situacion, setSituacion] = useState(null)
+    const [juez, setJuez] = useState('-')
+    const [juez2, setJuez2] = useState('-')
+    const [juez3, setJuez3] = useState('-')
+    const [situacion, setSituacion] = useState('')
+    
     const [horaError, setHoraError] = useState(false)
     const [horaProgramadaError, setHoraProgramadaError] = useState(false)
     const [salaError, setSalaError] = useState(false)
@@ -26,7 +28,10 @@ export function AddAudienciaForm ({date}) {
     const [legajo3Error, setLegajo3Error] = useState(false)
     const [tipoError, setTipoError] = useState(false)
     const [juezError, setJuezError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState(false)
+    
     const [dupliCheck, setDupliCheck] = useState(false)
+    
     const errorChecking = () =>{
         (hora && hora2) ? setHoraError(false) : setHoraError(true);
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
@@ -40,11 +45,11 @@ export function AddAudienciaForm ({date}) {
             (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
         }
         if(colegiado){
-            ((jueces.includes(juez)) && (jueces.includes(juez2)) && (jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
+            ((desplegables.jueces.includes(juez)) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
         }else{
-            jueces.includes(juez) ? setJuezError(false) : setJuezError(true);
+            desplegables.jueces.includes(juez) ? setJuezError(false) : setJuezError(true);
         }
-        const formattedHora = `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`;
+        const formattedHora = `${hora && hora.padStart(2,'0')}:${hora2 && hora2.padStart(2,'0')}`;
         const formattedNumeroLeg = `${legajo1}-${legajo2.padStart(5,'0')}-${legajo3}`;
         const isDuplicate = bydate.some(el => el.hora === formattedHora && el.numeroLeg === formattedNumeroLeg);
         setDupliCheck(isDuplicate);
@@ -67,9 +72,9 @@ export function AddAudienciaForm ({date}) {
         await updateByDate(date)
     }
     const restore = () =>{
-        setHora(null);
-        setHora2(null);
-        setSala(null);
+        setHora('');
+        setHora2('');
+        setSala('-');
         setLegajo1('MPF-SJ');
         setLegajo2('');
         setLegajo3('');
@@ -77,11 +82,11 @@ export function AddAudienciaForm ({date}) {
         setTipo2('-')
         setTipo3('-')
         setColegiado(false)
-        setJuez(null)
-        setJuez2(null)
-        setJuez3(null)
+        setJuez('')
+        setJuez2('')
+        setJuez3('')
         setHoraProgramada(45)
-        setSituacion(null)
+        setSituacion('')
     }
     const handleSubmit = async(event) =>{
         event.preventDefault();
@@ -92,15 +97,32 @@ export function AddAudienciaForm ({date}) {
         }
     }
     useEffect(() => {
+        if(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck){
+            setErrorMessage(true)
+            setTimeout(function(){
+                setErrorMessage(false)
+            }, 3000);
+            setTimeout(function(){
+                setHoraError(false)
+                setSalaError(false)
+                setLegajo2Error(false)
+                setLegajo3Error(false)
+                setTipoError(false)
+                setJuezError(false)
+                setDupliCheck(false)
+            }, 10000);
+        }
+    }, [horaError, salaError, legajo2Error, legajo3Error, tipoError, juezError, dupliCheck])
+    useEffect(() => {
         updateTiposAudiencias()
-        updateJueces()
-        updateAños()
+        updateDesplegables()
     }, [])
     return(
         <>
-        {(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck) && 
+        {errorMessage && 
             (<div className={`${styles.errorMessage}`}>{dupliCheck ? 'AUDIENCIA DUPLICADA' : 'DATOS INSUFICIENTES O INCORRECTOS'}</div>)}
-        <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaBlock}`}>
+        <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaFormBlock}`}>
+            <AddAudienciaSelectDate dateFunction={dateFunction} date={date}/>
             <div className={`${styles.inputProgramadaBlock}`}>
                 <div className={`${styles.inputHoraProgramada}`}>
                     <p className={`${styles.titleInput}`}>DURACIÓN</p>
@@ -109,115 +131,77 @@ export function AddAudienciaForm ({date}) {
                 <div className={horaError ? `${styles.inputHoraBlock} ${styles.inputError} ${styles.inputItemBlock}` : ` ${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
                     <p className={`${styles.titleInput}`}>HORA</p>
                     <div className={`${styles.inputTimeBlock}`}>
-                        <input placeholder='00' min='0' max='24' onChange={e => {setHora(e.target.value)}}/>
+                        <input placeholder='00' min='0' value={hora} max='24' onChange={e => {setHora(e.target.value)}}/>
                         <p className={`${styles.separatorDots}`}>:</p>
-                        <input placeholder='00' min='0' max='59' onChange={e => {setHora2(e.target.value)}}/>
+                        <input placeholder='00' min='0' value={hora2} max='59' onChange={e => {setHora2(e.target.value)}}/>
                     </div>
                 </div>    
             </div>
         
             <div className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputSalaBlock} ${styles.inputItemBlock}` }>
                 <p className={`${styles.titleInput}`}>SALA</p>
-                <select  onChange={(e)=>{setSala(e.target.value)}}>
-                    <option value={"-"}>-</option>
-                    <option value={"1"}>SALA 1</option>
-                    <option value={"2"}>SALA 2</option>
-                    <option value={"3"}>SALA 3</option>
-                    <option value={"4"}>SALA 4</option>
-                    <option value={"5"}>SALA 5</option>
-                    <option value={"6"}>SALA 6</option>
-                    <option value={"7"}>SALA 7</option>
-                    <option value={"8"}>SALA 8</option>
-                    <option value={"9"}>SALA 9</option>
-                    <option value={"10"}>SALA 10</option>
-                </select>
+                <span className={`${styles.inputSalaSelectBlock}`}>
+                    <input list='sala2' onChange={e => setSala(e.target.value)}/>
+                    <datalist id='sala2' className={`${styles.tableCellInput}`}><option>{sala}</option>
+                    {desplegables.salas && desplegables.salas.map(el =>(
+                        <option key={el} value={el}>SALA {el}</option>
+                    ))}</datalist></span>
             </div>
             <div className={`${styles.inputLegajoBlock} ${styles.inputItemBlock}`}>
                 <p className={`${styles.titleInput}`}>LEGAJO</p>
-                <div className={`${styles.legajoBlock}`}><select className={`${styles.legajo1}`} onChange={(e)=>{setLegajo1(e.target.value)}}>
-                    <option value={"MPF-SJ"}>MPF-SJ</option>
-                    <option value={"OJU-SJ"}>OJU-SJ</option>
-                </select>
+                <div className={`${styles.legajoBlock}`}>
+                    <input list='legajoPrefijo' className={`${styles.legajo1}`} onChange={e => setLegajo1(e.target.value)}/>
+                    <datalist id='legajoPrefijo' className={`${styles.tableCellInput}`}><option>-</option>
+                    {desplegables.legajosPrefijo && desplegables.legajosPrefijo.map(el =>(
+                        <option key={el} value={el}>{el}</option>
+                    ))}</datalist>
                 <input className={legajo2Error ? `${styles.inputAreaError} ${styles.legajo2}` : `${styles.legajo2}` } min='1' max='99999' id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
-                <select className={legajo3Error ? `${styles.inputAreaError} ${styles.legajo3}` : `${styles.legajo3}`} onChange={(e)=>{setLegajo3(e.target.value)}}>
-                    {años && años.map(el =>{
-                        return(
-                            <option key={el} value={el}>{el}</option>
-                        )
-                    })}
-                </select></div>
+                <input list='anio' className={`${styles.legajo3}`} onChange={e => setLegajo3(e.target.value)}/>
+                    <datalist id='anio' className={`${styles.tableCellInput}`}><option>-</option>
+                    {desplegables.años && desplegables.años.map(el =>(
+                        <option key={el} value={el}>{el}</option>
+                ))}</datalist></div>
             </div>
             <div className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ` : `${styles.inputTipoBlock} ${styles.inputItemBlock}`}>
                 <p className={`${styles.titleInput}`}>TIPO</p>
-                <input list="tipo1" onChange={(e)=>{setTipo(e.target.value)}}/>
-                <datalist id='tipo1'>
+                <input list="tipo" value={tipo} className={`${styles.tipoInput}`} onChange={(e)=>{setTipo(e.target.value)}}/>
+                {(tipo && tipo =='-' || tipo =='') ||
+                <input list="tipo" value={tipo2} className={`${styles.tipoInput}`} onChange={(e)=>{setTipo2(e.target.value)}}/>}
+                {((tipo && tipo =='-' || tipo =='') || (tipo2 && tipo2 =='-' || tipo2 =='')) ||
+                    <input list="tipo" className={`${styles.tipoInput}`} onChange={(e)=>{setTipo3(e.target.value)}}/>}
+                <datalist id='tipo'>
                     {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
                         return(
                             <option key={el} value={el}>{el}</option>
                         )
                     })}
                 </datalist>
-                {(tipo && tipo =='-' || tipo =='') ||
-                <>
-                    <input list="tipo2" onChange={(e)=>{setTipo2(e.target.value)}}/>
-                    <datalist id='tipo2'>
-                        {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
-                            return(
-                                <option key={el} value={el}>{el}</option>
-                            )
-                        })}
-                    </datalist>
-                </>}
-                {((tipo && tipo =='-' || tipo =='') || (tipo2 && tipo2 =='-' || tipo2 =='')) ||
-                    <>
-                    <input list="tipo3" onChange={(e)=>{setTipo3(e.target.value)}}/>
-                    <datalist id='tipo3'>
-                        {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
-                            return(
-                                <option key={el} value={el}>{el}</option>
-                            )
-                        })}
-                    </datalist>
-                    </>}
             </div>
             <div className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputJuezBlock} ${styles.inputItemBlock}`}>
                 <p className={`${styles.titleInput}`}>JUEZ</p>
                 <div className={`${styles.juecesButtonBlock}`}>
-                <button className={`${styles.colegiadoButton}`} type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>{colegiado ? 'COL' : 'UNI'}</button>
-                <input list="juez1" className={`${styles.uniSelect}`} onChange={(e)=>{setJuez(e.target.value)}}/>
-                <datalist id="juez1">
-                    {jueces && jueces.sort().map((el) =>{
-                        return(
-                            <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
-                        )
-                    })}
-                </datalist>
+                <button className={`${styles.uniButton}`}  type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>{colegiado ? 'COL' : 'UNI'}</button>
+                <input list="juez" className={`${styles.juecesSelect1}`} onChange={(e)=>{setJuez(e.target.value)}}/>
                 </div>
             {(colegiado) && (
                 <>
-                <input list="juez2" className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez2(e.target.value)}}/>
-                <datalist id="juez2">
-                    {jueces && jueces.sort().map((el) =>{
-                        return(
-                            <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
-                        )
-                    })}
-                </datalist>
-                <input list="juez3" className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez3(e.target.value)}}/>
-                <datalist id="juez3">
-                    {jueces && jueces.sort().map((el) =>{
-                        return(
-                            <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
-                        )
-                    })}
-                </datalist>
+                <input list="juez" className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez2(e.target.value)}}/>
+                <input list="juez" className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez3(e.target.value)}}/>
                 </>
             )}
+            <datalist id="juez">
+                {desplegables.jueces && desplegables.jueces.sort().map((el) =>{
+                    return(
+                        <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
+                    )
+                })}
+            </datalist>
             </div>
             <div className={`${styles.inputItemBlock}`}>
-                <input className={`${styles.inputArea} ${styles.inputSituacion}`} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
+                <p className={`${styles.titleInput}`}>SITUACIÓN</p>
+                <input className={`${styles.inputSituacion}`} value={situacion} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
             </div>
-            <div className={`${styles.inputSubmitBlock} ${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></div>
+            <div className={`${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></div>
         </form>
         </>
     )

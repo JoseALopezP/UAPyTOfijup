@@ -19,7 +19,7 @@
     display: inline-flex;
     flex-direction: column;
     width: 76vw;
-    margin-left: 22vw;
+    margin-left: 23vw;
 }
 .tableRow:nth-child(even){
     background-color: #ffffff03;
@@ -110,9 +110,9 @@
 }
 
 
-.addAudienciaBlock{
-    width: 18vw;
-    margin-left: 1vw;
+.addAudienciaFormBlock{
+    width: calc(18vw - 10px);
+    margin-left: 3vw;
     display: inline-flex;
     flex-direction: column;
     padding: 10px;
@@ -123,38 +123,49 @@
     width: 100%;
     display: inline-flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
-.addAudienciaBlock input, .addAudienciaBlock select{
+.addAudienciaFormBlock input, .addAudienciaFormBlock select{
     background-color: #2B2B2B;
     outline: none;
     border-radius: 2px;
     border: solid 1px #2B2B2B;
     margin-left: 1px;
-    height: 20px;
+    height: 30px;
     text-align: center;
+    font-weight: 700;
 }
 .inputHoraProgramada{
-    width: 35%;
+    width: 80px;
     height: 30px;
+}
+.inputHoraProgramada{
+    display: inline-flex;
+    flex-direction: column;
+    height: fit-content;
 }
 .inputHoraProgramada input{
-    width: 95%;
-    height: 30px;
+    height: 32px;
+    width: 40px;
+    color: #CCCCCC;
+    align-self: center;
 }
 .inputTimeBlock{
-    width: 95%;
-    height: 30px;
+    height: fit-content;
+    width: 90px;
     display: inline-flex;
     flex-direction: row;
     background-color: #2B2B2B;
-    padding: auto 0;
     color: #CCCCCC;
     margin-left: 10px;
+    font-size: 10px;
 }
 .inputTimeBlock input{
-    width: 35%;
-    height: 30px;
+    width: 40px;
+    height: 32px;
+    padding: 0;
+    font-size: 14px;
+    color: #CCCCCC;
 }
 .titleInput{
     color: #CCCCCC;
@@ -166,18 +177,126 @@
     align-items: center;
     justify-content: space-around;
 }
+.inputSalaBlock input{
+    align-self: center;
+    color: #CCCCCC;
+    width: 100px;
+}
+.inputSalaSelectBlock{
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-around;
+    padding: 0;
+}
 .legajoBlock{
     display: inline-flex;
     flex-direction: row;
     width: 100%;
-    justify-content: center;
+    justify-content: space-evenly;
+    height: 30px;
+    color: #CCCCCC;
+    margin-bottom: 5px;
 }
 .legajo1{
     width: 40%;
+    height: 30px;
+    color: #CCCCCC;
 }
 .legajo2{
     width: 60%;
+    height: 30px;
+    color: #CCCCCC;
 }
-.legajo2{
+.legajo3{
     width: 30%;
+    height: 30px;
+    color: #CCCCCC;
+}
+.tipoInput{
+    width: 98%;
+}
+.uniButton{
+    height: 34px;
+    width: 40px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.juecesSelect1{
+    width: 100%;
+}
+.juecesSelect{
+    width: 98%;
+    margin-top: 2px;
+}
+.juecesButtonBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+}
+.inputSituacion{
+    width: 98%;
+}
+.submitButton{
+    width: 100%;
+    height: 30px;
+    margin-top: 10px;
+    font-weight: 700;
+    background-color: #0078D4;
+    outline: none;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.errorMessage{
+    position: fixed;
+    background-color: #dc3545;
+    color: #CCCCCC;
+    z-index: 12;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: 900;
+    font-size: 28px;
+}
+
+.audienciaSelectDateBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 22vw;
+    margin: 0;
+    border: none;
+    padding: 1px;
+}
+.audienciaSelectDateBlock input{
+    background-color: #CCCCCC;
+    border-radius: 2px;
+    padding: 1px;
+    height: 30px;
+    margin: 0;
+    font-size: 14px;
+}
+.selectDate2{
+    width: 14%;
+}
+.selectDate4{
+    width: 20%;
+}
+.selectDateButton{
+    width: 28%;
+    height: 32px;
+    padding: 2px;
+    margin-top: 1px;
+    background-color: #E4E510;
+    border: none;
+    font-weight: 700;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.tableCellAccion button{
+    padding: 1px;
+    margin-left: 2px;
+}
+.tableCellAccion svg{
+    width: 16px;
 }

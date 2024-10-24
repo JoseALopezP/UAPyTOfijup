@@ -5,8 +5,9 @@ import InputReloj from '@/app/components/InputReloj';
 import addAudienciaTypes, { AddAudienciaTypes } from './AddAudienciaTypes'
 
 export function AddAudienciaIndiv({date, element}) {
-    const { updateByDate, jueces, updateData, deleteAudiencia, desplegables } = useContext(DataContext);
-    const [show, setShow] = useState(false)
+    const { updateByDate, desplegables } = useContext(DataContext);
+    const [cambios, setCambios] = useState(false)
+    const [del, setDel] = useState(false)
     const [hora, setHora] = useState(element.hora.split(':')[0] || '')
     const [minuto, setMinuto] = useState(element.hora.split(':')[1] || '')
     const [sala, setSala] = useState(element.sala || '')
@@ -43,6 +44,9 @@ export function AddAudienciaIndiv({date, element}) {
             setJuez(value)
         }
     }
+    const handleSubmit = () =>{
+
+    }
 
     return(
         <form onClick={() => setShow(!show)} className={`${styles.tableRow}`}>
@@ -72,7 +76,16 @@ export function AddAudienciaIndiv({date, element}) {
                 {juez.split('').includes('+') && <><input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} title={juez2} value={juez2} onChange={e => handleJuezChange(e.target.value, 1)}/>
                 <input type='string' className={`${styles.tableCellInput} ${styles.tableCellJuezInput}`} title={juez3} value={juez3} onChange={e => handleJuezChange(e.target.value, 2)}/></>}
             </span>
-            <span className={`${styles.tableCell} ${styles.tableCellAccion}`}><button>X</button></span>
+            <span className={`${styles.tableCell} ${styles.tableCellAccion}`}>
+                <button className={del? `${styles.delButton}`:`${styles.delButton} ${styles.delButtonClicked}`} type='button'><svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6 10L7.70141 19.3578C7.87432 20.3088 8.70258 21 9.66915 21H14.3308C15.2974 21 16.1257 20.3087 16.2986 19.3578L18 10" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg></button>
+                <button className={cambios ? `${styles.cambiosButton}`:`${styles.cambiosButton} ${styles.cambiosButtonClicked}`} type='button'><svg viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1716 1C18.702 1 19.2107 1.21071 19.5858 1.58579L22.4142 4.41421C22.7893 4.78929 23 5.29799 23 5.82843V20C23 21.6569 21.6569 23 20 23H4C2.34315 23 1 21.6569 1 20V4C1 2.34315 2.34315 1 4 1H18.1716ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21L5 21L5 15C5 13.3431 6.34315 12 8 12L16 12C17.6569 12 19 13.3431 19 15V21H20C20.5523 21 21 20.5523 21 20V6.82843C21 6.29799 20.7893 5.78929 20.4142 5.41421L18.5858 3.58579C18.2107 3.21071 17.702 3 17.1716 3H17V5C17 6.65685 15.6569 8 14 8H10C8.34315 8 7 6.65685 7 5V3H4ZM17 21V15C17 14.4477 16.5523 14 16 14L8 14C7.44772 14 7 14.4477 7 15L7 21L17 21ZM9 3H15V5C15 5.55228 14.5523 6 14 6H10C9.44772 6 9 5.55228 9 5V3Z" fill="#0F0F0F"/>
+                </svg></button>
+            </span>
         </form>
     )
 }

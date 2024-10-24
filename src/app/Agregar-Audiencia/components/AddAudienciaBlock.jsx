@@ -4,13 +4,15 @@ import styles from './AddAudiencia.module.css'
 import { DataContext } from '@/context/DataContext'
 import { todayFunction } from '@/utils/dateUtils'
 import { AddAudienciaList } from './AddAudienciasList'
-import { AuthContext } from '@/context/AuthContext'
 import { AddAudienciaForm } from './AddAudienciaForm'
 
 export function AddAudienciaBlock() {
     const {updateByDate, updateDesplegables} = useContext(DataContext)
     const [dateToUse, setDateToUse] = useState(todayFunction())
-    const {user} = useContext(AuthContext);
+    const dateFunction = (value) =>{
+        setDateToUse(value)
+        updateByDate(setDateToUse)
+    }
     useEffect(() => {
         updateByDate(dateToUse)
     }, [dateToUse])
@@ -20,8 +22,8 @@ export function AddAudienciaBlock() {
     }, [])
     return(
         <section className={`${styles.addAudienciaBlock}`}>
-            <AddAudienciaForm/>
-            <AddAudienciaList dateFunction={setDateToUse}/>
+            <AddAudienciaForm dateFunction={dateFunction} date={dateToUse}/>
+            <AddAudienciaList/>
         </section>
     )
 }
