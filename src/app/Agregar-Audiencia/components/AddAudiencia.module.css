@@ -120,9 +120,10 @@
     z-index: 0;
 }
 .inputProgramadaBlock{
+    width: 100%;
     display: inline-flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 .addAudienciaBlock input, .addAudienciaBlock select{
     background-color: #2B2B2B;
@@ -133,34 +134,27 @@
     height: 20px;
     text-align: center;
 }
-.inputTimeBlock{
-    width: 100%;
-    display: inline-flex;
-    flex-direction: row;
-    align-self: center;
-    text-align: center;
-}
-.inputTimeBlock input{
-    width: 50%;
-    background-color: #2B2B2B;
-    text-align: center;
-}
-.inputHoraBlock{
-    width: 50%;
-    display: inline-flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-}
 .inputHoraProgramada{
-    display: inline-flex;
-    flex-direction: column;
+    width: 35%;
+    height: 30px;
 }
 .inputHoraProgramada input{
-    width: 30px;
-    align-self: center;
-    text-align: center;
-    z-index: 0;
+    width: 95%;
+    height: 30px;
+}
+.inputTimeBlock{
+    width: 95%;
+    height: 30px;
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #2B2B2B;
+    padding: auto 0;
+    color: #CCCCCC;
+    margin-left: 10px;
+}
+.inputTimeBlock input{
+    width: 35%;
+    height: 30px;
 }
 .titleInput{
     color: #CCCCCC;
