@@ -6,9 +6,6 @@ export default function NavBar() {
         <container className={[styles.container]}>
             <IconNavBar iconRoute={''}/>
             <IconNavBar iconRoute={'Agregar-Audiencia'}/>
-            <IconNavBar iconRoute={'Uga'}/>
-            <IconNavBar iconRoute={'Oficios'}/>
-            <IconNavBar iconRoute={'Listas-Desplegables'}/>
         </container>
     );
 }
