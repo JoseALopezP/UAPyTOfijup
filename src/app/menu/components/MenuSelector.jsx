@@ -17,7 +17,7 @@ export default function MenuSelector() {
     const [dayXLXS, setDayXLXS] = useState(null)
     const [monthXLXS, setMonthXLXS] = useState(null)
     const [yearXLXS, setYearXLXS] = useState(null)
-    const {checkUserType, userType, updateByDate, bydate, setDateToUse} = useContext(DataContext);
+    const {checkUserType, userType, updateByDate, bydate} = useContext(DataContext);
     const {user} = useContext(AuthContext);
     const router = useRouter()
     useEffect(() => {
@@ -34,12 +34,6 @@ export default function MenuSelector() {
       await updateByDate(`${dayXLXS}${monthXLXS}${yearXLXS}`)
       await setTimeout(generateExcel(bydate, `${dayXLXS}${monthXLXS}${yearXLXS}`), 3000)
     }
-    useEffect(() => {
-      setDateToUse(''+dayUAC+monthUAC+yearUAC)
-    }, [dayUAC, monthUAC, yearUAC]);
-    useEffect(() => {
-      setDateToUse(''+dayUGA+monthUGA+yearUGA)
-    }, [dayUGA, monthUGA, yearUGA]);
     return (
       <section className={`${styles.selectorSection}`}>
         <div className={`${styles.selectorBody}`}>
@@ -53,12 +47,12 @@ export default function MenuSelector() {
             </>
           )}
           {(userType == 'admin' || userType == 'ugaadmin' || userType == 'operador')&&(
-            <Link href="/audienciasUGA/control" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
+            <Link href="/audienciasUGA/listaAudiencias" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
           )}
           {(userType == 'admin' || userType == 'uac')&&(
             <>
             <Link href="/audienciasUAC/tablero" className={`${styles.linkRedirection}`}>UAC TABLERO</Link>
-            <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
+            <Link href={'/audienciasUAC/' + dayUAC.padStart(2,'0') + monthUAC.padStart(2,'0') + yearUAC.padStart(4,'20')} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
             </>
           )}
           {(userType == 'admin')&&(
