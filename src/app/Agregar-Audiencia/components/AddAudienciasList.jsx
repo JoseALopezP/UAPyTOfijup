@@ -4,7 +4,7 @@ import { AddAudienciaTableHead } from './AddAudienciaTableHead';
 import { AddAudienciaIndiv } from './AddAudienciaIndiv';
 import { useContext } from 'react';
 
-export function AddAudienciaList (date) {
+export function AddAudienciaList ({date}) {
     const {bydate} = useContext(DataContext)
     return(
         <section className={`${styles.audienciaListSection}`}>
