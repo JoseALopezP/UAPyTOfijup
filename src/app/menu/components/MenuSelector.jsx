@@ -52,7 +52,7 @@ export default function MenuSelector() {
           {(userType == 'admin' || userType == 'uac')&&(
             <>
             <Link href="/audienciasUAC/tablero" className={`${styles.linkRedirection}`}>UAC TABLERO</Link>
-            <Link href={'/audienciasUAC/' + dayUAC.padStart(2,'0') + monthUAC.padStart(2,'0') + yearUAC.padStart(4,'20')} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
+            <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
             </>
           )}
           {(userType == 'admin')&&(
