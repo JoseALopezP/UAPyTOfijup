@@ -6,10 +6,10 @@ import { AudienciaIndiv } from './AudienciaIndiv';
 import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-export function AudienciaAddList ({date}) {
-    const {updateByDate, bydate} = useContext(DataContext);
+export function AudienciaAddList () {
+    const {updateByDate, bydate, dateToUse, setDateToUse} = useContext(DataContext);
     useEffect(() => {
-        updateByDate(date)
+        updateByDate(dateToUse)
     }, []);
     const { user } = useAuthContext()
     const router = useRouter()
@@ -17,8 +17,11 @@ export function AudienciaAddList ({date}) {
       if (user == null) router.push("/signin")
     }, [user])
     function tick() {
-        updateByDate(date);
+        updateByDate(dateToUse);
     }
+    useEffect(() =>{
+        updateByDate(dateToUse)
+    }, [dateToUse])
     useEffect(() =>{
         tick()
         const timerID = setInterval(() => tick(), 30000);  
@@ -34,15 +37,15 @@ export function AudienciaAddList ({date}) {
                     <span className={`${styles.tableCell} ${styles.tableCellHora}`}>HORA</span>
                     <span className={`${styles.tableCell} ${styles.tableCellSala}`}>SALA</span>
                     <span className={`${styles.tableCell} ${styles.tableCellLegajo}`}>LEGAJO</span>
-                    <span className={`${styles.tableCell} ${styles.tableCellTipo}`}>TIPO DE AUDIENCIA</span>
+                    <span className={`${styles.tableCell} ${styles.tableCellTipo}`}><input type='text' value={dateToUse} onChange={e=>setDateToUse(e.target.value)}/></span>
                     <span className={`${styles.tableCell} ${styles.tableCellJuez}`}>JUEZ</span>
                     <span className={`${styles.tableCell} ${styles.tableCellSituacion}`}>SIT. CORPORAL</span>
                     <span className={`${styles.tableCell} ${styles.tableCellAction}`}>ACCIÓN</span>
                 </div>
-                <AddBlock date={date}/>
+                <AddBlock date={dateToUse}/>
                 {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
                     return(
-                        <AudienciaIndiv date={date} element={el} key={el.numeroLeg + el.hora}/>
+                        <AudienciaIndiv date={dateToUse} element={el} key={el.numeroLeg + el.hora}/>
                     )
                 })}
             </div>

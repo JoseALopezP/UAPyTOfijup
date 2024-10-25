@@ -1,4 +1,5 @@
 .audienciaListSection{
+    margin-left: 2vw;
     width: calc(100vw - (100vw - 100%));
 }
 .audienciaListTable{

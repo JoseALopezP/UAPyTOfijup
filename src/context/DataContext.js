@@ -17,6 +17,7 @@ export const DataContext = createContext({});
 const {Provider} = DataContext;
 export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
+    const [dateToUse, setDateToUse] = useState(todayFunction);
     const [desplegables, setDesplegables] = useState(defaultValue);
     const [realTime, setRealTime] = useState(null);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
@@ -134,6 +135,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateRealTime,
         updateDesplegables,
         addDesplegable,
+        setDateToUse,
+        dateToUse,
         desplegables,
         realTime,
         userType,
