@@ -300,3 +300,21 @@
 .tableCellAccion svg{
     width: 16px;
 }
+.delButton, .cambiosButton{
+    border: none;
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.cambiosButton{
+    opacity: 0.1;
+    cursor: not-allowed;
+}
+.delButtonClicked{
+    background-color: #dc3545;
+}
+.cambiosButtonClicked{
+    opacity: 1;
+    background-color: #28a745;
+    cursor: pointer;
+}

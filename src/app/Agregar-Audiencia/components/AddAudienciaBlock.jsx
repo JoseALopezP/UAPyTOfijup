@@ -23,7 +23,7 @@ export function AddAudienciaBlock() {
     return(
         <section className={`${styles.addAudienciaBlock}`}>
             <AddAudienciaForm dateFunction={dateFunction} date={dateToUse}/>
-            <AddAudienciaList/>
+            <AddAudienciaList date={dateToUse}/>
         </section>
     )
 }

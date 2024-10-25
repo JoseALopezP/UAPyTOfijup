@@ -7,7 +7,6 @@ export default async function updateListItem(collectionName, documentId, searchV
     try {
         const docRef = doc(db, collectionName, documentId);
         const docSnapshot = await getDoc(docRef);
-
         if (docSnapshot.exists()) {
             const { list } = docSnapshot.data();
             const foundItem = list.find(item => item.numeroLeg === searchValue1 && item.hora === searchValue2);

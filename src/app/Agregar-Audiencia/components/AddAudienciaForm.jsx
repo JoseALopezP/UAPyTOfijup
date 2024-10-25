@@ -5,8 +5,8 @@ import { AddAudienciaSelectDate } from './AddAudienciaSelectDate';
 
 export function AddAudienciaForm ({dateFunction, date}) {
     const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateDesplegables, addAudiencia, bydate, desplegables} = useContext(DataContext);
-    const [hora, setHora] = useState('-')
-    const [hora2, setHora2] = useState('-')
+    const [hora, setHora] = useState('')
+    const [hora2, setHora2] = useState('')
     const [horaProgramada, setHoraProgramada] = useState(45)
     const [sala, setSala] = useState('-')
     const [legajo1, setLegajo1] = useState('MPF-SJ')
@@ -150,14 +150,14 @@ export function AddAudienciaForm ({dateFunction, date}) {
             <div className={`${styles.inputLegajoBlock} ${styles.inputItemBlock}`}>
                 <p className={`${styles.titleInput}`}>LEGAJO</p>
                 <div className={`${styles.legajoBlock}`}>
-                    <input list='legajoPrefijo' className={`${styles.legajo1}`} onChange={e => setLegajo1(e.target.value)}/>
-                    <datalist id='legajoPrefijo' className={`${styles.tableCellInput}`}><option>-</option>
+                    <input list='legajoPrefijo' value={legajo1} className={`${styles.legajo1}`} onChange={e => setLegajo1(e.target.value)}/>
+                    <datalist id='legajoPrefijo' className={`${styles.tableCellInput}`}>
                     {desplegables.legajosPrefijo && desplegables.legajosPrefijo.map(el =>(
                         <option key={el} value={el}>{el}</option>
                     ))}</datalist>
                 <input className={legajo2Error ? `${styles.inputAreaError} ${styles.legajo2}` : `${styles.legajo2}` } min='1' max='99999' id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
-                <input list='anio' className={`${styles.legajo3}`} onChange={e => setLegajo3(e.target.value)}/>
-                    <datalist id='anio' className={`${styles.tableCellInput}`}><option>-</option>
+                <input list='anio' className={`${styles.legajo3}`} placeholder="1970" onChange={e => setLegajo3(e.target.value)}/>
+                    <datalist id='anio' className={`${styles.tableCellInput}`}>
                     {desplegables.años && desplegables.años.map(el =>(
                         <option key={el} value={el}>{el}</option>
                 ))}</datalist></div>
@@ -192,7 +192,7 @@ export function AddAudienciaForm ({dateFunction, date}) {
             <datalist id="juez">
                 {desplegables.jueces && desplegables.jueces.sort().map((el) =>{
                     return(
-                        <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
+                        <option key={el} value={el}></option>
                     )
                 })}
             </datalist>
