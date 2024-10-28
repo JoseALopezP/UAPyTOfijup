@@ -11,7 +11,7 @@ export function AddAudienciaBlock() {
     const [dateToUse, setDateToUse] = useState(todayFunction())
     const dateFunction = (value) =>{
         setDateToUse(value)
-        updateByDate(setDateToUse)
+        updateByDate(dateToUse)
     }
     useEffect(() => {
         updateByDate(dateToUse)

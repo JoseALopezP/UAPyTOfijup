@@ -23,11 +23,6 @@ export default function MenuSelector() {
     useEffect(() => {
       if (user == null){
         router.push("/signin")
-      }else{
-        checkUserType(user.uid)
-        if(userType == 'operador'){
-          router.push("/audienciasUGA/listaAudiencias")
-        }
       }
     }, [user])
     const generateXLXS = async() =>{

@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import styles from './AddAudiencia.module.css'
 import { DataContext } from '@/context/DataContext';
-import { AddAudienciaSelectDate } from './AddAudienciaSelectDate';
+import { SelectDate } from '@/app/components/SelectDate';
 
 export function AddAudienciaForm ({dateFunction, date}) {
     const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateDesplegables, addAudiencia, bydate, desplegables} = useContext(DataContext);
@@ -122,7 +122,7 @@ export function AddAudienciaForm ({dateFunction, date}) {
         {errorMessage && 
             (<div className={`${styles.errorMessage}`}>{dupliCheck ? 'AUDIENCIA DUPLICADA' : 'DATOS INSUFICIENTES O INCORRECTOS'}</div>)}
         <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaFormBlock}`}>
-            <AddAudienciaSelectDate dateFunction={dateFunction} date={date}/>
+            <SelectDate dateFunction={dateFunction} date={date}/>
             <div className={`${styles.inputProgramadaBlock}`}>
                 <div className={`${styles.inputHoraProgramada}`}>
                     <p className={`${styles.titleInput}`}>DURACIÓN</p>

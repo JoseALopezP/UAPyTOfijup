@@ -6,6 +6,7 @@ export default function NavBar() {
         <container className={[styles.container]}>
             <IconNavBar iconRoute={''}/>
             <IconNavBar iconRoute={'Agregar-Audiencia'}/>
+            <IconNavBar iconRoute={'Registro-Audiencia'}/>
         </container>
     );
 }

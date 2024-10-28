@@ -259,40 +259,6 @@
     font-size: 28px;
 }
 
-.audienciaSelectDateBlock{
-    display: inline-flex;
-    flex-direction: row;
-    width: 22vw;
-    margin: 0;
-    border: none;
-    padding: 1px;
-}
-.audienciaSelectDateBlock input{
-    background-color: #CCCCCC;
-    border-radius: 2px;
-    padding: 1px;
-    height: 30px;
-    margin: 0;
-    font-size: 14px;
-}
-.selectDate2{
-    width: 14%;
-}
-.selectDate4{
-    width: 20%;
-}
-.selectDateButton{
-    width: 28%;
-    height: 32px;
-    padding: 2px;
-    margin-top: 1px;
-    background-color: #E4E510;
-    border: none;
-    font-weight: 700;
-    border-radius: 2px;
-    cursor: pointer;
-}
-
 .tableCellAccion button{
     padding: 1px;
     margin-left: 2px;

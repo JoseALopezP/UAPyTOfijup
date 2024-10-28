@@ -1,8 +1,7 @@
-'use client'
+import styles from './SelectDate.module.css';
 import { useState } from 'react';
-import styles from './AddAudiencia.module.css'
 
-export function AddAudienciaSelectDate({dateFunction, date}) {
+export function SelectDate({dateFunction, date}) {
     const [dia, setDia] = useState(date.substring(0,2))
     const [mes, setMes] = useState(date.substring(2,4))
     const [anio, setAnio] = useState(date.substring(4,8))

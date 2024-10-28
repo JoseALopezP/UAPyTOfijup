@@ -22,8 +22,6 @@ export function AudienciaAddList() {
             updateByDate(dateToUse);
         }
     }
-
-    // Debounce input update to avoid immediate call for each keystroke
     useEffect(() => {
         const handler = setTimeout(() => {
             if (dateToUse) {
@@ -32,8 +30,6 @@ export function AudienciaAddList() {
         }, 1500); // Adjust debounce delay as needed
         return () => clearTimeout(handler);
     }, [dateToUse]);
-
-    // Set interval for calling tick
     useEffect(() => {
         const timerID = setInterval(() => tick(), 30000);
         return () => clearInterval(timerID);

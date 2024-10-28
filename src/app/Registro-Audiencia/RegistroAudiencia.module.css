@@ -1,0 +1,57 @@
+.container{
+    display: inline-flex;
+    flex-direction: row;
+    margin-left: 2vw;
+}
+.listaBlock{
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.container {
+    display: inline-flex;
+    flex-direction: row;
+    margin-left: 2vw;
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    height: auto;
+    margin-bottom: 2px;
+    flex-direction: row;
+    justify-content: space-evenly;
+    color: #fff;
+}
+.listaBlock {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px;
+}
+.block1 {
+    width: 75%;
+}
+.block2 {
+    width: 25%;
+    height: 100%;
+    border-radius: 3px;
+    margin: auto;
+    color: #fff;
+    flex-direction: column;
+    background-color: #181818;
+}
+.text {
+    text-align: center;
+}
+.textEstado {
+    font-weight: 400;
+}
+.textLegajo {
+    font-weight: 600;
+}
+.textHora {
+    color: #ffffffd1;
+    font-weight: 600;
+}
+.textoperador {
+    font-weight: 500;
+}
