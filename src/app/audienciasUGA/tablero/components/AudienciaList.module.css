@@ -1,4 +1,5 @@
 .tableSection{
+    margin-left: 3vw;
     width: calc(100vw - 100% + 100%);
     color: white;
     display: inline-flex;
