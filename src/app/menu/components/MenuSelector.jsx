@@ -32,27 +32,13 @@ export default function MenuSelector() {
     return (
       <section className={`${styles.selectorSection}`}>
         <div className={`${styles.selectorBody}`}>
-          {(userType == 'admin' || userType == 'uapyt')&&(
             <Link href="/tablero" className={`${styles.linkRedirection}`}>TABLERO</Link>
-          )}
-          {(userType == 'admin' || userType == 'ugaadmin')&&(
-            <>
             <Link href="/audienciasUGA/tablero" className={`${styles.linkRedirection}`}>UGA TABLERO</Link>
             <Link href={'/audienciasUGA/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>
-            </>
-          )}
-          {(userType == 'admin' || userType == 'ugaadmin' || userType == 'operador')&&(
             <Link href="/audienciasUGA/listaAudiencias" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
-          )}
-          {(userType == 'admin' || userType == 'uac')&&(
-            <>
             <Link href="/audienciasUAC/tablero" className={`${styles.linkRedirection}`}>UAC TABLERO</Link>
             <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
-            </>
-          )}
-          {(userType == 'admin')&&(
             <Link href="/signup" className={`${styles.linkRedirection}`}>CONTROL USUARIOS</Link>
-          )}
           {(userType == 'admin')&&(
             <>
             <h1>ETAPA EN DESARROLLO...</h1>
