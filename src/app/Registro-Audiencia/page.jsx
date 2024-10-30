@@ -1,15 +1,17 @@
 'use client'
 import { useState, useEffect } from 'react';
-import AudienciaList from './AudienciaList';
+import RegistroAudienciaList from './RegistroAudienciaList';
 import { todayFunction } from '@/utils/dateUtils';
 import styles from './RegistroAudiencia.module.css'
 import { DataContextProvider } from '@/context/DataContext';
 import { AuthContextProvider } from '@/context/AuthContext';
+import RegistroAudienciaControl from './RegistroAudienciaControl';
 
 export default function Page() {
     const [date, setDate] = useState(null)
+    const [selectedAud, setSelectedAud] = useState(null)
     const handleSave = (newDate) => {
-        setData(newDate);
+        setDate(newDate);
         localStorage.setItem('dateToUse', newDate);
     };
     useEffect(() => {
@@ -21,7 +23,8 @@ export default function Page() {
     return (
         <AuthContextProvider><DataContextProvider>
         <container className={[styles.container]}>
-            {date && <AudienciaList dateFunction={handleSave} date={date}/>}
+            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud}/>}
+            <RegistroAudienciaControl aud={selectedAud} dateToUse={date}/>
         </container>
         </DataContextProvider></AuthContextProvider>
     );

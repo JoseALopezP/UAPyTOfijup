@@ -1,9 +1,9 @@
 import styles from './RegistroAudiencia.module.css';
 import { nameTranslate } from '@/utils/traductorNombres';
 
-export default function AudienciaRegistroIndiv({ aud }) {
+export default function AudienciaRegistroIndiv({ aud, audFunction }) {
     return (
-        <div className={styles.listadoAudiencias}>
+        <div className={`${styles.listadoAudiencias} ${styles[aud.estado]}`} onClick={() => audFunction(aud)}>
             <div className={styles.block1}>
                 <p className={`${styles.text} ${styles.textLegajo}`}>{aud.numeroLeg}</p>
                 <span className={styles.block3}>
@@ -12,7 +12,7 @@ export default function AudienciaRegistroIndiv({ aud }) {
                     </p>
                 </span>
             </div>
-            <div className={styles.block2}>
+            <div className={`${styles.block2} ${styles[aud.estado]}`}>
                 <p className={`${styles.text} ${styles.textHora}`}>{aud.hora}</p>
                 <p className={`${styles.text} ${styles.textoperador}`}>{nameTranslate(aud.operador)}</p>
             </div>

@@ -7,6 +7,7 @@
     background-color: #181818ff;
     padding: 0;
     z-index: 10;
+    border-right: solid 1px #2B2B2B;
 }
 .navButton{
     justify-content: center;
