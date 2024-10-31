@@ -3,6 +3,7 @@ import { Reconversion } from './Reconversion';
 import styles from './RegistroAudiencia.module.css';
 import RegistroChangeState from './RegistroChangeState';
 import { DataContext } from '@/context/DataContext';
+import DeleteSVGF from './DeleteSVGF';
 
 const deepEqual = (obj1, obj2) => {
     if (obj1 === obj2) return true;
@@ -150,7 +151,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
             setTipo3Aux(tipo3)
         }
         }
-        await updateToday();
+        await updateByDate(dateToUse);
         if (await checkForResuelvo(item)) {
             await updateRealTime();
             await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', realTime);
@@ -207,7 +208,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
     }, [caratula, mpf, defensa, imputado, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3]);
     useEffect(() => {
         updateComparisson();
-    }, []);
+    }, [item]);
     useEffect(() => {
         checkGuardar();
     }, [guardarInc]);
@@ -215,26 +216,31 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
         updateDesplegables()
     }, [])
     return (
-        <div className={`${styles.controlBlockLeft}`}>
+        <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
+            {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
+                <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
+                <span className={`${styles.guardar}`}>GUARDAR</span>
+                <span className={`${styles.guardando}`}>GUARDANDO...</span>
+            </button>}
             <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
             <RegistroChangeState aud={item}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
-                <input list='sala' className={`${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
+                <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft42} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
                 <datalist id='sala' className={`${styles.tableCellInput}`}><option>{sala}</option>
                 {desplegables.salas && desplegables.salas.map(el =>(
                     <option key={el} value={el}>SALA {el}</option>
                 ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Carátula</label>
-                <input className={`${styles.inputItem}`}
+                <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
                     type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)}/></span>
-            <button className={showReconversion ? `${styles.formButton} ${styles.reconvertidaButton} ${styles.reconvertidaButtonClicked}` : `${styles.formButton} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
+            <button className={showReconversion ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButtonClicked}` : `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
             {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux}/> : ''}
-            <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDRow}`}>Ministerio Público Fiscal</label>
+            <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
             {mpf.map((input, index) => (
                     <div key={input.id} className={`${styles.inputRow}`}>
                         <input
                             list='mpf'
-                            className={`${styles.inputResuelvo} ${styles.inputResuelvo1} ${styles.inputSelect}`}
+                            className={`${styles.inputLeft} ${styles.inputLeft70}`}
                             value={input.nombre}
                             onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
                         />
@@ -245,11 +251,11 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                                 </option>
                             ))}
                         </datalist>
-                        <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}>QUITAR</button>
-                        <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>{input.asistencia ?  'PRE' : 'AUS'}</button>
                     </div>
                 ))}
-            <button className={styles.formButton} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
+            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
@@ -259,28 +265,28 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
                 {imputado.map((input, index) => (
                     <div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
-                        <input className={`${styles.inputResuelvo} ${styles.inputResuelvo2} ${styles.inputText}`}
+                        <input className={`${styles.inputLeft} ${styles.inputLeft35}`}
                             type="text"
                             value={input.nombre}
                             onChange={(e) => handleInputChange(setImputado, index, 'nombre', e.target.value)}
                             placeholder="Nombre"/>
-                        <input className={`${styles.inputResuelvo} ${styles.inputResuelvo2} ${styles.inputText}`}
+                        <input className={`${styles.inputLeft} ${styles.inputLeft35}`}
                             type="text"
                             value={input.dni}
                             onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
                             placeholder="DNI"/>
-                        <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}>QUITAR</button>
-                        <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                     </div>
                 ))}
                 <span className={styles.imputadoButtons}>
-                    <button className={`${styles.formButton} ${styles.imputadoButton}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true })}>+ IMPUTADO</button>
-                    <button className={`${styles.formButton} ${styles.condenadoButton}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true })}>+ CONDENADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true })}>+ IMPUTADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true })}>+ CONDENADO</button>
                 </span></span>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
                     {defensa.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
-                            <select className={`${styles.inputResuelvo} ${styles.inputResuelvo3} ${styles.inputSelect}`}
+                            <select className={`${styles.inputLeft} ${styles.inputLeft50}`}
                                 value={input.tipo}
                                 onChange={(e) => handleInputChange(setDefensa, index, 'tipo', e.target.value)}>
                                 <option value=""></option>
@@ -289,6 +295,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                             </select>
                             {input.tipo && (input.tipo === 'Oficial' ? (
                                     <><input list='oficial'
+                                        className={`${styles.inputLeft} ${styles.inputLeft50}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}/>
                                     <datalist id='oficial'>
@@ -299,6 +306,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                                     </datalist></>
                                 ) : (
                                     <><input list='particular'
+                                        className={`${styles.inputLeft} ${styles.inputLeft50}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
                                         placeholder="Nombre"/>
@@ -311,31 +319,31 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                                     </datalist></>
                                 )
                             )}
-                            <select value={input.imputado} onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}>
-                                <option value="">imputado - (opcional)</option>
+                            <select className={`${styles.inputLeft} ${styles.inputLeft70}`} value={input.imputado} onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}>
+                                <option value="" >imputado - (opcional)</option>
                                 {imputado.map(imputadoItem =>(
                                     <option key={imputadoItem.nombre} value={imputadoItem.nombre}>
                                         {imputadoItem.nombre}
                                     </option>))}
                             </select>
-                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}>QUITAR</button>
-                            <button className={`${styles.formButton} ${styles.presenteButton}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'P' : 'A'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                         </div>
                     ))}
-                    <button className={styles.formButton} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true })}>+ DEFENSA</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true })}>+ DEFENSA</button></span>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
                     {partes.map((input, index) => (
                         <div key={input.id}>
-                            <select value={input.role} onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}>
+                            <select className={`${styles.inputLeft} ${styles.inputLeft42}`} value={input.role} onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}>
                             <option value=""></option>
                             {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte =>(
                                     <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
                             </select>
-                            <input type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="Name"/>
-                            <button className={`${styles.formButton} ${styles.removeButton}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}>QUITAR</button>
+                            <input className={`${styles.inputLeft} ${styles.inputLeft42}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="Name"/>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={styles.formButton} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '' })}>+ PARTE</button></span>
-        </div>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '' })}>+ PARTE</button></span>
+        </form>
     );
 }

@@ -100,35 +100,46 @@
     width: 30%;
     height: 100%;
     border-right: solid 1px #2B2B2B;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .buttonChange{
     border-radius: 2px;
     height: 40px;
     font-weight: 700;
+    opacity: .1;
     cursor: pointer;
 }
 .REINICIAR{
     background-color: #6c757d;
+    opacity: 1;
 }
 .CONTINUAR{
+    opacity: 1;
     background-color: #17a2b8;
 }
 .FINALIZAR{
+    opacity: 1;
     background-color: #28a745;
 }
-.ICUARTOINTERMEDIO{
+.CUARTOINTERMEDIO{
+    opacity: 1;
     background-color: #ffc107;
 }
 .INICIAR{
+    opacity: 1;
     background-color: #17a2b8;
 }
 .CANCELAR{
+    opacity: 1;
     background-color: #dc3545;
 }
 .REPROGRAMAR{
+    opacity: 1;
     background-color: #6c757d;
 }
 .RESUELVO{
+    opacity: 1;
     background-color: #28a745;
 }
 .audControlTitle{
@@ -161,6 +172,7 @@
     width: 100%;
     text-align: center;
     font-size: 20px;
+    margin-top: 20px;
 }
 .inputLeftDRow{
     width: 50%;
@@ -171,4 +183,61 @@
     display: inline-flex;
     flex-direction: column;
     width: 100%;
+}
+.inputLeft{
+    height: 30px;
+    border-radius: 2px;
+}
+.inputLeft15{
+    width: 14%;
+}
+.inputLeft33{
+    width: 32%;
+}
+.inputLeft35{
+    width: 34%;
+}
+.inputLeft42{
+    width: 41%;
+}
+.inputLeft50{
+    width: 48%;
+}
+.inputLeft70{
+    width: 68%;
+}
+.inputLeft100{
+    width: 99%;
+}
+.deleteSVG{
+    width: 80%;
+    height: 80%;
+}
+.guardarButton{
+    font-size: 20px;
+    background-color: #28a745;
+    cursor: pointer;
+    position: fixed;
+    align-self: end;
+    height: 50px;
+    width: 23vw;
+    font-weight: 700;
+}
+.guardar{
+    display: none;
+}
+.guardarButton:hover .guardar{
+    display: block;
+}
+.guardarButton:hover .sinGuardar{
+    display: none;
+}
+.guardando{
+    display: none;
+}
+.guardandoButton .guardando{
+    display: block;
+}
+.guardandoButton .guardar, .guardandoButton .sinGuardar, .guardandoButton:hover .guardar{
+    display: none;
 }

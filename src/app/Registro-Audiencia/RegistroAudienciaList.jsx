@@ -18,11 +18,11 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction})
     }, [])
     
     return (
-        <container className={[styles.listaBlock]}>
+        <div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>
             <div className={[styles.listadoBlock]}>{bydate && bydate.map(el =>(
                 <AudienciaRegistroIndiv key={el.numeroLeg+el.hora} aud={el} audFunction={audFunction}/>
             ))}</div>
-        </container>
+        </div>
     );
 }

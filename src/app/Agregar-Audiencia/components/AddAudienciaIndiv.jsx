@@ -4,7 +4,7 @@ import { DataContext } from '@/context/DataContext';
 import InputReloj from '@/app/components/InputReloj';
 
 export function AddAudienciaIndiv({date, element}) {
-    const { desplegables, updateData } = useContext(DataContext);
+    const { desplegables, updateData} = useContext(DataContext);
     const [cambios, setCambios] = useState(false)
 
     const [del, setDel] = useState(false)
@@ -67,34 +67,34 @@ export function AddAudienciaIndiv({date, element}) {
         if(cambios){
             if(minuto !== minutoBis || hora !== horaBis){
                 await updateData(date, element.numeroLeg, element.hora, 'hora', `${hora}:${minuto}`);
-                await setHoraBis(hora)
-                await setMinutoBis(minuto)}
+                setHoraBis(hora)
+                setMinutoBis(minuto)}
             if(sala !== salaBis){
                 await updateData(date, element.numeroLeg, element.hora, 'sala', sala);
-                await setSalaBis(sala)}
+                setSalaBis(sala)}
             if(legajo !== legajoBis){
                 await updateData(date, element.numeroLeg, element.hora, 'numeroLeg', legajo);
-                await setLegajoBis(legajo)}
+                setLegajoBis(legajo)}
             if(tipo !== tipoBis){
                 await updateData(date, element.numeroLeg, element.hora, 'tipo', tipo);
-                await setTipoBis(tipo)}
+                setTipoBis(tipo)}
             if(tipo2 !== tipo2Bis){
                 await updateData(date, element.numeroLeg, element.hora, 'tipo2', tipo2);
-                await setTipo2Bis(tipo2)}
+                setTipo2Bis(tipo2)}
             if(tipo3 !== tipo3Bis){
                 await updateData(date, element.numeroLeg, element.hora, 'tipo3', tipo3);
-                await setTipo3Bis(tipo3)}
+                setTipo3Bis(tipo3)}
             if(juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis){
                 if(element.juez.includes('+')){
                     (desplegables.jueces.includes(juez1) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) && await updateData(date, element.numeroLeg, element.hora, 'juez', `${juez1}+${juez2}+${juez3}`);
-                    await setJuez1Bis(juez1)
-                    await setJuez2Bis(juez2)
-                    await setJuez3Bis(juez3)
+                    setJuez1Bis(juez1)
+                    setJuez2Bis(juez2)
+                    setJuez3Bis(juez3)
                 }else{
                     desplegables.jueces.includes(juez1) && await updateData(date, element.numeroLeg, element.hora, 'juez', juez1);
-                    await setJuez1Bis(juez1)
+                    setJuez1Bis(juez1)
                 }}
-            await checkEditing()
+            setCambios(false)
         }
     }
     useEffect(() => {

@@ -22,10 +22,10 @@ export default function Page() {
     }, []);
     return (
         <AuthContextProvider><DataContextProvider>
-        <container className={[styles.container]}>
+        <div className={[styles.container]}>
             {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud}/>}
             <RegistroAudienciaControl aud={selectedAud} dateToUse={date}/>
-        </container>
+        </div>
         </DataContextProvider></AuthContextProvider>
     );
 }

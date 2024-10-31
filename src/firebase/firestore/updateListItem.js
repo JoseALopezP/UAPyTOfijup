@@ -20,7 +20,6 @@ export default async function updateListItem(collectionName, documentId, searchV
         if (foundItem) {
             foundItem[propertyToUpdate] = newValue;
             await updateDoc(docRef, { list });
-            console.log(`Updated item with numeroLeg ${searchValue1} and hora ${searchValue2}.`);
         } else {
             console.log("Item not found in 'list' array.");
         }
