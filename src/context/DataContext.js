@@ -1,5 +1,6 @@
 import React, { createContext, useState, useRef, useEffect} from "react";
 import getCollection from "@/firebase/firestore/getCollection";
+import { getFirestore } from "firebase/firestore";
 import addData from "@/firebase/firestore/addData";
 import removeFromArray from "@/firebase/firestore/removeFromArray";
 import removeData from "@/firebase/firestore/removeData";
@@ -13,6 +14,8 @@ import getList from "@/firebase/firestore/getList";
 import addStringToList from "@/firebase/firestore/addStringToList";
 import { todayFunction } from "@/utils/dateUtils";
 export const DataContext = createContext({});
+import firebase_app from "@/firebase/config";
+
 
 const {Provider} = DataContext;
 export const DataContextProvider = ({defaultValue = [], children}) => {
@@ -27,19 +30,25 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
     const updateRealTime = async () => {
+        const db = getFirestore(firebase_app)
         try {
-            const response = await fetch('https://worldtimeapi.org/api/ip');
-            if (!response.ok) {
-                throw new Error('Failed to fetch server time');
+            const tempDocRef = doc(db, "timestamps", "temp");
+            await setDoc(tempDocRef, { time: serverTimestamp() });
+            const docSnap = await getDoc(tempDocRef);
+            if (docSnap.exists()) {
+                const serverTime = docSnap.data().time.toDate();
+                console.log(realTime)
+                setRealTime(serverTime.toLocaleTimeString("es-AR", {
+                    hourCycle: 'h23',
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }));
+            } else {
+                throw new Error("No timestamp document found.");
             }
-            const data = await response.json();
-            setRealTime(new Date(data.utc_datetime).toLocaleTimeString("es-AR", {
-                hourCycle: 'h23',
-                hour: "2-digit",
-                minute: "2-digit"
-            }));
+            
         } catch (error) {
-            console.error('Error fetching server time, using local time:', error);
+            console.error('Error fetching server time from Firestore, using local time:', error);
             setRealTime(new Date().toLocaleTimeString("es-AR", {
                 hourCycle: 'h23',
                 hour: "2-digit",

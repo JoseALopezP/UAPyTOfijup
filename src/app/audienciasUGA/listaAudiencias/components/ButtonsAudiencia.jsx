@@ -89,6 +89,7 @@ export function ButtonsAudiencia ({element}) {
                     <option value={"8"} >SALA 8</option>
                     <option value={"9"} >SALA 9</option>
                     <option value={"10"} >SALA 10</option>
+                    <option value={"17"} >SALA 17</option>
                 </select>
                 </>}
                 {(element.estado == 'EN_CURSO') &&

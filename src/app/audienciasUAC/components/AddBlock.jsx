@@ -122,6 +122,7 @@ export function AddBlock ({date}) {
                 <option value={"8"}>SALA 8</option>
                 <option value={"9"}>SALA 9</option>
                 <option value={"10"}>SALA 10</option>
+                <option value={"17"}>SALA 17</option>
             </select>
         </span>
         <span className={`${styles.inputLegajoBlock} ${styles.inputItemBlock} ${styles.tableCell} ${styles.tableCellLegajo}`}>
