@@ -13,8 +13,8 @@ import updateListItem from "@/firebase/firestore/updateListItem";
 import getList from "@/firebase/firestore/getList";
 import addStringToList from "@/firebase/firestore/addStringToList";
 import { todayFunction } from "@/utils/dateUtils";
+import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
 export const DataContext = createContext({});
-import firebase_app from "@/firebase/config";
 
 
 const {Provider} = DataContext;
@@ -29,33 +29,10 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
-    const updateRealTime = async () => {
-        const db = getFirestore(firebase_app)
-        try {
-            const tempDocRef = doc(db, "timestamps", "temp");
-            await setDoc(tempDocRef, { time: serverTimestamp() });
-            const docSnap = await getDoc(tempDocRef);
-            if (docSnap.exists()) {
-                const serverTime = docSnap.data().time.toDate();
-                console.log(realTime)
-                setRealTime(serverTime.toLocaleTimeString("es-AR", {
-                    hourCycle: 'h23',
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }));
-            } else {
-                throw new Error("No timestamp document found.");
-            }
-            
-        } catch (error) {
-            console.error('Error fetching server time from Firestore, using local time:', error);
-            setRealTime(new Date().toLocaleTimeString("es-AR", {
-                hourCycle: 'h23',
-                hour: "2-digit",
-                minute: "2-digit"
-            }));
-        }
-    };
+    
+    const updateRealTime = async() =>{
+        setRealTime(await updateRealTimeFunction().toString())
+    }
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
     }

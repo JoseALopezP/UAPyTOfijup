@@ -7,7 +7,7 @@ import { AddAudienciaList } from './AddAudienciasList'
 import { AddAudienciaForm } from './AddAudienciaForm'
 
 export function AddAudienciaBlock() {
-    const {updateByDate, updateDesplegables} = useContext(DataContext)
+    const {updateByDate, updateDesplegables, updateRealTime, realTime} = useContext(DataContext)
     const [dateToUse, setDateToUse] = useState(todayFunction())
     const dateFunction = (value) =>{
         setDateToUse(value)

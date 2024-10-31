@@ -19,8 +19,7 @@ export function AudienciaList ({date}) {
             clearInterval(timerID);
         };
     }, [])
-    const getMinutes = async(dateObject) =>{
-        await updateRealTime()
+    const getMinutes = (dateObject) =>{
         if(realTime.includes(':')){
             const nowTime = (parseInt(realTime.split(':')[0]) * 60 + parseInt(realTime.split(':')[1]))
             const timeComparison = parseInt(`${dateObject}`.split(':')[0])*60 + parseInt(`${dateObject}`.split(':')[1])
