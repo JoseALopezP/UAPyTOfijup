@@ -9,7 +9,7 @@ import { nameTranslate } from '@/utils/traductorNombres';
 
 export function AudienciaList () {
     const [operadorF, setOperadorF] = useState('')
-    const {updateToday, today, update, updateDesplegables, desplegables} = useContext(DataContext);
+    const {updateToday, today, updateRealTime, updateDesplegables, desplegables} = useContext(DataContext);
     function tick() {
         updateToday();
         updateRealTime() 
