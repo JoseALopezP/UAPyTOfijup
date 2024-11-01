@@ -5,18 +5,11 @@ import AudienciaRegistroIndiv from './AudienciaRegistroIndiv';
 import { DataContext} from '@/context/DataContext';
 
 export default function RegistroAudienciaList({date, dateFunction, audFunction}) {
-    const {updateByDate, bydate} = useContext(DataContext)
-    const tick = () =>{
-        updateByDate(date)
-    }
-    useEffect(() =>{
-        tick()
-        const timerID = setInterval(() => tick(), 30000);  
-        return function cleanup() {
-            clearInterval(timerID);
-        };
-    }, [])
-    
+    const {updateByDateListener, bydate} = useContext(DataContext)
+    useEffect(() => {
+        const unsubscribe = updateByDateListener(date);
+        return () => unsubscribe();
+    }, [date]);
     return (
         <div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>

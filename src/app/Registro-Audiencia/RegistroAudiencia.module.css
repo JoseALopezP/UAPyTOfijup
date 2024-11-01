@@ -95,6 +95,8 @@
 .controlBlock{
     width: 77.5vw;
     background-color: #1F1F1F;
+    display: inline-flex;
+    flex-direction: row;
 }
 .controlBlockLeft{
     width: 30%;
@@ -187,6 +189,7 @@
 .inputLeft{
     height: 30px;
     border-radius: 2px;
+    font-size: 18px;
 }
 .inputLeft15{
     width: 14%;
@@ -206,6 +209,9 @@
 .inputLeft70{
     width: 68%;
 }
+.inputLeft85{
+    width: 84%;
+}
 .inputLeft100{
     width: 99%;
 }
@@ -222,6 +228,7 @@
     height: 50px;
     width: 23vw;
     font-weight: 700;
+    opacity: .9;
 }
 .guardar{
     display: none;
@@ -240,4 +247,14 @@
 }
 .guardandoButton .guardar, .guardandoButton .sinGuardar, .guardandoButton:hover .guardar{
     display: none;
+}
+.controlBlockRight{
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.textArea{
+    font-size: 18px;
+    font-family: inherit;
 }

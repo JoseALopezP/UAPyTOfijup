@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={titillium.className}>
-        <NavBar/>
+        <NavBar />
         {children}
       </body>
     </html>

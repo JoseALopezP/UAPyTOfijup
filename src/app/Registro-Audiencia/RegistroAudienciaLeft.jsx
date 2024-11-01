@@ -4,20 +4,11 @@ import styles from './RegistroAudiencia.module.css';
 import RegistroChangeState from './RegistroChangeState';
 import { DataContext } from '@/context/DataContext';
 import DeleteSVGF from './DeleteSVGF';
+import { checkForResuelvo } from '@/utils/resuelvoUtils';
+import deepEqual from '@/utils/deepEqual';
 
-const deepEqual = (obj1, obj2) => {
-    if (obj1 === obj2) return true;
-    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
-        return false;}
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-    if (keys1.length !== keys2.length) return false;
-    for (let key of keys1) {
-        if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) return false;}
-    return true;
-};
 export default function RegistroAudienciaLeft({ item, dateToUse }) {
-    const {updateDesplegables, desplegables, updateByDate, bydate, updateRealTime, realTime, updateData} = useContext(DataContext)
+    const {updateDesplegables, desplegables, updateByDate, updateRealTime, realTime, updateData} = useContext(DataContext)
     const [sala, setSala] = useState(item.sala)
     const [caratula2, setCaratula2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -30,6 +21,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
     const [razonDemora2, setRazonDemora2] = useState('');
     const [mpf, setMpf] = useState([]);
     const [ufi, setUfi] = useState('');
+    const [estado, setEstado] = useState('');
     const [ufi2, setUfi2] = useState('');
     const [defensa, setDefensa] = useState([]);
     const [imputado, setImputado] = useState([]);
@@ -82,6 +74,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
         setRazonDemora(item.razonDemora || '');
         setRazonDemora2(item.razonDemora || '');
         setUfi(item.ufi || '');
+        setEstado(item.estado || '');
         setUfi2(item.ufi || '');
         setTipo(item.tipo || '')
         setTipoAux(item.tipo || '')
@@ -161,7 +154,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
     }
     const handleSubmit = async (event) => {
         if(event) event.preventDefault();
-        await updateDataAud()
+        updateDataAud()
     };
     const handleReconversion = () =>{   
         setShowReconversion(!showReconversion)
@@ -223,7 +216,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                 <span className={`${styles.guardando}`}>GUARDANDO...</span>
             </button>}
             <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
-            <RegistroChangeState aud={item}/>
+            <RegistroChangeState estadoFunction={setEstado} estado={estado} numeroLegajo={item.numeroLeg} audienciaHora={item.hora} dateToUse={dateToUse}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
                 <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft42} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
                 <datalist id='sala' className={`${styles.tableCellInput}`}><option>{sala}</option>
@@ -344,6 +337,16 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                         </div>
                     ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '' })}>+ PARTE</button></span>
+            {(item.hora && item.hitos && checkHoraDiff() > 5) &&
+                <>
+                    <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
+                    <select className={`${styles.inputLeft} ${styles.inputLeft100}`} onChange={(e) => setRazonDemora(e.target.value)}>
+                        <option value={razonDemora}>{razonDemora}</option>
+                        <option value=''></option>
+                        {desplegables.motivoDemora && desplegables.motivoDemora.map(el => <option key={el} value={el}>{el}</option>)}
+                    </select></span>
+                </>
+            }
         </form>
     );
 }

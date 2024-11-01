@@ -14,6 +14,7 @@ import getList from "@/firebase/firestore/getList";
 import addStringToList from "@/firebase/firestore/addStringToList";
 import { todayFunction } from "@/utils/dateUtils";
 import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
+import updateDocumentListener from "@/firebase/firestore/updateDocumentListener";
 export const DataContext = createContext({});
 
 
@@ -48,6 +49,12 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))
     }
+    const updateByDateListener = (date) => {
+        const unsubscribe = updateDocumentListener('audiencias', date, (updatedData) => {
+            setBydate(updatedData);
+        });
+        return unsubscribe;
+    };
     const updateInformacion = async() =>{
         setInformacion(await getCollection('informacion'))
     }
@@ -97,8 +104,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         const userList = await getDocument('users', 'listaUsuarios')
         await setUsertype(userList.find(item => item['userId'] === userId).type)
     }
-
-
     const context = {
         updateToday,
         updateByDate,
@@ -122,6 +127,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateDesplegables,
         addDesplegable,
         setDateToUse,
+        updateByDateListener,
         dateToUse,
         desplegables,
         realTime,
