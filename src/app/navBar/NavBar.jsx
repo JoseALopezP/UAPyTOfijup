@@ -7,6 +7,7 @@ export default function NavBar() {
             <IconNavBar iconRoute={''}/>
             <IconNavBar iconRoute={'Agregar-Audiencia'}/>
             <IconNavBar iconRoute={'Registro-Audiencia'}/>
+            <IconNavBar iconRoute={'Sorteo-Operador'}/>
         </div>
     );
 }
