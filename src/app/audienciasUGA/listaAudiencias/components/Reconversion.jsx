@@ -5,7 +5,7 @@ import { DataContext } from '@/context/DataContext';
 
 
 export function Reconversion({ item, setTipo, setTipo2, setTipo3, tipo, tipo2, tipo3, tipoAux, tipo2Aux}) {
-    const {updateData, updateTiposAudiencias, tiposAudiencias} = useContext(DataContext);
+    const { updateTiposAudiencias, tiposAudiencias} = useContext(DataContext);
     useEffect(() => {
         updateTiposAudiencias()
     }, [])

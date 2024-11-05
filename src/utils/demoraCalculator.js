@@ -52,27 +52,35 @@ const demoraPorTipo = {
     "TRÁMITES DE EJECUCIÓN": 12.24,
     "UNIFICACIÓN DE PENAS": 22.67,
     "UNILATERAL DE PRÓRROGA DE LA INVESTIGACIÓN PREVIA A LA FORMALIZACIÓN IPP": 10.11,
-    "UNILATERAL PARA APERTURA Y EXAMEN DE SECUESTRO": 11.25
+    "UNILATERAL PARA APERTURA Y EXAMEN DE SECUESTRO": 11.25,
+    "DEBATE DEL JUICIO ORAL": 240
   };
-export default function demoraCalculator(tipo){
+  export default function demoraCalculator(tipo) {
     const searchValue = tipo.toLowerCase();
+
     function getMatchScore(name) {
-        const nameLower = name.toLowerCase();
+        const nameWords = name.toLowerCase().split(" ");
+        const searchWords = searchValue.split(" ");
         let score = 0;
+        for (let word of searchWords) {
+            if (nameWords.includes(word)) {
+                score += 10; 
+            }
+        }
         for (let char of searchValue) {
-        if (nameLower.includes(char)) {
-            score++;
-        }
-        }
+            if (name.toLowerCase().includes(char)) {
+                score++;
+            }}
         return score;
     }
+
     let bestMatch = null;
     let highestScore = 0;
     for (const name in demoraPorTipo) {
         const score = getMatchScore(name);
         if (score > highestScore) {
-        highestScore = score;
-        bestMatch = name;
+            highestScore = score;
+            bestMatch = name;
         }
     }
     return bestMatch ? demoraPorTipo[bestMatch] : 0;
