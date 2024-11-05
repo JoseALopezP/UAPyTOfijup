@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styles from './sorteoOperador.module.css'
+import styles from '../sorteoOperador.module.css'
 
 export default function SorteoFunction({selectedList}){
     const [sorteo, setSorteo] = useState([])
@@ -16,7 +16,7 @@ export default function SorteoFunction({selectedList}){
             <button className={[styles.sorteoButton]} onClick={() => shuffleArray()}>SORTEAR</button>
             <div className={[styles.listSorteadoBlock]}>
                 {sorteo.map((el,i)=>(
-                    <span className={[styles.listSorteadoItem]}>{i+1}. {el}</span>
+                    <span key={el} className={[styles.listSorteadoItem]}>{i+1}. {el}</span>
                 ))}
             </div>
         </div>

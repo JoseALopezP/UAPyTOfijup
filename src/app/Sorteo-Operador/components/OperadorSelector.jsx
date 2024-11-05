@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import styles from './sorteoOperador.module.css';
+import styles from '../sorteoOperador.module.css';
 import { nameTranslate } from '@/utils/traductorNombres';
 
 export default function OperadorSelector({ originalList, originalListFunction, selectedList, selectedListFunction }) {

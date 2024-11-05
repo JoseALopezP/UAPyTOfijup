@@ -1,17 +1,16 @@
 'use client'
-import { useState } from 'react';
 import styles from './sorteoOperador.module.css'
 import { DataContextProvider } from '@/context/DataContext';
 import { AuthContextProvider } from '@/context/AuthContext';
-import SorteoBlock from './SorteoBlock';
-import SorteoFilterBar from './SorteoFilterBar';
+import SorteoBlock from './components/SorteoBlock';
+import ListBlock from './components/ListBlock';
 
 export default function Page() {
     return (
         <AuthContextProvider><DataContextProvider>
-        <div className={[styles.container]}>
+        <div className={styles.containerBlock}>
             <SorteoBlock/>
-            <SorteoFilterBar/>
+            <ListBlock/>
         </div>
         </DataContextProvider></AuthContextProvider>
     );

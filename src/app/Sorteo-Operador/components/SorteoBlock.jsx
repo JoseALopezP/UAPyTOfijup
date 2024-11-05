@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import OperadorSelector from './OperadorSelector';
 import SorteoFunction from './SorteoFunction';
-import styles from './sorteoOperador.module.css'
+import styles from '../sorteoOperador.module.css'
 import { DataContext } from '@/context/DataContext';
 
 export default function SorteoBlock() {

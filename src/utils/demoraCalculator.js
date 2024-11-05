@@ -68,7 +68,7 @@ export default function demoraCalculator(tipo){
     }
     let bestMatch = null;
     let highestScore = 0;
-    for (const name in data) {
+    for (const name in demoraPorTipo) {
         const score = getMatchScore(name);
         if (score > highestScore) {
         highestScore = score;
