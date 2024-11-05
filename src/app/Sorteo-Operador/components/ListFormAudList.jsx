@@ -24,24 +24,24 @@ export default function ListFormAudList({filtroValue,operadorFilled}) {
                 return 0;
         }
     };
-    const filterFunction = (el) =>{
-        switch(operadorFilled){
+    const filterFunction = (el) => {
+        switch (operadorFilled) {
             case 'TODOS':
-                return true
+                return true;
             case 'S/OPERADOR':
-                if(el.operador){
-                    return false
-                }else{
-                    return true
+                if (el.operador) {
+                    return false;
                 }
+                return true;
             case 'C/OPERADOR':
-                if(!el.operador){
-                    return false
+                if (!el.operador) {
+                    return false;
                 }
+                return true;
             default:
-                return true
+                return true;
         }
-    }
+    };
     useEffect(() => {
         updateToday()
     }, []);

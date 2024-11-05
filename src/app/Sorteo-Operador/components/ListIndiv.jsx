@@ -10,6 +10,9 @@ export default function ListIndiv({item}) {
     useEffect(() => {
         updateDataToday(item.numeroLeg, item.hora, 'operador', operadorAud);
     }, [operadorAud])
+    useEffect(()=>{
+        setOperadorAud(item.operador)
+    }, [item])
     return (
         <div className={styles.listIndivBlock}>
             <select onChange={(e)=>{setOperadorAud(e.target.value)}} className={styles.operadorItem}>
