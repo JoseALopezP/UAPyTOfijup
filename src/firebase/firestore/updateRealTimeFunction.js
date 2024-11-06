@@ -14,7 +14,7 @@ export default async function  updateRealTimeFunction(){
                 hourCycle: 'h23',
                 hour: "2-digit",
                 minute: "2-digit"
-            }));
+            }).toString());
         } else {
             throw new Error("No timestamp document found.");
         }

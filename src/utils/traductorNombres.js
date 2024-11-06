@@ -1,6 +1,6 @@
 export const nameTranslate = (operadorName) =>{
     const traducciones = {
-        'Echegaray, Andrea': 'ANDI',
+        "Echegaray, Andrea": 'ANDI',
         "Galaburri, Enrique": 'QUIQUE',
         "Lara, María Cielo": 'CIELO',
         "Martín, Juan": 'JUAN',

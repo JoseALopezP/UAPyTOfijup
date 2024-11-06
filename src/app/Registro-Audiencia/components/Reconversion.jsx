@@ -1,4 +1,4 @@
-import styles from './RegistroAudiencia.module.css'
+import styles from '../RegistroAudiencia.module.css'
 import { useContext, useEffect} from 'react'
 import { DataContext } from '@/context/DataContext';
 

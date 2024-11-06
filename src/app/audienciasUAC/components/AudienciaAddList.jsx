@@ -7,25 +7,19 @@ import { AudienciaIndiv } from './AudienciaIndiv';
 export function AudienciaAddList() {
     const { updateByDate, bydate } = useContext(DataContext);
     const [dateToUse, setDateToUse] = useState('');
-
-    // Debounce the update for dateToUse
     useEffect(() => {
         const handler = setTimeout(() => {
             if (dateToUse) {
                 updateByDate(dateToUse);
             }
-        }, 1500); // Debounce delay in ms
+        }, 1500); 
         return () => clearTimeout(handler);
     }, [dateToUse]);
-
-    // Only call updateByDate if dateToUse has a value
     function tick() {
         if (dateToUse) {
             updateByDate(dateToUse);
         }
     }
-
-    // Set interval to call tick every 30 seconds
     useEffect(() => {
         const timerID = setInterval(() => tick(), 30000);
         return function cleanup() {

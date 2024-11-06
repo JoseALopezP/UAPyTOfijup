@@ -1,4 +1,4 @@
-import styles from './RegistroAudiencia.module.css';
+import styles from '../RegistroAudiencia.module.css';
 
 export default function DeleteSVGF() {
     return (

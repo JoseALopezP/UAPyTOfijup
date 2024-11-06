@@ -12,7 +12,7 @@ export default function ListIndiv({item}) {
     }, [operadorAud])
     useEffect(()=>{
         setOperadorAud(item.operador)
-    }, [item])
+    }, [item.operador])
     return (
         <div className={styles.listIndivBlock}>
             <select onChange={(e)=>{setOperadorAud(e.target.value)}} className={styles.operadorItem}>

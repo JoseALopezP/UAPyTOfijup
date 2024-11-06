@@ -15,8 +15,6 @@ export function AudienciaAddList() {
     useEffect(() => {
         if (user == null) router.push("/signin");
     }, [user, router]);
-
-    // Call update only if dateToUse has a value
     function tick() {
         if (dateToUse) {
             updateByDate(dateToUse);
@@ -27,7 +25,7 @@ export function AudienciaAddList() {
             if (dateToUse) {
                 updateByDate(dateToUse);
             }
-        }, 1500); // Adjust debounce delay as needed
+        }, 1500);
         return () => clearTimeout(handler);
     }, [dateToUse]);
     useEffect(() => {

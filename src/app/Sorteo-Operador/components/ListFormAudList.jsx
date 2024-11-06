@@ -29,15 +29,9 @@ export default function ListFormAudList({filtroValue,operadorFilled}) {
             case 'TODOS':
                 return true;
             case 'S/OPERADOR':
-                if (el.operador) {
-                    return false;
-                }
-                return true;
+                return !el.operador;
             case 'C/OPERADOR':
-                if (!el.operador) {
-                    return false;
-                }
-                return true;
+                return !!el.operador;
             default:
                 return true;
         }
@@ -47,8 +41,8 @@ export default function ListFormAudList({filtroValue,operadorFilled}) {
     }, []);
     return (
         <span className={styles.listFormAudListBlock}>
-            {today && today.filter(el=>filterFunction(el)).sort((a,b) => sortFunction(a,b)).map(el=>(
-                <ListIndiv item={el}/>
+            {today && today.filter(el => filterFunction(el)).sort((a,b) => sortFunction(a,b)).map(el=>(
+                <ListIndiv key={el.numeroLeg} item={el}/>
             ))}
         </span>
     );

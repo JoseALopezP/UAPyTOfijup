@@ -1,11 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react';
-import RegistroAudienciaList from './RegistroAudienciaList';
+import RegistroAudienciaList from './components/RegistroAudienciaList';
 import { todayFunction } from '@/utils/dateUtils';
 import styles from './RegistroAudiencia.module.css'
 import { DataContextProvider } from '@/context/DataContext';
 import { AuthContextProvider } from '@/context/AuthContext';
-import RegistroAudienciaControl from './RegistroAudienciaControl';
+import RegistroAudienciaControl from './components/RegistroAudienciaControl';
 
 export default function Page() {
     const [date, setDate] = useState(null)

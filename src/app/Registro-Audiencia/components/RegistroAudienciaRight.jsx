@@ -1,5 +1,5 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
-import styles from './RegistroAudiencia.module.css';
+import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 import { listModelos, modeloMinuta } from '@/utils/modelosUtils';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';

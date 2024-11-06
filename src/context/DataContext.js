@@ -32,7 +32,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [userType, setUsertype] = useState('')
     
     const updateRealTime = async() =>{
-        setRealTime(await updateRealTimeFunction().toString())
+        setRealTime(await updateRealTimeFunction())
     }
     const updateJueces = async() =>{
         setJueces(await getDocument('audiencias', 'jueces'))
@@ -44,7 +44,10 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         setAños(await getDocument('audiencias', 'años'))
     }
     const updateToday = async() => {
-        setToday(await getDocument('audiencias', todayFunction()))
+        const unsubscribe = updateDocumentListener('audiencias', todayFunction(), (updatedData) => {
+            setToday(updatedData);
+        });
+        return unsubscribe;
     }
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))

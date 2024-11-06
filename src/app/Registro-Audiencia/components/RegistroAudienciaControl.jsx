@@ -1,6 +1,5 @@
 import { useContext, useEffect } from 'react';
-import styles from './RegistroAudiencia.module.css';
-import RegistroChangeState from './RegistroChangeState';
+import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 import RegistroAudienciaLeft from './RegistroAudienciaLeft';
 import RegistroAudienciaRight from './RegistroAudienciaRight';

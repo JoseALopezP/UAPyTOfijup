@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { Reconversion } from './Reconversion';
-import styles from './RegistroAudiencia.module.css';
+import styles from '../RegistroAudiencia.module.css';
 import RegistroChangeState from './RegistroChangeState';
 import { DataContext } from '@/context/DataContext';
 import DeleteSVGF from './DeleteSVGF';

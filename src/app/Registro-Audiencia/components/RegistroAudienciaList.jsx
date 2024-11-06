@@ -1,6 +1,6 @@
-import styles from './RegistroAudiencia.module.css'
+import styles from '../RegistroAudiencia.module.css'
 import { useContext, useEffect } from 'react';
-import { SelectDate } from '../components/SelectDate';
+import { SelectDate } from '../../components/SelectDate';
 import AudienciaRegistroIndiv from './AudienciaRegistroIndiv';
 import { DataContext} from '@/context/DataContext';
 

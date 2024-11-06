@@ -1,4 +1,4 @@
-import styles from './RegistroAudiencia.module.css';
+import styles from '../RegistroAudiencia.module.css';
 import { nameTranslate } from '@/utils/traductorNombres';
 
 export default function AudienciaRegistroIndiv({ aud, audFunction }) {
