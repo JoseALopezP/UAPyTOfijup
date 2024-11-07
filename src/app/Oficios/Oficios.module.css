@@ -4,11 +4,52 @@
     margin-left: 2vw;
     height: 100vh;
     border-right: solid 1px #2B2B2B;
+    overflow: hidden;
 }
 .audienciaListContainer{
-    width: 18vw;
+    width: 25vw;
     margin-top: 10px;
     padding-left: 10px;
-    padding-bottom: 10px;
-    border-bottom: solid 1px #2B2B2B;
+    padding-top: 10px;
+    padding-left: auto;
+    height: 95vh;
+}
+.audienciasListDisplayBlock{
+    border-top: solid 1px #2B2B2B;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.audienciasListIndivBlock{
+    color: #d7d7d7;
+    display: inline-flex;
+    flex-direction: row;
+    padding: 1px;
+    margin-top: 4px;
+    width: 24.5vw;
+    line-height: 14px;
+    cursor: pointer;
+}
+.block1{
+    width: 3.5vw;
+    justify-content: center;
+    color: #fff;
+}
+.block1 svg{
+    stroke: #fff;
+}
+.block2{
+    width: 22vw;
+}
+.legajoTitle{
+    font-weight: 700;
+    font-size: 20px;
+    margin: 4px 0;
+}
+.tipoTitle{
+    margin-top: 8px;
+    font-size: 14px;
+}
+.juezTitle{
+    font-size: 12px;
 }
