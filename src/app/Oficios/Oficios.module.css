@@ -30,6 +30,84 @@
     line-height: 14px;
     cursor: pointer;
 }
+.fechaSorteoBlock{
+    display: inline-flex;
+    flex-direction: row;
+    padding: 2px;
+}
+.buttonRaffle{
+    margin-left: -1.5vw;
+    width: 70%;
+    border-radius: 2px;
+    border: none;
+    outline: none;
+    height: 32px;
+    margin-top: 2px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.raffleContainer{
+    position: fixed;
+    display: grid;
+    top: 6.5vh;
+    width: 22vw;
+    height: 300px;
+    background-color: #1F1F1F;
+    border-radius: 2px;
+    border: solid 1px #2B2B2B;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 'top top' 'left right' 'bottom bottom';
+    padding: 10px 1vw;
+}
+.blockTop{
+    display: flex;
+    grid-area: top;
+    display: inline-flex;
+    flex-direction: column;
+}
+.blockLeft{
+    display: flex;
+    grid-area: left;
+    display: inline-flex;
+    overflow-y: scroll;
+    flex-direction: column;
+    height: 200px;
+    border-right: solid 1px #2B2B2B;
+}
+.blockTop select{
+    width: 100%;
+    height: 30px;
+    border-radius: 2px;
+}
+.blockRight{
+    display: flex;
+    grid-area: right;
+    display: inline-flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 200px;
+}
+.blockBottom{
+    grid-area: bottom;
+    padding: auto;
+    width: 100%;
+    align-items: center;
+    border-top: solid 1px #2B2B2B;
+}
+.blockBottom button{
+    width: 100%;
+    height: 30px;
+    align-self: center;
+    margin: auto;
+    border-radius: 2px;
+    outline: none;
+    border: none;
+}
+.actuarioListItem{
+    cursor: pointer;
+    color: #fff;
+    margin-left: 20px;
+}
 .block1{
     width: 3.5vw;
     justify-content: center;

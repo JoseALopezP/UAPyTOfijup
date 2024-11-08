@@ -23,3 +23,12 @@ export const nameTranslate = (operadorName) =>{
     }
     return traducciones[operadorName]
 }
+export const nameTranslateActuario = (actuarioNombre) =>{
+    const traducciones = {
+        "Sánchez, Gemma Luciana": 'GEMMA',
+        "Pérez, Juan Carlos": 'CHARLIE',
+        "Gimenez, María Agostina": 'AGOS',
+        "Radi Pezzotti, Lucas": 'LUCAS'
+    }
+    return traducciones[actuarioNombre]
+}

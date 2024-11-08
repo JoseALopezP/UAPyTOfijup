@@ -1,4 +1,5 @@
 'use client'
+import { nameTranslateActuario } from '@/utils/traductorNombres'
 import styles from '../Oficios.module.css'
 import { oficioState } from '@/utils/oficioState'
 
@@ -33,7 +34,7 @@ export default function AudienciasListIndiv({item, audFunction}) {
                 {SVGs[oficioState(item)]}
             </div>
             <div className={styles.block2}>
-                <p className={styles.legajoTitle}>{item.numeroLeg}</p>
+                <span><p className={styles.legajoTitle}>{item.numeroLeg}</p>{item.actuario && <p>{nameTranslateActuario(item.actuario)}</p>}</span>
                 <p className={styles.tipoTitle}>{item.tipo}</p>
                 <p className={styles.juezTitle}>{item.juez.split(' ').splice(1,1)} {item.juez.split(' ').splice(2,2).join(' ')}</p>
             </div>

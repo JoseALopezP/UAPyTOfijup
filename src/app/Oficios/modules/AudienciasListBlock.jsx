@@ -14,7 +14,7 @@ export default function AudienciasListBlock({audFunction, dateFunction, dateToUs
     }, [dateToUse]);
     return (
         <div className={styles.audienciaListContainer}>
-            <span><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule/></span>
+            <span className={styles.fechaSorteoBlock}><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule date={dateToUse} arr={bydate}/></span>
             {bydate && <AudienciasListDisplay arr={bydate} audFunction={audFunction}/>}
         </div>
     )
