@@ -72,8 +72,7 @@
 }
 .loginButtonClicked{
         transform: scale(0.98); 
-        color: #fd7e14;
-        background-color: #000;
+        color: #375166;
         box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
     }
 .loginButton:active{
@@ -82,4 +81,7 @@
         font-size: 14px;
         height: 40px;
         border-radius: 4px;
+}
+.errorMessage{
+        color: red;
 }

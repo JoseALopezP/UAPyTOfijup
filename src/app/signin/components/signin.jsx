@@ -1,30 +1,40 @@
-"use client";  // Use this to mark the component as a client component
+"use client";
 
 import signIn from "@/firebase/auth/signin";
-import styles from './signin.module.css'
+import styles from './signin.module.css';
 import { useState } from "react";
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
+const errorMessages = {
+    "auth/invalid-credential": "Credenciales inválidas",
+    "auth/user-not-found": "Usuario no encontrado",
+    "auth/wrong-password": "Contraseña incorrecta",
+    "auth/too-many-requests": "Demasiados intentos. Inténtalo de nuevo más tarde.",
+    "auth/network-request-failed": "Error de red. Verifica tu conexión.",
+};
+
+function translateError(error) {
+    const errorCode = error?.code;
+    return errorMessages[errorCode] || "Ocurrió un error. Inténtalo de nuevo.";
+}
 
 export default function SignIn() {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [clicked, setClicked] = useState(false)
-    const [errorMessage, setErrorMessage] = useState('') // State for error message
-    const router = useRouter()
-    
-    const handleForm = async (event) => {
-        event.preventDefault()
-        const { result, error } = await signIn(email, password);
-        
-        if (error) {
-            setErrorMessage(error.message) // Set error message if login fails
-            return
-        }
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [clicked, setClicked] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const router = useRouter();
 
-        setErrorMessage('') // Clear any previous error
-        router.push("/")
+    const handleForm = async (event) => {
+        event.preventDefault();
+        const { result, error } = await signIn(email, password);
+        if (error) {
+            setErrorMessage(translateError(error));
+            return;
+        }
+        setErrorMessage('');
+        router.push("/");
     }
 
     return (
@@ -47,7 +57,7 @@ export default function SignIn() {
                         <label htmlFor="password" className={`${styles.labelSquare}`}>
                             <input className={`${styles.inputBlock}`} onChange={(e) => setPassword(e.target.value)} required type="password" name="password" id="password" placeholder="contraseña" />
                         </label>
-                        {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>} {/* Display error message */}
+                        {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
                         <button type="submit" onClick={() => setClicked(!clicked)} className={clicked ? `${styles.loginButton} ${styles.loginButtonClicked}` : `${styles.loginButton}`}>
                             Iniciar Sesión
                         </button>
