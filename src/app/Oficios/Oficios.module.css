@@ -131,3 +131,16 @@
 .juezTitle{
     font-size: 12px;
 }
+.legajoActuarioSpan{
+    display: inline-flex;
+    width: 95%;
+    justify-content: space-between;
+    flex-direction: row;
+    height: 18px;
+}
+.actuarioName{
+    height: 14px;
+    background-color: #d7d7d718;
+    padding: 4px;
+    border-radius: 4px;
+}

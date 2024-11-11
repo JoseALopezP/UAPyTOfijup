@@ -34,7 +34,7 @@ export default function AudienciasListIndiv({item, audFunction}) {
                 {SVGs[oficioState(item)]}
             </div>
             <div className={styles.block2}>
-                <span><p className={styles.legajoTitle}>{item.numeroLeg}</p>{item.actuario && <p>{nameTranslateActuario(item.actuario)}</p>}</span>
+                <span className={styles.legajoActuarioSpan}><p className={styles.legajoTitle}>{item.numeroLeg}</p>{item.actuario && <p className={styles.actuarioName}>{nameTranslateActuario(item.actuario)}</p>}</span>
                 <p className={styles.tipoTitle}>{item.tipo}</p>
                 <p className={styles.juezTitle}>{item.juez.split(' ').splice(1,1)} {item.juez.split(' ').splice(2,2).join(' ')}</p>
             </div>

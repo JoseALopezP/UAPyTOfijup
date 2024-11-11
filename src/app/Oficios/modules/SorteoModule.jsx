@@ -5,7 +5,7 @@ import { nameTranslateActuario } from '@/utils/traductorNombres'
 
 export default function SorteoModule({date, arr}) {
     const {updateDesplegables, desplegables, updateData} = useContext(DataContext)
-    const [showRaffle, setShowRaffle] = useState(false)
+    const [showRaffle, setShowRaffle] = useState(true)
     const [listaOriginal, setListaOriginal] = useState(desplegables.actuario || []);
     const [listaSeleccionado, setListaSeleccionado] = useState([]);
     const [turno, setTurno] = useState(true)
@@ -21,18 +21,18 @@ export default function SorteoModule({date, arr}) {
         setListaOriginal(updatedOriginalList);
         setListaSeleccionado(updatedSelectedList);
     };
-    const handleAsignacion = async() =>{
-        arr.forEach((el, index) => {
-            if(turno){
-                if(parseInt(el.hora.split(':')[0]) < 14){
-                    console.log(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[(index % listaSeleccionado.length)])
-                    updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[(index % listaSeleccionado.length)]);}
-            }else{
-                if(parseInt(el.hora.split(':')[0]) >= 14){
-                    updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[(index % listaSeleccionado.length)]);}
+    const handleAsignacion = async () => {
+        for (const [index, el] of arr.entries()) {
+            if(turno === true && parseInt(el.hora.split(':')[0], 10) < 14) {
+                console.log(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
+                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
-        })
-    }
+            if(turno === false && parseInt(el.hora.split(':')[0], 10) >= 14){
+                console.log(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
+                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
+            }
+        }
+    };
     useEffect(() => {
         updateDesplegables()
     }, []);
@@ -43,12 +43,12 @@ export default function SorteoModule({date, arr}) {
         <>
         <button className={styles.buttonRaffle} type='button' onClick={()=> setShowRaffle(!showRaffle)}>SORTEO OFICIO</button>
         {showRaffle && <div className={styles.raffleContainer}>
-            <span className={styles.blockTop}>
-                <select onChange={e => {setTurno(e.target.value)}}>
-                    <option value={true}>MAÑANA</option>
-                    <option value={false}>TARDE</option>
-                </select>
-            </span>
+        <span className={styles.blockTop}>
+            <select onChange={e => {setTurno(e.target.value === "true")}}>
+                <option value={true}>MAÑANA</option>
+                <option value={false}>TARDE</option>
+            </select>
+        </span>
             <span className={styles.blockLeft}>
                 {listaOriginal && listaOriginal.map((el) => (
                     <span key={el} className={styles.actuarioListItem} onClick={() => handleClickActuarioAdd(el)}>
