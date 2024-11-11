@@ -1,16 +1,8 @@
 import { PDFGenerator } from "./pdfUtils";
+import { capitalizeFirst } from "./caratulaUtils";
+import { getMonthName } from "./caratulaUtils";
 
-function getMonthName(number) {
-    const date = new Date(0, number - 1);
-    return date.toLocaleString('es-AR', { month: 'long' });
-}
-
-function capitalizeFirst(sentence) {
-    if (!sentence) return sentence;
-    return sentence.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-}
-
-function listFiscal(arr, ufi) {
+export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `Ministerio Público Fiscal: ${el.nombre.split(' - ')[0]}  UFI:${ufi} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
@@ -18,7 +10,7 @@ function listFiscal(arr, ufi) {
     return aux;
 }
 
-function listDefensa(arr) {
+export function listDefensa(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `Defensa ${el.tipo}: ${el.nombre} ${el.imputado ? `(En representación de ${el.imputado})` : ''} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
@@ -26,7 +18,7 @@ function listDefensa(arr) {
     return aux;
 }
 
-function listImputado(arr) {
+export function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
@@ -34,7 +26,7 @@ function listImputado(arr) {
     return aux;
 }
 
-function listPartes(arr) {
+export function listPartes(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `${el.role}: ${el.name} ${el.dni ? ` D.N.I. N.°:${el.dni}` : ''}` + (arr.length !== i + 1 ? '\n' : '');

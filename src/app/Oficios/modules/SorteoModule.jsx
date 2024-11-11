@@ -5,7 +5,7 @@ import { nameTranslateActuario } from '@/utils/traductorNombres'
 
 export default function SorteoModule({date, arr}) {
     const {updateDesplegables, desplegables, updateData} = useContext(DataContext)
-    const [showRaffle, setShowRaffle] = useState(true)
+    const [showRaffle, setShowRaffle] = useState(false)
     const [listaOriginal, setListaOriginal] = useState(desplegables.actuario || []);
     const [listaSeleccionado, setListaSeleccionado] = useState([]);
     const [turno, setTurno] = useState(true)

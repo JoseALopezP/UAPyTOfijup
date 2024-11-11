@@ -6,19 +6,21 @@ import { useContext, useEffect, useState } from 'react';
 
 export default function ListIndiv({item}) {
     const {desplegables, updateDataToday} = useContext(DataContext)
-    const [operadorAud, setOperadorAud] = useState(item.operador)
-    useEffect(() => {
-        updateDataToday(item.numeroLeg, item.hora, 'operador', operadorAud);
-    }, [operadorAud])
+    const [operadorAud, setOperadorAud] = useState(item.operador || '')
+    const handleOperadorChange = (value) =>{
+        updateDataToday(item.numeroLeg, item.hora, 'operador', value);
+        setOperadorAud(value)
+    }
     useEffect(()=>{
         setOperadorAud(item.operador)
     }, [item.operador])
     return (
         <div className={styles.listIndivBlock}>
-            <select onChange={(e)=>{setOperadorAud(e.target.value)}} className={styles.operadorItem}>
+            <select onChange={(e)=>{handleOperadorChange(e.target.value)}} className={styles.operadorItem}>
                 <option>{nameTranslate(operadorAud)}</option>
-                {desplegables.operador.map(el =>(
-                    <option key={el}>{nameTranslate(el)}</option>
+                <option value={''}></option>
+                {desplegables.operador && desplegables.operador.map(el =>(
+                    <option key={el} value={el}>{nameTranslate(el)}</option>
                 ))}
             </select>
             <p className={styles.horaItem}>{item.hora}</p>

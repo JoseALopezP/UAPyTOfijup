@@ -3,8 +3,9 @@
     margin: 0;
     margin-left: 2vw;
     height: 100vh;
-    border-right: solid 1px #2B2B2B;
     overflow: hidden;
+    display: inline-flex;
+    flex-direction: row;
 }
 .audienciaListContainer{
     width: 25vw;
@@ -13,6 +14,7 @@
     padding-top: 10px;
     padding-left: auto;
     height: 95vh;
+    border-right: solid 1px #2B2B2B;
 }
 .audienciasListDisplayBlock{
     border-top: solid 1px #2B2B2B;
@@ -143,4 +145,41 @@
     background-color: #d7d7d718;
     padding: 4px;
     border-radius: 4px;
+}
+
+.oficioBlockContainer{
+    display: inline-flex;
+    flex-direction: row;
+    width: 78vw;
+    height: 100%;
+}
+.oficioLeftBlockContainer{
+    border-right: solid 1px #2B2B2B;
+    width: 50%;
+    height: 100%;
+}
+.oficioRightBlockContainer{
+    width: 50%;
+    padding: 10px;
+}
+.oficioText{
+    color: #d7d7d7;
+    font-size: 18px;
+}
+.controlOficioTitle{
+    color: #d7d7d7;
+    width: 100%;
+    text-align: center;
+}
+.oficioControlBlock{
+    display: inline-flex;
+    flex-direction: column;
+    border-bottom: solid 1px #2B2B2B;
+    padding: 10px;
+    width: calc(100% - 20px);
+}
+.oficioControlTextArea{
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #d7d7d7;
 }

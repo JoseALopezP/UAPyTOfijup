@@ -4,6 +4,7 @@ import { AuthContextProvider} from "@/context/AuthContext";
 import { DataContextProvider } from "@/context/DataContext";
 import AudienciasListBlock from './modules/AudienciasListBlock';
 import { useState, useEffect } from 'react';
+import OficioBlock from './modules/OficioBlock';
 
 export default function page() {
     const [date, setDate] = useState(null)
@@ -23,6 +24,7 @@ export default function page() {
         <DataContextProvider>
           <div className={styles.container}>
             {date && <AudienciasListBlock audFunction={setSelectedAud} dateFunction={handleSave} dateToUse={date}/>}
+            {selectedAud && <OficioBlock dateToUse={date} aud={selectedAud}/>}
           </div>
         </DataContextProvider>
       </AuthContextProvider>
