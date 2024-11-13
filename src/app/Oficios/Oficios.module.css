@@ -208,3 +208,73 @@
     opacity: .5;
     cursor: not-allowed;
 }
+.controlOficioErrorInput{
+    height: 30px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 14px;
+    vertical-align: middle;
+    border: none;
+    outline: none;
+}
+.addErrorBlock{
+    display: inline-flex;
+    flex-direction: row;
+    height: 30px;
+    padding: 0;
+    width: 98%;
+    margin: 1%;
+}
+.controlOficioErrorInputTipos{
+    width: 32%;
+}
+.controlOficioErrorInputComent{
+    margin: 0 1%;
+    width: 62%;
+    height: 28px;
+}
+.controlOficioErrorInputAdd{
+    padding: 6px 12px;
+    background-color: brown;
+    color: #fff;
+    font: 700;
+    cursor: pointer;
+}
+.tableRowErrores{
+    display: inline-flex;
+    flex-direction: row;
+    width: 98%;
+    margin: 1px 1%;
+    height: 28px;
+}
+.errorListTipo, .errorListComentario, .errorListEstado, .errorListDel{
+    border-radius: 2px;
+    height: 28px;
+    border: none;
+    outline: none;
+    margin-left: 2px;
+    background-color: #2B2B2B;
+    margin-top: 0;
+}
+.errorListTipo{
+    width: 32%;
+}
+.errorListComentario{
+    width: 62%;
+}
+.errorListEstado{
+    cursor: pointer;
+    width: 4%;
+}
+.errorListDel{
+    width: 4%;
+    cursor: pointer;
+}
+.erroresListBlock{
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+}
+.tableRowErroresSolved{
+    opacity: .5;
+}
