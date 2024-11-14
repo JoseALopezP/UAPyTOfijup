@@ -4,9 +4,8 @@ import { DataContext } from '@/context/DataContext';
 import InputReloj from '@/app/components/InputReloj';
 
 export function AddAudienciaIndiv({date, element}) {
-    const { desplegables, updateData} = useContext(DataContext);
+    const { desplegables, updateData, deleteAudiencia} = useContext(DataContext);
     const [cambios, setCambios] = useState(false)
-
     const [del, setDel] = useState(false)
     const [hora, setHora] = useState(element.hora.split(':')[0] || '')
     const [minuto, setMinuto] = useState(element.hora.split(':')[1] || '')
@@ -19,7 +18,6 @@ export function AddAudienciaIndiv({date, element}) {
     const [juez1, setJuez1] = useState(element.juez && element.juez.split('+')[0] || '')
     const [juez2, setJuez2] = useState(element.juez && element.juez.split('+')[1] || '')
     const [juez3, setJuez3] = useState(element.juez && element.juez.split('+')[2] || '')
-
     const [horaBis, setHoraBis] = useState(element.hora.split(':')[0] || '')
     const [minutoBis, setMinutoBis] = useState(element.hora.split(':')[1] || '')
     const [salaBis, setSalaBis] = useState(element.sala || '')
@@ -56,7 +54,7 @@ export function AddAudienciaIndiv({date, element}) {
         }
     }
     const checkEditing = () =>{
-        if(hora !== horaBis|| minuto !== minutoBis || sala !== salaBis || legajo !== legajoBis || tipo !== tipoBis || tipo2 !== tipo2Bis || tipo3 !== tipo3Bis || juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis){
+        if(del || hora !== horaBis|| minuto !== minutoBis || sala !== salaBis || legajo !== legajoBis || tipo !== tipoBis || tipo2 !== tipo2Bis || tipo3 !== tipo3Bis || juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis){
             setCambios(true)
         }else{
             setCambios(false)
@@ -94,12 +92,15 @@ export function AddAudienciaIndiv({date, element}) {
                     desplegables.jueces.includes(juez1) && await updateData(date, element.numeroLeg, element.hora, 'juez', juez1);
                     setJuez1Bis(juez1)
                 }}
+            if(del){
+                await deleteAudiencia(date, element.numeroLeg, element.hora);
+            }
             setCambios(false)
         }
     }
     useEffect(() => {
         checkEditing();
-    }, [minuto, sala, legajo, tipo, tipo2, tipo3, juez1, juez2, juez3]);
+    }, [minuto, sala, legajo, tipo, tipo2, tipo3, juez1, juez2, juez3, del]);
 
     return(
         <form onSubmit={(event) => handleSubmit(event)} className={`${styles.tableRow}`}>

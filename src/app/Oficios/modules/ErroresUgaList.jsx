@@ -6,24 +6,16 @@ export default function ErroresUgaList({ aud, date, errores, setErrores }) {
     const { updateData } = useContext(DataContext);
 
     const handleToggleEstado = async (index) => {
-        // Update the local state
         const updatedErrores = errores.map((error, i) =>
             i === index ? { ...error, estado: !error.estado } : error
         );
-        
         setErrores(updatedErrores);
-
-        // Immediately update Firebase with the new `errores` array
         await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', updatedErrores);
     };
 
     const handleRemoveError = async (index) => {
-        // Remove the error from the list
         const newErrores = errores.filter((_, i) => i !== index);
-        
         setErrores(newErrores);
-
-        // Update Firebase with the updated `errores` array
         await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', newErrores);
     };
 
