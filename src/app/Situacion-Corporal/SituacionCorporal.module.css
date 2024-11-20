@@ -1,0 +1,51 @@
+.sitCorporalContainer{
+    width: 97.5vw;
+    margin-left: 2.5vw;
+    height: 99vh;
+    overflow: hidden;
+}
+.selectDateBlock{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.audienciaSelectDateBlock{
+    width: 250px;
+    height: 40px;
+    align-self: center;
+}
+.selectDate2{
+    width: 30px;
+    height: 30px;
+    border: 0;
+    outline: 0;
+    margin-right: 3px;
+    font-size: 18px;
+    border-radius: 2px;
+    padding: 0 4px;
+}
+.selectDate4{
+    width: 50px;
+    height: 30px;
+    border: 0;
+    outline: 0;
+    margin-right: 6px;
+    font-size: 18px;
+    border-radius: 2px;
+    padding: 0 4px;
+}
+.selectDateButton{
+    width: 100px;
+    height: 30px;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.sitListBlock{
+    overflow-y: scroll;
+}

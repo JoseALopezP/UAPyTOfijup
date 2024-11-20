@@ -9,7 +9,7 @@ export default function NavBar() {
             <IconNavBar iconRoute={'Registro-Audiencia'}/>
             <IconNavBar iconRoute={'Sorteo-Operador'}/>
             <IconNavBar iconRoute={'Oficios'}/>
-            <IconNavBar iconRoute={'Situación-Corporal'}/>
+            <IconNavBar iconRoute={'Situacion-Corporal'}/>
         </div>
     );
 }
