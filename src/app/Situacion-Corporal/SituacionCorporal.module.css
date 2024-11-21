@@ -2,7 +2,6 @@
     width: 97.5vw;
     margin-left: 2.5vw;
     height: 99vh;
-    overflow: hidden;
 }
 .selectDateBlock{
     width: 100%;
@@ -48,4 +47,78 @@
 }
 .sitListBlock{
     overflow-y: scroll;
+}
+.sitCorporalIndivBlock{
+    width: calc(33% - 20px);
+    display: inline-flex;
+    flex-direction: column;
+    border: solid 1px #313131;
+    padding: 10px;
+}
+.sitCorporalIndivFirst{
+    display: inline-flex;
+    flex-direction: row;
+    cursor: pointer;
+}
+.sitIndivValue{
+    line-height: 18px;
+    font-size: 18px;
+    color: #CCCCCC;
+}
+.sitIndivHora{
+    width: 15%;
+}
+.sitIndivLeg{
+    width: 20%;
+}
+.sitIndivJuez{
+    display: inline-flex;
+    flex-direction: row;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 0;
+    margin: 0;
+    width: 65%;
+    max-height: 52px;
+}
+.sitCorporalIndivSecond{
+    margin-top: 5px;
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 80px;
+}
+.textAreaSituacion{
+    width: 70%;
+    background-color: #2A2D2E;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 18px;
+}
+.sitCorporalIndivSecondHidden{
+    transform: scale(0);
+    height: 20px;
+}
+.situacionButton{
+    width: 80px;
+    height: 100%;
+    border-radius: 2px;
+    font-weight: 700;
+    cursor: not-allowed;
+}
+.selectLegSearch{
+    height: 28px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+}
+.sitCorporalIndivBlockFilled{
+    background-color: #242424;
+}
+.situacionButtonTrue{
+    background-color: #CBCB41;
+    cursor: pointer;
 }

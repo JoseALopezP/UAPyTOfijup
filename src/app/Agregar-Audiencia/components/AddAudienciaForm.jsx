@@ -4,7 +4,7 @@ import { DataContext } from '@/context/DataContext';
 import { SelectDate } from '@/app/components/SelectDate';
 
 export function AddAudienciaForm ({dateFunction, date}) {
-    const {updateTiposAudiencias, updateByDate, tiposAudiencias, jueces, updateDesplegables, addAudiencia, bydate, desplegables} = useContext(DataContext);
+    const {updateTiposAudiencias, updateByDate, tiposAudiencias, updateDesplegables, addAudiencia, bydate, desplegables} = useContext(DataContext);
     const [hora, setHora] = useState('')
     const [hora2, setHora2] = useState('')
     const [horaProgramada, setHoraProgramada] = useState(45)
