@@ -1,3 +1,5 @@
+'use client'
+import { AuthContextProvider } from '@/context/AuthContext';
 import IconNavBar from './IconNavBar';
 import styles from './NavBar.module.css'
 

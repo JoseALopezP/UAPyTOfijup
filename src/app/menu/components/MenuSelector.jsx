@@ -8,16 +8,10 @@ import { AuthContext } from '@/context/AuthContext'
 import { generateExcel } from '@/utils/excelUtils'
 
 export default function MenuSelector() {
-    const [dayUGA, setDayUGA] = useState(null)
-    const [monthUGA, setMonthUGA] = useState(null)
-    const [yearUGA, setYearUGA] = useState(null)
-    const [dayUAC, setDayUAC] = useState(null)
-    const [monthUAC, setMonthUAC] = useState(null)
-    const [yearUAC, setYearUAC] = useState(null)
     const [dayXLXS, setDayXLXS] = useState(null)
     const [monthXLXS, setMonthXLXS] = useState(null)
     const [yearXLXS, setYearXLXS] = useState(null)
-    const {checkUserType, userType, updateByDate, bydate} = useContext(DataContext);
+    const {userType, updateByDate, bydate} = useContext(DataContext);
     const {user} = useContext(AuthContext);
     const router = useRouter()
     useEffect(() => {

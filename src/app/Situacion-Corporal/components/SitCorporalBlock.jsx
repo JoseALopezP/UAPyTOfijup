@@ -7,7 +7,7 @@ import SitCorporalList from './SitCorporalList'
 
 export default function SitCorporalBlock() {
     const [dateToUSe, setDateToUse] = useState(null)
-    const [legSearch, setLegSearch] = useState('-')
+    const [legSearch, setLegSearch] = useState('')
     const {updateByDateListener, bydate} = useContext(DataContext)
     const handleSave = (newDate) => {
         setDateToUse(newDate);

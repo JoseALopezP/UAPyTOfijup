@@ -5,6 +5,7 @@ import { listModelos, modeloMinuta } from '@/utils/modelosUtils';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { generatePDF } from '@/utils/pdfUtils';
 import deepEqual from '@/utils/deepEqual';
+import { checkCompletion } from '@/utils/checkCompletion';
 
 export default function RegistroAudienciaRight({ item, dateToUse }) {
     const {updateRealTime, realTime, updateData} = useContext(DataContext)
@@ -17,6 +18,8 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const [minuta2, setMinuta2] = useState('');
     const [cierre, setCierre] = useState('');
     const [cierre2, setCierre2] = useState('');
+    const [errorDescarga, setErrorDescarga] = useState(false)
+    const [checkDescarga, setCheckDescarga] = useState('')
     const updateComparisson = () => {
         setResuelvo(item.resuelvoText || '');
         setResuelvo2(item.resuelvoText || '');
@@ -61,6 +64,18 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
             !deepEqual(cierre2, cierre)
         setGuardarInc(guardarStatus);
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
+    const handleDescargar = () =>{
+        switch(checkCompletion(item)){
+            case 'mpf':
+                setCheckDescarga('Faltan datos fiscal ¿Quiere continuar con la descarga?');
+            case 'defensa':
+                setCheckDescarga('Faltan datos de la defensa ¿Quiere continuar con la descarga?');
+            case 'noListo':
+                setErrorDescarga(true);
+                setInterval(function(){setErrorDescarga(false)})
+            break;
+        }
+    }
     useEffect(() => {
         const interval = setInterval(() => {
             if(document.getElementById('submit-btn') && !showReconversion){
@@ -120,6 +135,6 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 onChange={(e) => setCierre(e.target.value)}
             />
         </form>
-        <button type='button' className={`${styles.descargarButton}`} onClick={async() => await generatePDF(item,(new Date()).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }).split('/').join(''))}>Descargar PDF</button></>
+        <button type='button' className={`${styles.descargarButton}`} onClick={() => handleDescargar()}>Descargar PDF</button></>
     );
 }

@@ -4,20 +4,20 @@ import { DataContext } from '@/context/DataContext';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 
-export function AudienciaList ({date}) {
+export function AudienciaList () {
+    const router = useRouter()
     const {updateToday, today} = useContext(DataContext);
+    const { user } = useAuthContext()
     function tick() {
         updateToday();     
     }
     useEffect(() =>{
         tick()
-        const timerID = setInterval(() => tick(), 30000);  
+        const timerID = setInterval(() => tick(), 30000);
         return function cleanup() {
             clearInterval(timerID);
         };
     }, [])
-    const { user } = useAuthContext()
-    const router = useRouter()
     useEffect(() => {
       if (user == null) router.push("/signin")
     }, [user])
