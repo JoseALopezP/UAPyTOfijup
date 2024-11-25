@@ -37,12 +37,12 @@ export function AddAudienciaForm ({dateFunction, date}) {
         (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
         (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
         (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
-        (tipo || tipo == '-') ? setTipoError(false) : setTipoError(true);
+        (tipo || tipo == '-' || !desplegables.tipos.includes(tipo)) ? setTipoError(false) : setTipoError(true);
         (horaProgramada || horaProgramada === 0) ? setHoraProgramadaError(false) : setHoraProgramadaError(true);
         if(colegiado){
-            ((juez || juez == '-' ) && (juez2 || juez == '-') && (juez3 || juez == '-')) ? setJuezError(false) : setJuezError(true);
+            ((juez || juez == '-' || desplegables.jueces.includes(juez)) && (juez2 || juez2 == '-' || desplegables.jueces.includes(juez2)) && (juez3 || juez3 == '-' || desplegables.jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
         }else{
-            (juez || juez == '-') ? setJuezError(false) : setJuezError(true);
+            (juez || juez == '-' || desplegables.jueces.includes(juez)) ? setJuezError(false) : setJuezError(true);
         }
         if(colegiado){
             ((desplegables.jueces.includes(juez)) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
@@ -170,7 +170,7 @@ export function AddAudienciaForm ({dateFunction, date}) {
                 {((tipo && tipo =='-' || tipo =='') || (tipo2 && tipo2 =='-' || tipo2 =='')) ||
                     <input list="tipo" className={`${styles.tipoInput}`} onChange={(e)=>{setTipo3(e.target.value)}}/>}
                 <datalist id='tipo'>
-                    {tiposAudiencias && tiposAudiencias.sort().map((el) =>{
+                    {desplegables.tipos && desplegables.tipos.sort().map((el) =>{
                         return(
                             <option key={el} value={el}>{el}</option>
                         )

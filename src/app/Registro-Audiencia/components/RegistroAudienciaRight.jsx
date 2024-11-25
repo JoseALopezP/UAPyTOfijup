@@ -58,6 +58,9 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         if(event) event.preventDefault();
         await updateDataAud()
     };
+    const handleDescargar2 = async() =>{
+        await set
+    }
     const checkGuardar = useCallback(() => {
         const guardarStatus = !deepEqual(resuelvo2, resuelvo) ||
             !deepEqual(minuta2, minuta) ||
@@ -97,7 +100,11 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         checkGuardar();
     }, [guardarInc]);
     return (
-        <><form className={`${styles.controlBlockRight}`} onSubmit={(event) => handleSubmit(event)}>
+        <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
+                <p>{checkDescarga}</p>
+                <button className={`${styles.buttonDownload2}`}>DESCARGAR</button>
+            </div>}
+            <form className={`${styles.controlBlockRight}`} onSubmit={(event) => handleSubmit(event)}>
             {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
                 <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
                 <span className={`${styles.guardar}`}>GUARDAR</span>
@@ -134,7 +141,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 value={cierre}
                 onChange={(e) => setCierre(e.target.value)}
             />
-        </form>
-        <button type='button' className={`${styles.descargarButton}`} onClick={() => handleDescargar()}>Descargar PDF</button></>
+            <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>Descargar PDF</button>
+        </form></>
     );
 }

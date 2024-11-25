@@ -258,3 +258,40 @@
     font-size: 18px;
     font-family: inherit;
 }
+.checkDescargaFalta{
+    position: fixed;
+    border: solid 1px #2B2B2B;
+    border-radius: 2px;
+    background-color: #1F1F1F;
+    top: 40%;
+    left: 40%;
+    width: 20%;
+    height: 20%;
+    justify-content: space-between;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 8px;
+}
+.buttonDownload{
+    width: 80%;
+    margin: 8px 10%;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.buttonDownload2{
+    width: 80%;
+    margin: 0 10%;
+    padding: 4px;
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 2px;
+}
+.controlBlock button{
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
