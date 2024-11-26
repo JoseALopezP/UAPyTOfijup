@@ -2,10 +2,10 @@ import { jsPDF } from 'jspdf';
 import { generateMinutaSection } from './resuelvoUtils';
 
 export const generatePDF = async (item, date) => {
-  PDFGenerator(generateMinutaSection(item, date));
+  PDFGenerator(generateMinutaSection(item, date),item.numeroLeg);
 }
 
-export const PDFGenerator = async (sections) => {
+export const PDFGenerator = async (sections, numeroLeg) => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const headerImage = '/pdf/header.jpg';
   const footerImage = '/pdf/footer.jpg';
@@ -29,9 +29,9 @@ export const PDFGenerator = async (sections) => {
       if (align === 'right') {
         doc.text(line, initialX, currentY, { align: 'right' });
       } else if (align === 'justify') {
-        doc.text(20, currentY, line, { maxWidth: 170, align: 'justify' });
+        doc.text(20, currentY, line, { maxWidth: 180, align: 'justify' });
       } else {
-        doc.text(line, initialX, currentY, { maxWidth: 170, align: 'justify' });
+        doc.text(line, initialX, currentY, { maxWidth: 180, align: 'justify' });
       }
       currentY += lineHeight;
     });
@@ -101,5 +101,5 @@ export const PDFGenerator = async (sections) => {
         await doc.addImage(footerImage, 'JPEG', footerX, footerY, footerWidth, footerHeight);
       }
     }
-    doc.save('document.pdf');
+    doc.save(numeroLeg+'.pdf');
 };

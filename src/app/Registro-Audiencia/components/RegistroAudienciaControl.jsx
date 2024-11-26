@@ -5,7 +5,7 @@ import RegistroAudienciaLeft from './RegistroAudienciaLeft';
 import RegistroAudienciaRight from './RegistroAudienciaRight';
 
 export default function RegistroAudienciaControl({ aud, dateToUse }) {
-    const {updateDesplegables, desplegables, updateByDate, bydate} = useContext(DataContext)
+    const {updateDesplegables} = useContext(DataContext)
     useEffect(() => {
         updateDesplegables()
     }, [])

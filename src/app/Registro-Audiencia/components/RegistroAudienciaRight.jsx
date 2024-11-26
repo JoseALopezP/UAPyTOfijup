@@ -59,7 +59,8 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         await updateDataAud()
     };
     const handleDescargar2 = async() =>{
-        await set
+        await generatePDF(item, dateToUse)
+        await setCheckDescarga('')
     }
     const checkGuardar = useCallback(() => {
         const guardarStatus = !deepEqual(resuelvo2, resuelvo) ||
@@ -75,13 +76,15 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 setCheckDescarga('Faltan datos de la defensa ¿Quiere continuar con la descarga?');
             case 'noListo':
                 setErrorDescarga(true);
-                setInterval(function(){setErrorDescarga(false)})
+                setInterval(function(){setErrorDescarga(false)},3000)
+            case 'completo':
+                generatePDF(item, dateToUse)
             break;
         }
     }
     useEffect(() => {
         const interval = setInterval(() => {
-            if(document.getElementById('submit-btn') && !showReconversion){
+            if(document.getElementById('submit-btn')){
                 document.getElementById('submit-btn').click();
             }
         }, 60000);
@@ -102,7 +105,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     return (
         <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
                 <p>{checkDescarga}</p>
-                <button className={`${styles.buttonDownload2}`}>DESCARGAR</button>
+                <button type='button' className={`${styles.buttonDownload2}`} onClick={() => handleDescargar2()}>DESCARGAR</button>
             </div>}
             <form className={`${styles.controlBlockRight}`} onSubmit={(event) => handleSubmit(event)}>
             {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
