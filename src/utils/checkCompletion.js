@@ -16,7 +16,7 @@ export const checkCompletion = (aud) =>{
         if(!aud.mpf){
             return 'mpf'
         }else{
-            if(aud.defensa){
+            if(!aud.defensa){
                 return 'defensa'
             }else{
                 return 'completo'

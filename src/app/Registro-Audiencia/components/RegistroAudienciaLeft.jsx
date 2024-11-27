@@ -333,7 +333,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                                     <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
                             </select>
                             <input className={`${styles.inputLeft} ${styles.inputLeft33}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
-                            <input className={`${styles.inputLeft} ${styles.inputLeft33}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
+                            <input className={`${styles.inputLeft} ${styles.inputLeft33}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
                             <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
                         </div>
                     ))}
