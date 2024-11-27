@@ -161,6 +161,7 @@
 .oficioRightBlockContainer{
     width: 50%;
     padding: 10px;
+    overflow-y: scroll;
 }
 .oficioText{
     color: #d7d7d7;
@@ -277,4 +278,11 @@
 }
 .tableRowErroresSolved{
     opacity: .5;
+}
+.generadorOficioForm{
+    background-color: #1F1F1FF0;
+    position: fixed;
+    z-index: 12;
+    width: 100%;
+    height: 100vh;
 }
