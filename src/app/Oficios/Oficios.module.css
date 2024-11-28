@@ -282,7 +282,65 @@
 .generadorOficioForm{
     background-color: #1F1F1FF0;
     position: fixed;
+    display: inline-flex;
+    flex-direction: column;
     z-index: 12;
-    width: 100%;
+    width: 37%;
+    left: 63%;
     height: 100vh;
+    overflow-y: scroll;
+    padding: 10px;
+}
+.oficioButton{
+    position: fixed;
+    width: 20%;
+    height: 36px;
+    top: 94%;
+    left: 72%;
+    padding: 0;
+    font-size: 24px;
+    font-family: inherit;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    z-index: 15;
+}
+
+.oficioInput{
+    border: solid 2px #375166;
+    width: calc(95% - 6px);
+    outline: none;
+    border-radius: 5px;
+}
+.controlButton{
+    width: 95%;
+    font-weight: 700;
+    background-color: #FFF;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+.textAreaTraslado{
+    width: 95%;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    background-color: #d7d7d7;
+    font-family: inherit;
+    margin-bottom: 20px;
+}
+.controlButtonDescargar{
+    background-color: #375166;
+    color: #fff;
+    border: #d7d7d7 2px solid;
+    padding: 6px;
+}
+.oficioTitle{
+    color: #FFF;
+    font-size: x-large;
+    font-family: inherit;
 }
