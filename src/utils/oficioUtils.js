@@ -1,16 +1,21 @@
-const processSectionsOficio = (sections) => {
+const justifyLine = (line) =>{
+  
+  return
+}
+
+export const processSectionsOficio = (sections) => {
     sections.forEach((section) => {
       let textWidth = 170;
       if (section.right) {
         doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
+        doc.setFont("arial", "normal");
         const textLines = doc.splitTextToSize(section.right, textWidth);
         addTextWithLineBreaks(textLines, doc.internal.pageSize.getWidth() - 20, 'right');
         currentY += sectionSpacingWithoutTitle;
       }
       if (section.title) {
         doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
+        doc.setFont("arial", "bold");
         const titleLines = doc.splitTextToSize(section.title, textWidth);
   
         titleLines.forEach((line) => {
@@ -23,13 +28,12 @@ const processSectionsOficio = (sections) => {
         });
   
         const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
-        textWidth -= titleWidth; // Adjust text width for subsequent text
+        textWidth -= titleWidth;
       }
   
       if (section.text) {
         doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-  
+        doc.setFont("arial", "normal");
         const textLines = doc.splitTextToSize(section.text, textWidth);
         addTextWithLineBreaks(textLines, 20, 'justify');
         currentY += sectionSpacingWithTitle;
