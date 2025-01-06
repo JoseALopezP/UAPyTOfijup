@@ -8,13 +8,15 @@
     top: 70px;
 }
 .table{
-    width: calc(100vw - (100vw - 100%));
-    border: none;   
+    width: calc(100vw - (100vw - 100%) - 2.35vw);
+    border: none;
+    margin-left: 2.35vw;
 }
 .tableHead{
     background-color: white;
     color: #375166;
     position: sticky;
+    
 }
 .tableBody tr{
     height: 70px;
@@ -44,13 +46,14 @@
     position: fixed;
     z-index: 50;
     flex-direction: row;
+    margin-left: 2.35vw;
 }
 
 .clockBlock{
     font-weight: 700;
     font-size: 48px;
     width: 180px;
-    padding: 10px 40px;
+    padding: 0px 40px;
     letter-spacing: 3px;
     display: inline-flex;
     flex-direction: column;

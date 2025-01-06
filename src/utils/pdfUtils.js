@@ -158,12 +158,12 @@ export const PDFGenerator = async (sections, numeroLeg) => {
         const startX = 20;
         const startY = currentY;
         const lineHeight = 10;
-        const indentFactor = 0.4; // Indentation for paragraphs
-        const paragraphSpacing = 0; // Single line jump between paragraphs
+        const indentFactor = 0.4;
+        const paragraphSpacing = 0;
         currentY = justifyText(doc, section.text, textWidth, startX, startY, lineHeight, indentFactor, paragraphSpacing
         );
       
-        currentY += sectionSpacingWithTitle; // Ensure spacing after the text block
+        currentY += sectionSpacingWithTitle; 
       }
       
     });
