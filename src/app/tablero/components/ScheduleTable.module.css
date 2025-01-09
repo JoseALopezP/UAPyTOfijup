@@ -150,7 +150,24 @@
     -webkit-animation: infodisappear2 1s;
     -webkit-animation-fill-mode: both;
 }
-
+.infoBlockTitleSearch{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.tableroSearch{
+    position: fixed;
+    left: 80%;
+    top: 14px;
+    width: 18%;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 24px; 
+    border: solid #BF906D;
+    border-width: 0 0 0 4px;
+    padding-left: 8px;
+}
 
 .ofijupTitle{
     position: fixed;

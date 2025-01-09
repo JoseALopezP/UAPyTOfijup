@@ -2,14 +2,18 @@ import { useContext, useEffect, useState} from 'react';
 import styles from './ScheduleTable.module.css';
 import { DataContext } from '@/context/DataContext';
 
-export function ScheduleTable() {
+export function ScheduleTable({filterValue}) {
     const { updateToday, today, realTime} = useContext(DataContext);
     const [filerValue, setFilterValue] = useState('')
 
     useEffect(() => {
         updateToday()
     }, []);
-
+    useEffect(() => {
+    }, [today]);
+    useEffect(()=>{
+        
+    }, [filterValue])
     return (
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
@@ -26,6 +30,9 @@ export function ScheduleTable() {
                 <tbody className={`${styles.tableBody}`}>
                     {today &&
                         today
+                            .filter(sentence =>
+                                filterValue.toLowerCase().split(' ').every(word => (sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3.toLowerCase().includes(word)))
+                            )
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
                             .map((el, i) => {
                                 return (
