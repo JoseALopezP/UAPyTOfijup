@@ -15,7 +15,8 @@ export function Clock () {
             clearInterval(timerID);
         };
     }, []);
-    
+    useEffect(() =>{
+    }, [realTime])
     return(
         <div className={`${styles.clockBlock}`}>
             <p className={`${styles.clockDigits}`}>{realTime && realTime}</p>

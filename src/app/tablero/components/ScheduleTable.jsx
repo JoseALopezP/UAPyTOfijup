@@ -4,16 +4,30 @@ import { DataContext } from '@/context/DataContext';
 
 export function ScheduleTable({filterValue}) {
     const { updateToday, today, realTime} = useContext(DataContext);
-    const [filerValue, setFilterValue] = useState('')
-
+    const [todayFiltered, setTodayFiltered] = useState(today)
     useEffect(() => {
         updateToday()
     }, []);
     useEffect(() => {
     }, [today]);
     useEffect(()=>{
-        
-    }, [filterValue])
+        const filteredData = today?.filter((sentence) => {
+            const searchableText = [
+                sentence.hora,
+                sentence.estado,
+                sentence.numeroLeg,
+                sentence.juez,
+                sentence.tipo,
+                sentence.tipo2,
+                sentence.tipo3
+            ].join(' ').toLowerCase();
+            return filterValue
+                .toLowerCase()
+                .split(' ')
+                .every((word) => searchableText.includes(word));
+        });
+        setTodayFiltered(filteredData)
+    }, [filterValue, today])
     return (
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
@@ -28,11 +42,13 @@ export function ScheduleTable({filterValue}) {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today &&
-                        today
-                            .filter(sentence =>
-                                filterValue.toLowerCase().split(' ').every(word => (sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3.toLowerCase().includes(word)))
+                    {todayFiltered &&
+                        todayFiltered
+                        .filter(sentence =>
+                            filterValue.toLowerCase().split(' ').every(word =>
+                                (sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3.toLowerCase().includes(word))
                             )
+                        )
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
                             .map((el, i) => {
                                 return (
