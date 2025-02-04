@@ -1,7 +1,7 @@
 import { caratulaGenerator } from '@/utils/caratulaUtils'
 import { testOficio } from '@/utils/testOficio';
 import styles from '../Oficios.module.css'
-import GeneradorOficioBlock from './generadorOficioBlock';
+import GeneradorOficioBlock from './GeneradorOficioBlock';
 import { useState } from 'react';
 
 export default function OficioRightBlock({aud, date}) {
