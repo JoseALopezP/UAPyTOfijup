@@ -47,7 +47,7 @@ export default function OficioLeftBlock({ date, aud }) {
                 />
             </span>
             <span className={styles.oficioErroresList}>
-                <h2 className={styles.controlOficioTitle}>ERRORES UGA</h2>
+                <h2 className={styles.controlOficioTitle}>REVISIÓN UGA</h2>
                 <ErroresUgaList date={date} aud={aud} errores={errores} setErrores={setErrores} />
                 <form className={styles.addErrorBlock} onSubmit={handleSubmit}>
                     <select

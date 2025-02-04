@@ -111,7 +111,7 @@ function juecesPart(jueces) {
     return aux;
 }
 
-export async function generateOficioSection(item, date, traslado, oficiados) {
+export async function generateOficioSection(item, date, traslado='', oficiados) {
     const sections = [];
     sections.push({ right: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.` });
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));

@@ -1,10 +1,22 @@
 import { caratulaGenerator } from '@/utils/caratulaUtils'
+import { testOficio } from '@/utils/testOficio';
 import styles from '../Oficios.module.css'
 import GeneradorOficioBlock from './generadorOficioBlock';
 import { useState } from 'react';
 
 export default function OficioRightBlock({aud, date}) {
-    const [showOficio, setShowOficio] = useState(true)
+    const [showOficio, setShowOficio] = useState(false)
+    const [showStop, setShowStop] = useState(false) 
+    const handleShow = () =>{
+        if(testOficio(aud)){
+            setShowOficio(!showOficio)
+        }else{
+            setShowStop(true)
+            setTimeout(() =>{
+                setShowStop(false)
+            }, 2000)
+        }
+    }
     if (!aud) return null;
     return (
         <><div className={styles.oficioRightBlockContainer} >
@@ -12,7 +24,7 @@ export default function OficioRightBlock({aud, date}) {
             {aud.minuta ? <p className={styles.oficioText}>{aud.minuta}</p> : <p></p>}
             {aud.resuelvo ? <p className={styles.oficioText}>{aud.resuelvo}</p> : <p></p>}
         </div>
-        <button className={styles.oficioButton} onClick={() => setShowOficio(!showOficio)}>GENERAR OFICIO</button>
+        <button className={styles.oficioButton} onClick={() => handleShow()}>{showStop ? 'FALTAN DATOS' : 'GENERAR OFICIO'}</button>
         {showOficio && <GeneradorOficioBlock item={aud} date={date}/>}</>
     )
 }
