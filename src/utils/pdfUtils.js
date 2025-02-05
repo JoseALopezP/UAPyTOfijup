@@ -9,7 +9,6 @@ export const generatePDF = async (item, date) => {
 
 export const PDFGenerator = async (sections, numeroLeg) => {
   const doc = new jsPDF('p', 'mm', 'a4');
-  
   const headerImage = '/pdf/header.jpg';
   const footerImage = '/pdf/footer.jpg';
   const headerImageOficio = '/pdf/headerOficio.jpg';
@@ -32,19 +31,14 @@ export const PDFGenerator = async (sections, numeroLeg) => {
     paragraphSpacing = lineHeight
   ) {
     const paragraphs = text.split("\n");
-    let currentY = startY;
-  
     paragraphs.forEach((paragraph) => {
       if (paragraph.trim() === "") {
-        return; // Skip empty lines
+        return;
       }
-  
       const indent = textWidth * indentFactor;
-  
       if (paragraph.includes("Saluda atte.")) {
-        // Render "Saluda atte." with indentation but without justification
         doc.text(paragraph, startX + indent, currentY);
-        currentY += lineHeight + paragraphSpacing; // Move to the next line
+        currentY += lineHeight + paragraphSpacing;
         return;
       }
   
@@ -53,12 +47,10 @@ export const PDFGenerator = async (sections, numeroLeg) => {
       let lines = [];
       let isFirstLine = true;
   
-      // Create lines for the paragraph
       words.forEach((word) => {
         const testLine = line + word + " ";
         const testLineWidth = doc.getTextWidth(testLine);
-  
-        // Use reduced width for the first line and full width for the rest
+
         const maxWidth = isFirstLine ? textWidth - indent : textWidth;
         if (testLineWidth > maxWidth) {
           lines.push({ text: line.trim(), isFirstLine });
@@ -72,17 +64,13 @@ export const PDFGenerator = async (sections, numeroLeg) => {
       if (line.length > 0) {
         lines.push({ text: line.trim(), isFirstLine });
       }
-  
-      // Render lines
       lines.forEach((lineData, index) => {
         const { text, isFirstLine } = lineData;
   
         if (index === lines.length - 1) {
-          // Last line: Align to the left
           const xOffset = isFirstLine ? startX + indent : startX;
           doc.text(text, xOffset, currentY);
         } else {
-          // Justify the text
           const wordsInLine = text.split(" ");
           const totalWordWidth = wordsInLine.reduce((sum, word) => sum + doc.getTextWidth(word), 0);
           const totalSpaces = wordsInLine.length - 1;
@@ -101,12 +89,9 @@ export const PDFGenerator = async (sections, numeroLeg) => {
   
         currentY += lineHeight;
       });
-  
-      // Add spacing between paragraphs
       currentY += paragraphSpacing;
     });
-  
-    return currentY; // Return updated Y position
+    return currentY; 
   }
   
   const addTextWithLineBreaks = (textLines, initialX, align = 'left', doc) => {
