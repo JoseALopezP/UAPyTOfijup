@@ -114,22 +114,27 @@ const processSections = (sections, doc) => {
 
     // Handle title
     if (section.title) {
-      doc.setFontSize(11);
-      doc.setFont("arialbd", "normal");
-      const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
+  doc.setFontSize(11);
+  doc.setFont("arialbd", "normal");
 
-      titleLines.forEach((line) => {
-        if (currentY > (pageHeight - bottomMargin)) {
-          doc.addPage();
-          currentY = topMargin;
-        }
-        doc.text(line, 20, currentY);
-        currentY += lineHeight;
-      });
+  // Calculate the justified width for titles
+  const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
 
-      const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
-      textWidth -= titleWidth;
+  titleLines.forEach((line, index) => {
+    if (currentY > (pageHeight - bottomMargin)) {
+      doc.addPage();
+      currentY = topMargin;
     }
+
+    // Handle justification for the title as well
+    justifyText(doc, line, textWidth * 0.45, 20, currentY, 2, 0, 0);
+    //justifyText(doc, text, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight)
+    currentY += 4;
+  });
+
+  const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
+  textWidth -= titleWidth;
+}
 
     // Handle text content
     if (section.text) {

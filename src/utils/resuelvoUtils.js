@@ -121,7 +121,7 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
     ${traslado}
     Saluda atte.`
     });
-    await PDFGenerator(sections);
+    await PDFGenerator(sections, item.numeroLeg);
 }
 
 export function generateMinutaSection(item, date) {

@@ -10,7 +10,7 @@ export function SelectDate({dateFunction, date}) {
             <input type="text" className={`${styles.selectDate2}`} value={dia} onChange={e => {setDia(e.target.value)}}/>
             <input type="text" className={`${styles.selectDate2}`} value={mes} onChange={e => {setMes(e.target.value)}}/>
             <input type="text" className={`${styles.selectDate4}`} value={anio} onChange={e => {setAnio(e.target.value)}}/>
-            <button type="button" className={`${styles.selectDateButton}`} onClick={() => dateFunction(''+dia+mes+anio)}>CAMBIAR</button>
+            <button type="button" className={`${styles.selectDateButton}`} onClick={() => dateFunction(''+dia.padStart(2,'0')+mes.padStart(2,'0')+anio.padStart(4,'20'))}>CAMBIAR</button>
         </section>
     )
 }
