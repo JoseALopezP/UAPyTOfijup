@@ -5,7 +5,7 @@ import { getMonthName } from "./caratulaUtils";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal:'} ${el.nombre.split(' - ')[0]} UFI:${ufi} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${el.nombre.split(' - ')[0]} ${el.asistencia ? '' : '(ausente)'} UFI:${ufi}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -47,7 +47,7 @@ Sala de Audiencias: ${item.sala}
 Hora programada: ${item.hora} horas
 Hora real de inicio: ${item.hitos[0].split(' | ')[0]} horas
 Juez Interviniente: ${capitalizeFirst(item.juez.toLowerCase())}
-${listFiscal(item.mpf, item.ufi)}
+${item.mpf && listFiscal(item.mpf, item.ufi)}
 ${listDefensa(item.defensa)}
 ${listImputado(item.imputado)}
 ${listPartes(item.partes)}
@@ -60,12 +60,12 @@ Fundamentos y Resolución: ${item.resuelvoText}
 
 export function generateResuelvoSection(item, date) {
     const sections = [
-        { title: 'Lugar y Fecha', text: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.` },
-        { title: 'Tipo de Audiencia', text: `${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''}.` },
-        { title: 'Legajo', text: `N° ${item.numeroLeg} Caratulado ${item.caratula}.` },
-        { title: 'Sala de Audiencias', text: `${item.sala}.` },
-        { title: 'Hora programada', text: `${item.hora} horas.` },
-        { title: 'Hora real de inicio', text: `${item.hitos[0].split(' | ')[0]} horas.` },
+        { title: 'Lugar y Fecha', text: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.`},
+        { title: 'Tipo de Audiencia', text: `${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''}.`},
+        { title: 'Legajo', text: `N° ${item.numeroLeg} Caratulado ${item.caratula}.`},
+        { title: 'Sala de Audiencias', text: `${item.sala}.`},
+        { title: 'Hora programada', text: `${item.hora} horas.`},
+        { title: 'Hora real de inicio', text: `${item.hitos[0].split(' | ')[0]} horas.`},
     ];
 
     if (item.juez.split('+').length > 1) {
@@ -75,10 +75,20 @@ export function generateResuelvoSection(item, date) {
     }
 
     if (item.mpf) {
-        listFiscal(item.mpf, item.ufi).split('\n').forEach((f, indexF, arr) => sections.push((indexF>0)?
-        {text: ' '.repeat(34) + ((arr.length === indexF+1) ? f.split('Ministerio Público Fiscal:')[1] : f.split(':')[1].split('UFI')[0])}:
-        { title: f.split(':')[0], text: f.split('Fiscal:')[1].split('UFI:')[0] + (item.mpf[indexF].asistencia ? '' : ' (ausente)') }));
-    }
+        let combinedText = '';
+        listFiscal(item.mpf, item.ufi).split('\n').forEach((f, indexF, arr) => {
+          if (indexF > 0) {
+            combinedText += ((arr.length === indexF + 1) 
+              ? f.split('Ministerio Público Fiscal:')[1]
+              : f.split(':')[1].split('UFI')[0]
+            ) + '\n';
+          } else {
+            combinedText += `${f.split(':')[0]}: ${f.split('Fiscal:')[1].split('UFI:')[0]}${item.mpf[indexF].asistencia ? '' : ' (ausente)'}\n`;
+          }
+        });
+
+        sections.push({ title: 'Fiscal Summary', text: combinedText.trim() });
+      }
     if (item.defensa) {
         listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0], text: d.split(':')[1]}));
     }

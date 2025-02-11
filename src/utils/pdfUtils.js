@@ -100,7 +100,6 @@ const processSections = (sections, doc) => {
   console.log(sections)
   sections.forEach((section) => {
     let textWidth = 170;
-
     if (section.right) {
       doc.setFontSize(11);
       doc.setFont("arial", "normal");
@@ -108,7 +107,7 @@ const processSections = (sections, doc) => {
       addTextWithLineBreaks(textLines, doc.internal.pageSize.getWidth() - 20, 'right', doc);
       currentY += sectionSpacingWithoutTitle;
     }
-    if (section.title) {
+    if (section.title && !section.text) {
     doc.setFontSize(11);
     doc.setFont("arialbd", "normal");
     const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
@@ -119,11 +118,11 @@ const processSections = (sections, doc) => {
       }
     justifyText(doc, line, textWidth * 0.45, 20, currentY, 2, 0, 0);
     currentY += 4;
-  });
-  const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
-  textWidth -= titleWidth;
+    });
+    const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
+    textWidth -= titleWidth;
   }
-  if (section.text) {
+  if (section.text && !section.title) {
     doc.setFontSize(11);
     doc.setFont("arial", "normal");
     const startX = 20;
@@ -142,6 +141,47 @@ const processSections = (sections, doc) => {
       }
 
       currentY += sectionSpacingWithTitle; 
+    }
+    if (section.text && section.title) {
+      doc.setFontSize(11);
+    
+      // Set bold font for the title
+      doc.setFont("arialbd", "normal");
+    
+      // Keep track of the current Y position before writing the title
+      const titleY = currentY;
+    
+      // Display the title without justification
+      const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
+      let maxTitleWidth = 0;
+      titleLines.forEach((line) => {
+        if (currentY > (pageHeight - bottomMargin)) {
+          doc.addPage();
+          currentY = topMargin;
+        }
+        doc.text(line, 20, titleY); // Write title at the same Y level
+        maxTitleWidth = Math.max(maxTitleWidth, doc.getTextWidth(line));
+      });
+    
+      const availableTextWidth = textWidth - maxTitleWidth - 5; // Subtract title width and padding
+      const textStartX = 20 + maxTitleWidth + 5;
+    
+      doc.setFont("arial", "normal");
+    
+      // Wrap and align text to fit the remaining width
+      const textLines = doc.splitTextToSize(section.text, availableTextWidth);
+      let firstLineY = titleY; // Ensure text starts at the same Y position as the title
+    
+      textLines.forEach((line) => {
+        if (firstLineY > (pageHeight - bottomMargin)) {
+          doc.addPage();
+          firstLineY = topMargin;
+        }
+        doc.text(line, textStartX, firstLineY);
+        firstLineY += lineHeight;
+      });
+    
+      currentY = firstLineY + sectionSpacingWithTitle;
     }
   });
 };
