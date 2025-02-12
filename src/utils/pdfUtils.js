@@ -4,10 +4,10 @@ import '../../public/fonts/arialbd'
 import '../../public/fonts/arial'
 
 export const generatePDF = async (item, date) => {
-PDFGenerator(generateMinutaSection(item, date),item.numeroLeg);
+PDFGenerator(generateMinutaSection(item, date),item.numeroLeg, true);
 }
 
-export const PDFGenerator = async (sections, numeroLeg, ) => {
+export const PDFGenerator = async (sections, numeroLeg, minutaBool=false) => {
 const doc = new jsPDF('p', 'mm', 'a4');
 const headerImage = '/pdf/header.jpg';
 const footerImage = '/pdf/footer.jpg';
@@ -127,7 +127,7 @@ const processSections = (sections, doc) => {
     doc.setFont("arial", "normal");
     const startX = 20;
     const startY = currentY;
-    const indentFactor = 0.4;
+    const indentFactor = minutaBool ? 0 : 0.4;
     const paragraphSpacing = 0;
     let newY = justifyText(doc, section.text, textWidth, startX, startY, lineHeight, indentFactor, paragraphSpacing);
       if (newY > (pageHeight - bottomMargin)) {
@@ -144,14 +144,8 @@ const processSections = (sections, doc) => {
     }
     if (section.text && section.title) {
       doc.setFontSize(11);
-    
-      // Set bold font for the title
       doc.setFont("arialbd", "normal");
-    
-      // Keep track of the current Y position before writing the title
       const titleY = currentY;
-    
-      // Display the title without justification
       const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
       let maxTitleWidth = 0;
       titleLines.forEach((line) => {
@@ -159,19 +153,14 @@ const processSections = (sections, doc) => {
           doc.addPage();
           currentY = topMargin;
         }
-        doc.text(line, 20, titleY); // Write title at the same Y level
+        doc.text(line, 20, titleY);
         maxTitleWidth = Math.max(maxTitleWidth, doc.getTextWidth(line));
       });
-    
-      const availableTextWidth = textWidth - maxTitleWidth - 5; // Subtract title width and padding
+      const availableTextWidth = textWidth - maxTitleWidth - 5;
       const textStartX = 20 + maxTitleWidth + 5;
-    
       doc.setFont("arial", "normal");
-    
-      // Wrap and align text to fit the remaining width
       const textLines = doc.splitTextToSize(section.text, availableTextWidth);
-      let firstLineY = titleY; // Ensure text starts at the same Y position as the title
-    
+      let firstLineY = titleY;
       textLines.forEach((line) => {
         if (firstLineY > (pageHeight - bottomMargin)) {
           doc.addPage();

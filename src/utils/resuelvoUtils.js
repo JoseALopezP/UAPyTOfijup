@@ -5,7 +5,7 @@ import { getMonthName } from "./caratulaUtils";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${el.nombre.split(' - ')[0]} ${el.asistencia ? '' : '(ausente)'} UFI:${ufi}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal:'}${el.nombre.split(' - ')[0]} UFI:${ufi} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -60,50 +60,51 @@ Fundamentos y Resolución: ${item.resuelvoText}
 
 export function generateResuelvoSection(item, date) {
     const sections = [
-        { title: 'Lugar y Fecha', text: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.`},
-        { title: 'Tipo de Audiencia', text: `${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''}.`},
-        { title: 'Legajo', text: `N° ${item.numeroLeg} Caratulado ${item.caratula}.`},
-        { title: 'Sala de Audiencias', text: `${item.sala}.`},
-        { title: 'Hora programada', text: `${item.hora} horas.`},
-        { title: 'Hora real de inicio', text: `${item.hitos[0].split(' | ')[0]} horas.`},
+        { title: 'Lugar y Fecha:', text: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.`},
+        { title: 'Tipo de Audiencia:', text: `${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''}.`},
+        { title: 'Legajo:', text: `N° ${item.numeroLeg} Caratulado ${item.caratula}.`},
+        { title: 'Sala de Audiencias:', text: `${item.sala}.`},
+        { title: 'Hora programada:', text: `${item.hora} horas.`},
+        { title: 'Hora real de inicio:', text: `${item.hitos[0].split(' | ')[0]} horas.`},
     ];
 
     if (item.juez.split('+').length > 1) {
-        sections.push({ title: 'Tribunal Colegiado', text: item.juez.split('+').map(j => capitalizeFirst(j.toLowerCase())).join('\n') });
+        sections.push({ title: 'Tribunal Colegiado:', text: item.juez.split('+').map(j => capitalizeFirst(j.toLowerCase())).join('\n') });
     } else {
-        sections.push({ title: 'Juez', text: capitalizeFirst(item.juez.toLowerCase())});
+        sections.push({ title: 'Juez:', text: capitalizeFirst(item.juez.toLowerCase())});
     }
-
     if (item.mpf) {
-        let combinedText = '';
-        listFiscal(item.mpf, item.ufi).split('\n').forEach((f, indexF, arr) => {
-          if (indexF > 0) {
-            combinedText += ((arr.length === indexF + 1) 
-              ? f.split('Ministerio Público Fiscal:')[1]
-              : f.split(':')[1].split('UFI')[0]
-            ) + '\n';
-          } else {
-            combinedText += `${f.split(':')[0]}: ${f.split('Fiscal:')[1].split('UFI:')[0]}${item.mpf[indexF].asistencia ? '' : ' (ausente)'}\n`;
-          }
+        let fiscales = [];
+        listFiscal(item.mpf, item.ufi)
+          .split('\n')
+          .forEach((f, indexF) => {
+            if (f.includes('Fiscal:') && f.includes('UFI:')) {
+              fiscales.push(`${f.split('Fiscal:')[1].split('UFI:')[0]}${item.mpf[indexF]?.asistencia ? '' : ' (ausente)'}`);
+            }
+          });
+        let ufiText = `UFI: ${item.ufi}`;
+        sections.push({
+          title: 'Ministerio Público Fiscal:',
+          text: `${fiscales.join('\n')}\n${ufiText}`
         });
-
-        sections.push({ title: 'Fiscal Summary', text: combinedText.trim() });
       }
     if (item.defensa) {
-        listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0], text: d.split(':')[1]}));
+        listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0]+':', text: d.split(':')[1]}));
     }
     if (item.imputado) {
-        listImputado(item.imputado).split('\n').forEach(i => sections.push({ title: i.split(':')[0], text: i.split(':')[1] + i.split(':')[2]}));
+        listImputado(item.imputado).split('\n').forEach(i => sections.push({ title: i.split(':')[0]+':', text: i.split(':')[1] + i.split(':')[2]}));
     }
     if (item.partes) {
-        listPartes(item.partes).split('\n').forEach((p,i) => sections.push((i>0)?{
-            text: p }:{
-            title:  capitalizeFirst(p.split(':')[0].toLowerCase()), text: p.split(' ').filter(word => word!=='TESTIGO:').join(' ')}));
+        listPartes(item.partes).split('\n').forEach((p, i) => {
+            const [role, ...rest] = p.split(':');
+            const text = rest.join(':').trim(); 
+            sections.push(i > 0
+                ? { text }
+                : { title: capitalizeFirst(role.toLowerCase())+ ':', text }
+            );
+        });
     }
-    
-    sections.push({ title: 'Operador', text: item.operador });
-    sections.push({ text: ' ' });
-
+    sections.push({ title: 'Operador:', text: item.operador });
     return sections;
 }
 
