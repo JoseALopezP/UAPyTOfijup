@@ -245,7 +245,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                             ))}
                         </datalist>
                         <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>{input.asistencia ?  'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.preaus}`} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}><b className={`${styles.preausButton}`}>{input.asistencia ?  'PRE' : 'AUS'}</b><b className={`${styles.preausButtonHover}`}>{input.asistencia ? 'AUS' : 'PRE'}</b></button>
                     </div>
                 ))}
             <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
