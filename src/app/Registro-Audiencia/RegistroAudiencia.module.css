@@ -18,8 +18,8 @@
 .listaBlock {
     display: inline-flex;
     flex-direction: column;
-    padding: 10px;
-    width: 17.5vw;
+    padding: 5px;
+    width: 14vw;
     margin: 0;
     border-right: solid 1px #2B2B2B;
 }
@@ -37,6 +37,13 @@
     padding: 5px;
     height: 50px;
     width: 95%;
+    opacity: .7;
+}
+.listadoAudiencias:hover{
+    opacity: 1;
+}
+.listadoAudienciasSelected{
+    opacity: 1;
 }
 .block1 {
     width: 75%;
@@ -69,24 +76,52 @@
 
 .DEMORADA{
     border-color: #fd7e14;
+    background-color: #fd7d14a0;
 }
 .PROGRAMADA{
     border-color: #007bff;
+    background-color: #007bffa0;
 }
 .EN_CURSO{
     border-color: #17a2b8;
+    background-color: #17a2b8a0;
 }
 .CANCELADA{
-    border-color: #dc3545; 
+    border-color: #dc3545;
+    background-color: #dc3545a0;
 }
 .CUARTO_INTERMEDIO{
     border-color: #ffc107;
+    background-color: #ffc107a0;
 }
 .FINALIZADA{
     border-color: #28a745;
+    background-color: #28a745a0;
 }
 .REPROGRAMADA{
     border-color: #6c757d;
+    background-color: #6c757da0;
+}
+.DEMORADA:hover{
+    background-color: #fd7d14e0;
+}
+.PROGRAMADA:hover{
+    background-color: #007bffe0;
+}
+.EN_CURSO:hover{
+    background-color: #17a2b8e0;
+}
+.CANCELADA:hover{
+    background-color: #dc3545e0; 
+}
+.CUARTO_INTERMEDIO:hover{
+    background-color: #ffc107e0;
+}
+.FINALIZADA:hover{
+    background-color: #28a745e0;
+}
+.REPROGRAMADA:hover{
+    background-color: #6c757de0;
 }
 
 .controlChangeStateButtonBlock{
@@ -96,7 +131,7 @@
     justify-content: space-between;
 }
 .controlBlock{
-    width: 77.5vw;
+    width: 83vw;
     background-color: #1F1F1F;
     display: inline-flex;
     flex-direction: row;
@@ -227,7 +262,6 @@
 }
 .inputLeftSelect{
     border: none;
-    outline: none;
     height: 30px;
     margin-bottom: 2px;
     padding-top: 4px;
@@ -290,15 +324,8 @@
     flex-direction: column;
     padding: 8px;
 }
-.buttonDownload{
-    width: 80%;
-    margin: 8px 10%;
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-}
 .buttonDownload2{
+    outline: none;
     width: 80%;
     margin: 0 10%;
     padding: 4px;
@@ -312,4 +339,46 @@
     font-family: inherit;
     font-weight: 700;
     cursor: pointer;
+}
+.topBlockMinuta{
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+    height: 4%;
+}
+
+.insertarModeloBlock{
+    width: 80%;
+    margin: 0 1%;
+    border-radius: 2px;
+    border: none;
+    outline: none;
+}
+.buttonDownload{
+    width: 20%;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 2px;
+    border: none;
+    outline: none;
+    height: 100%;
+    margin: 0;
+}
+.inputModelo{
+    width: 75%;
+    font-size: 18px;
+    padding: 0;
+    margin: 1px 2px 1px 0;
+}
+.insertarButton{
+    width: 20%;
+    padding: 0;
+    font-size: 16px;
+    margin: 3px 0 1px 0;
+}
+.insertarButton:hover, .buttonDownload:hover, .controlBlock button:hover{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }

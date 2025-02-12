@@ -1,35 +1,41 @@
 .audienciaSelectDateBlock{
     display: inline-flex;
     flex-direction: row;
-    width: 22vw;
-    margin: 0;
+    width: 100%;
+    align-self: center;
+    margin-left: 10%;
     border: none;
     padding: 1px;
 }
 .audienciaSelectDateBlock input{
     background-color: #CCCCCC;
     border-radius: 2px;
-    padding: 1px;
+    padding: 0.5px;
     height: 30px;
     margin: 0;
     font-size: 14px;
     text-align: center;
     font-weight: 700;
+    border: none;
+    margin: 1px 1px;
 }
 .selectDate2{
-    width: 14%;
+    width: 16%;
 }
 .selectDate4{
-    width: 20%;
+    width: 22%;
 }
 .selectDateButton{
     width: 28%;
-    height: 33px;
-    padding: 2px;
-    margin-top: 1px;
+    height: 31px;
+    margin: 1px 1px;
     background-color: #E4E510;
     border: none;
     font-weight: 700;
     border-radius: 2px;
     cursor: pointer;
+}
+.selectDateButton:hover{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }

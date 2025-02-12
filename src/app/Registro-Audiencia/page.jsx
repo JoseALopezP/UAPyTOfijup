@@ -23,7 +23,7 @@ export default function Page() {
     return (
         <AuthContextProvider><DataContextProvider>
         <div className={[styles.container]}>
-            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud}/>}
+            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && selectedAud.numeroLeg+selectedAud.hora}/>}
             <RegistroAudienciaControl aud={selectedAud} dateToUse={date}/>
         </div>
         </DataContextProvider></AuthContextProvider>

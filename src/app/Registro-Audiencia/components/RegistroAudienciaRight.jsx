@@ -113,16 +113,18 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 <span className={`${styles.guardar}`}>GUARDAR</span>
                 <span className={`${styles.guardando}`}>GUARDANDO...</span>
             </button>}
-            <label className={`${styles.inputLeftNameDColumn}`}>MODELO MINUTA</label>
-            <span className={`${styles.inputLeftRow}`}>
-            <select className={`${styles.inputLeft} ${styles.inputLeft85}`}
-                onChange={(e) => setModeloSelector(e.target.value)}>
-                <option value={''}></option>
-                {listModelos.map(mod =>
-                    <option key={mod} value={mod}>{mod.split('_').join(' ')}</option>
-                )}
-            </select>
-            <button type='button' onClick={() => insertarModelo()} className={`${styles.inputLeft} ${styles.inputLeft15}`}>INSERTAR</button></span>
+            <div className={`${styles.topBlockMinuta}`}>
+                <span className={`${styles.insertarModeloBlock}`}>
+                <select className={`${styles.inputLeft} ${styles.inputModelo}`}
+                    onChange={(e) => setModeloSelector(e.target.value)}>
+                    <option value={''}></option>
+                    {listModelos.map(mod =>
+                        <option key={mod} value={mod}>{mod.split('_').join(' ')}</option>
+                    )}
+                </select>
+                <button type='button' onClick={() => insertarModelo()} className={`${styles.inputLeft} ${styles.insertarButton}`}>INSERTAR MODELO</button></span>
+                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>DESCARGAR MINUTA</button>
+            </div>
             <label className={`${styles.inputLeftNameDColumn}`}>Cuerpo Minuta</label>
             <textarea
                 className={`${styles.textArea} ${styles.textAreaCuerpo}`}
@@ -144,7 +146,6 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 value={cierre}
                 onChange={(e) => setCierre(e.target.value)}
             />
-            <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>Descargar PDF</button>
         </form></>
     );
 }

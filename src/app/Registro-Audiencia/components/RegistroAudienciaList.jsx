@@ -6,7 +6,7 @@ import { DataContext} from '@/context/DataContext';
 import { useAuthContext } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation';
 
-export default function RegistroAudienciaList({date, dateFunction, audFunction}) {
+export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud}) {
     const router = useRouter()
     const {updateByDateListener, bydate} = useContext(DataContext)
     const { user } = useAuthContext()
@@ -21,7 +21,7 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction})
         <div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>
             <div className={[styles.listadoBlock]}>{bydate && bydate.map(el =>(
-                <AudienciaRegistroIndiv key={el.numeroLeg+el.hora} aud={el} audFunction={audFunction}/>
+                <AudienciaRegistroIndiv key={el.numeroLeg+el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud===el.numeroLeg+el.hora}/>
             ))}</div>
         </div>
     );
