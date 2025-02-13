@@ -244,8 +244,10 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                                 </option>
                             ))}
                         </datalist>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.preaus}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
+                            {input.asistencia ?  'PRE' : 'AUS'}
+                        </button>
                         <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.preaus}`} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}><b className={`${styles.preausButton}`}>{input.asistencia ?  'PRE' : 'AUS'}</b><b className={`${styles.preausButtonHover}`}>{input.asistencia ? 'AUS' : 'PRE'}</b></button>
                     </div>
                 ))}
             <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
@@ -268,8 +270,8 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                             value={input.dni}
                             onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
                             placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftDelete}  ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
                         <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftDelete}  ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
                     </div>
                 ))}
                 <span className={styles.imputadoButtons}>
@@ -319,8 +321,8 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                                         {imputadoItem.nombre}
                                     </option>))}
                             </select>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                             <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                         </div>
                     ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true })}>+ DEFENSA</button></span>
