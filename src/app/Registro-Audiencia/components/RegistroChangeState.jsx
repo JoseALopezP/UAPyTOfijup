@@ -11,7 +11,8 @@ export default function RegistroChangeState({estado, dateToUse, numeroLegajo, au
         'EN_CURSO': ['FINALIZAR', 'CUARTO INTERMEDIO'],
         'PROGRAMADA': ['INICIAR','CANCELAR','REPROGRAMAR'],
         'CANCELADA': [''],
-        'REPROGRAMADA': ['']
+        'REPROGRAMADA': [''],
+        'RESUELVO': ['']
     }
     const translate = {
         'REINICIAR': 'EN_CURSO',
@@ -25,6 +26,9 @@ export default function RegistroChangeState({estado, dateToUse, numeroLegajo, au
     }
     const handleSubmit = async() =>{
         await updateRealTime()
+        if(changeToMake==='RESUELVO'){
+            await updateData(dateToUse, numeroLegajo, audienciaHora, 'resuelvo', realTime)
+        }
         if(changeToMake && changeToMake!=='RESUELVO'){
             await updateData(dateToUse, numeroLegajo, audienciaHora, 'estado', translate[changeToMake])
             if(changeToMake == 'CUARTO INTERMEDIO'){
