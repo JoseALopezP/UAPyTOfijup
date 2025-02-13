@@ -233,32 +233,35 @@
     margin: 0 2px 2px 0;
 }
 .inputLeft15{
-    width: 14%;
+    width: 13.5%;
+    font-size: 16px;
 }
 .inputLeft33{
-    width: 32%;
+    width: 31.5%;
 }
 .inputLeft35{
-    width: 34%;
+    width: 33.5%;
 }
 .inputLeft42{
-    width: 41%;
+    width: 40.5%;
 }
 .inputLeft50{
-    width: 48%;
+    width: 48.5%;
 }
 .inputLeft70{
-    width: 68%;
+    width: 68.5%;
 }
 .inputLeft85{
-    width: 84%;
+    width: 83.5%;
 }
 .inputLeft100{
-    width: 99%;
+    width: 98.5%;
 }
 .inputLeftDelete{
     background-color: #dc3545;
-    height: 32px;
+    height: 30px;
+    padding: 3px;
+    margin: 3px 1px 0 0;
 }
 .inputLeftSelect{
     border: none;
@@ -381,17 +384,4 @@
 .insertarButton:hover, .buttonDownload:hover, .controlBlock button:hover{
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
-}
-
-.preausButton{
-    display: block;
-}
-.preausButtonHover{
-    display: none;
-}
-.preaus:hover .preausButton{
-    display: none;  
-}
-.preaus:hover.preausButtonHover{
-    display: block;
 }
