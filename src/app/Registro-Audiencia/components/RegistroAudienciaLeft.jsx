@@ -260,6 +260,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
                 {imputado.map((input, index) => (
                     <div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                        <span className={`${styles.condenadoimputadoFlag}`}><p>{input.condenado ? "CONDENADO" : "IMPUTADO"}</p></span>
                         <input className={`${styles.inputLeft} ${styles.inputLeft35}`}
                             type="text"
                             value={input.nombre}

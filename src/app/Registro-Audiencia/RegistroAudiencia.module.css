@@ -123,7 +123,33 @@
 .REPROGRAMADA:hover{
     background-color: #6c757de0;
 }
-
+.condenadoInput{
+    background-color: #ffc107a0;
+}
+.condenadoInput .condenadoimputadoFlag{
+    background-color: #ffc107;
+}
+.imputadoInput .condenadoimputadoFlag{
+    background-color: #6c757d; 
+}
+.condenadoimputadoFlag{
+    display: inline-flex;
+    visibility: hidden;
+    flex-direction: row;
+    width: calc(18vw + 6px);
+    justify-content: space-around;
+    height: 34px;
+    position: absolute;
+    border-radius: 4px;
+    padding: 0;
+    animation: onDissapear 2s ;
+}
+.condenadoimputadoFlag p{
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: 22px;
+}
 .controlChangeStateButtonBlock{
     display: inline-flex;
     flex-direction: row;
@@ -384,4 +410,19 @@
 .insertarButton:hover, .buttonDownload:hover, .controlBlock button:hover{
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+
+@keyframes onDissapear {
+    0% {
+        visibility: visible;
+    }
+    1%{
+        opacity: 1;
+    }
+    99%{
+        opacity: 0;
+    }
+    100%{
+        visibility: none;
+    }
 }
