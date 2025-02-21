@@ -123,7 +123,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                     )}
                 </select>
                 <button type='button' onClick={() => insertarModelo()} className={`${styles.inputLeft} ${styles.insertarButton}`}>INSERTAR MODELO</button></span>
-                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>DESCARGAR MINUTA</button>
+                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
             <label className={`${styles.inputLeftNameDColumn}`}>Cuerpo Minuta</label>
             <textarea
