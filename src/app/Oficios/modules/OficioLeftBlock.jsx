@@ -7,6 +7,7 @@ import ErroresUgaList from './ErroresUgaList';
 export default function OficioLeftBlock({ date, aud }) {
     const { updateData, desplegables } = useContext(DataContext);
     const [control, setControl] = useState(aud.control || '');
+    const [resultado, setResultado] = useState(aud.resultado || '');
     const [auxControl, setAuxControl] = useState(aud.control || '');
     const [errores, setErrores] = useState([]);
     const [errorTipo, setErrorTipo] = useState('');
@@ -72,6 +73,15 @@ export default function OficioLeftBlock({ date, aud }) {
                         +
                     </button>
                 </form>
+            </span>
+            <span className={styles.resultadoBlock}>
+                <h2 className={styles.controlOficioTitle}>Resultado</h2>
+                <textarea
+                    className={`${styles.oficioControlTextArea} ${styles.resultadoTextArea}`}
+                    rows="8"
+                    value={resultado}
+                    onChange={(e) => setResultado(e.target.value)}
+                />
             </span>
         </div>
     );

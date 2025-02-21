@@ -157,6 +157,9 @@
     border-right: solid 1px #2B2B2B;
     width: 50%;
     height: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .oficioRightBlockContainer{
     width: 50%;
@@ -187,6 +190,13 @@
     outline: none;
     font-family: inherit;
     font-size: 18px;
+}
+.resultadoBlock{
+    padding: 10px;
+    width: calc(100% - 20px);
+}
+.resultadoTextArea{
+    width: calc(100% - 20px);
 }
 .controlOficioButton1, .controlOficioButton2{
     width: 49%;
