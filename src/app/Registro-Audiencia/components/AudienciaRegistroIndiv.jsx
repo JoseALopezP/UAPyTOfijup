@@ -8,7 +8,7 @@ export default function AudienciaRegistroIndiv({ aud, audFunction, selectedAud }
                 <p className={`${styles.text} ${styles.textLegajo}`}>{aud.numeroLeg}</p>
                 <span className={styles.block3}>
                     <p className={`${styles.text} ${styles.textEstado}`}>
-                        {aud.hitos ? aud.hitos[aud.hitos.length - 1].split(' | ')[1].split('_').join(' ') : 'PROGRAMADA'}
+                        {aud.estado ? aud.estado.split('_').join(' ') : 'PROGRAMADA'}
                     </p>
                 </span>
             </div>

@@ -6,6 +6,7 @@ import { DataContext } from '@/context/DataContext';
 import DeleteSVGF from './DeleteSVGF';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import deepEqual from '@/utils/deepEqual';
+import Cronometro from './Cronometro';
 
 export default function RegistroAudienciaLeft({ item, dateToUse }) {
     const {updateDesplegables, desplegables, updateByDate, updateRealTime, realTime, updateData} = useContext(DataContext)
@@ -346,11 +347,12 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
                     <select className={`${styles.inputLeft} ${styles.inputLeft100}  ${styles.inputLeftSelect}`} onChange={(e) => setRazonDemora(e.target.value)}>
                         <option value={razonDemora}>{razonDemora}</option>
-                        <option value=''></option>
                         {desplegables.motivoDemora && desplegables.motivoDemora.map(el => <option key={el} value={el}>{el}</option>)}
                     </select></span>
                 </>
             }
+            <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
+            <Cronometro item={item} dateToUse={dateToUse}/>
         </form>
     );
 }
