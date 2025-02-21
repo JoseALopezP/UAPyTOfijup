@@ -214,6 +214,9 @@
 .controlOficioButton2{
     background-color: #20c997;
 }
+.controlOficioButton3{
+    width: 100%;
+}
 .controlOficioButtonNone{
     background-color: #6c757d;
     opacity: .5;

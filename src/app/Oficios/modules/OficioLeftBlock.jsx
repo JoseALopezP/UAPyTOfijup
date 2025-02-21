@@ -8,6 +8,7 @@ export default function OficioLeftBlock({ date, aud }) {
     const { updateData, desplegables } = useContext(DataContext);
     const [control, setControl] = useState(aud.control || '');
     const [resultado, setResultado] = useState(aud.resultado || '');
+    const [resultadoSave, setResultadoSave] = useState(false);
     const [auxControl, setAuxControl] = useState(aud.control || '');
     const [errores, setErrores] = useState([]);
     const [errorTipo, setErrorTipo] = useState('');
@@ -21,13 +22,25 @@ export default function OficioLeftBlock({ date, aud }) {
         setErrorTipo('');
         setErrorInput('');
     };
-
+    const handleSave = async() =>{
+        await updateData(date, aud.numeroLeg, aud.hora, 'resultado', resultado)
+        setResultadoSave(false)
+    }
     useEffect(() => {
         setControl(aud.control);
         setErrores(aud.erroresUga ? [...aud.erroresUga] : []);
         setAuxControl(aud.control);
     }, [aud]);
-
+    useEffect(()=>{
+        if(resultado !== aud.resultado){
+            setResultadoSave(true)
+        }else{
+            setResultadoSave(false)
+        }
+    },[resultado])
+    useEffect(()=>{
+        setResultado(aud.resultado)
+    },[aud.resultado])
     return (
         <div className={styles.oficioLeftBlockContainer}>
             <span className={styles.oficioControlBlock}>
@@ -82,6 +95,9 @@ export default function OficioLeftBlock({ date, aud }) {
                     value={resultado}
                     onChange={(e) => setResultado(e.target.value)}
                 />
+                <button type='button' onClick={() => handleSave()}
+                className={resultadoSave ? `${styles.controlOficioButton2} ${styles.controlOficioButton3}` : `${styles.controlOficioButton2} ${styles.controlOficioButton3} ${styles.controlOficioButtonNone}`}>
+                    GUARDAR</button>
             </span>
         </div>
     );
