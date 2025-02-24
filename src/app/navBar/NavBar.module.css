@@ -8,6 +8,14 @@
     padding: 0;
     z-index: 10;
     border-right: solid 1px #2B2B2B;
+    justify-content: space-between;
+}
+.subcontainer{
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    flex-direction: column;
 }
 .navButton{
     justify-content: center;

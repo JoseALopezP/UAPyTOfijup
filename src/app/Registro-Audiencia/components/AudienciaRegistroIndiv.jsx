@@ -3,7 +3,7 @@ import { nameTranslate } from '@/utils/traductorNombres';
 
 export default function AudienciaRegistroIndiv({ aud, audFunction, selectedAud }) {
     return (
-        <div className={selectedAud ? `${styles.listadoAudiencias} ${styles.listadoAudienciasSelected} ${styles[aud.estado]}` : `${styles.listadoAudiencias} ${styles[aud.estado]}`} onClick={() => audFunction(aud)}>
+        <div title={aud.situacion ? aud.situacion : 'No hay situación corporal agregada'} className={selectedAud ? `${styles.listadoAudiencias} ${styles.listadoAudienciasSelected} ${styles[aud.estado]}` : `${styles.listadoAudiencias} ${styles[aud.estado]}`} onClick={() => audFunction(aud)}>
             <div className={styles.block1}>
                 <p className={`${styles.text} ${styles.textLegajo}`}>{aud.numeroLeg}</p>
                 <span className={styles.block3}>
