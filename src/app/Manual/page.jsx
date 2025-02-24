@@ -1,9 +1,10 @@
 import styles from './Manual.module.css'
+import Image from 'next/image';
 
 export default function Manual() {
     return (
         <div className={`${styles.manualContainer}`}>
-            <h1>MANUAL DE USUARIO</h1>
+            <h1>INSTRUCTIVO USUARIO</h1>
             <div className={`${styles.indiceContainer}`}>
             <h2>Índice</h2>
             <ol>
@@ -15,30 +16,30 @@ export default function Manual() {
                         <li><a href="#busquedaTablero">Búsqueda</a></li>
                     </ol>
                 </li>
-                <li>Agregar Audiencia
+                <li><a href="#agregarAudiencia">Agregar Audiencia</a>
                     <ol type="a">
-                        <li>Seleccionar fecha</li>
-                        <li>Agregar audiencia</li>
-                        <li>Editar audiencias</li>
+                        <li><a href="#seleccionarFechaAgregarAudiencia">Seleccionar fecha</a></li>
+                        <li><a href="#agregarAudiencia2">Agregar audiencia</a></li>
+                        <li><a href="#editarAudiencia">Editar audiencias</a></li>
                     </ol>
                 </li>
-                <li>Registro Audiencia
+                <li><a href="#registroAudiencia">Registro Audiencia</a>
                     <ol type="a">
-                        <li>Seleccionar fecha y audiencia</li>
-                        <li>Cambiar estado y cronómetro</li>
-                        <li>Cambiar datos audiencia</li>
+                        <li><a href="#seleccionarFechaRegistroAudiencia">Seleccionar fecha y audiencia</a></li>
+                        <li><a href="#cambiarEstado">Cambiar estado y cronómetro</a></li>
+                        <li><a href="#editarDatosMinuta">Editar datos de minuta</a></li>
                     </ol>
                 </li>
-                <li>Sorteo Operador
+                <li><a href="#sorteoOperador">Sorteo Operador</a>
                     <ol type="a">
-                        <li>Sorteo</li>
-                        <li>Seleccionar operador encargado de audiencia</li>
+                        <li><a href="#sorteo">Sorteo</a></li>
+                        <li><a href="#seleccionarOperador">Seleccionar operador encargado de audiencia</a></li>
                     </ol>
                 </li>
-                <li>Oficios
+                <li><a href="#oficios">Oficios</a>
                     <ol type="a">
-                        <li>Seleccionar fecha y audiencia</li>
-                        <li>Código de color</li>
+                        <li><a href="#seleccionarFechaOficio">Seleccionar fecha y audiencia</a></li>
+                        <li><a href="#codigoColor">Código de color</a></li>
                         <li>Editar comentario control</li>
                         <li>Agregar revisión UGA</li>
                         <li>Editar comentario resultado</li>
@@ -61,20 +62,84 @@ export default function Manual() {
                 <h3 id='home'>Home</h3>
                 <p>Utilizado para mostrar información relevante, es la dirección por defecto al acceder a la aplicación.</p>
                 <h3 id='tablero'>Tablero</h3>
+                <Image align='left' src="/imgManual/tablero.png" width={600} height={330} alt="Tablero"/>
                 <h4 id='descripcionTablero'>Descripción</h4>
-                <p>Visor de información general de audiencias del mismo día ordenadas por hora de programación. La información a mostrar es:
-                    <ul><li>Hora programada</li>
+                <p>Visor de información general de audiencias del mismo día ordenadas por hora de programación. La información a mostrar es:</p>
+                <ul><li>Hora programada</li>
                     <li>Sala</li>
                     <li>Número de Legajo</li>
                     <li>Tipo de audiencia</li>
                     <li>Juez o jueces</li>
                     <li>Estado actual con el correcto código de color</li></ul>
-                </p>
                 <h4 id='busquedaTablero'>Búsqueda</h4>
-                <p>Utilizando la cuadro de entrada situado en la esquina superior derecha con el texto provisorio "Buscar..." se pueden filtrar las audiencias por cualquiera de los valores listados anteriormente (aquellos que se muestran) o una combinación de ellos utilizando espacios como separadores. Por ejemplo:
+                <Image align='right' src="/imgManual/tableroBusqueda.png" width={292} height={85} alt="Tablero"/>
+                <p>Utilizando la cuadro de entrada situado en la esquina superior derecha con el texto provisorio "Buscar..." se pueden filtrar las audiencias por cualquiera de los valores listados anteriormente (aquellos que se muestran) o una combinación de ellos utilizando espacios como separadores. Por ejemplo:</p>
                 <ul><li>"8 30 13456": Va mostrar solo aquellas audiencias que respeten el criterio, podría mostrar las audiencias de las 8:30 con el número de legajo 13456</li>
                     <li>"IPP 2024": Mostrará solo aquellas audiencia que contengan en su nombre de tipo la palabra "IPP" y cuyo número de legajo contenga los dígitos "2024" en ese orden</li></ul>
+                <h3 id='agregarAudiencia'>Agregar audiencia</h3>
+                <h4 id='seleccionarFechaAgregarAudiencia'>Seleccionar fecha</h4>
+                <Image align='right' src="/imgManual/seleccionarFecha.png" width={241} height={36} alt="Tablero"/>
+                <p>Seleccionar la fecha del día a editar, por defecto selecciona el mismo día. El formato aceptado para el día es "dd" o "d", para el mes es "mm" o "m" y para el año "aa" o "aaaa"</p>
+                <h4 id='agregarAudiencia2'>Agregar audiencia</h4>
+                <Image align='left' src="/imgManual/agregarAudiencia.png" width={272} height={429} alt="Tablero"/>
+                <p>Para agregar una audiencia a la lista se deben inlcuir los siguientes datos:</p>
+                <ul><li><strong>Duración programada (obligatorio, no controlado):</strong> duración expresada en minutos</li>
+                    <li><strong>Hora programada de audiencia (obligatorio, controlado):</strong> el formato es hh:mm en 24hs</li>
+                    <li><strong>Número de Legajo (obligatorio, controlado)</strong></li>
+                    <li><strong>Tipo de audiencia (obligatorio, controlado):</strong> se pueden agregar hasta 3 tipos, los datos válidos se despliegan de valores habilitados</li>
+                    <li><strong>Juez o jueces (obligatorio, controlado):</strong> con el botón situado a la izquierda del cuadro de ingreso se puede seleccionar entre unipersonal (uni) y colegiado (col), con esto permitiendo agregar 1 o 3 nombres de jueces respectivamente de la lista de habilitados</li>
+                    <li><strong>Situación (no obligatorio, no controlado):</strong> permite agregar la situación corporal desde el agendamiento</li></ul>
+                <p>No agregar alguno de aquellos datos obligatorios o al no respetar los formatos o valores aceptables de aquellos controlados resultará en error.</p>
+                <h4 id='editarAudiencia'>Editar audiencia</h4>
+                <Image src="/imgManual/editarAudiencia.png" width={1108} height={48} alt="Tablero"/>
+                <p>Editar cualquier valor o seleccionar la opción de eliminar la audiencia resultará en la habilitación del botón guardar identificado con el ícono de un diskette (floppy disk), seleccionar el mismo resultará en guardar el cambio o la eliminación de la audiencia según lo indicado.</p>
+                <h3 id='registroAudiencia'>Registro audiencia</h3>
+                <h4 id='seleccionarFechaRegistroAudiencia'>Seleccionar fecha y audiencia</h4>
+                <Image align='right' src="/imgManual/seleccionarFecha.png" width={241} height={36} alt="Tablero"/>
+                <p>Seleccionar la fecha del día a editar, por defecto selecciona el mismo día. El formato aceptado para el día es "dd" o "d", para el mes es "mm" o "m" y para el año "aa" o "aaaa"</p>
+                <h4 id='cambiarEstado'>Cambiar estado y cronómetro</h4>
+                <Image align='right' src="/imgManual/cronometro.png" width={272} height={104} alt="Tablero"/>
+                <p>Los cambios de estado se realizan presionando el cambio deseado durante 2 segundos, tiempo en el que se percibe una retroalimentación visual indicando esta carga, esto con el fin de evitar cambios no deseados.
+                    El cronómetro indica el tiempo acumulado en vivo en el sector izquierdo, y tiempo del bloque actual en el sector derecho, el tiempo inicia cuando la audiencia se encuentra en curso y no requiere permanecer en el mismo sector para que la medición continúe.
+                    El tiempo acumulado puede tener una demora de segundos en ser actualizado una vez finalizado un bloque dependiendo de los timepos de demora del servidor, el del bloque actual es casi instantáneo.
+                    Habiendo seleccionado cuarto intermedio se espera luego que se indique quién lo pide y el tiempo pedido.
                 </p>
+                <h4 id='editarDatosMinuta'>Editar datos de minuta</h4>
+                <Image align='right' src="/imgManual/editarDatosMinuta.png" width={897} height={618} alt="Tablero"/>
+                <p>Para poder descargar la minuta en formato PDF previamente se tuvo que finalizar la audiencia cuidando los tiempos de los estados, haber marcado como finalizado el resuelvo y haber rellenado todos los datos obligatorios:</p>
+                <ul><li><strong>Carátula</strong></li>
+                    <li><strong>Ministero Público Fiscal:</strong> al agregar un fiscal se selecciona automáticamente la UFI a la que pertenece el fiscal seleccionado, esto no implica que se deba mantener la misma ufi, cuidando así los casos en los que el fiscal se encuentra subrogando para otra unidad. Requiere que sea de la lista de fiscales habilitados donde se incluyen tanto fiscales como ayudantes</li>
+                    <li><strong>Imputados:</strong> se puede agregar en formato imputado o condenado, requiere del nombre ingresado manualmente y el dni sin puntos con el mismo método de ingreso</li>
+                    <li><strong>Defensa:</strong> se agrega la defensa seleccionando primero si es oficial o particular, para ambos se incluye una lista de los mismos para cuidar la calidad de los datos, luego se puede seleccionar opcionalmente qué imputado defiende el abogado</li>
+                    <li><strong>Otras Partes:</strong> permite incluir otras partes presentes como querella o traductores siendo esto no obligatorio para descargar la minuta</li>
+                    <li><strong>Motivo demora:</strong> se habilita en el caso de haber tenido un tiempo de demora mayor a 5 minutos, requiriendo que se indique la razón de la misma</li>
+                    <li><strong>Insertar modelo:</strong> permite agregar un modelo de minuta con fines de facilitar un proceso más eficiente pero pudiendo ser ignorado de no requerirlo o no creerlo conveniente por el usuario</li></ul>
+                <h3 id='sorteoOperador'>Sorteo Operador</h3>
+                <Image align='right' src="/imgManual/sorteo.png" width={434} height={613} alt="Tablero"/>
+                <h4 id='sorteo'>Sorteo</h4>
+                <p>Permite incluir todos los nombres que se quieran partícipes del sorteo para, luego de seleccionar la opción "SORTEAR", obtener una lista de los operadores seleccionados en el orden que resultaron seleccionados. Para cambiar los operadores entre la columna de la lista de nombres y los seleccionados solo requiere de un click sobre el nombre</p>
+                <h4 id='seleccionarOperador'>Seleccionar operador encargado de audiencia</h4>
+                <p>Cambiar el operador responsable d euna audiencia se realiza seleccionándolo en cada audiencia dispeusta a la derecha de la lista desplegable. Para facilitar el proceso se puede filtrar y ordenar por distintos valores:</p>
+                <ul className={`${styles.filterList}`}>
+                    <li>Si hay un operador seleccionado</li>
+                    <li>Nombre de operador alfabeticamente</li>
+                    <li>Hora</li>
+                    <li>Nombre del tipo de audiencia</li>
+                    <li>Nombre de Juez principal</li>
+                    <li>Duración estimada de audiencia</li>
+                </ul>
+                <Image align='left' src="/imgManual/seleccionarOperador.png" width={972} height={162} alt="Tablero"/>
+                <p>&nbsp</p>
+                <h3 id='oficios'>Oficios</h3>
+                <h4 id='seleccionarFechaOficio'>Seleccionar fecha</h4>
+                <Image align='right' src="/imgManual/seleccionarFecha.png" width={241} height={36} alt="Tablero"/>
+                <p>Seleccionar la fecha del día a editar, por defecto selecciona el mismo día. El formato aceptado para el día es "dd" o "d", para el mes es "mm" o "m" y para el año "aa" o "aaaa"</p>
+                <h4 id='codigoColor'>Código de color</h4>
+                <span className={`${styles.lineaCodigo}`}>
+                <svg viewBox="0 0 24 24" fill="none" align='left'>
+                    <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005" stroke='#fff' strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p>Audiencia programada, no iniciada</p></span>
             </div>
         </div>
     );
