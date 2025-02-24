@@ -1,0 +1,11 @@
+.manualContainer{
+    padding: 5% 20%;
+    color: #ffffffd0;
+}
+.manualContainer a{
+    color: inherit;
+    text-decoration: none;
+}
+.bodyContainer h3{
+    text-align: center;
+}
