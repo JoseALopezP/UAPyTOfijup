@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function Manual() {
     return (
         <div className={`${styles.manualContainer}`}>
-            <h1>INSTRUCTIVO USUARIO</h1>
+            <h1 id='goUp'>INSTRUCTIVO USUARIO</h1>
             <div className={`${styles.indiceContainer}`}>
             <h2>Índice</h2>
             <ol>
@@ -58,7 +58,7 @@ export default function Manual() {
             <div className={`${styles.bodyContainer}`}>
             <h2>Cuerpo</h2>
                 <h3 id='barraDeNavegacion'>Barra de navegación</h3>
-                <p>Dispuesta a lo alto, del lado izquierdo, permite navegar entre las herramientas del tablero utilizando los íconos. Con un borde izquierdo de color azúl y un cambio de relleno de los íconos indica en qué herramienta está situado el usuario. Al posar el mouse (hover) muestra el título de la herramienta</p>
+                <p>Dispuesta al margen izquierdo, permite navegar entre las herramientas del tablero utilizando los íconos. Con un borde izquierdo de color azúl y un cambio de relleno de los íconos indica en qué herramienta está situado el usuario. Al posar el mouse (hover) muestra el título de la herramienta</p>
                 <h3 id='home'>Home</h3>
                 <p>Utilizado para mostrar información relevante, es la dirección por defecto al acceder a la aplicación.</p>
                 <h3 id='tablero'>Tablero</h3>
@@ -73,9 +73,9 @@ export default function Manual() {
                     <li>Estado actual con el correcto código de color</li></ul>
                 <h4 id='busquedaTablero'>Búsqueda</h4>
                 <Image align='right' src="/imgManual/tableroBusqueda.png" width={292} height={85} alt="Tablero"/>
-                <p>Utilizando la cuadro de entrada situado en la esquina superior derecha con el texto provisorio "Buscar..." se pueden filtrar las audiencias por cualquiera de los valores listados anteriormente (aquellos que se muestran) o una combinación de ellos utilizando espacios como separadores. Por ejemplo:</p>
+                <p>Utilizando el cuadro de entrada situado en la esquina superior derecha con el texto provisorio "Buscar..." se pueden filtrar las audiencias por cualquiera de los valores listados anteriormente o una combinación de ellos utilizando espacios como separadores. Por ejemplo:</p>
                 <ul><li>"8 30 13456": Va mostrar solo aquellas audiencias que respeten el criterio, podría mostrar las audiencias de las 8:30 con el número de legajo 13456</li>
-                    <li>"IPP 2024": Mostrará solo aquellas audiencia que contengan en su nombre de tipo la palabra "IPP" y cuyo número de legajo contenga los dígitos "2024" en ese orden</li></ul>
+                    <li>"IPP 2024": Muestra solo aquellas audiencia que contengan en su nombre de tipo la palabra "IPP" y cuyo número de legajo contenga los dígitos "2024" en ese orden</li></ul>
                 <h3 id='agregarAudiencia'>Agregar audiencia</h3>
                 <h4 id='seleccionarFechaAgregarAudiencia'>Seleccionar fecha</h4>
                 <Image align='right' src="/imgManual/seleccionarFecha.png" width={241} height={36} alt="Tablero"/>
