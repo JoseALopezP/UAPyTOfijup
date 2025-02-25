@@ -1,6 +1,6 @@
 export const oficioState = (item) =>{
     if(item.hitos){
-        if(item.estado==='FINALIZADA'){
+        if(item.estado==='FINALIZADA' || item.estado==='RESUELVO'){
             if(item.resuelvo){
                 if(item.control){
                     if(item.control === 'controlado'){

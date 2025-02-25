@@ -40,17 +40,17 @@ export default function Manual() {
                     <ol type="a">
                         <li><a href="#seleccionarFechaOficio">Seleccionar fecha y audiencia</a></li>
                         <li><a href="#codigoColor">Código de color</a></li>
-                        <li>Editar comentario control</li>
-                        <li>Agregar revisión UGA</li>
-                        <li>Editar comentario resultado</li>
+                        <li><a href="#editarComentario">Editar comentario control</a></li>
+                        <li><a href="#revisionUga">Agregar revisión UGA</a></li>
+                        <li><a href="#comentarioResultado">Editar comentario resultado</a></li>
+                        <li><a href="#generaroOficio">Generar oficio PDF</a></li>
                     </ol>
                 </li>
-                <li>Situación Corporal
+                <li><a href="#situacionCorporal">Situación Corporal</a>
                     <ol type="a">
-                        <li>Descripción</li>
-                        <li>Búsqueda</li>
-                        <li>Cambio de Situación</li>
-                        <li>Código de color</li>
+                        <li><a href="#busquedaSituacion">Búsqueda</a></li>
+                        <li><a href="#cambioSituacion">Cambio de Situación</a></li>
+                        <li><a href="#codigoSituacion">Código de color</a></li>
                     </ol>
                 </li>
             </ol>
@@ -129,17 +129,59 @@ export default function Manual() {
                     <li>Duración estimada de audiencia</li>
                 </ul>
                 <Image align='left' src="/imgManual/seleccionarOperador.png" width={972} height={162} alt="Tablero"/>
-                <p>&nbsp</p>
+                <p>&nbsp; </p>
+                <p>&nbsp; </p>
                 <h3 id='oficios'>Oficios</h3>
                 <h4 id='seleccionarFechaOficio'>Seleccionar fecha</h4>
                 <Image align='right' src="/imgManual/seleccionarFecha.png" width={241} height={36} alt="Tablero"/>
                 <p>Seleccionar la fecha del día a editar, por defecto selecciona el mismo día. El formato aceptado para el día es "dd" o "d", para el mes es "mm" o "m" y para el año "aa" o "aaaa"</p>
                 <h4 id='codigoColor'>Código de color</h4>
-                <span className={`${styles.lineaCodigo}`}>
+                <div><div className={`${styles.codigoColorBlock}`}><span className={`${styles.lineaCodigo}`}>
                 <svg viewBox="0 0 24 24" fill="none" align='left'>
                     <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005" stroke='#fff' strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <p>Audiencia programada, no iniciada</p></span>
+                <span className={`${styles.lineaCodigo}`}>
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005M12 11V17M12 11L14 13M12 11L10 13" stroke='#17a2b8' strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p>Audiencia finalizada, sin resuelvo subido</p></span>
+                <span className={`${styles.lineaCodigo}`}>
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005M9 14H15" stroke='#ffc107' strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p>Audiencia finalizada y con resuelvo completo, no controlada por oficio</p></span>
+                <span className={`${styles.lineaCodigo}`}>
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005M10 12L14 16M14 12L10 16" stroke='#dc3545' strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p>Audiencia controlada por oficio, con correcciones necesarias</p></span>
+                <span className={`${styles.lineaCodigo}`}>
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005M16 11H14M16 16H14M8 11L9 12L11 10M8 16L9 17L11 15" stroke='#28a745' strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p>Audiencia controlada y correcta</p></span></div><Image align='right' src="/imgManual/codigoColorOficio.png" width={364} height={193} alt="Tablero"/></div>
+                <h4 id='editarComentario'>Editar comentario control</h4>
+                <Image align='right' src="/imgManual/oficio.png" width={624} height={486} alt="Tablero"/>
+                <p>Se puede editar libremente el cuadro de entrada de texto guardando siempre con el botón indicado como "GUARDAR"que ese habilita siempre que haya cambios generados. Una vez terminado con el proceso se puede indicar como controlado con el botón "CONTROLADO" o escribiendo la palabra controlado, cambiando así la devolución visual que ahora indicará que el estado actual es correcto</p>
+                <h4 id='revisionUga'>Revisión UGA</h4>
+                <p>Permite agregar ítems a revisar por parte del operador encargado de la audiencia, indicando cuando ha sido resuelto para poder continuar con el proceso de oficio</p>
+                <h4 id='comentarioResultado'>Editar comentario resultado</h4>
+                <p>Cuadro de texto editable con fin de dejar comentarios de rápida lectura que eficienticen el proceso y su posterior revisión. Se guarda con el botón "GUARDAR" habilitado cuando se detecta un cambio &nbsp;</p>
+                <p>&nbsp; </p>
+                <Image align='left' src="/imgManual/generarOficioPDF.png" width={468} height={364} alt="Tablero"/>
+                <h4 id='generaroOficio'>Generar oficio PDF</h4>
+                <p>El sector derecho del tablero de oficio muestra la carátula y una versión simplificada de la minuta. Esta información con fin de, al seleccionar la opción con el boton inferior "GENERAR OFICIO" se puedan descargar los PDFs oficiando a las partes seleccionadas.</p>
+                <p>Una vez agregado un destinatario se lo puede elegir de la lista desplegable, filtra automáticamente en base al texto escrito manualmente.</p>
+                <p>El cuadro de texto mostrado debajo del ingreso de destinatarios permite incluir texto libre de necesitarse.</p>
+                <h3 id='situacionCorporal'>Situación Corporal</h3>
+                <h4 id='busquedaSituacion'>Búsqueda</h4>
+                <p>El método de filtrado de las situaciones corporales toma en consideración los números de legajo, trabajando de forma instantánea cuando se ingresa un dígito</p>
+                <h4 id='cambioSituacion'>Cambio Situación</h4>
+                <p>El comentario sobre la situación se puede editar libremente y seleccionando la opción guardar para registrar los cambios</p>
+                <h4 id='codigoSituacion'>Código de color</h4>
+                <Image align='left' src="/imgManual/codigoColorSituacion.png" width={233} height={61} alt="Tablero"/>
+                <p>Cuando la audiencia tenga un comentario de situación corporal guardado se mostrará con un fondo con una tonalidad de gris más claro</p>
             </div>
         </div>
     );

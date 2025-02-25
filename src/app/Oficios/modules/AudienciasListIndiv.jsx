@@ -29,7 +29,7 @@ const SVGs = {
 }
 export default function AudienciasListIndiv({item, audFunction}) {
     return (
-        <div onClick={()=> item.estado==='FINALIZADA' && audFunction(item)} className={`${styles.audienciasListIndivBlock}`} title={oficioState(item)}>
+        <div onClick={()=> (item.estado==='FINALIZADA' || item.estado==='RESUELVO') && audFunction(item)} className={`${styles.audienciasListIndivBlock}`} title={oficioState(item)}>
             <div className={styles.block1}>
                 {SVGs[oficioState(item)]}
             </div>

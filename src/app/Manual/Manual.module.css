@@ -41,7 +41,12 @@
 .manualContainer svg{
     width: 24px;
 }
+.codigoColorBlock{
+    display: inline-flex;
+    flex-direction: column;
+}
 .lineaCodigo{
     display: inline-flex;
     flex-direction: row;
+    line-height: 10px;
 }
