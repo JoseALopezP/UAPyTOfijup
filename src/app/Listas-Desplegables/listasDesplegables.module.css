@@ -1,0 +1,28 @@
+.desplegablesContainer{
+    margin-left: 2vw;
+}
+.listasDesplegablesSelector{
+    width: 16vw;
+    padding: 0 .5vw;
+    border-right: solid 1px #2B2B2B;
+    height: 100vh;
+}
+.listIndiv{
+    width: 100%;
+    height: 40px;
+    background-color: #1F1F1F;
+    cursor: pointer;
+    font-size: 20px;
+    border: SOLID 1PX #2B2B2B;
+    margin: 2px;
+    padding: 0;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.listIndiv p{
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    color: #ffffff;
+}

@@ -12,7 +12,9 @@ export default function NavBar() {
             <IconNavBar iconRoute={'Sorteo-Operador'}/>
             <IconNavBar iconRoute={'Oficios'}/>
             <IconNavBar iconRoute={'Situacion-Corporal'}/></span>
-            <span className={[styles.subcontainer]}><IconNavBar iconRoute={'Manual'}/></span>
+            <span className={[styles.subcontainer]}>
+                <IconNavBar iconRoute={'Listas-Desplegables'}/>
+                <IconNavBar iconRoute={'Manual'}/></span>
         </div>
     );
 }
