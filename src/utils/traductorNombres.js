@@ -19,7 +19,10 @@ export const nameTranslate = (operadorName) =>{
         "Hidalgo, María Milagro": 'MILI',
         "Cuart, Sofía": 'SOFI C',
         "Sánchez, Soledad": 'SOLE',
-        "Gimenez, Florencia": 'FLOR G' 
+        "Gimenez, Florencia": 'FLOR G',
+        "Waisman, Natasha": 'NATI',
+        "Victoria, Gonzalo José": 'GONZA',
+        "Fernández Chipre, Cecilia": 'CHECHU'
     }
     return traducciones[operadorName]
 }

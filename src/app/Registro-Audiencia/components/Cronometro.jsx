@@ -158,8 +158,8 @@ export default function Cronometro({item, dateToUse}) {
     }, [item.numeroLeg])
     useEffect(()=>{
         setStopwatchAccum(item.stopwatch)
-    }, [item.stopwatch])  
-    return (
+    }, [item.stopwatch])
+    return(
         <div className={`${styles.stateBlock}`}
             style={{
                 "--newColor": newColor,
