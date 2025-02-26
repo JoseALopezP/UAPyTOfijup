@@ -45,7 +45,7 @@ export default function GeneradorOficioBlock({item, date}) {
             </div>
           ))}
           <button type='button' className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
-          <textarea className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
+          <textarea spellCheck='true' className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
           <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit">DESCARGAR</button>
         </form>
     )

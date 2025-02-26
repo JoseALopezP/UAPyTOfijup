@@ -130,6 +130,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 className={`${styles.textArea} ${styles.textAreaCuerpo}`}
                 rows="25"
                 value={minuta}
+                spellCheck='true'
                 onChange={(e) => setMinuta(e.target.value)}
             />
             <label className={`${styles.inputLeftNameDColumn}`}>Fundamentos y Resolución</label>
@@ -137,12 +138,14 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 className={`${styles.textArea} ${styles.textAreaResuelvo}`}
                 rows="10"
                 value={resuelvo}
+                spellCheck='true'
                 onChange={(e) => setResuelvo(e.target.value)}
             />
             <label className={`${styles.inputLeftNameDColumn}`}>Cierre</label>
             <textarea
                 className={`${styles.textArea} ${styles.textAreaCierre}`}
                 rows="4"
+                spellCheck='true'
                 value={cierre}
                 onChange={(e) => setCierre(e.target.value)}
             />
