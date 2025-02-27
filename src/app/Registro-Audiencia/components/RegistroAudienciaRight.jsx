@@ -21,10 +21,17 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const updateComparisson = () => {
-        // Check if the incoming data is smaller or incomplete
         const isDataSmaller = (newData, currentData) => {
-            return newData.length < currentData.length || !newData.trim();
+            if (Array.isArray(newData) && Array.isArray(currentData)) {
+                return newData.length < currentData.length || newData.some(item => (item || '').trim() === '');
+            }
+            if (typeof newData === 'string' && typeof currentData === 'string') {
+                return (newData || '').trim().length < (currentData || '').trim().length;
+            }
+            return false;
         };
+        
+        
         if (!isDataSmaller(item.resuelvoText, resuelvo) && !isDataSmaller(resuelvo, resuelvo2)) {
             setResuelvo(item.resuelvoText || '');
             setResuelvo2(item.resuelvoText || '');

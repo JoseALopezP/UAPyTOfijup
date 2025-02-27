@@ -65,7 +65,7 @@ export default function Cronometro({item, dateToUse}) {
     };
     const isSaving = useRef(false);
     const changeState = async () => {
-        if (isSaving.current) return; // Evita múltiples ejecuciones
+        if (isSaving.current) return;
         isSaving.current = true;
         
         setGuardando(true); 

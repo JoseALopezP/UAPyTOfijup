@@ -62,11 +62,16 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
     };
     
     const isDataSmaller = (newData, currentData) => {
-        if (Array.isArray(newData)) {
-            return newData.length < currentData.length || newData.some(item => !item.trim());
+        if (Array.isArray(newData) && Array.isArray(currentData)) {
+            return newData.length < currentData.length || newData.some(item => (item || '').trim() === '');
         }
-        return !newData.trim() || newData.length < currentData.length;  // Compare lengths or emptiness for non-array data
+        if (typeof newData === 'string' && typeof currentData === 'string') {
+            return (newData || '').trim().length < (currentData || '').trim().length;
+        }
+        return false;
     };
+    
+    
     
     const updateComparisson = () => {
         if (!isDataSmaller(item.mpf, mpf) && !isDataSmaller(mpf, mpf2)) {
