@@ -1,5 +1,7 @@
 .desplegablesContainer{
     margin-left: 2vw;
+    display: inline-flex;
+    flex-direction: row;
 }
 .listasDesplegablesSelector{
     width: 16vw;
@@ -25,4 +27,22 @@
     margin: 0;
     text-align: center;
     color: #ffffff;
+}
+.addToListBlock{
+    width: 80vw;
+    display: inline-flex;
+    flex-direction: column;
+}
+.inputDesplegableBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: calc(100% - 5px);
+    justify-content: space-around;
+    border-bottom: solid 1px #2B2B2B;
+    padding: 10px;
+}
+.selectedListBlock{
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }

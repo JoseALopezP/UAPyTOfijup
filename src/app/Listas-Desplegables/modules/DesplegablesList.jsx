@@ -4,12 +4,8 @@ import { DataContext } from '@/context/DataContext';
 
 export default function DesplegablesList({desplegableFunction}) {
     const { updateDesplegables, desplegables } = useContext(DataContext);
-    const consoleLogDesplegables = () =>{
-        console.log(desplegables)
-    }
     useEffect(() => {
         updateDesplegables()
-        console.log(desplegables)
     }, [])
     return (
         <div className={styles.listasDesplegablesSelector}>
