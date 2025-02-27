@@ -61,29 +61,48 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
         removedSetter(prev => [...prev, items[index]]);
     };
     
-    const updateComparisson = () => {
-        setMpf(item.mpf ? [...item.mpf] : []);
-        setMpf2(item.mpf ? [...item.mpf] : []);
-        setImputado(item.imputado ? [...item.imputado] : []);
-        setImputado2(item.imputado ? [...item.imputado] : []);
-        setDefensa(item.defensa ? [...item.defensa] : []);
-        setDefensa2(item.defensa ? [...item.defensa] : []);
-        setCaratula(item.caratula || '');
-        setCaratula2(item.caratula || '');
-        setPartes(item.partes ? [...item.partes] : []);
-        setPartes2(item.partes ? [...item.partes] : []);
-        setRazonDemora(item.razonDemora || '');
-        setRazonDemora2(item.razonDemora || '');
-        setUfi(item.ufi || '');
-        setEstado(item.estado || '');
-        setUfi2(item.ufi || '');
-        setTipo(item.tipo || '')
-        setTipoAux(item.tipo || '')
-        setTipo2(item.tipo2 || '')
-        setTipo2Aux(item.tipo2 || '')
-        setTipo3(item.tipo3 || '')
-        setTipo3Aux(item.tipo3 || '')
+    const isDataSmaller = (newData, currentData) => {
+        if (Array.isArray(newData)) {
+            return newData.length < currentData.length || newData.some(item => !item.trim());
+        }
+        return !newData.trim() || newData.length < currentData.length;  // Compare lengths or emptiness for non-array data
     };
+    
+    const updateComparisson = () => {
+        if (!isDataSmaller(item.mpf, mpf) && !isDataSmaller(mpf, mpf2)) {
+            setMpf(item.mpf ? [...item.mpf] : []);
+            setMpf2(item.mpf ? [...item.mpf] : []);}
+        if (!isDataSmaller(item.imputado, imputado) && !isDataSmaller(imputado, imputado2)) {
+            setImputado(item.imputado ? [...item.imputado] : []);
+            setImputado2(item.imputado ? [...item.imputado] : []);}
+        if (!isDataSmaller(item.defensa, defensa) && !isDataSmaller(defensa, defensa2)) {
+            setDefensa(item.defensa ? [...item.defensa] : []);
+            setDefensa2(item.defensa ? [...item.defensa] : []);}
+        if (!isDataSmaller(item.caratula, caratula)) {
+            setCaratula(item.caratula || '');
+            setCaratula2(item.caratula || '');}
+        if (!isDataSmaller(item.partes, partes) && !isDataSmaller(partes, partes2)) {
+            setPartes(item.partes ? [...item.partes] : []);
+            setPartes2(item.partes ? [...item.partes] : []);}
+        if (!isDataSmaller(item.razonDemora, razonDemora)) {
+            setRazonDemora(item.razonDemora || '');
+            setRazonDemora2(item.razonDemora || '');}
+        if (!isDataSmaller(item.ufi, ufi)) {
+            setUfi(item.ufi || '');
+            setUfi2(item.ufi || '');}
+        if (!isDataSmaller(item.estado, estado)) {
+            setEstado(item.estado || '');}
+        if (!isDataSmaller(item.tipo, tipo)) {
+            setTipo(item.tipo || '');
+            setTipoAux(item.tipo || '');}
+        if (!isDataSmaller(item.tipo2, tipo2)) {
+            setTipo2(item.tipo2 || '');
+            setTipo2Aux(item.tipo2 || '');}
+        if (!isDataSmaller(item.tipo3, tipo3)) {
+            setTipo3(item.tipo3 || '');
+            setTipo3Aux(item.tipo3 || '');}
+    };
+    
     const updateDataAud = async() =>{
         setGuardando(true)
         const handleRemove = async (itemList, removedList, field) => {

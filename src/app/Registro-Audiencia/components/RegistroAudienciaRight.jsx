@@ -21,13 +21,26 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const updateComparisson = () => {
-        setResuelvo(item.resuelvoText || '');
-        setResuelvo2(item.resuelvoText || '');
-        setMinuta(item.minuta || '');
-        setMinuta2(item.minuta || '');
-        setCierre(item.cierre || '');
-        setCierre2(item.cierre || '');
+        // Check if the incoming data is smaller or incomplete
+        const isDataSmaller = (newData, currentData) => {
+            return newData.length < currentData.length || !newData.trim();
+        };
+        if (!isDataSmaller(item.resuelvoText, resuelvo) && !isDataSmaller(resuelvo, resuelvo2)) {
+            setResuelvo(item.resuelvoText || '');
+            setResuelvo2(item.resuelvoText || '');
+        }
+    
+        if (!isDataSmaller(item.minuta, minuta) && !isDataSmaller(minuta, minuta2)) {
+            setMinuta(item.minuta || '');
+            setMinuta2(item.minuta || '');
+        }
+    
+        if (!isDataSmaller(item.cierre, cierre) && !isDataSmaller(cierre, cierre2)) {
+            setCierre(item.cierre || '');
+            setCierre2(item.cierre || '');
+        }
     };
+    
     const insertarModelo = () =>{
         setCierre(modeloMinuta('cierre'))
         setMinuta(modeloMinuta(modeloSelector).cuerpo)
