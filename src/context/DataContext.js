@@ -15,6 +15,7 @@ import addStringToList from "@/firebase/firestore/addStringToList";
 import { todayFunction } from "@/utils/dateUtils";
 import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
 import updateDocumentListener from "@/firebase/firestore/updateDocumentListener";
+import removeStringFromList from "@/firebase/firestore/removeStringFromList";
 export const DataContext = createContext({});
 
 
@@ -90,6 +91,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const addDesplegable = async(type, data) =>{
         await addStringToList('desplegables', 'desplegables', type, data)
     }
+    const deleteDesplegable = async(type, data) =>{
+        await removeStringFromList('desplegables', 'desplegables', type, data)
+    }
     const deleteAudiencia = async(date, searchValLeg, searchValHora) =>{
         await removeFromArray('audiencias', date, searchValLeg, searchValHora)
     }
@@ -131,6 +135,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         addDesplegable,
         setDateToUse,
         updateByDateListener,
+        deleteDesplegable,
         dateToUse,
         desplegables,
         realTime,

@@ -1,19 +1,32 @@
 import styles from '../listasDesplegables.module.css'
 import { useContext, useState } from "react";
+import DeleteSVGF from '@/app/Registro-Audiencia/components/DeleteSVGF';
 import { DataContext } from "@/context/DataContext";
 
 export default function AddToListBlock({desplegablesOption}) {
-    const { desplegables } = useContext(DataContext);
+    const { desplegables, addDesplegable, deleteDesplegable, updateDesplegables } = useContext(DataContext);
     const [inputValue, setInputValue] = useState('')
+    const uploadDesplegable = async() =>{
+        await addDesplegable(desplegablesOption, inputValue)
+        await setInputValue('')
+        await updateDesplegables()
+    }
+    const deleteDesplegableFir = async(element) =>{
+        await deleteDesplegable(desplegablesOption, element)
+        await updateDesplegables()
+    }
     return (
         <div className={styles.addToListBlock}>
             <span className={`${styles.inputDesplegableBlock}`}>
-                <span><input className={`${styles.inputDesplegable}`}/>
-                <button>AGREGAR</button></span>
+                <span><input className={`${styles.inputDesplegable}`} value={inputValue} onChange={e => {setInputValue(e.target.value)}}/>
+                <button className={`${styles.addButton}`} onClick={()=>uploadDesplegable()}>AGREGAR</button></span>
             </span>
             <span className={`${styles.selectedListBlock}`}>
                 {desplegablesOption && desplegables[desplegablesOption].map(el=>(
-                    <span className={`${styles.input}`} key={el}>{el}</span>
+                    <>{el.toUpperCase().includes(inputValue.toUpperCase()) && 
+                        <span className={`${styles.inputList}`} key={el}><p>{el}</p>
+                        <button className={`${styles.deleteButton}`} onClick={() => deleteDesplegableFir(el)}>ELIMINAR</button>
+                    </span>}</>
                 ))}
             </span>
         </div>

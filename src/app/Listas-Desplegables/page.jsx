@@ -13,7 +13,7 @@ export default function page() {
         <DataContextProvider>
             <div className={styles.desplegablesContainer}>
                 <DesplegablesList desplegableFunction={setDesplegableList}/>
-                <AddToListBlock desplegablesOption={desplegableList}/>
+                {desplegableList && <AddToListBlock desplegablesOption={desplegableList}/>}
             </div>
         </DataContextProvider>
       </AuthContextProvider>
