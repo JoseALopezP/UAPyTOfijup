@@ -33,7 +33,7 @@ function justifyText(doc, text, textWidth, startX, currentY, lineHeight, pageHei
 }
 
 export const processSectionsOficio = (sections, doc) => {
-  let currentY = 10; // Initial top margin
+  let currentY = 10;
   const topMargin = 10;
   const bottomMargin = 10;
   const pageHeight = doc.internal.pageSize.height;
@@ -44,21 +44,18 @@ export const processSectionsOficio = (sections, doc) => {
   const lineHeight = 10;
 
   sections.forEach((section) => {
-    // Handle right-aligned text
     if (section.right) {
-      doc.setFontSize(10);
+      doc.setFontSize(12);
       doc.setFont("arial", "normal");
       const textLines = doc.splitTextToSize(section.right, maxTextWidth);
       currentY = addTextWithLineBreaks(textLines, pageWidth - 20, 'right', doc, currentY, pageHeight, topMargin, bottomMargin, lineHeight);
       currentY += sectionSpacingWithoutTitle;
     }
 
-    // Handle section titles
     if (section.title) {
-      doc.setFontSize(10);
+      doc.setFontSize(12);
       doc.setFont("arial", "bold");
       const titleLines = doc.splitTextToSize(section.title, maxTextWidth * 0.4);
-
       titleLines.forEach((line) => {
         if (currentY + lineHeight > pageHeight - bottomMargin) {
           doc.addPage();
@@ -67,13 +64,11 @@ export const processSectionsOficio = (sections, doc) => {
         doc.text(line, 20, currentY);
         currentY += lineHeight;
       });
-
       currentY += sectionSpacingWithoutTitle;
     }
 
-    // Handle justified text
     if (section.text) {
-      doc.setFontSize(10);
+      doc.setFontSize(12);
       doc.setFont("arial", "normal");
       currentY = justifyText(
         doc,

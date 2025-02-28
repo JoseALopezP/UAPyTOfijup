@@ -8,7 +8,7 @@ import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import deepEqual from '@/utils/deepEqual';
 import Cronometro from './Cronometro';
 
-export default function RegistroAudienciaLeft({ item, dateToUse }) {
+export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
     const {updateDesplegables, desplegables, updateByDate, updateRealTime, realTime, updateData} = useContext(DataContext)
     const [sala, setSala] = useState(item.sala)
     const [caratula2, setCaratula2] = useState('');
@@ -63,11 +63,14 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
     
     const isDataSmaller = (newData, currentData) => {
         if (Array.isArray(newData) && Array.isArray(currentData)) {
-            return newData.length < currentData.length || newData.some(item => (item || '').trim() === '');
+            return (
+                newData.length < currentData.length || 
+                newData.some(item => typeof item === 'string' && item.trim() === '')
+            );
         }
         if (typeof newData === 'string' && typeof currentData === 'string') {
-            return (newData || '').trim().length < (currentData || '').trim().length;
-        }
+            return newData.trim().length < currentData.trim().length;
+        } 
         return false;
     };
     
@@ -376,7 +379,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse }) {
                 </>
             }
             <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
-            <Cronometro item={item} dateToUse={dateToUse}/>
+            <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered}/>
         </form>
     );
 }

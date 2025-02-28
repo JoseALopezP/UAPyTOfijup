@@ -2,13 +2,13 @@
     display: inline-flex;
     flex-direction: row;
     margin-left: 2vw;
+    margin-right: 0;
     width: 100%;
     padding: 4px;
     border-radius: 4px;
     height: calc(100vh - 10px);
     margin-bottom: 2px;
     flex-direction: row;
-    justify-content: space-evenly;
     color: #fff;
     overflow: hidden;
 }
@@ -18,10 +18,15 @@
 .listaBlock {
     display: inline-flex;
     flex-direction: column;
+    overflow: hidden;
     padding: 5px;
-    width: 14vw;
+    width: 2vw;
     margin: 0;
     border-right: solid 1px #2B2B2B;
+    opacity: 0;
+}
+.listaBlock:hover{
+    animation: appearOnHover .2s both;
 }
 .listadoBlock{
     overflow-y: scroll;
@@ -168,13 +173,13 @@
     justify-content: space-between;
 }
 .controlBlock{
-    width: 83vw;
+    width: 95vw;
     background-color: #1F1F1F;
     display: inline-flex;
     flex-direction: row;
 }
 .controlBlockLeft{
-    width: 30%;
+    width: 36%;
     height: 100%;
     border-right: solid 1px #2B2B2B;
     overflow-y: scroll;
@@ -425,14 +430,18 @@
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
+
 .stateBlock{
     position: fixed;
-    left: 16.5vw;
+    left: 5vw;
     top: 85vh;
     margin-left: .5vw;
-    width: 18vw;
+    width: 24vw;
     display: inline-flex;
     flex-direction: column;
+}
+.stateBlockHovered{
+    animation: growOnHover .2s both;
 }
 .cronoBlock{
     width: 99%;
@@ -474,6 +483,7 @@
     font-size: 20px;
 }
 
+
 @keyframes gradientPressing {
     from {
         background-position: right;
@@ -495,5 +505,24 @@
     }
     100%{
         visibility: none;
+    }
+}
+@keyframes appearOnHover {
+    0% {
+
+    }
+    100%{
+        width: 14vw;
+        opacity: 1;
+    }
+}
+@keyframes growOnHover {
+    0% {
+        left: 5vw;
+        width: 24vw;
+    }
+    100%{
+        left: 16.5vw;
+        width: 22vw;
     }
 }

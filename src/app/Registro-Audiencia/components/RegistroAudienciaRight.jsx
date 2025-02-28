@@ -23,10 +23,13 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const updateComparisson = () => {
         const isDataSmaller = (newData, currentData) => {
             if (Array.isArray(newData) && Array.isArray(currentData)) {
-                return newData.length < currentData.length || newData.some(item => (item || '').trim() === '');
+                return (
+                    newData.length < currentData.length || 
+                    newData.some(item => typeof item === 'string' && item.trim() === '')
+                );
             }
             if (typeof newData === 'string' && typeof currentData === 'string') {
-                return (newData || '').trim().length < (currentData || '').trim().length;
+                return newData.trim().length < currentData.trim().length;
             }
             return false;
         };

@@ -10,7 +10,7 @@ const translateColor = {
     'REPROGRAMADA': '#6c757d',
     'RESUELVO': '#1F572B'
 }
-export default function Cronometro({item, dateToUse}) {
+export default function Cronometro({item, dateToUse, isHovered}) {
     const [tiempoPedido, setTiempoPedido] = useState(false)
     const [estadoActual, setEstadoActual] = useState(item.estado)
     const [prevColor, setPrevColor] = useState('#6c757d')
@@ -160,7 +160,7 @@ export default function Cronometro({item, dateToUse}) {
         setStopwatchAccum(item.stopwatch)
     }, [item.stopwatch])
     return(
-        <div className={`${styles.stateBlock}`}
+        <div className={isHovered ? `${styles.stateBlockHovered}` : `${styles.stateBlock}`}
             style={{
                 "--newColor": newColor,
                 "--prevColor": prevColor,

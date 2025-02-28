@@ -10,6 +10,7 @@ import RegistroAudienciaControl from './components/RegistroAudienciaControl';
 export default function Page() {
     const [date, setDate] = useState(null)
     const [selectedAud, setSelectedAud] = useState(null)
+    const [isHovered, setIsHovered] = useState(false)
     const handleSave = (newDate) => {
         setDate(newDate);
         localStorage.setItem('dateToUse', newDate);
@@ -23,8 +24,8 @@ export default function Page() {
     return (
         <AuthContextProvider><DataContextProvider>
         <div className={[styles.container]}>
-            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && selectedAud.numeroLeg+selectedAud.hora}/>}
-            <RegistroAudienciaControl aud={selectedAud} dateToUse={date}/>
+            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && selectedAud.numeroLeg+selectedAud.hora} setIsHovered={setIsHovered}/>}
+            <RegistroAudienciaControl aud={selectedAud} dateToUse={date} isHovered={isHovered}/>
         </div>
         </DataContextProvider></AuthContextProvider>
     );

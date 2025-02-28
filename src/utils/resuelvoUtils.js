@@ -124,7 +124,7 @@ function juecesPart(jueces) {
 
 export async function generateOficioSection(item, date, traslado='', oficiados) {
     const sections = [];
-    sections.push({ right: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.` });
+    sections.push({ right: `San Juan, ${date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}.` });
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: ${item.resuelvoText}
