@@ -6,6 +6,8 @@ import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { generatePDF } from '@/utils/pdfUtils';
 import deepEqual from '@/utils/deepEqual';
 import { checkCompletion } from '@/utils/checkCompletion';
+import TextEditor from './TextEditor';
+import RegistroNavBar from './RegistroNavBar';
 
 export default function RegistroAudienciaRight({ item, dateToUse }) {
     const {updateRealTime, realTime, updateData} = useContext(DataContext)
@@ -18,6 +20,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const [minuta2, setMinuta2] = useState('');
     const [cierre, setCierre] = useState('');
     const [cierre2, setCierre2] = useState('');
+    const [selectedTab, setSelectedTab] = useState('');
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const updateComparisson = () => {
@@ -148,6 +151,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 <button type='button' onClick={() => insertarModelo()} className={`${styles.inputLeft} ${styles.insertarButton}`}>INSERTAR MODELO</button></span>
                 <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
+            <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
             <label className={`${styles.inputLeftNameDColumn}`}>Cuerpo Minuta</label>
             <textarea
                 className={`${styles.textArea} ${styles.textAreaCuerpo}`}

@@ -482,6 +482,27 @@
 .timeNumbers{
     font-size: 20px;
 }
+.navBarBlock{
+    width: 100%;
+    height: 40px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    border-top: solid 1px #2B2B2B;
+    margin-top: 6px;
+}
+.tab{
+    vertical-align: middle;
+}
+.tab p{
+    padding: 5px;
+    height: 30px;
+    border: solid 1px #2B2B2B;
+    cursor: pointer;
+}
+.selectedTab{
+
+}
 
 
 @keyframes gradientPressing {
