@@ -1,6 +1,5 @@
 import styles from '../listasDesplegables.module.css'
 import { useContext, useState } from "react";
-import DeleteSVGF from '@/app/Registro-Audiencia/components/DeleteSVGF';
 import { DataContext } from "@/context/DataContext";
 
 export default function AddToListBlock({desplegablesOption}) {
