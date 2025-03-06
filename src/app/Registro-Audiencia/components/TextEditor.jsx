@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-const TextEditor = (textValue, setTextValue) => {
+export default function TextEditor(textValue, setTextValue){
   const [editorValue, setEditorValue] = useState("");
   const handleChange = (value) => {
     setValue(value);
@@ -27,5 +27,3 @@ const TextEditor = (textValue, setTextValue) => {
     </div>
   );
 };
-
-export default TextEditor;
