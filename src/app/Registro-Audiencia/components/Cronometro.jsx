@@ -1,3 +1,4 @@
+'use client'
 import styles from '../RegistroAudiencia.module.css';
 import { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '@/context/DataContext';

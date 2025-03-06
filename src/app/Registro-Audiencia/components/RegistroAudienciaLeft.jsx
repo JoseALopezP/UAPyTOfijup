@@ -1,3 +1,4 @@
+'use client'
 import { useContext, useEffect, useState, useCallback } from 'react';
 import { Reconversion } from './Reconversion';
 import styles from '../RegistroAudiencia.module.css';
