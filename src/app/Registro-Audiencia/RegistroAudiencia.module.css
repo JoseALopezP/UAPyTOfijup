@@ -493,15 +493,21 @@
 }
 .tab{
     vertical-align: middle;
+    border: solid 1px #2B2B2B;
+    height: 28px;
+    padding: 5px 15px;
+    color: #9D9D9D;
 }
 .tab p{
-    padding: 5px;
-    height: 30px;
-    border: solid 1px #2B2B2B;
+    width: 130px;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
 }
 .selectedTab{
-
+    border-bottom: none;
+    border-top: solid 2px #0078D4;
+    color: #ffffff;
 }
 
 
