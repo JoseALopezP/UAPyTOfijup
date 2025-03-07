@@ -21,8 +21,9 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const [pidiente, setPidiente] = useState(false)
     const {updateData, updateRealTime, realTime, pushtToArray} = useContext(DataContext)
 
-    const [stopwatchRunning, setStopwatchRunning] = useState((item.stopwatchStart !==0 && item.stopwatchStart)  ? true : false)
+    const [stopwatchRunning, setStopwatchRunning] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? true : false)
     const [stopwatchCurrent, setStopwatchCurrent] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? (Date.now() - item.stopwatchStart) : 0)
+    const [timeStampStart, setTimeStampStart] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? item.stopwatchStart : 0)
     const [stopwatchAccum, setStopwatchAccum] = useState(item.stopwatch ? item.stopwatch : 0)
 
     const [progress, setProgress] = useState(0);
@@ -50,16 +51,16 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const stopwatch = async () => {
         const current = stopwatchCurrent || 0;
         const accum = stopwatchAccum || 0;
-        const sum = current + accum; // Ensure valid numbers
-    
+        const sum = current + accum;
         if (stopwatchRunning) {
-            await setStopwatchAccum(sum);
+            setStopwatchAccum(prev => prev + stopwatchCurrent);
             await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatch', sum);
             await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', 0);
             await setStopwatchCurrent(0);
             await setStopwatchRunning(false);
         } else {
             await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', Date.now());
+            setTimeStampStart(Date.now())
             await setStopwatchRunning(true);
         }
     };
@@ -67,9 +68,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const changeState = async () => {
         if (isSaving.current) return;
         isSaving.current = true;
-        
         setGuardando(true); 
-    
         await updateRealTime();
     
         if (newState === 'RESUELVO') {
@@ -130,7 +129,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     useEffect(() => {
         if (stopwatchRunning) {
             const interval = setInterval(() => {
-                setStopwatchCurrent((prev) => (prev || 0) + 1000);
+                setStopwatchCurrent(Date.now() - timeStampStart);
             }, 1000);
             return () => clearInterval(interval);
         }
@@ -157,8 +156,8 @@ export default function Cronometro({item, dateToUse, isHovered}) {
         }
     }, [item.numeroLeg])
     useEffect(()=>{
-        setStopwatchAccum(item.stopwatch)
-    }, [item.stopwatch])
+        setStopwatchAccum(item.stopwatch ? item.stopwatch : 0)
+    },[item.stopwatch])
     return(
         <div className={isHovered ? `${styles.stateBlockHovered}` : `${styles.stateBlock}`}
             style={{
@@ -184,7 +183,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
             <span className={isPressing ? `${styles.cronoBlock} ${styles.cronoBlockPressing}` : `${styles.cronoBlock}`}>
                 <p className={`${styles.stateTitle}`}>{guardando ? 'GUARDANDO...' : estadoActual.split('_').join(' ')}</p>
                 <span className={`${styles.timeBlock}`}><p>ACUMULADO</p>
-                <p className={`${styles.timeNumbers}`}>{formatTime(item.stopwatch ? stopwatchCurrent + stopwatchAccum : stopwatchCurrent)}</p></span>
+                <p className={`${styles.timeNumbers}`}>{formatTime((stopwatchCurrent ? stopwatchCurrent : 0) + (stopwatchAccum ? stopwatchAccum : 0))}</p></span>
                 <span className={`${styles.timeBlock}`}><p>ACTUAL</p>
                 <p className={`${styles.timeNumbers}`}>{formatTime(stopwatchCurrent)}</p></span>
             </span>
