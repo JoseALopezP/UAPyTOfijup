@@ -153,6 +153,14 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
             <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
+            {selectedTab === 'Cuerpo minuta' &&
+                <TextEditor textValue={minuta} setTextValue={setMinuta}/>
+            }{selectedTab === 'Resuelvo' &&
+                <TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>
+            }{selectedTab === 'Cierre' &&
+                <TextEditor textValue={cierre} setTextValue={setCierre}/>
+            }
+            
             <label className={`${styles.inputLeftNameDColumn}`}>Cuerpo Minuta</label>
             <textarea
                 className={`${styles.textArea} ${styles.textAreaCuerpo}`}

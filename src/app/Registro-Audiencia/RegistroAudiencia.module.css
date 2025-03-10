@@ -509,7 +509,10 @@
     border-top: solid 2px #0078D4;
     color: #ffffff;
 }
-
+.ql-editor {
+    font-size: 32px;
+    line-height: 1.5;
+}
 
 @keyframes gradientPressing {
     from {
