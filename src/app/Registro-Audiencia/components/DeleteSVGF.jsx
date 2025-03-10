@@ -1,3 +1,4 @@
+'use client'
 import styles from '../RegistroAudiencia.module.css';
 
 export default function DeleteSVGF() {

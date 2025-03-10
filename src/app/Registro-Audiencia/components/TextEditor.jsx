@@ -1,18 +1,24 @@
-// components/QuillEditor.jsx
-import React, { useState, useEffect } from "react";
-import ReactQuill from "react-quill";
+"use client";
+
+import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 
-const TextEditor = (textValue, setTextValue) => {
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
+export default function TextEditor({ textValue, setTextValue }) {
   const [editorValue, setEditorValue] = useState("");
+
   const handleChange = (value) => {
-    setValue(value);
+    setEditorValue(value);
+    setTextValue(value);
   };
+
   return (
     <div>
       <h2>Simple Quill Editor</h2>
       <ReactQuill
-        value={value}
+        value={editorValue}
         onChange={handleChange}
         modules={{
           toolbar: [
@@ -27,6 +33,4 @@ const TextEditor = (textValue, setTextValue) => {
       />
     </div>
   );
-};
-
-export default TextEditor;
+}

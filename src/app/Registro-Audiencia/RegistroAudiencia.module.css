@@ -321,7 +321,7 @@
     background-color: #28a745;
     cursor: pointer;
     position: fixed;
-    align-self: end;
+    align-self: flex-end;
     height: 50px;
     width: 23vw;
     font-weight: 700;
@@ -451,7 +451,7 @@
     background-color: var(--prevColor);
     display: inline-flex;
     flex-direction: row;
-    justify-content: end;
+    justify-content: flex-end;
     line-height: 10px;
     
 }
