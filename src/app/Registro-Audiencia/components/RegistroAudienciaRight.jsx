@@ -21,7 +21,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const [minuta2, setMinuta2] = useState('');
     const [cierre, setCierre] = useState('');
     const [cierre2, setCierre2] = useState('');
-    const [selectedTab, setSelectedTab] = useState('');
+    const [selectedTab, setSelectedTab] = useState('Cuerpo minuta');
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const updateComparisson = () => {

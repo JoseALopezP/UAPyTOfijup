@@ -2,7 +2,7 @@
     display: inline-flex;
     flex-direction: row;
     margin: 0;
-    margin-left: 2vw;
+    margin-left: 2.5vw;
     width: 100%;
     padding: 0;
     border-radius: 4px;
@@ -19,7 +19,7 @@
     flex-direction: column;
     overflow: hidden;
     width: 2vw;
-    margin: 0 0 0 6px;
+    margin: 0;
     opacity: 0;
     border-right: solid 1px #2B2B2B;
     z-index: 2;
@@ -186,6 +186,7 @@
     border-right: solid 1px #2B2B2B;
     overflow-y: scroll;
     overflow-x: hidden;
+    background-color: #181818;
 }
 .buttonChange{
     border-radius: 2px;
@@ -403,6 +404,7 @@
     border: none;
     outline: none;
     padding: 0;
+    background-color: #181818;
 }
 .buttonDownload{
     width: 20%;
@@ -416,7 +418,7 @@
     height: 100%;
     margin: 0;
     color: #C7C7C7;
-    background-color: transparent;
+    background-color: #181818;
 }
 .inputModelo{
     width: 75%;
