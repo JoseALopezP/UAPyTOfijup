@@ -1,9 +1,9 @@
 "use client";
-
+import "react-quill/dist/quill.snow.css";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
 import './TextEditor.css'; 
+import styles from '../RegistroAudiencia.module.css';
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -13,7 +13,7 @@ export default function TextEditor({ textValue, setTextValue }) {
   };
 
   return (
-    <div>
+    <div className={`${styles.textEditorContainer}`}>
       <ReactQuill
         value={textValue}
         onChange={handleChange}

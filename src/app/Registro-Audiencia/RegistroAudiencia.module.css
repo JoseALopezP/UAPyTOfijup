@@ -1,13 +1,12 @@
 .container {
     display: inline-flex;
     flex-direction: row;
+    margin: 0;
     margin-left: 2vw;
-    margin-right: 0;
     width: 100%;
-    padding: 4px;
+    padding: 0;
     border-radius: 4px;
     height: calc(100vh - 10px);
-    margin-bottom: 2px;
     flex-direction: row;
     color: #fff;
     overflow: hidden;
@@ -19,18 +18,21 @@
     display: inline-flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 5px;
     width: 2vw;
-    margin: 0;
-    border-right: solid 1px #2B2B2B;
+    margin: 0 0 0 6px;
     opacity: 0;
+    border-right: solid 1px #2B2B2B;
+    z-index: 2;
 }
+
 .listaBlock:hover{
     animation: appearOnHover .2s both;
 }
 .listadoBlock{
     overflow-y: scroll;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 .listadoAudiencias{
     cursor: pointer;
@@ -38,7 +40,7 @@
     flex-direction: row;
     border-radius: 4px;
     border: solid 1px;
-    margin-top: 5px;
+    margin-top: 2px;
     padding: 5px;
     height: 50px;
     width: 95%;
@@ -389,7 +391,8 @@
     display: inline-flex;
     flex-direction: row;
     width: 100%;
-    height: 4%;
+    height: 3%;
+    padding: 0;
 }
 .footerSpace{
     width: 100%;
@@ -397,10 +400,9 @@
 }
 .insertarModeloBlock{
     width: 80%;
-    margin: 0 1%;
-    border-radius: 2px;
     border: none;
     outline: none;
+    padding: 0;
 }
 .buttonDownload{
     width: 20%;
@@ -413,22 +415,30 @@
     outline: none;
     height: 100%;
     margin: 0;
+    color: #C7C7C7;
+    background-color: transparent;
 }
 .inputModelo{
     width: 75%;
+    height: 100%;
     font-size: 18px;
     padding: 0;
-    margin: 1px 2px 1px 0;
+    border: none;
+    background-color: #2D2E2E;
+    margin: none;
+    color: #C7C7C7;
 }
 .insertarButton{
     width: 20%;
     padding: 0;
     font-size: 16px;
-    margin: 3px 0 1px 0;
+    background-color: transparent;
+    border-radius: 2px;
+    margin: 0;
+    color: #C7C7C7;
 }
 .insertarButton:hover, .buttonDownload:hover, .controlBlock button:hover{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+    background-color: #2D2E2E;
 }
 
 .stateBlock{
@@ -489,12 +499,12 @@
     flex-direction: row;
     justify-content: flex-start;
     border-top: solid 1px #2B2B2B;
-    margin-top: 6px;
 }
 .tab{
     vertical-align: middle;
-    border: solid 1px #2B2B2B;
-    height: 28px;
+    border: none;
+    border-right: solid 1px #2B2B2B;
+    height: 26px;
     padding: 5px 15px;
     color: #9D9D9D;
 }
@@ -505,13 +515,29 @@
     margin: 0;
 }
 .selectedTab{
-    border-bottom: none;
     border-top: solid 2px #0078D4;
     color: #ffffff;
 }
-.ql-editor {
+.textEditorContainer{
+    height: 100%;
+    border: solid 1px #2B2B2B;
+    border-left: none;
+}
+.expandBlock{
+    position: fixed;
     font-size: 32px;
-    line-height: 1.5;
+    height: 100vh;
+    z-index: 1;
+    color: #6c757d;
+    left: 2.9vw;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 1.2vw;
+    border-right: solid 1px #2B2B2B;
+}
+.expandBlockHovered{
+    animation: disappear .3s both;
 }
 
 @keyframes gradientPressing {
@@ -554,5 +580,13 @@
     100%{
         left: 16.5vw;
         width: 22vw;
+    }
+}
+@keyframes disappear {
+    0% {
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
     }
 }

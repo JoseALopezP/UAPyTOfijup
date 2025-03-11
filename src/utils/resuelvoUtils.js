@@ -1,6 +1,7 @@
 import { PDFGenerator } from "./pdfUtils";
 import { capitalizeFirst } from "./caratulaUtils";
 import { getMonthName } from "./caratulaUtils";
+import { removeHtmlTags } from "./removeHtmlTags";
 
 export function listFiscal(arr, ufi) {
     let aux = '';
@@ -53,7 +54,7 @@ ${listImputado(item.imputado)}
 ${listPartes(item.partes)}
 Operador: ${item.operador}
 
-Fundamentos y Resolución: ${item.resuelvoText}
+Fundamentos y Resolución: ${removeHtmlTags(item.resuelvoText)}
     `;
     return resuelvo;
 }
@@ -127,7 +128,7 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
     sections.push({ right: `San Juan, ${date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}.` });
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
-        text: `Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: ${item.resuelvoText}
+        text: `Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: ${removeHtmlTags(item.resuelvoText)}
     En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${item.ufi}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`).join(' ') : ''} Operador: ${item.operador}.
     ${traslado}
     Saluda atte.`
@@ -138,9 +139,9 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
 export function generateMinutaSection(item, date) {
     const sections = [];
     sections.push(...generateResuelvoSection(item, date));
-    sections.push({ text: item.minuta });
-    sections.push({ text: item.resuelvoText });
-    sections.push({ text: item.cierre });
+    sections.push({ text: removeHtmlTags(item.minuta) });
+    sections.push({ text: removeHtmlTags(item.resuelvoText) });
+    sections.push({ text: removeHtmlTags(item.cierre) });
     return sections;
 }
 

@@ -1,5 +1,16 @@
+.ql-container{
+  border: #2B2B2B 1px solid !important;
+  border-left: none !important;
+  border-right: none !important;
+  outline: none;
+  height: 100%;
+}
+.ql-toolbar{
+  border: none !important;
+  outline: none;
+}
 .ql-editor {
-    font-size: 18px;
-    border: none;
+    font-size: 20px;
+    border: none !important;
     font-family: "Arial", sans-serif;
-  }
+}

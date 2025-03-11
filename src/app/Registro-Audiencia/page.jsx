@@ -24,7 +24,7 @@ export default function Page() {
     return (
         <AuthContextProvider><DataContextProvider>
         <div className={[styles.container]}>
-            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && selectedAud.numeroLeg+selectedAud.hora} setIsHovered={setIsHovered}/>}
+            {date && <RegistroAudienciaList dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && selectedAud.numeroLeg+selectedAud.hora} setIsHovered={setIsHovered} isHovered={isHovered}/>}
             <RegistroAudienciaControl aud={selectedAud} dateToUse={date} isHovered={isHovered}/>
         </div>
         </DataContextProvider></AuthContextProvider>
