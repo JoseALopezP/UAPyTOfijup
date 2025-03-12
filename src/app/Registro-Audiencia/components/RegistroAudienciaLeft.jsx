@@ -247,13 +247,13 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
             <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
             <RegistroChangeState estadoFunction={setEstado} estado={estado} numeroLegajo={item.numeroLeg} audienciaHora={item.hora} dateToUse={dateToUse}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
-                <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft42} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
+                <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft40} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
                 <datalist id='sala' className={`${styles.tableCellInput}`}><option>{sala}</option>
                 {desplegables.salas && desplegables.salas.map(el =>(
                     <option key={el} value={el}>SALA {el}</option>
                 ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Carátula</label>
-                <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                <input className={`${styles.inputLeft} ${styles.inputLeft100} ${styles.inputTyped100}`}
                     type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)}/></span>
             <button className={showReconversion ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButtonClicked}` : `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
             {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux}/> : ''}
@@ -262,7 +262,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                     <div key={input.id} className={`${styles.inputRow}`}>
                         <input
                             list='mpf'
-                            className={`${styles.inputLeft} ${styles.inputLeft70}`}
+                            className={`${styles.inputLeft} ${styles.inputTyped70}`}
                             value={input.nombre}
                             onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
                         />
@@ -273,7 +273,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                                 </option>
                             ))}
                         </datalist>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.preaus}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
                             {input.asistencia ?  'PRE' : 'AUS'}
                         </button>
                         <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
@@ -281,7 +281,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                 ))}
             <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
-                <input list='ufi' className={`${styles.inputLeftDRow}`} value={ufi}
+                <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
                 <datalist id='ufi'>{desplegables.fiscal && desplegables.ufi.map(option => (
                         <option key={option} value={option}>{option}</option>
@@ -290,18 +290,18 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                 {imputado.map((input, index) => (
                     <div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
                         <span className={`${styles.condenadoimputadoFlag}`}><p>{input.condenado ? "CONDENADO" : "IMPUTADO"}</p></span>
-                        <input className={`${styles.inputLeft} ${styles.inputLeft35}`}
+                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.nombre}
                             onChange={(e) => handleInputChange(setImputado, index, 'nombre', e.target.value)}
                             placeholder="Nombre"/>
-                        <input className={`${styles.inputLeft} ${styles.inputLeft35}`}
+                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.dni}
                             onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
                             placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftDelete}  ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft20}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
                     </div>
                 ))}
                 <span className={styles.imputadoButtons}>
@@ -311,7 +311,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
                     {defensa.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
-                            <select className={`${styles.inputLeft} ${styles.inputLeft50} ${styles.inputLeftSelect}`}
+                            <select className={`${styles.inputLeft} ${styles.inputTyped50} ${styles.dropDownSelect}`}
                                 value={input.tipo}
                                 onChange={(e) => handleInputChange(setDefensa, index, 'tipo', e.target.value)}>
                                 <option value=""></option>
@@ -320,7 +320,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                             </select>
                             {input.tipo && (input.tipo === 'Oficial' ? (
                                     <><input list='oficial'
-                                        className={`${styles.inputLeft} ${styles.inputLeft50}`}
+                                        className={`${styles.inputLeft} ${styles.inputTyped50}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}/>
                                     <datalist id='oficial'>
@@ -331,7 +331,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                                     </datalist></>
                                 ) : (
                                     <><input list='particular'
-                                        className={`${styles.inputLeft} ${styles.inputLeft50}`}
+                                        className={`${styles.inputLeft} ${styles.inputTyped50}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
                                         placeholder="Nombre"/>
@@ -351,8 +351,8 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                                         {imputadoItem.nombre}
                                     </option>))}
                             </select>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft15}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                         </div>
                     ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true })}>+ DEFENSA</button></span>

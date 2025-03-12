@@ -160,7 +160,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
         setStopwatchAccum(item.stopwatch ? item.stopwatch : 0)
     },[item.stopwatch])
     return(
-        <div className={isHovered ? `${styles.stateBlockHovered}` : `${styles.stateBlock}`}
+        <div className={isHovered ? `${styles.stateBlockHovered} ${styles.stateBlock}` : `${styles.stateBlock}`}
             style={{
                 "--newColor": newColor,
                 "--prevColor": prevColor,
