@@ -24,6 +24,7 @@ function justifyText(doc, text, textWidth, startX, startY, lineHeight, indentFac
   const paragraphs = text.split("\n");
   paragraphs.forEach((paragraph) => {
     if (paragraph.trim() === "") {
+      currentY += lineHeight;
       return;
     }
     const indent = textWidth * indentFactor;

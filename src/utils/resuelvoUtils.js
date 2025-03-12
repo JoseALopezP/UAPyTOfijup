@@ -143,7 +143,7 @@ export function generateMinutaSection(item, date) {
     sections.push({ text: removeHtmlTags(item.resuelvoText) });
     sections.push({ text: removeHtmlTags(item.cierre) });
     return sections;
-}
+} 
 
 export function copyResuelvoToClipboard(item, date) {
     navigator.clipboard.writeText(generateResuelvo(item, date));
