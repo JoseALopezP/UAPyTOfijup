@@ -3,7 +3,8 @@
   border-left: none !important;
   border-right: none !important;
   outline: none;
-  height: 100%;
+  height: calc(100vh - 120px);
+  overflow: auto;
 }
 .ql-toolbar{
   border: none !important;
