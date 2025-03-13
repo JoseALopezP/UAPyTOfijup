@@ -46,7 +46,7 @@ export const generateExcel = async (data, date) => {
         { header: 'DEFENSOR INTERVINIENTE', key: 'defensor', width: 20 },
         { header: 'JUEZ', key: 'juez', width: 20 }
     ];
-    data.forEach((item, i) => {
+    await data.forEach((item, i) => {
         worksheet.addRow({
             id: `${i}`
             ,numeroLeg: `${item.numeroLeg}`

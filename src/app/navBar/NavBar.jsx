@@ -13,6 +13,7 @@ export default function NavBar() {
             <IconNavBar iconRoute={'Oficios'}/>
             <IconNavBar iconRoute={'Situacion-Corporal'}/></span>
             <span className={[styles.subcontainer]}>
+                <IconNavBar iconRoute={'Administracion-Logistica'}/>
                 <IconNavBar iconRoute={'Listas-Desplegables'}/>
                 <IconNavBar iconRoute={'Manual'}/></span>
         </div>
