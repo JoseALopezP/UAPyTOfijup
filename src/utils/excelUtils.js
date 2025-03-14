@@ -1,18 +1,18 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
+export function formatDate(date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}${month}${year}`;
+}
 export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) {
     function parseDate(dateStr) {
       const day = parseInt(dateStr.substring(0, 2), 10);
       const month = parseInt(dateStr.substring(2, 4), 10) - 1;
       const year = parseInt(dateStr.substring(4, 8), 10);
       return new Date(year, month, day);
-    }
-    function formatDate(date) {
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}${month}${year}`;
     }
     const startDate = parseDate(startDateStr);
     const endDate = parseDate(endDateStr);

@@ -1,7 +1,7 @@
 .containerBlock{
     display: inline-flex;
-    margin-left: 2vw;
-    width: 100vw;
+    margin-left: 2.4vw;
+    width: 98vw;
     border-radius: 4px;
     height: calc(100vh - 10px);
     margin-bottom: 2px;
@@ -10,7 +10,7 @@
 .sorteoBlock{
     display: inline-flex;
     flex-direction: column;
-    width: 30vw;
+    width: 30%;
     height: 98%;
     border-right: solid 1px #2B2B2B;
 }
@@ -54,7 +54,6 @@
     border-right: solid 1px #2B2B2B;
 }
 .sorteoFunctionBlock{
-    border-top: solid 1px #2B2B2B;
     height: 50%;
     padding: 10px;
 }
@@ -159,4 +158,30 @@
 .demoraItem{
     width: 8%;
     text-align: center;
+}
+.sorteoTitle{
+    width: calc(100% - 15px);
+    margin: 5px;
+    outline: none;
+    border: solid #2B2B2B 1px;
+    background-color: transparent;
+    font-size: 20px;
+    text-align: center;
+    color: #fff;
+}
+.sorteoListIndiv{
+    width: calc(100% - 20px);
+    color: #d7d7d7;
+    border-radius: 2px;
+    border: solid #2B2B2B;
+    border-width: 1px 0 1px 0;
+    height: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 2px;
+}
+.sorteoListIndiv:hover{
+    background-color: #242424;
 }

@@ -31,6 +31,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [bydate, setBydate] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
+    const [sorteoList, setSorteoList] = useState([])
     
     const updateRealTime = async() =>{
         setRealTime(await updateRealTimeFunction())
@@ -55,6 +56,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const getByDate = async(date) => {
         return await getDocument('audiencias', date)
+    }
+    const updateByDateSorteo = async(date) => {
+        setSorteoList(await getDocument('sorteos', date))
     }
     const updateByDateListener = (date) => {
         const unsubscribe = updateDocumentListener('audiencias', date, (updatedData) => {
@@ -91,6 +95,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const addAudiencia = async(data, date) =>{
         await addOrUpdateDocument('audiencias', date, data)
     }
+    const addSorteo = async(data, date) =>{
+        await addOrUpdateDocument('sorteos', date, data)
+    }
     const addDesplegable = async(type, data) =>{
         await addStringToList('desplegables', 'desplegables', type, data)
     }
@@ -121,9 +128,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateState,
         docExists,
         addAudiencia,
+        addSorteo,
         deleteAudiencia,
         addInfo,
-        addAudiencia,
         deleteInfo,
         updateTiposAudiencias,
         updateJueces,
@@ -140,6 +147,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateByDateListener,
         deleteDesplegable,
         getByDate,
+        updateByDateSorteo,
         dateToUse,
         desplegables,
         realTime,
@@ -149,7 +157,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         bydate,
         informacion,
         tiposAudiencias,
-        jueces
+        jueces,
+        sorteoList
     }
     return(
         <>
