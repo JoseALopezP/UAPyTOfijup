@@ -53,6 +53,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))
     }
+    const getByDate = async(date) => {
+        return await getDocument('audiencias', date)
+    }
     const updateByDateListener = (date) => {
         const unsubscribe = updateDocumentListener('audiencias', date, (updatedData) => {
             setBydate(updatedData);
@@ -136,6 +139,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         setDateToUse,
         updateByDateListener,
         deleteDesplegable,
+        getByDate,
         dateToUse,
         desplegables,
         realTime,

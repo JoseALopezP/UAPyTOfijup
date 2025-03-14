@@ -1,20 +1,29 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
-export const cuartoCalculator = (aud) =>{
-    let aux = 0
-    aud.hitos.forEach((el, index) =>{
-        if(el.split(' | ')[1] === 'CUARTO_INTERMEDIO'){
-            const inicio = (parseInt(el.split(' | ')[0].split(':')[0]) * 60 + parseInt(el.split(' | ')[0].split(':')[1]))
-            const fin = (parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1]))
-            aux = aux + (fin - inicio)
-        }
-    })
-    return(aux)
-}
-export const generateExcel = async (data, date) => {
+export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) {
+    function parseDate(dateStr) {
+      const day = parseInt(dateStr.substring(0, 2), 10);
+      const month = parseInt(dateStr.substring(2, 4), 10) - 1;
+      const year = parseInt(dateStr.substring(4, 8), 10);
+      return new Date(year, month, day);
+    }
+    function formatDate(date) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}${month}${year}`;
+    }
+    const startDate = parseDate(startDateStr);
+    const endDate = parseDate(endDateStr);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return "Invalid date format";
+    }
+    if (startDate > endDate) {
+      return "Start date must be before end date.";
+    }
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(`${date}`);
+    const worksheet = workbook.addWorksheet(`acumulado`);
     worksheet.columns = [
         { header: 'NUMERO DE LEGAJO', key: 'numeroLeg', width: 20 },
         { header: 'CANTIDAD DE AUDIENCIAS POR LEGAJO', key: 'cantAud', width: 20 },
@@ -46,7 +55,11 @@ export const generateExcel = async (data, date) => {
         { header: 'DEFENSOR INTERVINIENTE', key: 'defensor', width: 20 },
         { header: 'JUEZ', key: 'juez', width: 20 }
     ];
-    await data.forEach((item, i) => {
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const formattedDate = formatDate(currentDate)
+      const aux = await getByDate(formattedDate)
+      await aux.forEach((item, i) => {
         worksheet.addRow({
             id: `${i}`
             ,numeroLeg: `${item.numeroLeg}`
@@ -57,8 +70,8 @@ export const generateExcel = async (data, date) => {
             ,agendamiento: ''
             ,solAgen: ''
             ,noti: ''
-            ,program: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hora}`
-            ,inicioReal: `${date.split('').splice(0,2).join('')}/${date.split('').splice(2,2).join('')}/${date.split('').splice(4,4).join('')} ${item.hitos ? item.hitos[0].split(' | ')[0] : ''}`
+            ,program: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hora}`
+            ,inicioReal: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hitos ? item.hitos[0].split(' | ')[0] : ''}`
             ,demora: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))) : ''}`
             ,motivoDem: ''
             ,observDem: ''
@@ -79,8 +92,28 @@ export const generateExcel = async (data, date) => {
             ,defensor: item.defensa ? `${item.defensa[0].nombre}` : ''
             ,juez: `${item.juez}`
         });
-    });
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `${date}.xlsx`);
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `planillaUAL.xlsx`);
+}
+
+export const cuartoCalculator = (aud) =>{
+    let aux = 0
+    aud.hitos.forEach((el, index) =>{
+        if(el.split(' | ')[1] === 'CUARTO_INTERMEDIO'){
+            const inicio = (parseInt(el.split(' | ')[0].split(':')[0]) * 60 + parseInt(el.split(' | ')[0].split(':')[1]))
+            const fin = (parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1]))
+            aux = aux + (fin - inicio)
+        }
+    })
+    return(aux)
+}
+
+export const generateExcel = async (data, date) => {
+    
+    
+    
 };
