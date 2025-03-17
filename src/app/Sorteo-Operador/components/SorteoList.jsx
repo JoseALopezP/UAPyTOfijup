@@ -1,16 +1,11 @@
-import { useEffect } from 'react';
 import styles from '../sorteoOperador.module.css'
 
-export default function SorteoList({sorteoList, setSelectedSorteo}) {
-    
-    useEffect(() => {
-        console.log(sorteoList)
-        }, []);
+export default function SorteoList({sorteoListCurr, setSelectedSorteo, selectedSorteo}) {
     return (
         <div className={styles.sorteoListContainer}>
-            {sorteoList ? sorteoList.map(el =>{
-                <span className={styles.sorteoListIndiv} onClick={() => setSelectedSorteo(el)}><p>{el.title}</p></span>
-            }) : <p className={styles.sorteoListIndiv}>No se realizaron sorteos aún</p>}
+            {sorteoListCurr ? sorteoListCurr.map(el => { 
+                return(<p className={styles.sorteoListIndiv} onClick={() => setSelectedSorteo(el)}>{el.title}</p>
+            )}) : <p className={styles.sorteoListIndiv}>No se realizaron sorteos aún</p>}
         </div>
     );
 }

@@ -1,9 +1,9 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import styles from '../sorteoOperador.module.css'
 import { formatDate } from '@/utils/excelUtils';
 import { DataContext } from '@/context/DataContext';
 
-export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr}){
+export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr, selectedSorteo, setSelectedSorteo}){
     const [sorteo, setSorteo] = useState([])
     const { addSorteo } = useContext(DataContext);
     const today = formatDate(new Date())
@@ -18,13 +18,17 @@ export default function SorteoFunction({selectedList, titleSorteo, sorteoListCur
             title: titleSorteo,
             sorteo: sorteo
         } , today)
-        sorteoListCurr.push({title: titleSorteo, sorteo: sorteo})
+        setSorteoListCurr([{title: titleSorteo, sorteo: sorteo}, ...sorteoListCurr])
+        setSelectedSorteo({sorteo: shuffledArray})
     }
+    useEffect(() =>{
+        console.log(selectedSorteo)
+    }, [selectedSorteo])
     return (
         <div className={[styles.sorteoFunctionBlock]}>
             <button className={[styles.sorteoButton]} onClick={() => shuffleArray()}>SORTEAR</button>
             <div className={[styles.listSorteadoBlock]}>
-                {sorteo.map((el,i)=>(
+                {selectedSorteo && selectedSorteo.sorteo.map((el,i)=>(
                     <span key={el} className={[styles.listSorteadoItem]}>{i+1}. {el}</span>
                 ))}
             </div>

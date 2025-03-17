@@ -15,7 +15,7 @@
     border-right: solid 1px #2B2B2B;
 }
 .operadorSelectorBlock{
-    height: 50%;
+    height: 40%;
 }
 .operadorSelectorTitle{
     width: 100%;
@@ -29,7 +29,7 @@
 }
 .listaSelector{
     width: 50%;
-    height: 38vh;
+    height: 30%;
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -54,7 +54,7 @@
     border-right: solid 1px #2B2B2B;
 }
 .sorteoFunctionBlock{
-    height: 50%;
+    height: 40%;
     padding: 10px;
 }
 .sorteoButton{
@@ -74,6 +74,9 @@
     padding: 10px;
     font-size: 20px;
     width: calc(100% - 20px) ;
+    height: 60%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .listSorteadoItem{
     width: 100%;
@@ -169,18 +172,23 @@
     text-align: center;
     color: #fff;
 }
+.sorteoListContainer{
+    height: 200px;
+    overflow-y: scroll;
+}
 .sorteoListIndiv{
     width: calc(100% - 20px);
     color: #d7d7d7;
     border-radius: 2px;
     border: solid #2B2B2B;
-    border-width: 1px 0 1px 0;
+    border-width: 1px 0 0 0;
     height: 24px;
     font-size: 16px;
     cursor: pointer;
     width: 100%;
     text-align: center;
     margin-bottom: 2px;
+    margin: 0;
 }
 .sorteoListIndiv:hover{
     background-color: #242424;

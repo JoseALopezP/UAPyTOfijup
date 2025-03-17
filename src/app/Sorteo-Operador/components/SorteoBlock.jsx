@@ -12,7 +12,7 @@ export default function SorteoBlock() {
     const [listaSeleccionado, setListaSeleccionado] = useState([]);
     const [titleSorteo, setTitleSorteo] = useState('')
     const [selectedSorteo, setSelectedSorteo] = useState()
-    const [sorteoListCurr, setSorteoListCurr] = useState(sorteoList || [{title: 'No hay sorteos realizados'}])
+    const [sorteoListCurr, setSorteoListCurr] = useState(sorteoList ? sorteoList : [{title: 'No hay sorteos realizados'}])
 
     useEffect(() => {
         updateDesplegables();
@@ -21,6 +21,9 @@ export default function SorteoBlock() {
     useEffect(() => {
         setListaOriginal(desplegables.operador || []);
     }, [desplegables.operador]);
+    useEffect(() =>{
+        setSorteoListCurr(sorteoList)
+    }, [sorteoList])
     return (
         <div className={styles.sorteoBlock}>
             <OperadorSelector 
@@ -31,8 +34,13 @@ export default function SorteoBlock() {
                 titleSorteo={titleSorteo}
                 setTitleSorteo={setTitleSorteo}
             />
-            <SorteoFunction selectedList={listaSeleccionado} titleSorteo={titleSorteo} sorteoListCurr={sorteoListCurr}/>
-            <SorteoList sorteoListCurr={sorteoListCurr} setSelectedSorteo={setSelectedSorteo}/>
+            <SorteoFunction selectedList={listaSeleccionado} 
+                titleSorteo={titleSorteo} 
+                sorteoListCurr={sorteoListCurr} 
+                setSorteoListCurr={setSorteoListCurr} 
+                selectedSorteo={selectedSorteo} 
+                setSelectedSorteo={setSelectedSorteo}/>
+            {sorteoListCurr && <SorteoList sorteoListCurr={sorteoListCurr} setSelectedSorteo={setSelectedSorteo}/>}
         </div>
     );
 }
