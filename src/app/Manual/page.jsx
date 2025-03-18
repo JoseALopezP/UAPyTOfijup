@@ -60,7 +60,7 @@ export default function Manual() {
                 <h3 id='barraDeNavegacion'>Barra de navegación</h3>
                 <p>Dispuesta al margen izquierdo, permite navegar entre las herramientas del tablero utilizando los íconos. Con un borde izquierdo de color azúl y un cambio de relleno de los íconos indica en qué herramienta está situado el usuario. Al posar el mouse (hover) muestra el título de la herramienta</p>
                 <h3 id='home'>Home</h3>
-                <p>Utilizado para mostrar información relevante, es la dirección por defecto al acceder a la aplicación.</p>
+                <p>Accesos a las diferentes secciones del Tablero de acuerdo a las funciones del usuario.</p>
                 <h3 id='tablero'>Tablero</h3>
                 <Image align='left' src="/imgManual/tablero.png" width={600} height={330} alt="Tablero"/>
                 <h4 id='descripcionTablero'>Descripción</h4>
@@ -73,7 +73,7 @@ export default function Manual() {
                     <li>Estado actual con el correcto código de color</li></ul>
                 <h4 id='busquedaTablero'>Búsqueda</h4>
                 <Image align='right' src="/imgManual/tableroBusqueda.png" width={292} height={85} alt="Tablero"/>
-                <p>Utilizando el cuadro de entrada situado en la esquina superior derecha con el texto provisorio "Buscar..." se pueden filtrar las audiencias por cualquiera de los valores listados anteriormente o una combinación de ellos utilizando espacios como separadores. Por ejemplo:</p>
+                <p>Se encuentra ubicado en el margen superior derecho con el texto provisorio "Buscar..." se pueden filtrar las audiencias por cualquiera de los valores listados anteriormente o una combinación de ellos utilizando espacios como separadores. Por ejemplo:</p>
                 <ul><li>"8 30 13456": Va mostrar solo aquellas audiencias que respeten el criterio, podría mostrar las audiencias de las 8:30 con el número de legajo 13456</li>
                     <li>"IPP 2024": Muestra solo aquellas audiencia que contengan en su nombre de tipo la palabra "IPP" y cuyo número de legajo contenga los dígitos "2024" en ese orden</li></ul>
                 <h3 id='agregarAudiencia'>Agregar audiencia</h3>
@@ -101,22 +101,23 @@ export default function Manual() {
                 <Image align='right' src="/imgManual/cronometro.png" width={272} height={104} alt="Tablero"/>
                 <p>Los cambios de estado se realizan presionando el cambio deseado durante 2 segundos, tiempo en el que se percibe una retroalimentación visual indicando esta carga, esto con el fin de evitar cambios no deseados.
                     El cronómetro indica el tiempo acumulado en vivo en el sector izquierdo, y tiempo del bloque actual en el sector derecho, el tiempo inicia cuando la audiencia se encuentra en curso y no requiere permanecer en el mismo sector para que la medición continúe.
-                    El tiempo acumulado puede tener una demora de segundos en ser actualizado una vez finalizado un bloque dependiendo de los timepos de demora del servidor, el del bloque actual es casi instantáneo.
+                    El tiempo acumulado puede tener una demora de segundos en ser actualizado una vez finalizado un bloque dependiendo de los tiempos de demora del servidor, el del bloque actual es casi instantáneo.
                     Habiendo seleccionado cuarto intermedio se espera luego que se indique quién lo pide y el tiempo pedido.
                 </p>
                 <h4 id='editarDatosMinuta'>Editar datos de minuta</h4>
                 <Image align='right' src="/imgManual/editarDatosMinuta.png" width={897} height={618} alt="Tablero"/>
-                <p>Para poder descargar la minuta en formato PDF previamente se tuvo que finalizar la audiencia cuidando los tiempos de los estados, haber marcado como finalizado el resuelvo y haber rellenado todos los datos obligatorios:</p>
+                <p>Para descargar la minuta en formato PDF previamente se tuvo que finalizar la audiencia cuidando los tiempos de los estados, haber marcado como finalizado el resuelvo y haber rellenado todos los datos obligatorios:</p>
                 <ul><li><strong>Carátula</strong></li>
-                    <li><strong>Ministero Público Fiscal:</strong> al agregar un fiscal se selecciona automáticamente la UFI a la que pertenece el fiscal seleccionado, esto no implica que se deba mantener la misma ufi, cuidando así los casos en los que el fiscal se encuentra subrogando para otra unidad. Requiere que sea de la lista de fiscales habilitados donde se incluyen tanto fiscales como ayudantes</li>
-                    <li><strong>Imputados:</strong> se puede agregar en formato imputado o condenado, requiere del nombre ingresado manualmente y el dni sin puntos con el mismo método de ingreso</li>
+                    <li><strong>Ministero Público Fiscal:</strong> al agregar un fiscal se selecciona automáticamente la UFI a la que pertenece el fiscal seleccionado, esto no implica que se deba mantener la misma ufi, cuidando así los casos en los que el fiscal se encuentra subrogando para otra unidad. Requiere que sea de la lista de fiscales habilitados donde se incluyen tanto fiscales como ayudantes. Corroborar SIEMPRE LA UFI.</li>
+                    <li><strong>Imputados:</strong> se puede agregar en formato imputado o condenado, requiere del nombre y apellido ingresado manualmente y el dni sin puntos con el mismo método de ingreso</li>
                     <li><strong>Defensa:</strong> se agrega la defensa seleccionando primero si es oficial o particular, para ambos se incluye una lista de los mismos para cuidar la calidad de los datos, luego se puede seleccionar opcionalmente qué imputado defiende el abogado</li>
-                    <li><strong>Otras Partes:</strong> permite incluir otras partes presentes como querella o traductores siendo esto no obligatorio para descargar la minuta</li>
-                    <li><strong>Motivo demora:</strong> se habilita en el caso de haber tenido un tiempo de demora mayor a 5 minutos, requiriendo que se indique la razón de la misma</li>
-                    <li><strong>Insertar modelo:</strong> permite agregar un modelo de minuta con fines de facilitar un proceso más eficiente pero pudiendo ser ignorado de no requerirlo o no creerlo conveniente por el usuario</li></ul>
+                    <li><strong>Otras Partes:</strong> permite incluir otras partes presentes como querella o traductores. No es obligatorio para descargar la minuta.</li>
+                    <li><strong>Motivo demora:</strong> se debe registrar si esta es mayor a 5 minutos requiriendo que se indique la razón de la misma</li>
+                    <li><strong>Insertar modelo:</strong> permite Insertar un modelo de minuta con fines de facilitar un proceso más eficiente pero pudiendo ser ignorado de no requerirlo o no creerlo conveniente por el usuario</li></ul>
                 <h3 id='sorteoOperador'>Sorteo Operador</h3>
                 <Image align='right' src="/imgManual/sorteo.png" width={434} height={613} alt="Tablero"/>
                 <h4 id='sorteo'>Sorteo</h4>
+                <p>Automatización del sistema de convencional de sorteo para los operadores</p>
                 <p>Permite incluir todos los nombres que se quieran partícipes del sorteo para, luego de seleccionar la opción "SORTEAR", obtener una lista de los operadores seleccionados en el orden que resultaron seleccionados. Para cambiar los operadores entre la columna de la lista de nombres y los seleccionados solo requiere de un click sobre el nombre</p>
                 <h4 id='seleccionarOperador'>Seleccionar operador encargado de audiencia</h4>
                 <p>Cambiar el operador responsable d euna audiencia se realiza seleccionándolo en cada audiencia dispeusta a la derecha de la lista desplegable. Para facilitar el proceso se puede filtrar y ordenar por distintos valores:</p>

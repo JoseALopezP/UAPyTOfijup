@@ -1,7 +1,9 @@
 .desplegablesContainer{
     margin-left: 2vw;
+    height: 100vh;
     display: inline-flex;
     flex-direction: row;
+    overflow: hidden;
 }
 .listasDesplegablesSelector{
     width: 16vw;
@@ -61,6 +63,7 @@
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
+    overflow-y: scroll;
 }
 .inputList{
     width: calc(31% - 10px);
