@@ -26,10 +26,11 @@
     display: inline-flex;
     width: 100%;
     flex-direction: row;
+    height: 100%;
 }
 .listaSelector{
     width: 50%;
-    height: 30%;
+    height: 75%;
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
