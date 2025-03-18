@@ -10,6 +10,7 @@ export default function SorteoBlock() {
     const { desplegables, updateDesplegables, updateByDateSorteo, sorteoList } = useContext(DataContext);
     const [listaOriginal, setListaOriginal] = useState(desplegables.operador || []);
     const [listaSeleccionado, setListaSeleccionado] = useState([]);
+    const [emptyTitle, setEmptyTitle] = useState(false)
     const [titleSorteo, setTitleSorteo] = useState('')
     const [selectedSorteo, setSelectedSorteo] = useState()
     const [sorteoListCurr, setSorteoListCurr] = useState(sorteoList ? sorteoList : [{title: 'No hay sorteos realizados'}])
@@ -33,13 +34,15 @@ export default function SorteoBlock() {
                 selectedListFunction={setListaSeleccionado}
                 titleSorteo={titleSorteo}
                 setTitleSorteo={setTitleSorteo}
+                emptyTitle={emptyTitle}
             />
             <SorteoFunction selectedList={listaSeleccionado} 
                 titleSorteo={titleSorteo} 
                 sorteoListCurr={sorteoListCurr} 
                 setSorteoListCurr={setSorteoListCurr} 
                 selectedSorteo={selectedSorteo} 
-                setSelectedSorteo={setSelectedSorteo}/>
+                setSelectedSorteo={setSelectedSorteo}
+                setEmptyTitle={setEmptyTitle}/>
             {sorteoListCurr && <SorteoList sorteoListCurr={sorteoListCurr} setSelectedSorteo={setSelectedSorteo}/>}
         </div>
     );

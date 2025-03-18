@@ -194,3 +194,18 @@
 .sorteoListIndiv:hover{
     background-color: #242424;
 }
+.sorteoTitleEmpty{
+    color: #fff;
+    animation: both emptyTitle 1s;
+}
+@keyframes emptyTitle {
+    0% {
+        background-color: transparent;
+    }
+    25%{
+        background-color: #F07F6D;
+    }
+    100%{
+        background-color: transparent;
+    }
+}

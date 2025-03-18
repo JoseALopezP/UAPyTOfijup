@@ -1,7 +1,7 @@
 import styles from '../sorteoOperador.module.css';
 import { nameTranslate } from '@/utils/traductorNombres';
 
-export default function OperadorSelector({ originalList, originalListFunction, selectedList, selectedListFunction, titleSorteo, setTitleSorteo }) {
+export default function OperadorSelector({ originalList, originalListFunction, selectedList, selectedListFunction, titleSorteo, setTitleSorteo, emptyTitle }) {
     const handleClickOperadorAdd = (element) => {
         const updatedOriginalList = originalList.filter(el => el !== element);
         const updatedSelectedList = [...selectedList, element];
@@ -18,7 +18,7 @@ export default function OperadorSelector({ originalList, originalListFunction, s
     return (
         <div className={styles.operadorSelectorBlock}>
             <h2 className={styles.operadorSelectorTitle}>OPERADOR</h2>
-            <input className={styles.sorteoTitle} placeholder='Título de sorteo' value={titleSorteo} onChange={(e) => setTitleSorteo(e.target.value)}/>
+            <input className={emptyTitle ? `${styles.sorteoTitle} ${styles.sorteoTitleEmpty}` : `${styles.sorteoTitle}`} placeholder='Título de sorteo' value={titleSorteo} onChange={(e) => setTitleSorteo(e.target.value)}/>
             <div className={styles.listaTableBlock}>
                 <span className={`${styles.listaSelector} ${styles.listaSelectorLeft}`}>
                     <h3 className={styles.operadorSelectorTitle}>LISTA</h3>
