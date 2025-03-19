@@ -10,7 +10,7 @@ export default async function pushToHitos(collectionName, documentId, searchValu
 
         if (docSnapshot.exists()) {
             let { list } = docSnapshot.data();
-            const listItem = list.find(item => item.numeroLeg === searchValue1 && item.hora === searchValue2);
+            const listItem = list.find(item => (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2);
             if (listItem) {
                 if (!listItem.hasOwnProperty("hitos")) {
                     listItem.hitos = [];
