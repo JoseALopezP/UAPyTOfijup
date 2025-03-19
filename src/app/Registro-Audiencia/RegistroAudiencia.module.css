@@ -568,6 +568,20 @@
 .expandBlockHovered{
     animation: disappear .3s both;
 }
+.editHitosButtonBlock{
+    left: 27vw;
+    top: 10px;
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 20px;
+    background-color: transparent;
+}
+.editHitosButtonSVG{
+    width: 100%;
+    color: #000;
+}
 
 @keyframes gradientPressing {
     from {
