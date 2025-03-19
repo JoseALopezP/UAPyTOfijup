@@ -1,13 +1,11 @@
 import React, { createContext, useState, useRef, useEffect} from "react";
 import getCollection from "@/firebase/firestore/getCollection";
-import { getFirestore } from "firebase/firestore";
 import addData from "@/firebase/firestore/addData";
 import removeFromArray from "@/firebase/firestore/removeFromArray";
 import removeData from "@/firebase/firestore/removeData";
 import getDocument from "@/firebase/firestore/getDocument";
 import checkDoc from "@/firebase/firestore/checkDoc";
 import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument";
-import updateDocument from "@/firebase/firestore/updateDocument";
 import pushToHitos from "@/firebase/firestore/pushToHitos";
 import updateListItem from "@/firebase/firestore/updateListItem";
 import getList from "@/firebase/firestore/getList";
@@ -74,26 +72,22 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const pushtToArray = async(date, searchValLeg, searchValHora, newValue) => {
         await pushToHitos('audiencias', date, searchValLeg, searchValHora, newValue)
-    }
-    const updateState = async(state, num, date) =>{
-        await updateByDate(date)
-        const aux = await bydate
-        const index = await aux.findIndex((element) => element.numeroLeg == num)
-        aux[index].estado =
-         state
-        await updateDocument("audiencias", aux, date)
+        await pushToHitos('legajos', searchValLeg, date, searchValHora, newValue)
     }
     const updateData = async(date, searchValLeg, searchValHora, property, newValue) =>{
-        return updateListItem('audiencias', date, searchValLeg, searchValHora, property, newValue)
+        await updateListItem('audiencias', date, searchValLeg, searchValHora, property, newValue)
+        await updateListItem('legajos', searchValLeg, date, searchValHora, property, newValue)
     }
     const updateDataToday = async(searchValLeg, searchValHora, property, newValue) =>{
-        return updateListItem('audiencias', (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''), searchValLeg, searchValHora, property, newValue)
+        await updateListItem('audiencias', (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''), searchValLeg, searchValHora, property, newValue)
+        await updateListItem('legajos', searchValLeg, (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''), searchValHora, property, newValue)
     }
     const docExists = async(id) =>{
         return checkDoc('audiencias',id)
     }
     const addAudiencia = async(data, date) =>{
         await addOrUpdateDocument('audiencias', date, data)
+        await addOrUpdateDocument('legajos', data.numeroLeg, {...data, fecha: date})
     }
     const addSorteo = async(data, date) =>{
         await addOrUpdateDocument('sorteos', date, data)
@@ -106,8 +100,8 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const deleteAudiencia = async(date, searchValLeg, searchValHora) =>{
         await removeFromArray('audiencias', date, searchValLeg, searchValHora)
+        await removeFromArray('legajos', searchValLeg, date, searchValHora)
     }
-
     const addInfo = async(data) =>{
         addData('informacion', data)
     }
@@ -125,7 +119,6 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         updateToday,
         updateByDate,
         updateInformacion,
-        updateState,
         docExists,
         addAudiencia,
         addSorteo,
