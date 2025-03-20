@@ -578,11 +578,52 @@
     border-radius: 20px;
     background-color: transparent;
 }
+.editHitosButtonBlockHovered{
+    animation: moveOnHover .15s both;
+}
 .editHitosButtonSVG{
     width: 100%;
     color: #000;
 }
-
+.editHitosBlock{
+    position: fixed;
+    top: 6vh;
+    width: 25vw;
+    height: 70vh;
+    background-color: #007bff;
+    border: solid #1F1F1F 1px;
+    background-color: #1F1F1F;
+    border-radius: 2px;
+}
+.editHitosBlockHovered{
+    animation: growOnHoverHitos .15s both;
+}
+.hitoIndiv{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    height: 30px;
+}
+.hitoIndiv input{
+    width: 10%;
+    text-align: center;
+}
+@keyframes growOnHoverHitos{
+    from{
+        width: 25vw;
+    }
+    to{
+        width: 22.5vw;
+    }
+}
+@keyframes moveOnHover {
+    from{
+        left: 27vw;
+    }
+    to{
+        left: 35vw;
+    }
+}
 @keyframes gradientPressing {
     from {
         background-position: right;

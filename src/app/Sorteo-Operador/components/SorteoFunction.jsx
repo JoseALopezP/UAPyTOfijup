@@ -29,9 +29,6 @@ export default function SorteoFunction({selectedList, titleSorteo, sorteoListCur
             setSelectedSorteo({title: titleSorteo, sorteo: shuffledArray})
         }
     }
-    useEffect(() =>{
-        console.log(selectedSorteo)
-    }, [selectedSorteo])
     return (
         <div className={[styles.sorteoFunctionBlock]}>
             <button className={[styles.sorteoButton]} onClick={() => shuffleArray()}>SORTEAR</button>

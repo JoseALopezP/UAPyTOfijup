@@ -8,6 +8,7 @@ import DeleteSVGF from './DeleteSVGF';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import deepEqual from '@/utils/deepEqual';
 import Cronometro from './Cronometro';
+import EditHitos from './EditHitos';
 
 export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
     const {updateDesplegables, desplegables, updateByDate, updateRealTime, realTime, updateData} = useContext(DataContext)
@@ -40,6 +41,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
     const [removedDefensa, setRemovedDefensa] = useState([]);
     const [removedImputado, setRemovedImputado] = useState([]);
     const [removedPartes, setRemovedPartes] = useState([]);
+    const [showEditHitos, setShowEditHitos] = useState(false);
     const checkUFI = () =>{
         if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
             setUfi(mpf[0].nombre.split(' - ')[1])
@@ -245,10 +247,11 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                 <span className={`${styles.guardando}`}>GUARDANDO...</span>
             </button>}
             {item.hitos &&
-                <span className={`${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
+                <span onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
                 <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg></span>
             }
+            {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered}/>}
             <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
             <RegistroChangeState estadoFunction={setEstado} estado={estado} numeroLegajo={item.numeroLeg} audienciaHora={item.hora} dateToUse={dateToUse}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
