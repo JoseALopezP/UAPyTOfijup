@@ -135,15 +135,14 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(item.resuelvoText))}
     En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${item.ufi}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`).join(' ') : ''} Operador: ${item.operador}.
     ${traslado}
-    Saluda atte.`
-    });
+    Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);
 }
 
 export function generateMinutaSection(item, date) {
     const sections = [];
     sections.push(...generateResuelvoSection(item, date));
-    sections.push({ text: removeHtmlTags(item.minuta) });
+    sections.push({ text: removeHtmlTags(item.minuta)});
     sections.push({ text: removeHtmlTags(item.resuelvoText) });
     sections.push({ text: removeHtmlTags(item.cierre) });
     return sections;

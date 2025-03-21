@@ -234,6 +234,9 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
         updateComparisson();
     }, [item]);
     useEffect(() => {
+        setSala(item.sala);
+    }, [item]);
+    useEffect(() => {
         checkGuardar();
     }, [guardarInc]);
     useEffect(() => {

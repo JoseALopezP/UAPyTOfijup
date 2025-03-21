@@ -98,7 +98,6 @@ const addTextWithLineBreaks = (textLines, initialX, align = 'left', doc) => {
 };
 
 const processSections = (sections, doc) => {
-  console.log(sections)
   sections.forEach((section) => {
     let textWidth = 170;
     if (section.right) {

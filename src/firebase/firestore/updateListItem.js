@@ -15,7 +15,7 @@ export default async function updateListItem(collectionName, documentId, searchV
             return;
         }
         const { list = [] } = docSnapshot.data();
-        const foundItem = list.find(item => item.numeroLeg === searchValue1 && item.hora === searchValue2);
+        const foundItem = list.find(item => (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2);
 
         if (foundItem) {
             foundItem[propertyToUpdate] = newValue;

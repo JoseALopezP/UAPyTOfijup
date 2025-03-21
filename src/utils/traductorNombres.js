@@ -32,7 +32,8 @@ export const nameTranslateActuario = (actuarioNombre) =>{
         "Sánchez, Gemma Luciana": 'GEMMA',
         "Pérez, Juan Carlos": 'CHARLIE',
         "Gimenez, María Agostina": 'AGOS',
-        "Radi Pezzotti, Lucas": 'LUCAS'
+        "Radi Pezzotti, Lucas": 'LUCAS',
+        "":""
     }
     return traducciones[actuarioNombre]
 }
