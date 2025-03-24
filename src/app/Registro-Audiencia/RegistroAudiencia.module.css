@@ -594,6 +594,8 @@
     border: solid #1F1F1F 1px;
     background-color: #1F1F1F;
     border-radius: 2px;
+    display: inline-flex;
+    flex-direction: column;
 }
 .editHitosBlockHovered{
     animation: growOnHoverHitos .15s both;
@@ -603,10 +605,35 @@
     display: inline-flex;
     flex-direction: row;
     height: 30px;
+    background-color: #181818;
+    border: solid 1px #1f1f1f;
+    margin: 0;
 }
-.hitoIndiv input{
-    width: 10%;
+.inputTime, .inputStatus, .addHitoButton, .deleteButton, .guardarHitosButton{
+    background-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    color: #fff;
+    border: none;
     text-align: center;
+}
+.inputTime{
+    width: 8%;
+}
+.deleteButton{
+    width: 10%;
+}
+.inputStatus{
+    width: 70%;
+    cursor: pointer;
+}
+.guardarHitosButton{
+    margin-top: 20px;
+}
+.guardarButtonSaving{
+    background-color: #ffc107;
 }
 @keyframes growOnHoverHitos{
     from{

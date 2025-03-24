@@ -1,9 +1,12 @@
 'use client'
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
+import { DataContext } from '@/context/DataContext';
 
-export default function EditHitos({hitos, isHovered}) {
+export default function EditHitos({hitos, isHovered, item, dateToUse}) {
+    const {updateData} = useContext(DataContext)
     const [items, setItems] = useState(hitos);
+    const [saving, setSaving] = useState(false)
       const handleChange = (index, field, value) => {
         setItems((prev) =>
           prev.map((item, i) => {
@@ -21,59 +24,61 @@ export default function EditHitos({hitos, isHovered}) {
           })
         );
       };
-    
       const addItem = () => {
         setItems([...items, "00:00 | EN_CURSO"]);
       };
-    
+      const saveHitos = async() =>{
+        await setSaving(true)
+        await updateData(dateToUse, item.numeroLeg, item.hora, 'hitos', items);
+        await setSaving(false)
+      }
       const removeItem = (index) => {
         setItems(items.filter((_, i) => i !== index));
       };
+      useEffect(()=>{
+        setItems(hitos)
+      },[hitos])
     return (
         <div className={isHovered ? `${styles.editHitosBlock} ${styles.editHitosBlockHovered}` : `${styles.editHitosBlock}`}>
         {items.map((item, index) => {
         const [time, status] = item.split(" | ");
         const [hours, minutes] = time.split(":");
-
         return (
           <div key={index} className={`${styles.hitoIndiv}`} >
             <input
-              type="number"
+              type="text"
               value={hours}
               onChange={(e) => handleChange(index, "hours", e.target.value)}
-              className="border p-1 w-14 text-center"
-              min="0"
-              max="23"
+              className={`${styles.inputTime}`}
             />
             <span>:</span>
             <input
-              type="number"
+              type="text"
               value={minutes}
               onChange={(e) => handleChange(index, "minutes", e.target.value)}
-              className="border p-1 w-14 text-center"
-              min="0"
-              max="59"
+              className={`${styles.inputTime}`}
             />
             <select
               value={status}
               onChange={(e) => handleChange(index, "status", e.target.value)}
-              className="border p-1"
+              className={`${styles.inputStatus}`}
             >
-              <option value="EN_CURSO">EN_CURSO</option>
-              <option value="PENDIENTE">PENDIENTE</option>
-              <option value="FINALIZADO">FINALIZADO</option>
+              <option value="FINALIZADA">FINALIZADA</option>
+              <option value="EN_CURSO">EN CURSO</option>
+              <option value="PROGRAMADA">PROGRAMADA</option>
+              <option value="CANCELADA">CANCELADA</option>
+              <option value="REPROGRAMADA">REPROGRAMADA</option>
+              <option value="RESUELVO">RESUELVO</option>
             </select>
-            <button
-              onClick={() => removeItem(index)}
-              className="bg-red-500 text-white px-2 py-1 rounded"
-            >
-              ❌
-            </button>
+            <button onClick={() => removeItem(index)} className={`${styles.deleteButton}`}>❌</button>
           </div>
         );
       })}
-      <button onClick={addItem} className="bg-blue-500 text-white px-4 py-2 rounded">
-        ➕ Add More
+      <button onClick={addItem} className={`${styles.addHitoButton}`}>
+        ➕ Agregar Hito
+      </button>
+      <button onClick={() => saveHitos()} className={saving ? `${styles.guardarHitosButton} ${styles.guardarButtonSaving}` : `${styles.guardarHitosButton}`}>
+        Guardar
       </button>
     </div>
     );
