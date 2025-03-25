@@ -6,11 +6,13 @@ import AudienciaRegistroIndiv from './AudienciaRegistroIndiv';
 import { DataContext} from '@/context/DataContext';
 import { useAuthContext } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered}) {
     const router = useRouter()
     const {updateByDateListener, bydate} = useContext(DataContext)
     const { user } = useAuthContext()
+    updateRealTimeFunction()
     useEffect(() => {
         const unsubscribe = updateByDateListener(date);
         return () => unsubscribe();

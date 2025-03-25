@@ -13,8 +13,8 @@ export default function EditHitos({hitos, isHovered, item, dateToUse}) {
             if (i === index) {
               let [time, status] = item.split(" | ");
               let [hours, minutes] = time.split(":");
-              if (field === "hours") hours = value.padStart(2, "0");
-              if (field === "minutes") minutes = value.padStart(2, "0");
+              if (field === "hours") hours = value;
+              if (field === "minutes") minutes = value;
               if (field === "status") status = value;
     
               return `${hours}:${minutes} | ${status}`;

@@ -23,7 +23,7 @@ export default function OficioRightBlock({aud, date}) {
         <><div className={styles.oficioRightBlockContainer} >
             {aud && <p className={styles.oficioText}>{aud.estado && caratulaGenerator(aud, date)}</p>}
             {aud.minuta ? <p className={styles.oficioText}>{removeHtmlTags(aud.minuta)}</p> : <p></p>}
-            {aud.resuelvo ? <p className={styles.oficioText}>{removeHtmlTags(aud.resuelvo)}</p> : <p></p>}
+            {aud.resuelvoText ? <p className={styles.oficioText}>{removeHtmlTags(aud.resuelvoText)}</p> : <p></p>}
         </div>
         <button className={styles.oficioButton} onClick={() => handleShow()}>{showStop ? 'FALTAN DATOS' : 'GENERAR OFICIO'}</button>
         {showOficio && <GeneradorOficioBlock item={aud} date={date}/>}</>
