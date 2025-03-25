@@ -25,34 +25,12 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const updateComparisson = () => {
-        const isDataSmaller = (newData, currentData) => {
-            if (Array.isArray(newData) && Array.isArray(currentData)) {
-                return (
-                    newData.length < currentData.length || 
-                    newData.some(item => typeof item === 'string' && item.trim() === '')
-                );
-            }
-            if (typeof newData === 'string' && typeof currentData === 'string') {
-                return newData.trim().length < currentData.trim().length;
-            }
-            return false;
-        };
-        
-        
-        if (!isDataSmaller(item.resuelvoText, resuelvo) && !isDataSmaller(resuelvo, resuelvo2)) {
-            setResuelvo(item.resuelvoText || '');
-            setResuelvo2(item.resuelvoText || '');
-        }
-    
-        if (!isDataSmaller(item.minuta, minuta) && !isDataSmaller(minuta, minuta2)) {
-            setMinuta(item.minuta || '');
-            setMinuta2(item.minuta || '');
-        }
-    
-        if (!isDataSmaller(item.cierre, cierre) && !isDataSmaller(cierre, cierre2)) {
-            setCierre(item.cierre || '');
-            setCierre2(item.cierre || '');
-        }
+        setResuelvo(item.resuelvoText || '');
+        setResuelvo2(item.resuelvoText || '');
+        setMinuta(item.minuta || '');
+        setMinuta2(item.minuta || '');
+        setCierre(item.cierre || '');
+        setCierre2(item.cierre || '');
     };
     
     const insertarModelo = () =>{
@@ -120,9 +98,6 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     useEffect(() => {
         checkGuardar();
     }, [resuelvo, minuta, cierre, checkGuardar]);
-    useEffect(() => {
-        updateComparisson();
-    }, []);
     useEffect(() => {
         updateComparisson();
     }, [item]);
