@@ -42,7 +42,8 @@ export default function SorteoBlock() {
                 setSorteoListCurr={setSorteoListCurr} 
                 selectedSorteo={selectedSorteo} 
                 setSelectedSorteo={setSelectedSorteo}
-                setEmptyTitle={setEmptyTitle}/>
+                setEmptyTitle={setEmptyTitle}
+                setTitleSorteo={setTitleSorteo}/>
             {sorteoListCurr && <SorteoList sorteoListCurr={sorteoListCurr} setSelectedSorteo={setSelectedSorteo}/>}
         </div>
     );

@@ -13,7 +13,6 @@ export default function EditHitos({hitos, isHovered, item, dateToUse}) {
             if (i === index) {
               let [time, status] = item.split(" | ");
               let [hours, minutes] = time.split(":");
-    
               if (field === "hours") hours = value.padStart(2, "0");
               if (field === "minutes") minutes = value.padStart(2, "0");
               if (field === "status") status = value;
@@ -40,7 +39,7 @@ export default function EditHitos({hitos, isHovered, item, dateToUse}) {
       },[hitos])
     return (
         <div className={isHovered ? `${styles.editHitosBlock} ${styles.editHitosBlockHovered}` : `${styles.editHitosBlock}`}>
-        {items.map((item, index) => {
+        {items && items.map((item, index) => {
         const [time, status] = item.split(" | ");
         const [hours, minutes] = time.split(":");
         return (

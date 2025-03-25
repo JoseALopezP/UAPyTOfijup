@@ -3,7 +3,7 @@ import styles from '../sorteoOperador.module.css'
 import { formatDate } from '@/utils/excelUtils';
 import { DataContext } from '@/context/DataContext';
 
-export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr, selectedSorteo, setSelectedSorteo, setEmptyTitle}){
+export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr, selectedSorteo, setSelectedSorteo, setEmptyTitle, setTitleSorteo}){
     const [sorteo, setSorteo] = useState([])
     const { addSorteo } = useContext(DataContext);
     const today = formatDate(new Date())
@@ -27,6 +27,7 @@ export default function SorteoFunction({selectedList, titleSorteo, sorteoListCur
             } , today)
             setSorteoListCurr([{title: titleSorteo, sorteo: shuffledArray}, ...sorteoListCurr])
             setSelectedSorteo({title: titleSorteo, sorteo: shuffledArray})
+            setTitleSorteo('')
         }
     }
     return (
