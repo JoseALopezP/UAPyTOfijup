@@ -74,7 +74,7 @@ export function generateResuelvoSection(item, date) {
     } else {
         sections.push({ title: 'Juez:', text: capitalizeFirst(item.juez.toLowerCase())});
     }
-    if (item.mpf) {
+    if (item.mpf && item.tipo !== "TRÁMITES DE EJECUCIÓN") {
         let fiscales = [];
         listFiscal(item.mpf, item.ufi)
           .split('\n')

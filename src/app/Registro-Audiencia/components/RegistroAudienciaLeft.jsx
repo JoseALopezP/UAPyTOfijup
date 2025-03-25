@@ -14,6 +14,8 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
     const {updateDesplegables, desplegables, updateByDate, updateRealTime, realTime, updateData} = useContext(DataContext)
     const [sala, setSala] = useState(item.sala)
     const [caratula2, setCaratula2] = useState('');
+    const [saeNum, setSaeNum] = useState('');
+    const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
     const [defensa2, setDefensa2] = useState([]);
     const [imputado2, setImputado2] = useState([]);
@@ -92,6 +94,9 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
         if (!isDataSmaller(item.caratula, caratula)) {
             setCaratula(item.caratula || '');
             setCaratula2(item.caratula || '');}
+        if (!isDataSmaller(item.sae, saeNum)) {
+            setSaeNum(item.sae || '');
+            setSaeNum2(item.sae || '');}
         if (!isDataSmaller(item.partes, partes) && !isDataSmaller(partes, partes2)) {
             setPartes(item.partes ? [...item.partes] : []);
             setPartes2(item.partes ? [...item.partes] : []);}
@@ -263,6 +268,9 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                 {desplegables.salas && desplegables.salas.map(el =>(
                     <option key={el} value={el}>SALA {el}</option>
                 ))}</datalist></span>
+            {item.tipo === "TRÁMITES DE EJECUCIÓN" &&
+                <><span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>SAE:</label>
+                <input className={`${styles.inputTyped100} ${styles.inputLeft}`} value={saeNum} onChange={(e) => setSaeNum(e.target.value)}/></span></>}
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Carátula</label>
                 <input className={`${styles.inputLeft} ${styles.inputLeft100} ${styles.inputTyped100}`}
                     type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)}/></span>
