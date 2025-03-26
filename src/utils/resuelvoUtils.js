@@ -28,16 +28,29 @@ export function listImputado(arr) {
 }
 
 export function listPartes(arr) {
-    let aux = '';
-    let seenRoles = new Set();
-    arr?.sort((a, b) => a.role.localeCompare(b.role))
-        .forEach((el, i) => {
-            const roleText = seenRoles.has(el.role) ? ' '.repeat(el.role.length*2) : (el.role + ':');
-            seenRoles.add(el.role);
-            aux += `${roleText} ${el.name} ${el.dni ? ` D.N.I. N.°:${el.dni}` : ''}` + (arr.length !== i + 1 ? '\n' : '');
-        });
-    return aux;
+    let groupedRoles = {};
+    arr?.forEach(el => {
+        if (!groupedRoles[el.role]) {
+            groupedRoles[el.role] = [];
+        }
+        let personInfo = el.name ? el.name : '';
+        if (el.dni) {
+            personInfo += ` D.N.I. N.°:${el.dni}`;
+        }
+        if (personInfo.trim() !== '') {
+            groupedRoles[el.role].push(personInfo);
+        }
+    });
+    let result = '';
+    Object.entries(groupedRoles).forEach(([role, people], index) => {
+        result += `${role}:\n  ${people.join('\n  ')}`;
+        if (index !== Object.entries(groupedRoles).length - 1) {
+            result += '\n'; 
+        }
+    });
+    return result;
 }
+
 
 export function generateResuelvo(item, date) {
     const resuelvo = `
@@ -97,14 +110,24 @@ export function generateResuelvoSection(item, date) {
     }
     if (item.partes) {
         listPartes(item.partes).split('\n').forEach((p, i) => {
-            const [role, ...rest] = p.split(':');
-            const text = rest.join(':').trim(); 
-            sections.push(i > 0
-                ? { text }
-                : { title: capitalizeFirst(role.toLowerCase())+ ':', text }
-            );
+            const colonIndex = p.indexOf(':');
+            let role = '', text = '';
+            if (colonIndex !== -1) {
+                role = p.substring(0, colonIndex).trim();
+                text = p.substring(colonIndex + 1).trim();
+            } else {
+                text = p.trim();
+            }
+            if (text) {
+                sections.push(i > 0
+                    ? { text }
+                    : { title: capitalizeFirst(role.toLowerCase()) + ':', text }
+                );
+            }
         });
     }
+    
+    
     sections.push({ title: 'Operador:', text: item.operador });
     return sections;
 }

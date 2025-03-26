@@ -4,7 +4,7 @@ export default function SorteoList({sorteoListCurr, setSelectedSorteo, selectedS
     return (
         <div className={styles.sorteoListContainer}>
             {sorteoListCurr ? sorteoListCurr.map(el => { 
-                return(<p className={styles.sorteoListIndiv} onClick={() => setSelectedSorteo(el)}>{el.title}</p>
+                return(<p key={el.title} className={styles.sorteoListIndiv} onClick={() => setSelectedSorteo(el)}>{el.title}</p>
             )}) : <p className={styles.sorteoListIndiv}>No se realizaron sorteos aún</p>}
         </div>
     );
