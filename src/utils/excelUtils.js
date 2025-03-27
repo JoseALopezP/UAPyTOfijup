@@ -73,7 +73,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,program: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hora}`
             ,inicioReal: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hitos ? item.hitos[0].split(' | ')[0] : ''}`
             ,demora: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))) : ''}`
-            ,motivoDem: ''
+            ,motivoDem: `${item.razonDemora ? (item.razonDemora) : 'JUEZ'}`
             ,observDem: ''
             ,durProg: ''
             ,durReal: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1]))) : ''}`
