@@ -157,7 +157,7 @@ const processSections = (sections, doc) => {
         maxTitleWidth = Math.max(maxTitleWidth, doc.getTextWidth(line));
       });
       const availableTextWidth = textWidth - maxTitleWidth - 5;
-      const textStartX = 20 + maxTitleWidth + 5;
+      const textStartX = 20 + maxTitleWidth + 1;
       doc.setFont("arial", "normal");
       const textLines = doc.splitTextToSize(section.text, availableTextWidth);
       let firstLineY = titleY;

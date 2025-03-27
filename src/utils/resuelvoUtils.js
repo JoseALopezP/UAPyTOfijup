@@ -127,8 +127,8 @@ export function generateResuelvoSection(item, date) {
         });
     }
     
-    
     sections.push({ title: 'Operador:', text: item.operador });
+    sections.push({ title: ''});
     return sections;
 }
 
@@ -165,7 +165,7 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
 export function generateMinutaSection(item, date) {
     const sections = [];
     sections.push(...generateResuelvoSection(item, date));
-    sections.push({ text: removeHtmlTags(item.minuta)});
+    sections.push({ text: removeHtmlTags('\n'+item.minuta)});
     sections.push({ text: removeHtmlTags(item.resuelvoText) });
     sections.push({ text: removeHtmlTags(item.cierre) });
     return sections;
