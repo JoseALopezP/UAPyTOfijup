@@ -80,9 +80,9 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,cuartoTeo: ''
             ,cuartoReal: (item.hitos ? cuartoCalculator(item) : '')
             ,cuartoRealOtr: ''
-            ,final: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hitos[item.hitos.length()-2].split(' | ')[0] ? item.hitos[item.hitos.length()-2].split(' | ')[0] : ''}`
+            ,final: `${(item.hitos && item.hitos[item.hitos.length()-1]) && formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hitos[item.hitos.length()-2].split(' | ')[0] ? item.hitos[item.hitos.length()-2].split(' | ')[0] : ''}`
             ,horaResuelvo: ''
-            ,horaMinuta: `${item.hitos[item.hitos.length()-1].split(' | ')[0] ? item.hitos[item.hitos.length()-1].split(' | ')[0] : ''}`
+            ,horaMinuta: `${(item.hitos && item.hitos[item.hitos.length()-1])  && item.hitos[item.hitos.length()-1].split(' | ')[0] ? item.hitos[item.hitos.length()-1].split(' | ')[0] : ''}`
             ,demoraMinuta: ''
             ,cantidadImp: item.imputado ? `${item.imputado.length}` : ''
             ,tipoVict: ''
