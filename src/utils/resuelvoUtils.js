@@ -126,7 +126,6 @@ export function generateResuelvoSection(item, date) {
             }
         });
     }
-    
     sections.push({ title: 'Operador:', text: item.operador });
     sections.push({ title: ''});
     return sections;
