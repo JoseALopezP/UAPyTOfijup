@@ -102,10 +102,10 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
 
 export const cuartoCalculator = (aud) =>{
     let aux = 0
-    aud.hitos.forEach((el, index) =>{
+    aud.hitos && aud.hitos.forEach((el, index) =>{
         if(el.split(' | ')[1] === 'CUARTO_INTERMEDIO'){
             const inicio = (parseInt(el.split(' | ')[0].split(':')[0]) * 60 + parseInt(el.split(' | ')[0].split(':')[1]))
-            const fin = (parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1]))
+            const fin = (parseInt(aud.hitos[index + 1] ? (aud.hitos[index + 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(aud.hitos[index + 1].split(' | ')[0].split(':')[1]) : 0))
             aux = aux + (fin - inicio)
         }
     })
