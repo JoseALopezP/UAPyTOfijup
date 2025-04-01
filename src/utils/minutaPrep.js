@@ -47,16 +47,14 @@ function resuelvoStructure(juez){
 
 export const minutaPrep = (item) =>{
     const aux = []
-    const minutaAux = splitByTimestamps(item.minuta).map(el=>{
+    splitByTimestamps(item.minuta).map(el=>{
         aux.push({text: splitNormalBold(el), timestamp: (extractTimestamp(el) || 1)})
     })
-    const cierreAux = splitByTimestamps(item.cierre).map(el=>{
+    splitByTimestamps(item.cierre).map(el=>{
         aux.push({text: splitNormalBold(el), timestamp: (extractTimestamp(el) || 1)})
     })
-    const resuelvoAux = splitByTimestamps(item.resuelvoText, resuelvoStructure(juez)).forEach(el=>{
-        aux.push({text: splitNormalBold(el).map(el2 =>{
-            return(resuelvoStructure(el2))
-        }), timestamp: (extractTimestamp(el) || 1)})
+    splitByTimestamps(item.resuelvoText, resuelvoStructure(juez)).forEach(el=>{
+        aux.push({text: splitNormalBold(el), timestamp: (extractTimestamp(el) || 1)})
     })
 
 }
