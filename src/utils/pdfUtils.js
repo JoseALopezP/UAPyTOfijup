@@ -20,7 +20,6 @@ let currentY = topMargin;
 const lineHeight = 7;
 const sectionSpacingWithTitle = 0;
 const sectionSpacingWithoutTitle = 0;
-
 function justifyText(doc, text, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight){
   const paragraphs = text.split("\n");
   paragraphs.forEach((paragraph) => {
@@ -99,9 +98,8 @@ const addTextWithLineBreaks = (textLines, initialX, align = 'left', doc) => {
 };
 
 const processSections = (sections, doc) => {
-  let textWidth = 170;
-  let accumulatedContent = "";
-  sections.forEach((section, index) => {
+  sections.forEach((section) => {
+    let textWidth = 170;
     if (section.right) {
       doc.setFontSize(11);
       doc.setFont("arial", "normal");
@@ -113,7 +111,7 @@ const processSections = (sections, doc) => {
     doc.setFontSize(11);
     doc.setFont("arialbd", "normal");
     const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
-    titleLines.forEach((line) => {
+    titleLines.forEach((line, index) => {
       if (currentY > (pageHeight - bottomMargin)) {
         doc.addPage();
         currentY = topMargin;
@@ -124,42 +122,26 @@ const processSections = (sections, doc) => {
     const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
     textWidth -= titleWidth;
   }
-
-  if (section.text || section.bold) {
-        if (section.text) {
-          doc.setFont("arial", "normal");
-          accumulatedContent += (accumulatedContent ? "" : "") + section.text;
+  if (section.text && !section.title) {
+    doc.setFontSize(11);
+    doc.setFont("arial", "normal");
+    const startX = 20;
+    const startY = currentY;
+    const indentFactor = minutaBool ? 0 : 0.4;
+    const paragraphSpacing = 0;
+    let newY = justifyText(doc, section.text, textWidth, startX, startY, lineHeight, indentFactor, paragraphSpacing);
+      if (newY > (pageHeight - bottomMargin)) {
+        while (newY > (pageHeight - bottomMargin)) {
+          doc.addPage();
+          newY -= (pageHeight - bottomMargin);
         }
-        if (section.bold) {
-          doc.setFont("arialbd", "normal");
-          accumulatedContent += (accumulatedContent ? "" : "") + section.bold;
-        }
+        currentY = topMargin + newY;
+      } else {
+        currentY = newY;
+      }
 
-        let nextSection = sections[index + 1];
-        if (!nextSection || (!nextSection.text && !nextSection.bold)) {
-          const startX = 20;
-          const startY = currentY;
-          const indentFactor = minutaBool ? 0 : 0.4;
-          const paragraphSpacing = 0;
-
-          let newY = justifyText(doc, accumulatedContent, textWidth, startX, startY, lineHeight, indentFactor, paragraphSpacing);
-
-          if (newY > (pageHeight - bottomMargin)) {
-            while (newY > (pageHeight - bottomMargin)) {
-              doc.addPage();
-              newY -= (pageHeight - bottomMargin);
-            }
-            currentY = topMargin + newY;
-          } else {
-            currentY = newY;
-          }
-
-          currentY += sectionSpacingWithTitle;
-          accumulatedContent = "";
-        }}
-
-
-
+      currentY += sectionSpacingWithTitle; 
+    }
     if (section.text && section.title) {
       doc.setFontSize(11);
       doc.setFont("arialbd", "normal");
@@ -175,7 +157,7 @@ const processSections = (sections, doc) => {
         maxTitleWidth = Math.max(maxTitleWidth, doc.getTextWidth(line));
       });
       const availableTextWidth = textWidth - maxTitleWidth - 5;
-      const textStartX = 20 + maxTitleWidth + 1;
+      const textStartX = 20 + maxTitleWidth + 5;
       doc.setFont("arial", "normal");
       const textLines = doc.splitTextToSize(section.text, availableTextWidth);
       let firstLineY = titleY;
@@ -187,7 +169,7 @@ const processSections = (sections, doc) => {
         doc.text(line, textStartX, firstLineY);
         firstLineY += lineHeight;
       });
-    
+
       currentY = firstLineY + sectionSpacingWithTitle;
     }
   });
