@@ -21,7 +21,7 @@ const lineHeight = 7;
 const sectionSpacingWithTitle = 0;
 const sectionSpacingWithoutTitle = 0;
 function justifyText(doc, text, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight){
-  const paragraphs = text.split("\n");
+  const paragraphs = text.map(item => item.text).join(" ").split("\n");
   paragraphs.forEach((paragraph) => {
     if (paragraph.trim() === "") {
       currentY += lineHeight;

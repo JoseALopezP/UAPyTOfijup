@@ -2,6 +2,7 @@ import { PDFGenerator } from "./pdfUtils";
 import { capitalizeFirst } from "./caratulaUtils";
 import { getMonthName } from "./caratulaUtils";
 import { removeHtmlTags } from "./removeHtmlTags";
+import { minutaPrep } from "./minutaPrep";
 
 export function listFiscal(arr, ufi) {
     let aux = '';
@@ -162,11 +163,8 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
 }
 
 export function generateMinutaSection(item, date) {
-    const sections = [];
-    sections.push(...generateResuelvoSection(item, date));
-    sections.push({ text: removeHtmlTags('\n'+item.minuta)});
-    sections.push({ text: removeHtmlTags(item.resuelvoText) });
-    sections.push({ text: removeHtmlTags(item.cierre) });
+    console.log(...minutaPrep(item))
+    const sections = [...generateResuelvoSection(item, date), ...minutaPrep(item)];
     return sections;
 } 
 

@@ -24,7 +24,7 @@ function splitNormalBold(text) {
     const parts = text.split(/<\/?strong>/).map(part => removeHtmlTags(part.trim()));
     return parts.map((part, index) => ({
         text: part,
-        bold: index % 2 === 1,
+        bold: index % 2 === 1, // Even indices = normal, odd indices = bold
     }));
 }
 
