@@ -69,13 +69,25 @@ function splitNormalBold(text) {
 }
 function resuelvoStructure(juez) {
     if (juez.includes('+')) {
-        return "<strong>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
+        return "\n<strong>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
     } else if (juez.includes('DR.')) {
-        return "<strong>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
+        return "\n<strong>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
     } else {
-        return "<strong>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
+        return "\n<strong>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
     }
 }
+function extractFundamento(text) {
+    const regex = /<strong>\s*Fundamentos\s*y\s*Resoluci[oó]n\s*:<\/strong>\s*El\s*(Tribunal\s+Colegiado|Sr\.?\s+Juez|Sra\.?\s+Jueza)\s*<strong>\s*MOTIVA\s*y\s*RESUELVE\s*<\/strong>/gi;
+  
+    const matches = [];
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+      matches.push(match[0]);
+    }
+
+    return matches;
+  }
+  
 
 export const minutaPrep = (item) => {
     const processText = (text, resBool = false) => splitByTimestamps(text).map(el => ({
@@ -84,7 +96,7 @@ export const minutaPrep = (item) => {
     }));
     
     const auxMin = processText(item.minuta);
-    const auxRes = processText(item.resuelvoText, true);
+    const auxRes = processText(extractFundamento(item.resuelvoText), true);
     const auxCie = processText(item.cierre);
     console.log(...auxMin)
     const sortedItems = [
@@ -94,6 +106,6 @@ export const minutaPrep = (item) => {
             .filter(el => el.timestamp)
             .sort((a, b) => a.timestamp.start.localeCompare(b.timestamp.start)),
         ...auxCie
-    ].map(el => el.timestamp ? {text:[{text:`\n(Minuto ${el.timestamp.start}${el.timestamp.end && `/${el.timestamp.end}`} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
+    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
     return sortedItems
 };
