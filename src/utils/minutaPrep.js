@@ -1,39 +1,72 @@
 import { removeHtmlTags } from "./removeHtmlTags";
 
-function splitByTimestamps(text, insertText = "") {
-    const timestampRegex = /(\bminuto\b|\bMinuto\b)\s*(\d{2}:\d{2}:\d{2})(?:\/(\d{2}:\d{2}:\d{2}))?\s*(\bvideo\b|\bVideo\b)\s*(\d+)/g;
+function extractTimestamp(text) {
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\/(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/i;
+    const match = text.match(timestampRegex);
+    if (!match) return null;
+
+    return {
+        video: match[7] || "0",
+        start: `${match[1]}:${match[2]}:${match[3]}`,
+        end: match[4] ? `${match[4]}:${match[5]}:${match[6]}` : null
+    };
+}
+
+function splitByTimestamps(text) {
+    const timestampRegex = /\(?\bminuto\b\s*\d{2}:\d{2}:\d{2}(?:\/\d{2}:\d{2}:\d{2})?\s*\bvideo\b\s*\d+\)?/gi;
     let matches, lastIndex = 0;
     let result = [];
 
     while ((matches = timestampRegex.exec(text)) !== null) {
         if (matches.index > lastIndex) {
-            result.push(text.substring(lastIndex, matches.index).trim());
+            // Capture text BEFORE the timestamp
+            result.push({
+                text: text.substring(lastIndex, matches.index).trim(),
+                timestamp: null
+            });
         }
-        result.push(matches[0] + " " + insertText);
-        lastIndex = timestampRegex.lastIndex;
+        
+        const extractedTimestamp = extractTimestamp(matches[0].replace(/[()]/g, ""));
+        lastIndex = timestampRegex.lastIndex; // Move lastIndex forward
+        
+        // Instead of capturing the entire remaining text, capture only the part between timestamps
+        const nextMatch = timestampRegex.exec(text); // Look ahead for the next timestamp
+        timestampRegex.lastIndex = lastIndex; // Reset regex index to continue normally
+
+        result.push({
+            text: text.substring(lastIndex, nextMatch ? nextMatch.index : text.length).trim(),
+            timestamp: extractedTimestamp
+        });
+
+        lastIndex = nextMatch ? nextMatch.index : text.length; // Move lastIndex to next section
     }
 
+    // Capture any trailing text
     if (lastIndex < text.length) {
-        result.push(text.substring(lastIndex).trim());
+        result.push({
+            text: text.substring(lastIndex).trim(),
+            timestamp: null
+        });
     }
 
-    return result.filter(part => part.length > 0);
+    return result.filter(part => part.text.length > 0);
 }
+
 
 function splitNormalBold(text) {
-    const parts = text.split(/<\/?strong>/).map(part => removeHtmlTags(part.trim()));
-    return parts.map((part, index) => ({
-        text: part,
-        bold: index % 2 === 1, // Even indices = normal, odd indices = bold
-    }));
+    const parts = text.split(/(<strong>|<\/strong>)/).filter(p => p.trim());
+    let bold = false;
+    return parts.map(part => {
+        if (part === "<strong>") {
+            bold = true;
+            return null;
+        } else if (part === "</strong>") {
+            bold = false;
+            return null;
+        }
+        return { text: removeHtmlTags(part.trim()), bold };
+    }).filter(Boolean);
 }
-
-function extractTimestamp(text) {
-    const timestampRegex = /\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})\s*\bvideo\b\s*(\d+)/i;
-    const match = text.match(timestampRegex);
-    return match ? parseInt(`${match[4]}${match[1]}${match[2]}${match[3]}`) : 0;
-}
-
 function resuelvoStructure(juez) {
     if (juez.includes('+')) {
         return "<strong>Fundamentos y Resolución: El Tribunal Colegiado MOTIVA y RESUELVE</strong>";
@@ -45,23 +78,22 @@ function resuelvoStructure(juez) {
 }
 
 export const minutaPrep = (item) => {
-    const auxMin = splitByTimestamps(item.minuta).map(el => ({
-        text: splitNormalBold(el),
-        timestamp: extractTimestamp(el) || 0,
+    const processText = (text) => splitByTimestamps(text).map(el => ({
+        text: splitNormalBold(el.text),
+        timestamp: el.timestamp,
     }));
-
-    const auxCie = splitByTimestamps(item.cierre).map(el => ({
-        text: splitNormalBold(el),
-        timestamp: extractTimestamp(el) || 0,
-    }));
-
-    const auxRes = splitByTimestamps(item.resuelvoText, resuelvoStructure(item.juez)).map(el => ({
-        text: splitNormalBold(el),
-        timestamp: extractTimestamp(el) || 0,
-    }));
-
-    const sortedItems = [...auxMin, ...auxRes, ...auxCie].sort((a, b) => a.timestamp - b.timestamp);
-    const aux = sortedItems.filter(el => el.timestamp === 0).concat(sortedItems.filter(el => el.timestamp !== 0));
-
-    return aux;
+    
+    const auxMin = processText(item.minuta);
+    const auxRes = processText(resuelvoStructure(item.juez) + " " + item.resuelvoText);
+    const auxCie = processText(item.cierre);
+    const sortedItems = [
+        ...auxMin.filter(el => !el.timestamp),
+        ...auxRes.filter(el => !el.timestamp),
+        ...[...auxMin, ...auxRes]
+            .filter(el => el.timestamp)
+            .sort((a, b) => a.timestamp.start.localeCompare(b.timestamp.start)),
+        ...auxCie
+    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end && `/${el.timestamp.end}`} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
+    console.log(sortedItems)
+    return sortedItems
 };

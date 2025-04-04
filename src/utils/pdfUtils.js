@@ -20,71 +20,97 @@ let currentY = topMargin;
 const lineHeight = 7;
 const sectionSpacingWithTitle = 0;
 const sectionSpacingWithoutTitle = 0;
-function justifyText(doc, text, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight){
-  const paragraphs = text.map(item => item.text).join(" ").split("\n");
-  paragraphs.forEach((paragraph) => {
-    if (paragraph.trim() === "") {
+function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight) {
+  const paragraphs = [];
+  let paragraph = [];
+  textArray.forEach((segment) => {
+    const parts = segment.text.split("\n");
+    parts.forEach((part, idx) => {
+      if (idx > 0) {
+        paragraphs.push(paragraph);
+        paragraph = [];
+      }
+      if (part.trim()) {
+        paragraph.push({ text: part.trim(), bold: segment.bold });
+      }
+    });
+  });
+  if (paragraph.length) paragraphs.push(paragraph);
+
+  paragraphs.forEach((para) => {
+    if (!para.length) {
       currentY += lineHeight;
       return;
     }
+
     const indent = textWidth * indentFactor;
-    if (paragraph.includes("Saluda atte.")) {
-      doc.text(paragraph, startX + indent, currentY);
-      currentY += lineHeight + paragraphSpacing;
-      return;
-    }
-
-    const words = paragraph.split(" ");
-    let line = "";
-    let lines = [];
+    const paraWords = para.flatMap(seg => seg.text.split(" ").map(word => ({ word, bold: seg.bold })));
+    
+    const lines = [];
+    let line = [];
+    let lineWidth = 0;
     let isFirstLine = true;
+    const maxWidth = () => isFirstLine ? textWidth - indent : textWidth;
 
-    words.forEach((word) => {
-      const testLine = line + word + " ";
-      const testLineWidth = doc.getTextWidth(testLine);
-
-      const maxWidth = isFirstLine ? textWidth - indent : textWidth;
-      if (testLineWidth > maxWidth) {
-        lines.push({ text: line.trim(), isFirstLine });
-        line = word + " ";
+    paraWords.forEach(({ word, bold }) => {
+      doc.setFont(bold ? "arialbd" : "arial", "normal");
+      const wordWidth = doc.getTextWidth(word + " ");
+      if (lineWidth + wordWidth > maxWidth()) {
+        lines.push({ words: line, isFirstLine });
+        line = [{ word, bold }];
+        lineWidth = wordWidth;
         isFirstLine = false;
       } else {
-        line = testLine;
+        line.push({ word, bold });
+        lineWidth += wordWidth;
       }
     });
 
-    if (line.length > 0) {
-      lines.push({ text: line.trim(), isFirstLine });
+    if (line.length) {
+      lines.push({ words: line, isFirstLine });
     }
-    lines.forEach((lineData, index) => {
-      const { text, isFirstLine } = lineData;
+
+    lines.forEach(({ words, isFirstLine }, index) => {
       if (currentY > (pageHeight - bottomMargin)) {
         doc.addPage();
         currentY = topMargin;
       }
+
       if (index === lines.length - 1) {
-        const xOffset = isFirstLine ? startX + indent : startX;
-        doc.text(text, xOffset, currentY);
+        let x = isFirstLine ? startX + indent : startX;
+        words.forEach(({ word, bold }, i) => {
+          doc.setFont(bold ? "arialbd" : "arial", "normal")
+          doc.text(word, x, currentY);
+          x += doc.getTextWidth(word + " ");
+        });
       } else {
-        const wordsInLine = text.split(" ");
-        const totalWordWidth = wordsInLine.reduce((sum, word) => sum + doc.getTextWidth(word), 0);
-        const totalSpaces = wordsInLine.length - 1;
-        const extraSpace = totalSpaces > 0 ? (isFirstLine ? textWidth - indent : textWidth) - totalWordWidth : 0;
-        let currentX = isFirstLine ? startX + indent : startX;
+        const totalWordWidth = words.reduce((sum, { word, bold }) => {
+          doc.setFont(bold ? "arialbd" : "arial", "normal")
+          return sum + doc.getTextWidth(word);
+        }, 0);
+        const totalSpaces = words.length - 1;
+        const extraSpace = maxWidth() - totalWordWidth;
         const extraSpacePerGap = totalSpaces > 0 ? extraSpace / totalSpaces : 0;
-        wordsInLine.forEach((word, i) => {
-          doc.text(word, currentX, currentY);
-          if (i < wordsInLine.length - 1) {
-            currentX += doc.getTextWidth(word) + extraSpacePerGap;
+        let x = isFirstLine ? startX + indent : startX;
+
+        words.forEach(({ word, bold }, i) => {
+          doc.setFont(bold ? "arialbd" : "arial", "normal")
+          doc.text(word, x, currentY);
+          if (i < words.length - 1) {
+            x += doc.getTextWidth(word) + extraSpacePerGap;
           }
         });
       }
+
       currentY += lineHeight;
     });
+
     currentY += paragraphSpacing;
   });
-  return currentY; 
+
+  return currentY;
 }
+
 
 const addTextWithLineBreaks = (textLines, initialX, align = 'left', doc) => {
   textLines.forEach(line => {
@@ -157,7 +183,7 @@ const processSections = (sections, doc) => {
         maxTitleWidth = Math.max(maxTitleWidth, doc.getTextWidth(line));
       });
       const availableTextWidth = textWidth - maxTitleWidth - 5;
-      const textStartX = 20 + maxTitleWidth + 5;
+      const textStartX = 20 + maxTitleWidth + 2;
       doc.setFont("arial", "normal");
       const textLines = doc.splitTextToSize(section.text, availableTextWidth);
       let firstLineY = titleY;

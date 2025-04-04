@@ -86,7 +86,7 @@ export function generateResuelvoSection(item, date) {
     if (item.juez.split('+').length > 1) {
         sections.push({ title: 'Tribunal Colegiado:', text: item.juez.split('+').map(j => capitalizeFirst(j.toLowerCase())).join('\n') });
     } else {
-        sections.push({ title: 'Juez:', text: capitalizeFirst(item.juez.toLowerCase())});
+        sections.push({ title: item.juez.includes('DR.') ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez.toLowerCase())});
     }
     if (item.mpf && item.tipo !== "TRÁMITES DE EJECUCIÓN") {
         let fiscales = [];
@@ -163,7 +163,6 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
 }
 
 export function generateMinutaSection(item, date) {
-    console.log(...minutaPrep(item))
     const sections = [...generateResuelvoSection(item, date), ...minutaPrep(item)];
     return sections;
 } 
