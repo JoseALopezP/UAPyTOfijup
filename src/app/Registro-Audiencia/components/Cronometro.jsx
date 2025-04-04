@@ -2,6 +2,7 @@
 import styles from '../RegistroAudiencia.module.css';
 import { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '@/context/DataContext';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 const translateColor = {
     'FINALIZADA': '#28a745',
     'CUARTO_INTERMEDIO': '#ffc107',
@@ -20,7 +21,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const [newState, setNewState] = useState('')
 
     const [pidiente, setPidiente] = useState(false)
-    const {updateData, updateRealTime, realTime, pushtToArray} = useContext(DataContext)
+    const {updateData, pushtToArray} = useContext(DataContext)
 
     const [stopwatchRunning, setStopwatchRunning] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? true : false)
     const [stopwatchCurrent, setStopwatchCurrent] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? (Date.now() - item.stopwatchStart) : 0)
@@ -69,12 +70,10 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const changeState = async () => {
         if (isSaving.current) return;
         isSaving.current = true;
-        setGuardando(true); 
-        await updateRealTime();
-    
+        setGuardando(true);
         if (newState === 'RESUELVO') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', realTime);
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${realTime} | ${newState}`);
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction());
+            await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`);
         }
     
         if (newState && newState !== 'RESUELVO') {
@@ -85,13 +84,11 @@ export default function Cronometro({item, dateToUse, isHovered}) {
                 await stopwatch();
             }
             const entry = newState === 'CUARTO_INTERMEDIO'
-                ? `${realTime} | ${newState} | ${tiempoPedido || 0} | ${pidiente || "juez"}`
-                : `${realTime} | ${newState}`;
+                ? `${updateRealTimeFunction()} | ${newState} | ${tiempoPedido || 0} | ${pidiente || "juez"}`
+                : `${updateRealTimeFunction()} | ${newState}`;
             await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry);
         }
-    
         await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState);
-        
         setEstadoActual(newState);
         setGuardando(false);
         isSaving.current = false;
