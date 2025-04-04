@@ -69,23 +69,24 @@ function splitNormalBold(text) {
 }
 function resuelvoStructure(juez) {
     if (juez.includes('+')) {
-        return "<strong>Fundamentos y Resolución: El Tribunal Colegiado MOTIVA y RESUELVE</strong>";
+        return "<strong>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
     } else if (juez.includes('DR.')) {
-        return "<strong>Fundamentos y Resolución: El Sr. Juez MOTIVA Y RESUELVE</strong>";
+        return "<strong>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
     } else {
-        return "<strong>Fundamentos y Resolución: La Sra. Jueza MOTIVA Y RESUELVE</strong>";
+        return "<strong>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
     }
 }
 
 export const minutaPrep = (item) => {
-    const processText = (text) => splitByTimestamps(text).map(el => ({
-        text: splitNormalBold(el.text),
+    const processText = (text, resBool = false) => splitByTimestamps(text).map(el => ({
+        text: splitNormalBold(resBool ? resuelvoStructure(item.juez) + "\n" +  el.text : el.text),
         timestamp: el.timestamp,
     }));
     
     const auxMin = processText(item.minuta);
-    const auxRes = processText(resuelvoStructure(item.juez) + " " + item.resuelvoText);
+    const auxRes = processText(item.resuelvoText, true);
     const auxCie = processText(item.cierre);
+    console.log(...auxMin)
     const sortedItems = [
         ...auxMin.filter(el => !el.timestamp),
         ...auxRes.filter(el => !el.timestamp),
@@ -93,7 +94,6 @@ export const minutaPrep = (item) => {
             .filter(el => el.timestamp)
             .sort((a, b) => a.timestamp.start.localeCompare(b.timestamp.start)),
         ...auxCie
-    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end && `/${el.timestamp.end}`} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
-    console.log(sortedItems)
+    ].map(el => el.timestamp ? {text:[{text:`\n(Minuto ${el.timestamp.start}${el.timestamp.end && `/${el.timestamp.end}`} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
     return sortedItems
 };
