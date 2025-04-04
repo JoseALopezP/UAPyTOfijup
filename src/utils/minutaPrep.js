@@ -77,16 +77,14 @@ function resuelvoStructure(juez) {
     }
 }
 function extractFundamento(text) {
-    const regex = /<strong>\s*Fundamentos\s*y\s*Resoluci[oó]n\s*:<\/strong>\s*El\s*(Tribunal\s+Colegiado|Sr\.?\s+Juez|Sra\.?\s+Jueza)\s*<strong>\s*MOTIVA\s*y\s*RESUELVE\s*<\/strong>/gi;
+    const regex = new RegExp(
+      `<strong>\\s*Fundamentos\\s*y\\s*Resoluci[oó]n\\s*:\\s*</strong>\\s*El\\s*(Tribunal\\s+Colegiado|Sr\\.?\\s+Juez|Sra\\.?\\s+Jueza)\\s*<strong>\\s*MOTIVA\\s*y\\s*RESUELVE\\s*</strong>`,
+      'gi'
+    );
   
-    const matches = [];
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-      matches.push(match[0]);
-    }
-
-    return matches;
+    return text.replace(regex, '');
   }
+  
   
 
 export const minutaPrep = (item) => {
