@@ -1,0 +1,652 @@
+.audienciaListSection{
+    margin-left: 2vw;
+    width: calc(100vw - (100vw - 100%));
+}
+.audienciaListTable{
+    width: calc(100vw - (100vw - 100%));
+    display: table;
+    table-layout: fixed;
+}
+.audienciaListTableHead{
+    width: calc(100vw - (100vw - 100%));
+    text-align: center;
+}
+.inputLegajoBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: fit-content;
+}
+.addAudienciaRow{
+    height: 50px;
+    vertical-align: middle;
+    width: calc(100vw - (100vw - 100%));
+    display: table-row;
+}
+.true{
+    color: #dcc635;
+}
+.tableRow{
+    display: table-row;
+}
+.tableCell{
+    display: table-cell;
+    padding: 0 8px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+.tableCellAdmin{
+    width: 65px;
+}
+.tableCellAdmin input{
+    width: 90%;
+    height: 25px;
+}
+.tableCellHora{
+    align-items: center;
+    text-align: center;
+    width: 100px;
+}
+.tableCellHora input{
+    width: 90%;
+}
+.tableCellSala{
+    width: 90px;
+}
+.tableCellLegajo{
+    width: 250px;
+}
+.tableCellAction{
+    display:table-cell;
+    overflow: hidden;
+    width: 150px;
+}
+.juecesButtonBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 300px;
+}
+.colegiadoButton{
+    background-color: #dcc635;
+    width: 60px;
+    padding: 10px;
+    font-weight: 700;
+}
+.uniSelect{
+    width: calc(100% - 60px);
+}
+.juecesSelect{
+    width: 100%;
+    max-width: 300px;
+    margin-top: 10px;
+}
+.tableCellJuez{
+    width: 300px;
+    max-width: 300px;
+    flex-direction: column;
+}
+.tableCellJuezList{
+    font-size: 14px;
+    text-align: center;
+    
+}
+.addAudienciaRow select, .addAudienciaRow input, .addAudienciaRow button{
+    height: 40px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 2px;
+    border: none;
+    padding: 0;
+}
+.addAudienciaRow input:focus-visible{
+    outline: 2px #dcc635 solid;
+}
+.inputLegajoBlock{
+    min-width: 260px;
+    width: fit-content;
+}
+
+.inputItemBlock{
+    padding: 20px 5px;
+    display: table-cell;
+}
+.inputTipoBlock{
+    width: 80px;
+}
+.inputLegajoBlock input{
+    width: 48px;
+    padding: 0 6px;
+}
+.inputLegajoBlock select{
+    padding: 0 6px;
+}
+.inputSubmitBlock{
+    padding: 0 10px 0 8px;
+}
+.submitButton{
+    width: 100%;
+    font-weight: 700;
+    font-size: 32px;
+    outline: none;
+    border: none;
+    background-color: #007bff;
+    color: white;
+}
+
+.submitButton:focus-visible{
+    outline: 2px #dcc635 solid;
+}
+.inputError select, .inputError input, .inputAreaError{
+    outline: 4px #dc3545 solid;
+}
+.audienciaListTable{
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+}
+.audienciaListTable .audienciaList:nth-child(odd){
+    background-color: #475f74;
+}
+.audienciaListTable .audienciaList:nth-child(even){
+    background-color: #375166;
+}
+
+.errorMessage{
+    position:fixed;
+    width: 100%;
+    text-align: center;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 80px;
+    background-color: #dc3545;
+    animation: errorMessage 2s;
+    animation-fill-mode: both;
+    -webkit-animation: errorMessage 2s;
+    -webkit-animation-fill-mode: both;
+}
+
+.deleteButton{
+    width: 100%;
+    height: 30px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #dc3545;
+}
+.editButton{
+    width: 100%;
+    height: 30px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #17a2b8;
+    margin-top: 2px;
+}
+.editButtonNot{
+    opacity: .3;
+}
+.inputSituacion{
+    padding: 0 5px;
+    width: 95%;
+    border-radius: 5px;
+    border: none;
+    height: 50px;
+}
+.tableCellSituacion{
+    width: 180px;
+    max-width: 180px;
+    padding: 0 10px;
+}
+.tableCellSituacionIndiv{
+    flex-direction: column;
+    text-align: center;
+    vertical-align: middle;
+}
+.inputSituacionEdit{
+    width: 95%;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    height: 50px;
+    color: #fff;
+    background-color: transparent;
+    max-height: 50px;
+    font-size: 16px;
+}
+.inputSituacionEdit::placeholder{
+    color: #fff;
+    font-size: 16px;
+}
+.inputResultadoEdit{
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    font-size: 20px;
+    background-color: transparent;
+}
+.inputResultadoEdit::placeholder{
+    color: #fff;
+    font-size: 20px;
+}
+.tableCellResultado{
+    width: 150px;
+    display: table-cell;
+    flex-direction: column;
+    justify-content: center;
+}
+.tableCellResultadoIndiv{
+    padding: 5px;
+    height: 100%;
+    flex-direction: column;
+    text-align: center;
+    vertical-align: middle;
+}
+.selectSalaEdit{
+    appearance: none;
+    width: 80px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: none;
+    background-color: transparent;
+    color: #fff;
+}
+.selectSalaEdit option{
+    color: black;
+}
+.tableCellJuezN{
+    width: 60px;
+}
+.tableCellJuezN select{
+    width: 60px;
+    appearance: none;
+    font-size: 22px;
+    background-color: transparent;
+    border: white solid 1px;
+    border-radius: 5px;
+    font-weight: 700;
+    color: #fff;
+    padding: 5px;
+}
+.tableCellJuezN option{
+    color: #000;
+}
+.colegiadoButton{
+    background-color: #dcc635;
+    width: 60px;
+    padding: 10px;
+    font-weight: 700;
+}
+.cancelarButton{
+    background-color: #fd7e14;
+    border-radius: 5px;
+    border: none;
+    height: 25px;
+    font-size: 10px;
+    font-weight: 700;
+    width: 100%;
+}
+.cancelarButtonClicked{
+    transform: scale(0.98); 
+    color: #fd7e14;
+    background-color: #000;
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.reprogramarButton{
+    background-color: #6c757d;
+    border-radius: 5px;
+    border: none;
+    font-weight: 700;
+    height: 25px;
+    font-size: 10px;
+    width: 100%;
+}
+.reprogramarButtonClicked{
+    color: #6c757d;
+    background-color: #000;
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.deleteButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.deleteButtonBlock{
+    padding: 4px;
+    height: 100%;
+    width: 80px
+}
+.inputHora{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    width: 40px;
+    display: inline-flex;
+    flex-direction: row;
+    height: 30px;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family:inherit;
+}
+.inputHora::-webkit-datetime-edit-hour-field{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+.inputHora::-webkit-datetime-edit-text{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+.inputHora::-webkit-calendar-picker-indicator{
+    display: none;
+}
+.toDelete{
+    color: #dc3545;
+}
+.toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
+    color: #dc3545;
+}
+.inputAdmin{
+    border: solid white 1px;
+    font-size: 14px;
+    padding: 0 2px;
+    width: 65px;
+}
+.inputAdminChanges{
+    border: solid #dcc635 1px;
+    color: #dcc635;
+    font-size: 14px;
+    padding: 0 2px;
+    width: 65px;
+}
+.inputAdminChanges::placeholder{
+    color: #dcc635;
+}
+.inputAdminCorrect{
+    border: solid #28a745 1px;
+    color: #28a745;
+    font-size: 14px;
+    padding: 0 2px;
+    width: 65px;
+}
+.inputAdminCorrect::placeholder{
+    color: #28a745;
+}
+.inputAdmin::placeholder{
+    font-size: 14px;
+}
+.controlButton{
+    width: 95%;
+    font-weight: 700;
+    background-color: #FFF;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.controlButtonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.audienciaCancelada{
+    font-size: 14px;
+    text-align: center;
+}
+.DEMORADA{
+    color: #fd7e14;
+}
+.PROGRAMADA{
+    color: #007bff;
+}
+.EN_CURSO{
+    color: #17a2b8;
+}
+.CANCELADA{
+    color: #dc3545; 
+}
+.CUARTO_INTERMEDIO{
+    color: #ffc107;
+}
+.FINALIZADA {
+    color: #28a745;
+}
+.REPROGRAMADA {
+    background-color: #6c757d;
+}
+.inputComentarioEdit{
+    margin: 0;
+    width: 95%;
+    background-color: transparent;
+    height: 40px;
+    border-radius: 5px;
+    padding: 5px 0 5px 5px;
+}
+.inputComentarioEditCell{
+    padding: 0;
+}
+.tableCellWhiteLeft, .tableCellWhiteMiddle, .tableCellWhiteRight{
+    background-color: #fff;
+    opacity: 1;
+    vertical-align: middle;
+    padding: 0;
+    text-align: center;
+}
+.tableCellWhiteLeft{
+    border-radius: 10px 0 0 10px;
+}
+.tableCellWhiteMiddle{
+    border-radius: 0;
+
+}
+.tableCellWhiteRight{
+    border-radius: 0 10px 10px 0;
+}
+.buttonCorrect{
+    background-color: #28a745;
+    font-weight: 700;
+    color: #fff;
+    border: none;
+    outline: none;
+    padding: 8px 5px;
+    border-radius: 5px;
+}
+.buttonCorrectClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.buttonToChange{
+    color: #fff;
+    background-color: #fd7e14;
+    font-weight: 700;
+    padding: 8px 5px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+}
+.buttonToChangeClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.inputTimeBlock{
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #fff;
+    border-radius: 5px;
+    color: #375166;
+    height: 34px;
+    padding: 3px 0;
+    max-width: 80px;
+}
+.inputTimeBlock input{
+    margin: 0;
+    padding: 2px;
+    height: 30px;
+    text-align: center;
+}
+.inputTimeBlock input:focus-visible{
+    border: none;
+    outline: none;
+}
+.inputTimeBlock input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+.controlButtonOficio{
+    background-color: #007bff;
+    color: #fff;
+    border: #fff 2px solid;
+}
+.controlButtonOficioClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+
+.oficioBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 90%;
+    height: 85%;
+    margin: auto;
+    left: 5%;
+    top: 5%;
+    position: fixed;
+    z-index: 50;
+    background-color: #ffffffe3;
+    padding: 10px;
+    justify-content: space-between;
+    border-radius: 5px;
+}
+.resuelvoBlock{
+    width: calc(100% - 40px);
+    color: #000;
+    font-weight: 300;
+    overflow-y: scroll;
+    padding: 20px;
+    line-height: 22px;
+}
+.oficiadosBlock{
+    width: calc(100% - 40px);
+    padding: 20px;
+}
+.oficioInput{
+    border: solid 2px #375166;
+    outline: none;
+    width: 100%;
+    border-radius: 5px;
+    padding: 4px;
+}
+.controlButtonQuitar{
+    width: 20%;
+    padding: 4px;
+    background-color: #dc3545;
+    color: #fff;
+}
+.textAreaTraslado{
+    width: 95%;
+    border: none;
+    border-radius: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}
+.controlButtonAgregar{
+    border: #375166 2px solid;
+    padding: 6px;
+}
+.controlButtonDescargar{
+    background-color: #375166;
+    color: #fff;
+    border: #fff 2px solid;
+    padding: 6px;
+}
+.inputHoraProgramada{
+    text-align: center;
+    width: 40px;
+    padding: 10px;
+    margin: 0;
+}
+.inputHoraProgramada::-webkit-outer-spin-button,.inputHoraProgramada::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.controlButtonCerrar{
+    position: fixed;
+    z-index: 65;
+    background-color: #dc3545;
+    width: 200px;
+    color: white;
+    padding: 5px;
+    font-size: 32px;
+    left: calc(100% /2 - 100px);
+    top: calc(100vh - 200px);
+}
+@keyframes errorMessage {
+    0% {
+        display: none;
+    }
+    1%{
+        display: inline-flex;
+    }
+    50%{
+      opacity: 100%;
+    }
+    99%{
+      opacity: 0%;
+    }
+    100%{
+        display: none;
+    }
+}
+@media (max-width: 1550px) {
+    .tableCellJuez{
+        width: 200px;
+        max-width: 200px;
+        flex-direction: column;
+    }
+    .tableCellSituacion{
+        width: 120px;
+    }
+    .tableCellSituacion input{
+        width: 120px;
+    }
+    .tableCellLegajo{
+        width: 150px;
+    }
+    .tableCellTipoIndiv{
+        font-size: 16px;
+    }
+    .tableCellResultado{
+        width: 90px;
+    }
+    .tableCellLegajoIndiv{
+        font-size: 18px;
+    }
+}
+@media (max-width: 1400px) {
+    .audienciaListTableHead{
+        font-size: 20px;
+    }
+    .tableCellJuez{
+        width: 160px;
+        max-width: 160px;
+        flex-direction: column;
+    }
+    .tableCellResultado{
+        width: 80px;
+    }
+}

@@ -1,0 +1,274 @@
+.tableSection{
+    margin-left: 2vw;
+    width: 100%;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    overflow-x: hidden;
+}
+.table{
+    width: 100%;
+    border: none;   
+}
+.tableHead{
+    background-color: white;
+    color: #375166;
+}
+.tableBodyJuez{
+    width: 120px;
+    font-size: 16px;
+    line-height: 14px;
+}
+.tableHeadJuez{
+    width: 120px;
+}
+.tableBody tr{
+    height: 70px;
+    line-height: 20px;
+}
+.tableBody tr:hover{
+    height: 70px;
+    line-height: 20px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+.tableBody, .tableBody th, .tableBody td{
+    border-collapse: collapse;
+    margin: 0;
+}
+.tableBody td{
+    padding-left: 20px;
+}
+
+.tableBody tr:nth-child(odd){
+    background-color: #375166;
+}
+.tableBody tr:nth-child(even){
+    background-color: #475f74;
+}
+
+.buttonsBlock{
+    width: 40%;
+    height: 64%;
+    margin: auto;
+    left: 30%;
+    top: 10%;
+    position: fixed;
+    z-index: 50;
+    background-color: #ffffffe3;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 20px;
+    justify-content: flex-start;
+    border-radius: 5px;
+}
+.buttonsBlockResuelvo{
+    width: 96%;
+    height: 96%;
+    left: 2%;
+    top: 2%;
+    font-size: 26px;
+}
+.stateButton{
+    font-size: 24px;
+    background-color: #375166;
+    color: white;
+    height: 15%;
+    width: 100%;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    margin: 10px 0;
+}
+.legajoTitle{
+    text-align: center;
+    color: #375166;
+    font-weight: 700;
+    height: 50px;
+    margin: 0;
+}
+.stateButton:active{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.stateButtonFinalizarcuarto{
+    background-color: #20c997;
+    
+}
+.stateButtonIniciar{
+    background-color: #28a745;
+}
+.stateButtonSuspender{
+    background-color: #fd7e14;
+}   
+.stateButtonFinalizar{
+    background-color: #dc3545;
+}
+.stateButtonCuarto{
+    background-color: #6c757d;
+}
+.buttonClicked{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+.tableCellTipo{
+    text-align: center;
+}
+.stateButtonCerrar{
+    background-color: #dc3545;
+    color: #000;
+}
+.stateButtonBlock{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.stateButtonCerrar, .stateButtonResuelvoBlock{
+    width: 48%;
+    height: 50px;
+}
+.stateButtonResuelvoBlock{
+    background-color: #dcc635;
+    color: #000;
+}
+.changeBlock{
+    display: inline-flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+.stateButtonChange{
+    background-color: #6c757d;
+}
+.salaCell{
+    text-align: center;
+}
+.salaSelector{
+    height: 100%;
+    font-size: 24px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-size: 32px;
+    text-align: center;
+}
+.operadorList{
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    font-family: inherit;
+    font-weight: 700;
+    color: #375166;
+}
+.tiempoCuarto{
+    background-color: #fff;
+    border-radius: 5px;
+    display: inline-flex;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: space-between;
+    color: #000;
+    font-size: 38px;
+}
+.pidienteSelector{
+    outline: none;
+    border: none;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: inherit;
+    width: 100%;
+    text-align: center;
+}
+.tiempoPedido{
+    font-size: 32px;
+    line-height: 0px;
+    padding: 0 20px;
+}
+.tiempoCuarto button{
+    height: 60px;
+    width: 60px;
+    font-weight: 700;
+    font-size: 30px;
+    color: #1d1d1d;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+}
+.tiempoMasCuarto{
+    background-color: #28a745;
+}
+.tiempoMenosCuarto{
+    background-color: #fd7e14;
+}
+.DEMORADA{
+    background-color: #fd7e14;
+    text-align: center;
+}
+.PROGRAMADA{
+    text-align: center;
+    background-color: #007bff;
+}
+.EN_CURSO{
+    background-color: #17a2b8;
+    text-align: center;
+}
+.CANCELADA{
+    background-color: #dc3545; 
+    text-align: center;
+}
+.CUARTO_INTERMEDIO{
+    background-color: #ffc107;
+    text-align: center;
+}
+.FINALIZADA {
+    background-color: #28a745;
+    text-align: center;
+}
+.REPROGRAMADA {
+    background-color: #6c757d;
+}
+.stateButtonResuelvo{
+    background-color: #dcc635;
+}
+.stateButtonSubido{
+    opacity: 0.1;
+}
+.editButtonNot{
+    background-color: #6c757d;
+}
+
+
+@media (max-width: 900px) {
+    .buttonsBlock{
+        height: 80%;
+        width: 80%;
+        left: 5%;
+        top: 5%;
+    }
+    .tableBody td{
+        padding-left: 10px;
+    }
+}
+@media (max-width: 800px) {
+    .tableSection{
+        font-size: 18px;
+    }
+}
+@media (max-width: 720px) {
+    .tableSection{
+        font-size: 16px;
+    }
+    .tableBody td{
+        padding-left: 5px;
+    }
+}
+@media (max-width: 500px) {
+    .tableSection{
+        font-size: 12px;
+    }
+    .tableBody td{
+        padding-left: 2px;
+    }
+}

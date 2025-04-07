@@ -22,7 +22,6 @@ function splitByTimestamps(text) {
         const matchEnd = timestampRegex.lastIndex;
 
         if (matchStart > lastIndex) {
-            // Capture content before timestamp (excluding leading tags)
             const before = text.substring(lastIndex, matchStart).trim();
             if (before.length) {
                 result.push({
@@ -31,17 +30,12 @@ function splitByTimestamps(text) {
                 });
             }
         }
-
-        // Clean the match to extract timestamp (remove HTML tags from it)
         const cleanMatch = matches[0].replace(/<\/?[^>]+(>|$)/g, "").replace(/[()]/g, "");
         const extractedTimestamp = extractTimestamp(cleanMatch);
-
-        // Look for next match to define the boundary of current segment
         const nextMatch = timestampRegex.exec(text);
         const contentEnd = nextMatch ? nextMatch.index : text.length;
-        timestampRegex.lastIndex = matchEnd; // Reset to resume correctly next iteration
+        timestampRegex.lastIndex = matchEnd;
 
-        // Capture the content following the timestamp
         const content = text.substring(matchEnd, contentEnd).trim();
         if (content.length) {
             result.push({
@@ -53,7 +47,6 @@ function splitByTimestamps(text) {
         lastIndex = contentEnd;
     }
 
-    // Capture any trailing content
     if (lastIndex < text.length) {
         const tail = text.substring(lastIndex).trim();
         if (tail.length) {
