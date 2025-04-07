@@ -73,10 +73,10 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,program: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hora}`
             ,inicioReal: `${formattedDate.split('').splice(0,2).join('')}/${formattedDate.split('').splice(2,2).join('')}/${formattedDate.split('').splice(4,4).join('')} ${item.hitos ? item.hitos[0].split(' | ')[0] : ''}`
             ,demora: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))) : ''}`
-            ,motivoDem: `${item.razonDemora ? (item.razonDemora) : 'JUEZ'}`
+            ,motivoDem: `${item.razonDemora ? (item.razonDemora) : ''}`
             ,observDem: ''
             ,durProg: ''
-            ,durReal: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1]))) : ''}`
+            ,durReal: `${item.hitos ? ((parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[item.hitos.length - 1].split(' | ')[0].split(':')[1])) - (parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1]))) : ''}`
             ,cuartoTeo: ''
             ,cuartoReal: (item.hitos ? cuartoCalculator(item) : '')
             ,cuartoRealOtr: ''
@@ -88,7 +88,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,tipoVict: ''
             ,sala: `${item.sala}`
             ,operador: `${item.operador}`
-            ,fiscal: item.fiscal ? `${item.fiscal[0].nombre}` : ''
+            ,fiscal: item.mpf ? `${item.mpf[0].nombre}` : ''
             ,defensor: item.defensa ? `${item.defensa[0].nombre}` : ''
             ,juez: `${item.juez}`
         });
