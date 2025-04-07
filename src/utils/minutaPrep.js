@@ -13,44 +13,60 @@ function extractTimestamp(text) {
 }
 
 function splitByTimestamps(text) {
-    const timestampRegex = /\(?\bminuto\b\s*\d{2}:\d{2}:\d{2}(?:\/\d{2}:\d{2}:\d{2})?\s*\bvideo\b\s*\d+\)?/gi;
+    const timestampRegex = /(?:<[^>]+>\s*)*\(?\bminuto\b\s*\d{2}:\d{2}:\d{2}(?:\/\d{2}:\d{2}:\d{2})?\s*\bvideo\b\s*\d+\)?/gi;
     let matches, lastIndex = 0;
     let result = [];
 
     while ((matches = timestampRegex.exec(text)) !== null) {
-        if (matches.index > lastIndex) {
-            // Capture text BEFORE the timestamp
+        const matchStart = matches.index;
+        const matchEnd = timestampRegex.lastIndex;
+
+        if (matchStart > lastIndex) {
+            // Capture content before timestamp (excluding leading tags)
+            const before = text.substring(lastIndex, matchStart).trim();
+            if (before.length) {
+                result.push({
+                    text: before,
+                    timestamp: null
+                });
+            }
+        }
+
+        // Clean the match to extract timestamp (remove HTML tags from it)
+        const cleanMatch = matches[0].replace(/<\/?[^>]+(>|$)/g, "").replace(/[()]/g, "");
+        const extractedTimestamp = extractTimestamp(cleanMatch);
+
+        // Look for next match to define the boundary of current segment
+        const nextMatch = timestampRegex.exec(text);
+        const contentEnd = nextMatch ? nextMatch.index : text.length;
+        timestampRegex.lastIndex = matchEnd; // Reset to resume correctly next iteration
+
+        // Capture the content following the timestamp
+        const content = text.substring(matchEnd, contentEnd).trim();
+        if (content.length) {
             result.push({
-                text: text.substring(lastIndex, matches.index).trim(),
+                text: content,
+                timestamp: extractedTimestamp
+            });
+        }
+
+        lastIndex = contentEnd;
+    }
+
+    // Capture any trailing content
+    if (lastIndex < text.length) {
+        const tail = text.substring(lastIndex).trim();
+        if (tail.length) {
+            result.push({
+                text: tail,
                 timestamp: null
             });
         }
-        
-        const extractedTimestamp = extractTimestamp(matches[0].replace(/[()]/g, ""));
-        lastIndex = timestampRegex.lastIndex; // Move lastIndex forward
-        
-        // Instead of capturing the entire remaining text, capture only the part between timestamps
-        const nextMatch = timestampRegex.exec(text); // Look ahead for the next timestamp
-        timestampRegex.lastIndex = lastIndex; // Reset regex index to continue normally
-
-        result.push({
-            text: text.substring(lastIndex, nextMatch ? nextMatch.index : text.length).trim(),
-            timestamp: extractedTimestamp
-        });
-
-        lastIndex = nextMatch ? nextMatch.index : text.length; // Move lastIndex to next section
-    }
-
-    // Capture any trailing text
-    if (lastIndex < text.length) {
-        result.push({
-            text: text.substring(lastIndex).trim(),
-            timestamp: null
-        });
     }
 
     return result.filter(part => part.text.length > 0);
 }
+
 
 
 function splitNormalBold(text) {
@@ -94,9 +110,9 @@ export const minutaPrep = (item) => {
     }));
     
     const auxMin = processText(item.minuta);
+    console.log(item.resuelvoText)
     const auxRes = processText(extractFundamento(item.resuelvoText), true);
     const auxCie = processText(item.cierre);
-    console.log(...auxMin)
     const sortedItems = [
         ...auxMin.filter(el => !el.timestamp),
         ...auxRes.filter(el => !el.timestamp),

@@ -21,8 +21,13 @@ const lineHeight = 7;
 const sectionSpacingWithTitle = 0;
 const sectionSpacingWithoutTitle = 0;
 function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight) {
+  if (!Array.isArray(textArray)) {
+    textArray = [{text: textArray}];
+  }
+
   const paragraphs = [];
   let paragraph = [];
+
   textArray.forEach((segment) => {
     const parts = segment.text.split("\n");
     parts.forEach((part, idx) => {
@@ -35,6 +40,7 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
       }
     });
   });
+
   if (paragraph.length) paragraphs.push(paragraph);
 
   paragraphs.forEach((para) => {
@@ -44,8 +50,10 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
     }
 
     const indent = textWidth * indentFactor;
-    const paraWords = para.flatMap(seg => seg.text.split(" ").map(word => ({ word, bold: seg.bold })));
-    
+    const paraWords = para.flatMap(seg =>
+      seg.text.split(" ").map(word => ({ word, bold: seg.bold }))
+    );
+
     const lines = [];
     let line = [];
     let lineWidth = 0;
@@ -79,13 +87,13 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
       if (index === lines.length - 1) {
         let x = isFirstLine ? startX + indent : startX;
         words.forEach(({ word, bold }, i) => {
-          doc.setFont(bold ? "arialbd" : "arial", "normal")
+          doc.setFont(bold ? "arialbd" : "arial", "normal");
           doc.text(word, x, currentY);
           x += doc.getTextWidth(word + " ");
         });
       } else {
         const totalWordWidth = words.reduce((sum, { word, bold }) => {
-          doc.setFont(bold ? "arialbd" : "arial", "normal")
+          doc.setFont(bold ? "arialbd" : "arial", "normal");
           return sum + doc.getTextWidth(word);
         }, 0);
         const totalSpaces = words.length - 1;
@@ -94,7 +102,7 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
         let x = isFirstLine ? startX + indent : startX;
 
         words.forEach(({ word, bold }, i) => {
-          doc.setFont(bold ? "arialbd" : "arial", "normal")
+          doc.setFont(bold ? "arialbd" : "arial", "normal");
           doc.text(word, x, currentY);
           if (i < words.length - 1) {
             x += doc.getTextWidth(word) + extraSpacePerGap;
@@ -110,6 +118,7 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
 
   return currentY;
 }
+
 
 
 const addTextWithLineBreaks = (textLines, initialX, align = 'left', doc) => {
