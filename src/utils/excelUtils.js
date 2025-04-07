@@ -90,7 +90,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,operador: `${item.operador}`
             ,fiscal: item.mpf ? `${item.mpf[0].nombre}` : ''
             ,defensor: item.defensa ? `${item.defensa[0].nombre}` : ''
-            ,juez: `${item.juez}`
+            ,juez: `${item.juez.split('. ')[1]}`
         });
       });
       currentDate.setDate(currentDate.getDate() + 1);
