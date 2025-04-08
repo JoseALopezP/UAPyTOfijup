@@ -19,10 +19,35 @@
     outline: none;
     border: none;
     background-color: #515151;
-    margin-right: 2px;
+    margin-right: 1%;
     font-size: 18px;
-    padding: 2px;
+    padding: .5%;
+    color: #F2F2F2;
 }
 .inputday{
-    width: 32px;
+    width: 25%;
+}
+.inputmonth{
+    width: 25%;
+}
+.inputyear{
+    width: 40%;
+}
+.tableHeadCellDate{
+    width: 5%;
+}
+.tableHeadCellLeg{
+    width: 15%;
+}
+.tableHeadCellTipo{
+    width: 20%;
+}
+.tableHeadCellJuez{
+    width: 10%;
+}
+.tableHeadCellRes{
+    width: 20%;
+}
+.tableHeadCellCom{
+    width: 25%;
 }
