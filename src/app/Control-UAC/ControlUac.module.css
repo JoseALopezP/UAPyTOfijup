@@ -1,0 +1,28 @@
+.tableControlUac{
+    display: table;
+    margin-left: 2.45vw;
+    background-color: #303030;
+    width: calc(100% - 2.45vw);
+    height: 100vh;
+    color: #F2F2F2;
+}
+.tableHeadControlUac{
+    display: table-row;
+    font-size: 20px;
+}
+.tableHeadCell{
+    display: table-cell;
+    text-align: center;
+    padding: 10px 0;
+}
+.inputday, .inputmonth, .inputyear{
+    outline: none;
+    border: none;
+    background-color: #515151;
+    margin-right: 2px;
+    font-size: 18px;
+    padding: 2px;
+}
+.inputday{
+    width: 32px;
+}

@@ -11,6 +11,7 @@ export default function NavBar() {
             <IconNavBar iconRoute={'Registro-Audiencia'}/>
             <IconNavBar iconRoute={'Sorteo-Operador'}/>
             <IconNavBar iconRoute={'Oficios'}/>
+            <IconNavBar iconRoute={'Control-UAC'}/>
             <IconNavBar iconRoute={'Situacion-Corporal'}/></span>
             <span className={[styles.subcontainer]}>
                 <IconNavBar iconRoute={'Administracion-Logistica'}/>
