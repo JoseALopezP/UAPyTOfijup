@@ -42,14 +42,7 @@ export function listPartes(arr) {
             groupedRoles[el.role].push(personInfo);
         }
     });
-    let result = '';
-    Object.entries(groupedRoles).forEach(([role, people], index) => {
-        result += `${role}:\n  ${people.join('\n  ')}`;
-        if (index !== Object.entries(groupedRoles).length - 1) {
-            result += '\n'; 
-        }
-    });
-    return result;
+    return groupedRoles;
 }
 
 
@@ -110,23 +103,14 @@ export function generateResuelvoSection(item, date) {
         listImputado(item.imputado).split('\n').forEach(i => sections.push({ title: i.split(':')[0]+':', text: i.split(':')[1] + i.split(':')[2]}));
     }
     if (item.partes) {
-        listPartes(item.partes).split('\n').forEach((p, i) => {
-            const colonIndex = p.indexOf(':');
-            let role = '', text = '';
-            if (colonIndex !== -1) {
-                role = p.substring(0, colonIndex).trim();
-                text = p.substring(colonIndex + 1).trim();
-            } else {
-                text = p.trim();
-            }
-            if (text) {
-                sections.push(i > 0
-                    ? { text }
-                    : { title: capitalizeFirst(role.toLowerCase()) + ':', text }
-                );
-            }
+        const groupedPartes = listPartes(item.partes);
+        Object.entries(groupedPartes).forEach(([role, people]) => {
+            sections.push({
+                title: capitalizeFirst(role.toLowerCase()) + ':',
+                text: people.join('\n')
+            });
         });
-    }
+    }    
     sections.push({ title: 'Operador:', text: item.operador });
     sections.push({ title: ''});
     return sections;
