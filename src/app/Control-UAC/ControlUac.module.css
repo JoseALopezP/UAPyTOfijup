@@ -30,6 +30,10 @@
 .tableCell{
     display: table-cell;
     border: solid .5px #303030;
+    text-align: center;
+    height: 50px;
+    vertical-align: middle;
+    overflow: hidden;
 }
 .inputday{
     width: 18%;
@@ -50,13 +54,13 @@
     width: 7%;
 }
 .tableHeadCellLeg{
-    width: 13%;
+    width: 8%;
 }
 .tableHeadCellTipo{
-    width: 20%;
+    width: 21%;
 }
 .tableHeadCellJuez{
-    width: 10%;
+    width: 14%;
 }
 .tableHeadCellRes{
     width: 20%;
@@ -66,4 +70,6 @@
 }
 .tableRowControlUac{
     display: table-row;
+    height: 50px;
+    min-height: 50px;
 }

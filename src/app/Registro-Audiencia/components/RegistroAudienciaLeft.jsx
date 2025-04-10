@@ -94,9 +94,9 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
         if (!isDataSmaller(item.caratula, caratula)) {
             setCaratula(item.caratula || '');
             setCaratula2(item.caratula || '');}
-        if (!isDataSmaller(item.sae, saeNum)) {
-            setSaeNum(item.sae || '');
-            setSaeNum2(item.sae || '');}
+        if (!isDataSmaller(item.saeNum, saeNum)) {
+            setSaeNum(item.saeNum || '');
+            setSaeNum2(item.saeNum || '');}
         if (!isDataSmaller(item.partes, partes) && !isDataSmaller(partes, partes2)) {
             setPartes(item.partes ? [...item.partes] : []);
             setPartes2(item.partes ? [...item.partes] : []);}
@@ -157,6 +157,10 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
         if (!deepEqual(ufi2, ufi)){
             await updateData(dateToUse, item.numeroLeg, item.hora, 'ufi', ufi);
             setUfi2(ufi)}
+        if (!deepEqual(saeNum2, saeNum)){
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'saeNum', saeNum);
+            setSaeNum2(saeNum)
+        }
         if(showReconversion){
         if (!deepEqual(tipo, tipoAux)){
             if(!deepEqual(tipo2, tipo2Aux)){
