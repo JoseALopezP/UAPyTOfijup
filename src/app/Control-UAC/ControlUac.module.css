@@ -1,5 +1,6 @@
 .tableControlUac{
     display: table;
+    table-layout: fixed;
     margin-left: 2.45vw;
     background-color: #212121;
     width: calc(100% - 2.45vw);
@@ -29,11 +30,14 @@
 }
 .tableCell{
     display: table-cell;
-    border: solid .5px #303030;
+    border: solid #303030;
+    border-width: 1px 0 0 1px;
     text-align: center;
     height: 50px;
     vertical-align: middle;
-    overflow: hidden;
+    overflow-y: hidden;
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
 }
 .inputday{
     width: 18%;
@@ -71,5 +75,11 @@
 .tableRowControlUac{
     display: table-row;
     height: 50px;
-    min-height: 50px;
+    overflow: hidden;
+}
+.horaCell, .numeroLegCell, .tipoCell, .juezCell, .resultCell, .commentCell{
+    height: 50px;
+}
+.horaCell{
+    background-color: #424242;
 }
