@@ -212,10 +212,11 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
             (showReconversion & !deepEqual(tipo3Aux, tipo3)) ||
             !deepEqual(imputado2, imputado) ||
             !deepEqual(partes2, partes) ||
+            !deepEqual(saeNum2, saeNum) ||
             !deepEqual(ufi2, ufi);
     
         setGuardarInc(guardarStatus);
-    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion]);
+    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion, saeNum, saeNum2]);
 
     const checkHoraDiff = () => {
         const hora1 = parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]);
