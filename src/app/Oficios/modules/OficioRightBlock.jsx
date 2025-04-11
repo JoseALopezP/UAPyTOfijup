@@ -21,7 +21,7 @@ export default function OficioRightBlock({aud, date}) {
     if (!aud) return null;
     return (
         <><div className={styles.oficioRightBlockContainer} >
-            {aud && <p className={styles.oficioText}>{aud.estado && caratulaGenerator(aud, date)}</p>}
+            {aud && aud.estado && <>caratulaGenerator(aud, date)</>}
             {aud.minuta ? <p className={styles.oficioText}>{removeHtmlTags(aud.minuta)}</p> : <p></p>}
             {aud.resuelvoText ? <p className={styles.oficioText}>{removeHtmlTags(aud.resuelvoText)}</p> : <p></p>}
         </div>

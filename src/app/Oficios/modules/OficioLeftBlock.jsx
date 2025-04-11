@@ -70,7 +70,7 @@ export default function OficioLeftBlock({ date, aud }) {
                         className={`${styles.controlOficioErrorInput} ${styles.controlOficioErrorInputTipos}`}
                     >
                         <option></option>
-                        {desplegables.tiposErrores.map((el) => (
+                        {desplegables && desplegables.tiposErrores.map((el) => (
                             <option key={el} value={el}>
                                 {el}
                             </option>
