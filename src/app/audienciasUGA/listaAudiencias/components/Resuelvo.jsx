@@ -251,8 +251,10 @@ export function Resuelvo({ item }) {
         checkGuardar();
     }, [caratula, mpf, defensa, imputado, resuelvo, minuta, cierre, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3]);
     useEffect(() => {
-        updateComparisson();
-    }, []);
+        if (item) {
+            updateComparisson();
+        }
+    }, [item]);
     useEffect(() => {
         checkGuardar();
     }, [guardarInc]);
