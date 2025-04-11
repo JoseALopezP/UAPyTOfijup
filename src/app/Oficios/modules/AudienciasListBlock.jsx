@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 
 export default function AudienciasListBlock({audFunction, dateFunction, dateToUse}) {
     const router = useRouter()
-    const {updateByDateListener, bydate} = useContext(DataContext)
+    const {updateByDateListener, bydate, updateDesplegables} = useContext(DataContext)
     const { user } = useAuthContext()
     useEffect(() => {
         const unsubscribe = updateByDateListener(dateToUse);
@@ -19,6 +19,9 @@ export default function AudienciasListBlock({audFunction, dateFunction, dateToUs
     useEffect(() => {
         if (user == null) router.push("/signin")
       }, [user])
+    useEffect(()=>{
+        updateDesplegables()
+    },[])
     return (
         <div className={styles.audienciaListContainer}>
             <span className={styles.fechaSorteoBlock}><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule date={dateToUse} arr={bydate}/></span>
