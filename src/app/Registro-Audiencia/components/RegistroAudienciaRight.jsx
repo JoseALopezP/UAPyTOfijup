@@ -9,6 +9,7 @@ import deepEqual from '@/utils/deepEqual';
 import { checkCompletion } from '@/utils/checkCompletion';
 import TextEditor from './TextEditor';
 import RegistroNavBar from './RegistroNavBar';
+import { removeHtmlTags } from '@/utils/removeHtmlTags';
 
 export default function RegistroAudienciaRight({ item, dateToUse }) {
     const {updateRealTime, realTime, updateData} = useContext(DataContext)
@@ -40,18 +41,18 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     }
     const updateDataAud = async() =>{
         setGuardando(true)
-        if (!deepEqual(resuelvo2, resuelvo)){
+        if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
             await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvoText', resuelvo);
-            setResuelvo2(resuelvo)
+            setResuelvo2(resuelvo);
         }
-        if (!deepEqual(minuta2, minuta)){
+        if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
             await updateData(dateToUse, item.numeroLeg, item.hora, 'minuta', minuta);
-            setMinuta2(minuta)
+            setMinuta2(minuta);
         }
-        if (!deepEqual(cierre2, cierre)){
+        if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
             await updateData(dateToUse, item.numeroLeg, item.hora, 'cierre', cierre);
-            setCierre2(cierre)
-        }
+            setCierre2(cierre);
+        }        
         if (await checkForResuelvo(item)) {
             await updateRealTime();
             await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', realTime);
@@ -77,11 +78,14 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         switch(checkCompletion(item)){
             case 'mpf':
                 setCheckDescarga('Faltan datos fiscal ¿Quiere continuar con la descarga?');
+                break;
             case 'defensa':
                 setCheckDescarga('Faltan datos de la defensa ¿Quiere continuar con la descarga?');
+                break;
             case 'noListo':
                 setErrorDescarga(true);
                 setInterval(function(){setErrorDescarga(false)},3000)
+                break;
             case 'completo':
                 generatePDF(item, dateToUse)
             break;

@@ -1,5 +1,6 @@
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import firebase_app from "../config";
+import { removeHtmlTags } from "@/utils/removeHtmlTags";
 
 const db = getFirestore(firebase_app);
 
@@ -18,8 +19,12 @@ export default async function updateListItem(collectionName, documentId, searchV
         const foundItem = list.find(item => (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2);
 
         if (foundItem) {
-            foundItem[propertyToUpdate] = newValue;
-            await updateDoc(docRef, { list });
+            if (newValue !== undefined && newValue !== '' && removeHtmlTags(newValue) !== '') {
+                foundItem[propertyToUpdate] = newValue;
+                await updateDoc(docRef, { list });
+            } else {
+                console.warn("Skipped update because newValue is empty or undefined.");
+            }
         } else {
             console.log("Item not found in 'list' array.");
         }
