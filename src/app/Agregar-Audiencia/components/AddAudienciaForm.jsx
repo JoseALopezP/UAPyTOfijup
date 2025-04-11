@@ -145,7 +145,7 @@ export function AddAudienciaForm ({dateFunction, date}) {
                     <input list='sala2' onChange={e => setSala(e.target.value)}/>
                     <datalist id='sala2' className={`${styles.tableCellInput}`}><option>{sala}</option>
                     {desplegables.salas && desplegables.salas.map(el =>(
-                        <option key={el} value={el}>SALA {el}</option>
+                        <option key={el} value={el}>{el}</option>
                     ))}</datalist></span>
             </div>
             <div className={`${styles.inputLegajoBlock} ${styles.inputItemBlock}`}>

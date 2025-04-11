@@ -10,9 +10,10 @@ import { checkCompletion } from '@/utils/checkCompletion';
 import TextEditor from './TextEditor';
 import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 export default function RegistroAudienciaRight({ item, dateToUse }) {
-    const {updateRealTime, realTime, updateData} = useContext(DataContext)
+    const {updateData, updateByDate} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -53,12 +54,12 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
             await updateData(dateToUse, item.numeroLeg, item.hora, 'cierre', cierre);
             setCierre2(cierre);
         }        
-        if (await checkForResuelvo(item)) {
-            await updateRealTime();
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', realTime);
+        if (checkForResuelvo(item)) {
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', updateRealTimeFunction());
         }
         await setGuardarInc(false)
         await setGuardando(false)
+        await updateByDate(dateToUse)
     }
     const handleSubmit = async (event) => {
         if(event) event.preventDefault();

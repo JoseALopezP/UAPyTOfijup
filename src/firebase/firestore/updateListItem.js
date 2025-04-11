@@ -19,7 +19,7 @@ export default async function updateListItem(collectionName, documentId, searchV
         const foundItem = list.find(item => (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2);
 
         if (foundItem) {
-            if (newValue !== undefined && newValue !== '' && removeHtmlTags(newValue) !== '') {
+            if (newValue !== undefined && newValue !== '') {
                 foundItem[propertyToUpdate] = newValue;
                 await updateDoc(docRef, { list });
             } else {

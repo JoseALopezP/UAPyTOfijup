@@ -11,7 +11,7 @@ import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
 
 export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
-    const {updateDesplegables, desplegables, updateByDate, updateRealTime, realTime, updateData} = useContext(DataContext)
+    const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
     const [sala, setSala] = useState(item.sala)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum, setSaeNum] = useState('');
@@ -65,58 +65,30 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
         setter(prev => prev.filter((_, i) => i !== index));
         removedSetter(prev => [...prev, items[index]]);
     };
-    
-    const isDataSmaller = (newData, currentData) => {
-        if (Array.isArray(newData) && Array.isArray(currentData)) {
-            return (
-                newData.length < currentData.length || 
-                newData.some(item => typeof item === 'string' && item.trim() === '')
-            );
-        }
-        if (typeof newData === 'string' && typeof currentData === 'string') {
-            return newData.trim().length < currentData.trim().length;
-        } 
-        return false;
-    };
-    
-    
-    
     const updateComparisson = () => {
-        if (!isDataSmaller(item.mpf, mpf) && !isDataSmaller(mpf, mpf2)) {
-            setMpf(item.mpf ? [...item.mpf] : []);
-            setMpf2(item.mpf ? [...item.mpf] : []);}
-        if (!isDataSmaller(item.imputado, imputado) && !isDataSmaller(imputado, imputado2)) {
-            setImputado(item.imputado ? [...item.imputado] : []);
-            setImputado2(item.imputado ? [...item.imputado] : []);}
-        if (!isDataSmaller(item.defensa, defensa) && !isDataSmaller(defensa, defensa2)) {
-            setDefensa(item.defensa ? [...item.defensa] : []);
-            setDefensa2(item.defensa ? [...item.defensa] : []);}
-        if (!isDataSmaller(item.caratula, caratula)) {
-            setCaratula(item.caratula || '');
-            setCaratula2(item.caratula || '');}
-        if (!isDataSmaller(item.saeNum, saeNum)) {
-            setSaeNum(item.saeNum || '');
-            setSaeNum2(item.saeNum || '');}
-        if (!isDataSmaller(item.partes, partes) && !isDataSmaller(partes, partes2)) {
-            setPartes(item.partes ? [...item.partes] : []);
-            setPartes2(item.partes ? [...item.partes] : []);}
-        if (!isDataSmaller(item.razonDemora, razonDemora)) {
-            setRazonDemora(item.razonDemora || '');
-            setRazonDemora2(item.razonDemora || '');}
-        if (!isDataSmaller(item.ufi, ufi)) {
-            setUfi(item.ufi || '');
-            setUfi2(item.ufi || '');}
-        if (!isDataSmaller(item.estado, estado)) {
-            setEstado(item.estado || '');}
-        if (!isDataSmaller(item.tipo, tipo)) {
-            setTipo(item.tipo || '');
-            setTipoAux(item.tipo || '');}
-        if (!isDataSmaller(item.tipo2, tipo2)) {
-            setTipo2(item.tipo2 || '');
-            setTipo2Aux(item.tipo2 || '');}
-        if (!isDataSmaller(item.tipo3, tipo3)) {
-            setTipo3(item.tipo3 || '');
-            setTipo3Aux(item.tipo3 || '');}
+        setMpf(item.mpf ? [...item.mpf] : []);
+        setMpf2(item.mpf ? [...item.mpf] : []);
+        setImputado(item.imputado ? [...item.imputado] : []);
+        setImputado2(item.imputado ? [...item.imputado] : []);
+        setDefensa(item.defensa ? [...item.defensa] : []);
+        setDefensa2(item.defensa ? [...item.defensa] : []);
+        setCaratula(item.caratula || '');
+        setCaratula2(item.caratula || '');
+        setSaeNum(item.saeNum || '');
+        setSaeNum2(item.saeNum || '');
+        setPartes(item.partes ? [...item.partes] : []);
+        setPartes2(item.partes ? [...item.partes] : []);
+        setRazonDemora(item.razonDemora || '');
+        setRazonDemora2(item.razonDemora || '');
+        setUfi(item.ufi || '');
+        setUfi2(item.ufi || '');
+        setEstado(item.estado || '');
+        setTipo(item.tipo || '');
+        setTipoAux(item.tipo || '');
+        setTipo2(item.tipo2 || '');
+        setTipo2Aux(item.tipo2 || '');
+        setTipo3(item.tipo3 || '');
+        setTipo3Aux(item.tipo3 || '');
     };
     
     const updateDataAud = async() =>{
@@ -184,13 +156,13 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
             setTipo3Aux(tipo3)
         }
         }
-        await updateByDate(dateToUse);
         if (await checkForResuelvo(item)) {
             await updateRealTime();
             await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', realTime);
         }
         await setGuardarInc(false)
         await setGuardando(false)
+        await updateByDate(dateToUse)
     }
     const handleSubmit = async (event) => {
         if(event) event.preventDefault();

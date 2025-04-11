@@ -9,7 +9,7 @@ export const nameTranslate = (operadorName) =>{
         "Soria, Martín": 'MARTIN',
         "Naranjo, María Agustina": 'AGUS',
         "Zamudio, Francisco": 'FRAN',
-        "Narváez, Ignacio": 'IGNA',
+        "Narváez, Ignacio": 'IGNA N',
         "Manzione, Juliana": 'JULI',
         "Carpio, Florencia": 'FLOR C',
         "Sánchez, Martina": 'MARTI',
@@ -23,7 +23,7 @@ export const nameTranslate = (operadorName) =>{
         "Waisman, Natasha": 'NATI',
         "Victoria, Gonzalo José": 'GONZA',
         "Fernández Chipre, Cecilia": 'CHECHU',
-        "Martinazzo, Ignacio": 'NACHO'
+        "Martinazzo, Ignacio": 'NACHO M'
     }
     return traducciones[operadorName]
 }

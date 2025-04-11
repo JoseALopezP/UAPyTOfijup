@@ -21,7 +21,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const [newState, setNewState] = useState('')
 
     const [pidiente, setPidiente] = useState(false)
-    const {updateData, pushtToArray} = useContext(DataContext)
+    const {updateData, pushtToArray, updateByDate} = useContext(DataContext)
 
     const [stopwatchRunning, setStopwatchRunning] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? true : false)
     const [stopwatchCurrent, setStopwatchCurrent] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? (Date.now() - item.stopwatchStart) : 0)
@@ -65,6 +65,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
             setTimeStampStart(Date.now())
             await setStopwatchRunning(true);
         }
+        await updateByDate(dateToUse)
     };
     const isSaving = useRef(false);
     const changeState = async () => {

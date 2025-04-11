@@ -10,12 +10,11 @@ import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction'
 
 export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered}) {
     const router = useRouter()
-    const {updateByDateListener, bydate} = useContext(DataContext)
+    const {updateByDate, bydate} = useContext(DataContext)
     const { user } = useAuthContext()
     updateRealTimeFunction()
     useEffect(() => {
-        const unsubscribe = updateByDateListener(date);
-        return () => unsubscribe();
+        updateByDate(date)
     }, [date]);
     useEffect(() => {
         if (user == null) router.push("/signin")
