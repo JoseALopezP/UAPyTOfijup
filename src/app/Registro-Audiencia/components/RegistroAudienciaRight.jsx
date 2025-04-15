@@ -76,16 +76,19 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         setGuardarInc(guardarStatus);
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const handleDescargar = () =>{
-        switch(checkCompletion(item)){
+        switch('completo'/*checkCompletion(item)*/){
             case 'mpf':
                 setCheckDescarga('Faltan datos fiscal ¿Quiere continuar con la descarga?');
+                console.log('Faltan datos fiscal ¿Quiere continuar con la descarga?')
                 break;
             case 'defensa':
                 setCheckDescarga('Faltan datos de la defensa ¿Quiere continuar con la descarga?');
+                console.log('Faltan datos de la defensa ¿Quiere continuar con la descarga?')
                 break;
             case 'noListo':
                 setErrorDescarga(true);
                 setInterval(function(){setErrorDescarga(false)},3000)
+                console.log('noListo')
                 break;
             case 'completo':
                 generatePDF(item, dateToUse)
