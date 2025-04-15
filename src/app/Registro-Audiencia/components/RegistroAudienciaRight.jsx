@@ -76,7 +76,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         setGuardarInc(guardarStatus);
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const handleDescargar = () =>{
-        switch('completo'/*checkCompletion(item)*/){
+        switch(checkCompletion(item)){
             case 'mpf':
                 setCheckDescarga('Faltan datos fiscal ¿Quiere continuar con la descarga?');
                 console.log('Faltan datos fiscal ¿Quiere continuar con la descarga?')

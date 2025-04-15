@@ -5,7 +5,6 @@ export const checkCompletion = (aud) =>{
         aud.sala &&
         aud.hora &&
         aud.hitos &&
-        aud.hitos[aud.hitos.length-1].split(' | ')[1]==='FINALIZADA' &&
         aud.juez &&
         aud.mpf &&
         aud.defensa &&
