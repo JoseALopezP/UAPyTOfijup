@@ -10,7 +10,7 @@ import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction'
 
 export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered}) {
     const router = useRouter()
-    const {updateByDate, bydate} = useContext(DataContext)
+    const {updateByDate, bydate, updateModelosMinuta} = useContext(DataContext)
     const { user } = useAuthContext()
     updateRealTimeFunction()
     useEffect(() => {
@@ -19,6 +19,9 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction, 
     useEffect(() => {
         if (user == null) router.push("/signin")
       }, [user])
+    useEffect(() =>{
+        updateModelosMinuta()
+    }, [])
     return (
         <><div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>

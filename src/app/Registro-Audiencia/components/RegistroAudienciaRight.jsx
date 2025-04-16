@@ -2,7 +2,6 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
-import { listModelos, modeloMinuta } from '@/utils/modelosUtils';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { generatePDF } from '@/utils/pdfUtils';
 import deepEqual from '@/utils/deepEqual';
@@ -12,8 +11,12 @@ import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
+function extractNames(obj) {
+    return Object.keys(obj);
+}
+const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ item, dateToUse }) {
-    const {updateData, updateByDate} = useContext(DataContext)
+    const {updateData, updateByDate, modelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -36,9 +39,9 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     };
     
     const insertarModelo = () =>{
-        setCierre(modeloMinuta('cierre'))
-        setMinuta(modeloMinuta(modeloSelector).cuerpo)
-        setResuelvo(modeloMinuta(modeloSelector).resuelvo)
+        setCierre(cierreModelo)
+        setMinuta(modelosMinuta[modeloSelector].cuerpo)
+        setResuelvo(modelosMinuta[modeloSelector].resuelvo)
     }
     const updateDataAud = async() =>{
         setGuardando(true)
@@ -112,6 +115,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
     useEffect(() => {
         checkGuardar();
     }, [guardarInc]);
+
     return (
         <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
                 <p>{checkDescarga}</p>
@@ -128,7 +132,7 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 <select className={`${styles.inputLeft} ${styles.inputModelo}`}
                     onChange={(e) => setModeloSelector(e.target.value)}>
                     <option value={''}></option>
-                    {listModelos.map(mod =>
+                    {extractNames(modelosMinuta).map(mod =>
                         <option key={mod} value={mod}>{mod.split('_').join(' ')}</option>
                     )}
                 </select>

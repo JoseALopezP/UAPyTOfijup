@@ -22,6 +22,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [today, setToday] = useState(defaultValue);
     const [dateToUse, setDateToUse] = useState('');
     const [desplegables, setDesplegables] = useState(defaultValue);
+    const [modelosMinuta, setModelosMinuta] = useState(defaultValue)
     const [realTime, setRealTime] = useState(null);
     const [tiposAudiencias, setTiposAudiencias] = useState(defaultValue);
     const [años, setAños] = useState(defaultValue);
@@ -69,6 +70,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     }
     const updateDesplegables = async() =>{
         setDesplegables(await getList('desplegables', 'desplegables'))
+    }
+    const updateModelosMinuta = async() =>{
+        setModelosMinuta(await getList('desplegables', 'modelosMinuta'))
     }
     const pushtToArray = async(date, searchValLeg, searchValHora, newValue) => {
         await pushToHitos('audiencias', date, searchValLeg, searchValHora, newValue)
@@ -135,12 +139,14 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         checkUserType,
         updateRealTime,
         updateDesplegables,
+        updateModelosMinuta,
         addDesplegable,
         setDateToUse,
         updateByDateListener,
         deleteDesplegable,
         getByDate,
         updateByDateSorteo,
+        modelosMinuta,
         dateToUse,
         desplegables,
         realTime,
