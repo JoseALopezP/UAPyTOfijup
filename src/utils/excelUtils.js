@@ -65,7 +65,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,numeroLeg: `${item.numeroLeg}`
             ,cantAud: ''
             ,tipoAud: `${item.tipo}${item.tipo2 && ' + ' + item.tipo2}${item.tipo3 && ' + ' + item.tipo3}`
-            ,ufi: item.mpf ? item.mpf[0].nombre.split(' - ')[1] : ''
+            ,ufi: item?.mpf?.[0]?.nombre?.split(' - ')[1] || ''
             ,solicitud: ''
             ,agendamiento: ''
             ,solAgen: ''
@@ -88,8 +88,8 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,tipoVict: ''
             ,sala: `${item.sala}`
             ,operador: `${item.operador}`
-            ,fiscal: item.mpf ? `${item.mpf[0].nombre}` : ''
-            ,defensor: item.defensa ? `${item.defensa[0].nombre}` : ''
+            ,fiscal: item?.mpf?.[0]?.nombre ? `${item.mpf?.[0]?.nombre}` : ''
+            ,defensor: item?.defensa?.[0]?.nombre ? `${item.defensa?.[0]?.nombre}` : ''
             ,juez: `${item.juez.split('. ')[1]}`
         });
       });
