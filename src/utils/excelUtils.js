@@ -100,6 +100,55 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
       saveAs(blob, `planillaUAL.xlsx`);
 }
 
+export async function getValuesInDateRangeInforme(startDateStr, endDateStr, getByDate) {
+  function parseDate(dateStr) {
+    const day = parseInt(dateStr.substring(0, 2), 10);
+    const month = parseInt(dateStr.substring(2, 4), 10) - 1;
+    const year = parseInt(dateStr.substring(4, 8), 10);
+    return new Date(year, month, day);
+  }
+  const startDate = parseDate(startDateStr);
+  const endDate = parseDate(endDateStr);
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    return "Invalid date format";
+  }
+  if (startDate > endDate) {
+    return "Start date must be before end date.";
+  }
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(`acumulado`);
+  worksheet.columns = [
+      { header: 'NUMERO DE LEGAJO', key: 'numeroLeg', width: 20 },
+      { header: 'FECHA', key: 'fecha', width: 20 },
+      { header: 'OPERADOR', key: 'operador', width: 20 },
+      { header: 'MINUTA', key: 'minuta', width: 20 },
+      { header: 'CARATULA', key: 'caratula', width: 20 },
+      { header: 'ESTADOS', key: 'estados', width: 20 },
+      { header: 'ESTADOS1', key: 'estados1', width: 20 },
+      { header: 'ESTADOS2', key: 'estados2', width: 20 }
+  ];
+  let currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const formattedDate = formatDate(currentDate)
+    const aux = await getByDate(formattedDate)
+    await aux.forEach((item, i) => {
+      worksheet.addRow({
+          id: `${i}`
+          ,numeroLeg: `${item.numeroLeg}`
+          ,fecha: currentDate
+          ,operador: item.operador ? item.operador : ''
+          ,minuta: item.minuta ? item.minuta.length > 20 : false
+          ,caratula: (item.mpf && item.caratula) ? true : false
+          ,estados: item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) + 1) >= parseInt(item.hora.split(':')[0])) : false
+      });
+    });
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `InformeUso.xlsx`);
+}
+
 export const cuartoCalculator = (aud) =>{
     let aux = 0
     aud.hitos && aud.hitos.forEach((el, index) =>{
