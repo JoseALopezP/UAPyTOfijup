@@ -93,7 +93,13 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
                 console.log('noListo')
                 break;
             case 'completo':
-                generatePDF(item, dateToUse)
+                generatePDF({
+                    numeroLeg: item.numeroLeg,
+                    tipo: item.tipo,
+                    tipo2: item.tipo2,
+                    tipo3: item.tipo3,
+                    
+                }, dateToUse)
             break;
         }
     }

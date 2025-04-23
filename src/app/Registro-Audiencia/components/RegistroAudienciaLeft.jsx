@@ -60,7 +60,6 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
     const addNewInput = (setter, template) => {
         setter(prev => [...prev, { ...template, id: prev.length + 1 }]);
     };
-
     const removeInput = (setter, index, removedSetter, items) => {
         setter(prev => prev.filter((_, i) => i !== index));
         removedSetter(prev => [...prev, items[index]]);
