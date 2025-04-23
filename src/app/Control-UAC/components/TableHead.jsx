@@ -13,7 +13,6 @@ export default function TableHead({dateFunction, date}){
                 <input type='text' maxLength={4} className={`${styles.inputyear}`} value={anio} onChange={e => {setAnio(e.target.value)}}/>
                 <input type="button" value={'⟳'} className={`${styles.inputSet}`} onClick={() => dateFunction(''+dia.padStart(2,'0')+mes.padStart(2,'0')+anio.padStart(4,'20'))}/>
             </span>
-            <span className={`${styles.tableHeadCell} ${styles.tableHeadCellLeg}`}>LEGAJO</span>
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellTipo}`}>TIPO</span>
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellJuez}`}>JUEZ</span>
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellRes}`}>RESULTADO</span>

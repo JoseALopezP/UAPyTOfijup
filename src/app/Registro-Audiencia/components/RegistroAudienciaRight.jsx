@@ -37,11 +37,10 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         setCierre(item.cierre || '');
         setCierre2(item.cierre || '');
     };
-    
     const insertarModelo = () =>{
-        setCierre(cierreModelo)
-        setMinuta(modelosMinuta[modeloSelector].cuerpo)
-        setResuelvo(modelosMinuta[modeloSelector].resuelvo)
+        setCierre(cierreModelo);
+        setMinuta(modelosMinuta[modeloSelector].cuerpo.replace(/\n/g, '<br>'));
+        setResuelvo(modelosMinuta[modeloSelector].resuelvo.replace(/\n/g, '<br>'));
     }
     const updateDataAud = async() =>{
         setGuardando(true)

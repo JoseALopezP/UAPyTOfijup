@@ -35,9 +35,9 @@
     text-align: center;
     height: 50px;
     vertical-align: middle;
-    overflow-y: hidden;
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    overflow-y: scroll;
+    mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
 }
 .inputday{
     width: 18%;
@@ -55,10 +55,7 @@
     cursor: pointer;
 }
 .tableHeadCellDate{
-    width: 7%;
-}
-.tableHeadCellLeg{
-    width: 8%;
+    width: 15%;
 }
 .tableHeadCellTipo{
     width: 21%;
@@ -76,10 +73,65 @@
     display: table-row;
     height: 50px;
     overflow: hidden;
+    padding: 0 5px;
 }
-.horaCell, .numeroLegCell, .tipoCell, .juezCell, .resultCell, .commentCell{
+.horaCellP, .numeroLegCellP{
+    height: 25px;
+    overflow-y: hidden;
+    padding: 0;
+    margin: 0;
+    font-weight: 700;
+}
+.tipoCellP, .juezCellP, .resultCellP, .commentCellP{
     height: 50px;
+    overflow-y: hidden;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    width: 100%;
+    outline: none;
+    border: none;
+    color: #fff;
+    width: 100%;
+    font-family: inherit;
+    overflow-x: hidden;
+}
+.resultCellP, .commentCellP{
+    overflow-y: visible;
+}
+.resultCell, .commentCell{
+    padding: 2px 0 0 7px;
+    overflow-y: scroll;
 }
 .horaCell{
     background-color: #424242;
+}
+
+.PROGRAMADA{
+    border-color: #007bff;
+    color: #007bffa0;
+}
+.EN_CURSO{
+    border-color: #17a2b8;
+    color: #17a2b8a0;
+}
+.CANCELADA{
+    border-color: #dc3545;
+    color: #dc3545a0;
+}
+.CUARTO_INTERMEDIO{
+    border-color: #ffc107;
+    color: #ffc107a0;
+}
+.FINALIZADA{
+    border-color: #28a745;
+    color: #28a745a0;
+}
+.REPROGRAMADA{
+    border-color: #6c757d;
+    color: #6c757da0;
+}
+.RESUELVO{
+    border-color: #1F572B;
+    color: #1F572Ba0;
 }
