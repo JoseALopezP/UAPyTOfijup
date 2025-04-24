@@ -78,11 +78,11 @@ function splitNormalBold(text) {
 }
 function resuelvoStructure(juez) {
     if (juez.includes('+')) {
-        return "\n<strong>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
+        return "<strong><br/>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
     } else if (juez.includes('DR.')) {
-        return "\n<strong>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
+        return "<strong><br/>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
     } else {
-        return "\n<strong>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
+        return "<strong><br/>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
     }
 }
 function extractFundamento(text) {
@@ -109,7 +109,12 @@ export const minutaPrep = (item) => {
         ...auxRes.filter(el => !el.timestamp),
         ...[...auxMin, ...auxRes]
             .filter(el => el.timestamp)
-            .sort((a, b) => a.timestamp.start.localeCompare(b.timestamp.start)),
+            .sort((a, b) => {
+                const videoA = parseInt(a.timestamp.video, 10);
+                const videoB = parseInt(b.timestamp.video, 10);
+                if (videoA !== videoB) return videoA - videoB;
+                return a.timestamp.start.localeCompare(b.timestamp.start);
+            }),
         ...auxCie
     ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
     return sortedItems
