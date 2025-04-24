@@ -30,7 +30,7 @@ export const caratulaGenerator = (item, date) =>{
         Hora programada: {item.hora} horas.<br/>
         Hora real de inicio: {item.hitos[0].split(' | ')[0]} horas.<br/>
         Juez Interviniente: {item.juez}<br/>
-        {item.tipo === "TRÁMITES DE EJECUCIÓN" ? <></> : <>{listFiscal(item.mpf, item.ufi)}<br/></>}
+        {safeRender(listFiscal(item.mpf, item.ufi))}<br/>
         {safeRender(listDefensa(item.defensa))}<br/>
         {safeRender(listImputado(item.imputado))}<br/>
         {safeRender(listPartes(item.partes))}<br/>

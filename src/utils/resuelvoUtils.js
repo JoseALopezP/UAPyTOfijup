@@ -7,7 +7,8 @@ import { minutaPrep } from "./minutaPrep";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal:'}${el.nombre.split(' - ')[0]} UFI:${ufi} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
+        console.log(el)
+        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -81,20 +82,20 @@ export function generateResuelvoSection(item, date) {
     } else {
         sections.push({ title: item.juez.includes('DR.') ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez.toLowerCase())});
     }
-    if (item.mpf && item.tipo !== "TRÁMITES DE EJECUCIÓN") {
+    if (item.mpf) {
         let fiscales = [];
         listFiscal(item.mpf, item.ufi)
           .split('\n')
           .forEach((f, indexF) => {
-            if (f.includes('Fiscal:') && f.includes('UFI:')) {
+            if (f.includes('Fiscal:')) {
               fiscales.push(`${f.split('Fiscal:')[1].split('UFI:')[0]}${item.mpf[indexF]?.asistencia ? '' : ' (ausente)'}`);
             }
           });
-        let ufiText = `UFI: ${item.ufi}`;
-        sections.push({
-          title: 'Ministerio Público Fiscal:',
-          text: `${fiscales.join('\n')}\n${ufiText}`
-        });
+          let ufiText = item.ufi === "EJECUCIÓN" ? '' : `UFI: ${item.ufi}`;
+          sections.push({
+            title: 'Ministerio Público Fiscal:',
+            text: `${fiscales.join('\n')}${ufiText ? ('\n' + ufiText) : ''}`
+          });
       }
     if (item.defensa) {
         listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0]+':', text: d.split(':')[1]}));
@@ -140,7 +141,7 @@ export async function generateOficioSection(item, date, traslado='', oficiados) 
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo en el día de la fecha, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(item.resuelvoText))}
-    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]} UFI: ${item.ufi}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`).join(' ') : ''} Operador: ${item.operador}.
+    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`).join(' ') : ''} Operador: ${item.operador}.
     ${traslado}
     Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);

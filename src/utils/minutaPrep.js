@@ -101,9 +101,7 @@ export const minutaPrep = (item) => {
         text: splitNormalBold(resBool ? resuelvoStructure(item.juez) + "\n" +  el.text : el.text),
         timestamp: el.timestamp,
     }));
-    
     const auxMin = processText(item.minuta);
-    console.log(item.resuelvoText)
     const auxRes = processText(extractFundamento(item.resuelvoText), true);
     const auxCie = processText(item.cierre);
     const sortedItems = [
