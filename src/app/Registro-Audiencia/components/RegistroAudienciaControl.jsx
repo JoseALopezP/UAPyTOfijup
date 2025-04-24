@@ -7,14 +7,13 @@ import RegistroAudienciaRight from './RegistroAudienciaRight';
 
 export default function RegistroAudienciaControl({ aud, dateToUse, isHovered}) {
     const {updateDesplegables} = useContext(DataContext)
-    const [auxItem, setAuxItem] = useContext({})
     useEffect(() => {
         updateDesplegables()
     }, [])
     return (
         <div className={`${styles.controlBlock}`}>
-            {aud && <><RegistroAudienciaLeft item={aud} dateToUse={dateToUse} isHovered={isHovered} setAuxItem={setAuxItem}/>
-            <RegistroAudienciaRight item={aud} dateToUse={dateToUse} setAuxItem={setAuxItem}/></>}
+            {aud && <><RegistroAudienciaLeft item={aud} dateToUse={dateToUse} isHovered={isHovered}/>
+            <RegistroAudienciaRight item={aud} dateToUse={dateToUse}/></>}
         </div>
     );
 }
