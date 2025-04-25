@@ -1,21 +1,36 @@
 import { useEffect, useState } from 'react'
+import { useContext } from 'react'
+import { DataContext } from '@/context/DataContext'
 import styles from '../ControlUac.module.css'
 
-export default function TableIndiv({item}){
+export default function TableIndiv({item, date}){
     const [saved, setSaved] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [comment, setComment] = useState(item.comentario || '')
-    const [result, setResult] = useState(item.resultado || '')
-    const handleSave = () =>{
-
+    const [comment, setComment] = useState(item.comentario)
+    const [result, setResult] = useState(item.resultado)
+    const {updateData} = useContext(DataContext)
+    const handleSave = async() =>{
+        await setSaving(true)
+        if(comment !== item.comentario){
+            await updateData(date, item.numeroLeg, item.hora, 'comentario', comment);
+        }
+        if(result !== item.resultado){
+            await updateData(date, item.numeroLeg, item.hora, 'resultado', result);
+        }
+        await setSaving(false)
+        await setSaved(true)
     }
     useEffect(() =>{
         if(comment !== item.comentario || result !== item.resultado)
             setSaved(false)
+        else{
+            setSaved(true)
+        }
     }, [comment, result])
     return (
+        <>
+        {saved ? <></> : <span className={`${styles.saveButton}`} onClick={() => handleSave()}>{saving ? 'Guardando' : 'Guardar'}</span>}
         <div className={`${styles.tableRowControlUac}`}>
-            <span className={`${styles.saveButton}`} onClick={() => handleSave()}>{saved ? '-' : (saving ? 'Guardando' : 'Guardar')}</span>
             <div className={`${styles.tableCell} ${styles.numeroLegCell}`} title={item.estado. split('_').join(' ')}>
                 <p className={`${styles.horaCellP}`}><strong className={`${styles[item.estado]}`}>⬤</strong> 
                 {item.hora}</p>
@@ -29,6 +44,6 @@ export default function TableIndiv({item}){
                 <textarea onChange={e => {setResult(e.target.value)}} value={result} className={`${styles.resultCellP}`}/></div>
             <div className={`${styles.tableCell} ${styles.commentCell}`}>
                 <textarea onChange={e => {setComment(e.target.value)}} value={comment} className={`${styles.commentCellP}`}/></div>
-        </div>
+        </div></>
     )
 }

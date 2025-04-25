@@ -12,6 +12,6 @@ export default function TableBody({date}){
     }, [date])
     return (<>
         {bydate && bydate.sort((a,b) => a.hora.split(':').join('') - b.hora.split(':').join('')).map(el=>
-            (<TableIndiv item={el}/>)
+            (<TableIndiv item={el} date={date} key={el.numeroLeg}/>)
         )}</>)
 }
