@@ -61,7 +61,7 @@ export function ScheduleTable({filterValue}) {
                                         {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
                                             <td className={`${styles.DEMORADA}`}>DEMORADA</td>
                                         ) : (
-                                            <td className={`${styles[el.estado]}`}>{el.estado.split('_').join(' ')}</td>
+                                            <td className={el.estado === 'RESUELVO' ? `${styles.FINALIZADA}` : `${styles[el.estado]}`}>{el.estado === 'RESUELVO' ? "FINALIZADA" : el.estado.split('_').join(' ')}</td>
                                         )}
                                     </tr>
                                 );

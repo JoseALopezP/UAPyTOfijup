@@ -4,8 +4,24 @@
     margin-left: 2.45vw;
     background-color: #212121;
     width: calc(100% - 2.45vw);
-    height: 100vh;
     color: #F2F2F2;
+}
+.inputSearch{
+    position: fixed;
+    opacity: .3;
+    background-color: #515151;
+    left: 40%;
+    width: 20%;
+    height: 30px;
+    font-size: 20px;
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    margin-top: 10px;
+    color: #F2F2F2;
+}
+.inputSearch:hover{
+    opacity: 1;
 }
 .tableHeadControlUac{
     display: table-row;

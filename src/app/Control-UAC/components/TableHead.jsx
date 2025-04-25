@@ -1,11 +1,12 @@
 import styles from '../ControlUac.module.css'
 import { useState } from 'react'
 
-export default function TableHead({dateFunction, date}){
+export default function TableHead({dateFunction, date, setFilterValue, filterValue}){
     const [dia, setDia] = useState(date.substring(0,2))
     const [mes, setMes] = useState(date.substring(2,4))
     const [anio, setAnio] = useState(date.substring(4,8))
     return (
+        <><input className={`${styles.inputSearch}`} value={filterValue} onChange={e => setFilterValue(e.target.value)}/>
         <div className={`${styles.tableHeadControlUac}`}>
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellDate}`}>
                 <input type='text' maxLength={2} className={`${styles.inputday}`} value={dia} onChange={e => {setDia(e.target.value)}}/>
@@ -17,6 +18,6 @@ export default function TableHead({dateFunction, date}){
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellJuez}`}>JUEZ</span>
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellRes}`}>RESULTADO</span>
             <span className={`${styles.tableHeadCell} ${styles.tableHeadCellCom}`}>COMENTARIO</span>
-        </div>
+        </div></>
     )
 }

@@ -8,7 +8,7 @@ import TableBody from './components/TableBody';
 
 export default function page(){
     const [date, setDate] = useState(null)
-    const [selectedAud, setSelectedAud] = useState(null)
+    const [filterValue, setFilterValue] = useState('')
     const handleSave = (newDate) => {
         setDate(newDate);
         localStorage.setItem('dateToUse', newDate);
@@ -23,8 +23,8 @@ export default function page(){
       <AuthContextProvider>
         <DataContextProvider>
             <div className={`${styles.tableControlUac}`}>
-                <TableHead date={date} dateFunction={handleSave}/>
-                <TableBody date={date} />
+                <TableHead date={date} dateFunction={handleSave} setFilterValue={setFilterValue} filterValue={filterValue}/>
+                <TableBody date={date} filterValue={filterValue}/>
             </div>
         </DataContextProvider>
       </AuthContextProvider>
