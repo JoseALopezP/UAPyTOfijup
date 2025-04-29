@@ -283,7 +283,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                     ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
                 {imputado.map((input, index) => (
-                    <div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                    <><div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
                         <span className={`${styles.condenadoimputadoFlag}`}><p>{input.condenado ? "CONDENADO" : "IMPUTADO"}</p></span>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
@@ -298,10 +298,17 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                         <button className={`${styles.inputLeft} ${styles.inputLeft20}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                         <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
                     </div>
+                        {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo === "CONTROL DE DETENCIÓN" || item.tipo === "CONTROL DE DETENCIÓN") &&
+                        <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
+                        type="text"
+                        value={input.detenido}
+                        onChange={(e) => handleInputChange(setImputado, index, 'detenido', e.target.value)}
+                        placeholder="detenido en... 00/00/00"/>}
+                        </>
                 ))}
                 <span className={styles.imputadoButtons}>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true })}>+ IMPUTADO</button>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true })}>+ CONDENADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: ''  })}>+ IMPUTADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: ''  })}>+ CONDENADO</button>
                 </span></span>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
                     {defensa.map((input, index) => (
@@ -350,7 +357,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
                             <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true })}>+ DEFENSA</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true})}>+ DEFENSA</button></span>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
                     {partes.map((input, index) => (
                         <div key={input.id}>

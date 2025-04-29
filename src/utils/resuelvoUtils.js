@@ -7,7 +7,6 @@ import { minutaPrep } from "./minutaPrep";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        console.log(el)
         aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
@@ -25,6 +24,9 @@ export function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
+        if(el.detenido !== ''){
+            aux += `\nFecha de detención: ${el.detenido}\n`
+        }
     });
     return aux;
 }
@@ -101,15 +103,24 @@ export function generateResuelvoSection(item, date) {
         listDefensa(item.defensa).split('\n').forEach(d => sections.push({ title: d.split(':')[0]+':', text: d.split(':')[1]}));
     }
     if (item.imputado) {
-        listImputado(item.imputado).split('\n').forEach(i => sections.push({ title: i.split(':')[0]+':', text: i.split(':')[1] + i.split(':')[2]}));
-    }
+        listImputado(item.imputado).split('\n').forEach(i => {
+            if(i.split('detención:')[0] !== "Fecha de "){
+                sections.push({ title: i.split(':')[0]+':', text: i.split(':')[1] + i.split(':')[2]})}
+            else{
+                if(i.split('detención:')[0] === "Fecha de "){
+                    sections.push({title: i.split(':')[0]+':', text: i.split(':')[1]})}
+                }
+            }
+        )}
     if (item.partes) {
         const groupedPartes = listPartes(item.partes);
         Object.entries(groupedPartes).forEach(([role, people]) => {
-            sections.push({
-                title: capitalizeFirst(role.toLowerCase()) + ':',
-                text: people.join('\n')
-            });
+            if(role && people){
+                sections.push({
+                    title: capitalizeFirst(role.toLowerCase()) + ':',
+                    text: people.join('\n')
+                });
+            }
         });
     }    
     sections.push({ title: 'Operador:', text: item.operador });
