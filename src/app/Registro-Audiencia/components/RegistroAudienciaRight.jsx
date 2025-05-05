@@ -65,29 +65,6 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
         await updateDataAud()
     };
     const handleDescargar2 = async() =>{
-        const aux = {
-            resuelvoText: resuelvo,
-            minuta: minuta,
-            cierre: cierre,
-            sala: sala,
-            saeNum: saeNum,
-            caratula: caratula,
-            razonDemora: razonDemora,
-            mpf: mpf,
-            ufi: ufi,
-            estado: estado,
-            defensa: defensa,
-            imputado: imputado,
-            tipo: tipo,
-            tipo2: tipo2,
-            tipo3: tipo3,
-            partes: partes,
-            numeroLeg: item.numeroLeg,
-            operador: operador,
-            hora: hora,
-            hitos: hitos,
-            juez: juez
-        };
         await generatePDF(aux, dateToUse)
         await setCheckDescarga('')
     }
@@ -113,7 +90,30 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
                 console.log('noListo')
                 break;
             case 'completo':
-                generatePDF(item, dateToUse)
+                const aux = {
+                    resuelvoText: resuelvo,
+                    minuta: minuta,
+                    cierre: cierre,
+                    sala: sala,
+                    saeNum: saeNum,
+                    caratula: caratula,
+                    razonDemora: razonDemora,
+                    mpf: mpf,
+                    ufi: ufi,
+                    estado: estado,
+                    defensa: defensa,
+                    imputado: imputado,
+                    tipo: tipo,
+                    tipo2: tipo2,
+                    tipo3: tipo3,
+                    partes: partes,
+                    numeroLeg: item.numeroLeg,
+                    operador: item.operador,
+                    hora: item.hora,
+                    hitos: item.hitos,
+                    juez: item.juez
+                };
+                generatePDF(aux, dateToUse)
             break;
         }
     }
