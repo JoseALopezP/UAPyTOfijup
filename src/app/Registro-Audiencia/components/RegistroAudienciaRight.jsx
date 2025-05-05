@@ -15,16 +15,13 @@ function extractNames(obj) {
     return Object.keys(obj);
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
-export default function RegistroAudienciaRight({ item, dateToUse }) {
+export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
     const {updateData, updateByDate, modelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
-    const [resuelvo, setResuelvo] = useState('');
     const [resuelvo2, setResuelvo2] = useState('');
-    const [minuta, setMinuta] = useState('');
     const [minuta2, setMinuta2] = useState('');
-    const [cierre, setCierre] = useState('');
     const [cierre2, setCierre2] = useState('');
     const [selectedTab, setSelectedTab] = useState('Cuerpo minuta');
     const [errorDescarga, setErrorDescarga] = useState(false)
@@ -68,7 +65,30 @@ export default function RegistroAudienciaRight({ item, dateToUse }) {
         await updateDataAud()
     };
     const handleDescargar2 = async() =>{
-        await generatePDF(item, dateToUse)
+        const aux = {
+            resuelvoText: resuelvo,
+            minuta: minuta,
+            cierre: cierre,
+            sala: sala,
+            saeNum: saeNum,
+            caratula: caratula,
+            razonDemora: razonDemora,
+            mpf: mpf,
+            ufi: ufi,
+            estado: estado,
+            defensa: defensa,
+            imputado: imputado,
+            tipo: tipo,
+            tipo2: tipo2,
+            tipo3: tipo3,
+            partes: partes,
+            numeroLeg: item.numeroLeg,
+            operador: operador,
+            hora: hora,
+            hitos: hitos,
+            juez: juez
+        };
+        await generatePDF(aux, dateToUse)
         await setCheckDescarga('')
     }
     const checkGuardar = useCallback(() => {

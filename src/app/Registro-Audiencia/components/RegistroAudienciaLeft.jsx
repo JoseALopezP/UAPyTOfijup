@@ -10,33 +10,20 @@ import deepEqual from '@/utils/deepEqual';
 import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
 
-export default function RegistroAudienciaLeft({ item, dateToUse, isHovered }) {
+export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
-    const [sala, setSala] = useState(item.sala)
     const [caratula2, setCaratula2] = useState('');
-    const [saeNum, setSaeNum] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
     const [defensa2, setDefensa2] = useState([]);
     const [imputado2, setImputado2] = useState([]);
     const [showReconversion, setShowReconversion] = useState(false);
     const [partes2, setPartes2] = useState([]);
-    const [caratula, setCaratula] = useState('');
-    const [razonDemora, setRazonDemora] = useState('');
     const [razonDemora2, setRazonDemora2] = useState('');
-    const [mpf, setMpf] = useState([]);
-    const [ufi, setUfi] = useState('');
-    const [estado, setEstado] = useState('');
     const [ufi2, setUfi2] = useState('');
-    const [defensa, setDefensa] = useState([]);
-    const [imputado, setImputado] = useState([]);
-    const [tipo, setTipo] = useState('');
     const [tipoAux, setTipoAux] = useState('');
-    const [tipo2, setTipo2] = useState('');
     const [tipo2Aux, setTipo2Aux] = useState('');
-    const [tipo3, setTipo3] = useState('');
     const [tipo3Aux, setTipo3Aux] = useState('');
-    const [partes, setPartes] = useState([]);
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [removedMpf, setRemovedMpf] = useState([]);
