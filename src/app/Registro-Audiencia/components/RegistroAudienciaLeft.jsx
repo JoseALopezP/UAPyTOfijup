@@ -285,7 +285,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                         <button className={`${styles.inputLeft} ${styles.inputLeft20}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                         <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
                     </div>
-                        {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo === "CONTROL DE DETENCIÓN" || item.tipo === "CONTROL DE DETENCIÓN") &&
+                        {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
                         <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
                         type="text"
                         value={input.detenido}

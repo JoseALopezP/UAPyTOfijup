@@ -24,7 +24,7 @@ export function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
-        if(el.detenido !== ''){
+        if(el.detenido && el.detenido !== ''){
             aux += `\nFecha de detención: ${el.detenido}`
         }
     });
