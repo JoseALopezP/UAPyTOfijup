@@ -16,6 +16,12 @@
     height: 95vh;
     border-right: solid 1px #2B2B2B;
 }
+.audienciaListContainerHidden{
+    width: 5%;
+    overflow: hidden;
+    height: 100%;
+    animation: both showHidden .3s;
+}
 .audienciasListDisplayBlock{
     border-top: solid 1px #2B2B2B;
     height: 100%;
@@ -150,19 +156,19 @@
 .oficioBlockContainer{
     display: inline-flex;
     flex-direction: row;
-    width: 78vw;
+    width: 93vw;
     height: 100%;
 }
 .oficioLeftBlockContainer{
     border-right: solid 1px #2B2B2B;
-    width: 50%;
+    width: 30%;
     height: 100%;
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
 }
 .oficioRightBlockContainer{
-    width: 50%;
+    width: 70%;
     padding: 10px;
     overflow-y: scroll;
 }
@@ -356,4 +362,14 @@
     color: #FFF;
     font-size: x-large;
     font-family: inherit;
+}
+@keyframes showHidden {
+    0% {
+        opacity: 1;
+        width: 20%;
+    }
+    100%{
+        width: 5%;
+        opacity: .1;
+    }
 }
