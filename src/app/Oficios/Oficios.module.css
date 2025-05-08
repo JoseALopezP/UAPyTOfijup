@@ -172,6 +172,11 @@
     padding: 10px;
     overflow-y: scroll;
 }
+.editSectionOficio{
+    background-color: #d7d7d7;
+    height: 70%;
+    overflow-x: scroll;
+}
 .oficioText{
     color: #d7d7d7;
     font-size: 18px;
