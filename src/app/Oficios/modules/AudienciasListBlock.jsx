@@ -24,7 +24,7 @@ export default function AudienciasListBlock({audFunction, dateFunction, dateToUs
     },[])
     return (
         <div className={showList ? `${styles.audienciaListContainer}` : `${styles.audienciaListContainer} ${styles.audienciaListContainerHidden}`} onMouseEnter={() => setShowList(true)} onMouseLeave={() => setShowList(false)}>
-            <span className={styles.fechaSorteoBlock}><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule date={dateToUse} arr={bydate}/></span>
+            <span className={styles.fechaSorteoBlock}>{showList && <><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule date={dateToUse} arr={bydate}/></>}</span>
             {bydate && <AudienciasListDisplay arr={bydate} audFunction={audFunction}/>}
         </div>
     )
