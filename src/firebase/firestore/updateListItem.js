@@ -15,10 +15,8 @@ export default async function updateListItem(collectionName, documentId, searchV
             return;
         }
         const { list = [] } = docSnapshot.data();
-        console.log("Buscando en la lista:", list);
         const foundItem = list.find(item => {
             const match = (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2;
-            console.log("Comparando item:", item, "con searchValue1:", searchValue1, "searchValue2:", searchValue2, "Resultado:", match);
             return match;
         });
         if (foundItem) {
@@ -29,7 +27,18 @@ export default async function updateListItem(collectionName, documentId, searchV
                 console.warn("Skipped update because newValue is empty or undefined.");
             }
         } else {
-            console.log("Item not found in 'list' array.");
+            console.log("Item not found in 'list' array. Agregando uno nuevo.");
+            if (newValue !== undefined && newValue !== '') {
+                const newItem = {
+                    numeroLeg: searchValue1,
+                    hora: searchValue2,
+                    [propertyToUpdate]: newValue
+                };
+                list.push(newItem);
+                await updateDoc(docRef, { list });
+            } else {
+                console.warn("No se pudo crear un nuevo item porque el valor es vacío o indefinido.");
+            }
         }
     } catch (error) {
         console.error("Error updating document:", error);
