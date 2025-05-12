@@ -16,7 +16,7 @@ export default function OficioRightBlock({aud, date}) {
     const [minuta, setMinuta] = useState('');
     const [resuelvo2, setResuelvo2] = useState('');
     const [minuta2, setMinuta2] = useState('');
-    const [minutaShow, setShowMinuta] = useState(true);
+    const [minutaShow, setMinutaShow] = useState('caratula');
     const [partHover, setPartHover] = useState(false)
     const [guardarInc, setGuardarInc] = useState(false);
     const updateComparisson = () => {
@@ -66,8 +66,12 @@ export default function OficioRightBlock({aud, date}) {
     if (!aud) return null;
     return (
         <><div className={styles.oficioRightBlockContainer} >
-            {aud && aud.estado && <div className={styles.oficioText}>{caratulaGenerator(aud, date)}</div>}
+            <span className={styles.tabsSelector}>
+                <button onClick={() => setMinutaShow('caratula')} className={minutaShow === 'caratula' ? `${styles.tab} ${styles.tabSelected}` : `${styles.tab}`}>Carátula</button>
+                <button onClick={() => setMinutaShow('minuta')} className={minutaShow === 'minuta' ? `${styles.tab} ${styles.tabSelected}` : `${styles.tab}`}>Minuta</button>
+                <button onClick={() => setMinutaShow('resuelvo')} className={minutaShow === 'resuelvo' ? `${styles.tab} ${styles.tabSelected}` : `${styles.tab}`}>Resuelvo</button></span>
             <div className={styles.editSectionOficio}>{aud.minuta ? (minutaShow ? <TextEditor textValue={minuta} setTextValue={setMinuta}/> : <p></p>) : <p></p>}
+            {aud && aud.estado && minutaShow === 'caratula' && <div className={styles.oficioText}>{caratulaGenerator(aud, date)}</div>}
             {aud.resuelvoText ? (minutaShow ? <p></p> :<TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>) : <p></p>}</div>
         </div>
         <button className={styles.oficioButton} onClick={() => handleShow()}>{showStop ? 'FALTAN DATOS' : 'GENERAR OFICIO'}</button>
