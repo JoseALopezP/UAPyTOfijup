@@ -23,7 +23,8 @@ export const nameTranslate = (operadorName) =>{
         "Waisman, Natasha": 'NATI',
         "Victoria, Gonzalo José": 'GONZA',
         "Fernández Chipre, Cecilia": 'CHECHU',
-        "Martinazzo, Ignacio": 'NACHO M'
+        "Martinazzo, Ignacio": 'IGNA',
+        "Venerado, Tomás": 'TOMI'
     }
     return traducciones[operadorName]
 }

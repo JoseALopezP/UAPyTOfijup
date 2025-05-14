@@ -10,6 +10,7 @@ import OficioBlock from './modules/OficioBlock';
 export default function page() {
     const [date, setDate] = useState(null)
     const [selectedAud, setSelectedAud] = useState(null)
+    const [showList, setShowList] = useState(true)
     const handleSave = (newDate) => {
         setDate(newDate);
         localStorage.setItem('dateToUse', newDate);
@@ -24,8 +25,8 @@ export default function page() {
       <AuthContextProvider>
         <DataContextProvider>
           <div className={styles.container}>
-            {date && <AudienciasListBlock audFunction={setSelectedAud} dateFunction={handleSave} dateToUse={date}/>}
-            {selectedAud && <OficioBlock dateToUse={date} aud={selectedAud}/>}
+            {date && <AudienciasListBlock audFunction={setSelectedAud} dateFunction={handleSave} dateToUse={date} setShowList={setShowList} showList={showList}/>}
+            {selectedAud && <OficioBlock dateToUse={date} aud={selectedAud} showList={showList}/>}
           </div>
         </DataContextProvider>
       </AuthContextProvider>

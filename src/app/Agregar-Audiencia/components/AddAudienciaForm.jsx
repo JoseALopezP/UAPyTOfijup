@@ -111,7 +111,7 @@ export function AddAudienciaForm ({dateFunction, date}) {
                 setTipoError(false)
                 setJuezError(false)
                 setDupliCheck(false)
-            }, 10000);
+            }, 1000);
         }
     }, [horaError, salaError, legajo2Error, legajo3Error, tipoError, juezError, dupliCheck])
     useEffect(() => {

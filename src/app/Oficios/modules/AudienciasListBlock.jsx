@@ -8,7 +8,7 @@ import SorteoModule from './SorteoModule'
 import { useAuthContext } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation';
 
-export default function AudienciasListBlock({audFunction, dateFunction, dateToUse}) {
+export default function AudienciasListBlock({audFunction, dateFunction, dateToUse, showList, setShowList}) {
     const router = useRouter()
     const {updateByDateListener, bydate, updateDesplegables} = useContext(DataContext)
     const { user } = useAuthContext()
@@ -23,8 +23,8 @@ export default function AudienciasListBlock({audFunction, dateFunction, dateToUs
         updateDesplegables()
     },[])
     return (
-        <div className={styles.audienciaListContainer}>
-            <span className={styles.fechaSorteoBlock}><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule date={dateToUse} arr={bydate}/></span>
+        <div className={showList ? `${styles.audienciaListContainer}` : `${styles.audienciaListContainer} ${styles.audienciaListContainerHidden}`} onMouseEnter={() => setShowList(true)} onMouseLeave={() => setShowList(false)}>
+            <span className={styles.fechaSorteoBlock}>{showList && <><SelectDate dateFunction={dateFunction} date={dateToUse}/> <SorteoModule date={dateToUse} arr={bydate}/></>}</span>
             {bydate && <AudienciasListDisplay arr={bydate} audFunction={audFunction}/>}
         </div>
     )

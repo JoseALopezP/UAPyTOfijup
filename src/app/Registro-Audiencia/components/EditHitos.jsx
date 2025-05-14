@@ -4,8 +4,8 @@ import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 
 export default function EditHitos({hitos, isHovered, item, dateToUse}) {
-    const {updateData} = useContext(DataContext)
-    const [items, setItems] = useState(hitos);
+    const {updateData, updateByDate} = useContext(DataContext)
+    const [items, setItems] = useState([]);
     const [saving, setSaving] = useState(false)
       const handleChange = (index, field, value) => {
         setItems((prev) =>
@@ -16,7 +16,6 @@ export default function EditHitos({hitos, isHovered, item, dateToUse}) {
               if (field === "hours") hours = value;
               if (field === "minutes") minutes = value;
               if (field === "status") status = value;
-    
               return `${hours}:${minutes} | ${status}`;
             }
             return item;
@@ -30,13 +29,14 @@ export default function EditHitos({hitos, isHovered, item, dateToUse}) {
         await setSaving(true)
         await updateData(dateToUse, item.numeroLeg, item.hora, 'hitos', items);
         await setSaving(false)
+        await updateByDate(dateToUse)
       }
       const removeItem = (index) => {
         setItems(items.filter((_, i) => i !== index));
       };
       useEffect(()=>{
         setItems(hitos)
-      },[hitos])
+      },[item])
     return (
         <div className={isHovered ? `${styles.editHitosBlock} ${styles.editHitosBlockHovered}` : `${styles.editHitosBlock}`}>
         {items && items.map((item, index) => {
