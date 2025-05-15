@@ -63,17 +63,17 @@ export function AddAudienciaIndiv({date, element}) {
     const handleSubmit = async(event) =>{
         event.preventDefault();
         if(cambios){
-            if(minuto !== minutoBis || hora !== horaBis){
+            if((minuto !== minutoBis || hora !== horaBis) && hora !== '' && minuto !== ''){
                 await updateData(date, element.numeroLeg, element.hora, 'hora', `${hora}:${minuto}`);
                 setHoraBis(hora)
                 setMinutoBis(minuto)}
-            if(sala !== salaBis){
+            if(sala !== salaBis && sala !== ''){
                 await updateData(date, element.numeroLeg, element.hora, 'sala', sala);
                 setSalaBis(sala)}
-            if(legajo !== legajoBis){
+            if(legajo !== legajoBis && legajo !== ''){
                 await updateData(date, element.numeroLeg, element.hora, 'numeroLeg', legajo);
                 setLegajoBis(legajo)}
-            if(tipo !== tipoBis){
+            if(tipo !== tipoBis && tipo !== ''){
                 await updateData(date, element.numeroLeg, element.hora, 'tipo', tipo);
                 setTipoBis(tipo)}
             if(tipo2 !== tipo2Bis){
@@ -82,7 +82,7 @@ export function AddAudienciaIndiv({date, element}) {
             if(tipo3 !== tipo3Bis){
                 await updateData(date, element.numeroLeg, element.hora, 'tipo3', tipo3);
                 setTipo3Bis(tipo3)}
-            if(juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis){
+            if((juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis) && juez !== ''){
                 if(element.juez.includes('+')){
                     (desplegables.jueces.includes(juez1) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) && await updateData(date, element.numeroLeg, element.hora, 'juez', `${juez1}+${juez2}+${juez3}`);
                     setJuez1Bis(juez1)
