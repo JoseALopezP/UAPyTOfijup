@@ -242,7 +242,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
             {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux}/> : ''}
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
             {mpf.map((input, index) => (
-                    <div key={input.id} className={`${styles.inputRow}`}>
+                    <div key={input.id + input.nombre} className={`${styles.inputRow}`}>
                         <input
                             list='mpf'
                             className={`${styles.inputLeft} ${styles.inputTyped70}`}
@@ -271,7 +271,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                     ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
                 {imputado.map((input, index) => (
-                    <><div key={input.id + input.dni} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                    <><div key={input.id + input.nombre} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
                         <span className={`${styles.condenadoimputadoFlag}`}><p>{input.condenado ? "CONDENADO" : "IMPUTADO"}</p></span>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"

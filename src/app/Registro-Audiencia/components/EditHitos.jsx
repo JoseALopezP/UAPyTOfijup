@@ -25,18 +25,19 @@ export default function EditHitos({hitos, isHovered, item, dateToUse}) {
       const addItem = () => {
         setItems([...items, "00:00 | EN_CURSO"]);
       };
-      const saveHitos = async() =>{
-        await setSaving(true)
+      const saveHitos = async () => {
+        if (saving) return;
+        setSaving(true);
         await updateData(dateToUse, item.numeroLeg, item.hora, 'hitos', items);
-        await setSaving(false)
-        await updateByDate(dateToUse)
-      }
+        await new Promise(res => setTimeout(res, 300));
+        setSaving(false);
+      };
       const removeItem = (index) => {
         setItems(items.filter((_, i) => i !== index));
       };
-      useEffect(()=>{
-        setItems(hitos)
-      },[item])
+      useEffect(() => {
+        setItems(hitos);
+      }, [hitos]);
     return (
         <div className={isHovered ? `${styles.editHitosBlock} ${styles.editHitosBlockHovered}` : `${styles.editHitosBlock}`}>
         {items && items.map((item, index) => {

@@ -78,10 +78,14 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         await pushToHitos('audiencias', date, searchValLeg, searchValHora, newValue)
         await pushToHitos('legajos', searchValLeg, date, searchValHora, newValue)
     }
-    const updateData = async(date, searchValLeg, searchValHora, property, newValue) =>{
-        await updateListItem('audiencias', date, searchValLeg, searchValHora, property, newValue)
-        await updateListItem('legajos', searchValLeg, date, searchValHora, property, newValue)
-    }
+    const updateData = async (date, searchValLeg, searchValHora, property, newValue) => {
+        if (!newValue) {
+            console.warn("❌ Ignorado updateData: newValue es inválido", newValue);
+            return;
+        }
+        await updateListItem('audiencias', date, searchValLeg, searchValHora, property, newValue);
+        await updateListItem('legajos', searchValLeg, date, searchValHora, property, newValue);
+    };
     const updateDataToday = async(searchValLeg, searchValHora, property, newValue) =>{
         await updateListItem('audiencias', (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''), searchValLeg, searchValHora, property, newValue)
         await updateListItem('legajos', searchValLeg, (new Date()).toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join(''), searchValHora, property, newValue)
