@@ -174,12 +174,57 @@
 }
 .editSectionOficio{
     background-color: #d7d7d7;
-    height: 70%;
     overflow-x: scroll;
+    color: #000;
 }
 .oficioText{
-    color: #d7d7d7;
+    color: #000;
     font-size: 18px;
+}
+.inputLeft{
+    height: 30px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    height: 28px;
+    padding: 0;
+    margin: 0;
+    color: #D4D4D4;
+    background-color: #1F1F1F;
+    vertical-align: bottom;
+}
+.guardarButton{
+    font-size: 20px;
+    background-color: #28a745;
+    cursor: pointer;
+    position: fixed;
+    align-self: flex-end;
+    height: 50px;
+    width: 25vw;
+    font-weight: 700;
+    left: 50vw;
+    opacity: .9;
+}
+.dropDownSelect{
+    height: 28px;
+}
+.guardar{
+    display: none;
+}
+.guardarButton:hover .guardar{
+    display: block;
+}
+.guardarButton:hover .sinGuardar{
+    display: none;
+}
+.guardando{
+    display: none;
+}
+.guardandoButton .guardando{
+    display: block;
+}
+.guardandoButton .guardar, .guardandoButton .sinGuardar, .guardandoButton:hover .guardar{
+    display: none;
 }
 .tabsSelector{
     width: 100%;

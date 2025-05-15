@@ -9,7 +9,7 @@ import TextEditor from '@/app/Registro-Audiencia/components/TextEditor';
 import { DataContext } from '@/context/DataContext';
 
 export default function OficioRightBlock({aud, date}) {
-    const {updateData} = useContext(DataContext)
+    const {updateData, updateByDate} = useContext(DataContext)
     const [showOficio, setShowOficio] = useState(false)
     const [showStop, setShowStop] = useState(false)
     const [resuelvo, setResuelvo] = useState('');
@@ -19,6 +19,7 @@ export default function OficioRightBlock({aud, date}) {
     const [minutaShow, setMinutaShow] = useState('caratula');
     const [partHover, setPartHover] = useState(false)
     const [guardarInc, setGuardarInc] = useState(false);
+    const [guardando, setGuardando] = useState(false);
     const updateComparisson = () => {
         setResuelvo(aud.resuelvoText || '');
         setResuelvo2(aud.resuelvoText || '');
@@ -38,19 +39,16 @@ export default function OficioRightBlock({aud, date}) {
     const updateDataAud = async() =>{
             setGuardando(true)
             if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-                await updateData(dateToUse, aud.numeroLeg, aud.hora, 'resuelvoText', resuelvo);
+                await updateData(date, aud.numeroLeg, aud.hora, 'resuelvoText', resuelvo);
                 setResuelvo2(resuelvo);
             }
             if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-                await updateData(dateToUse, aud.numeroLeg, aud.hora, 'minuta', minuta);
+                await updateData(date, aud.numeroLeg, aud.hora, 'minuta', minuta);
                 setMinuta2(minuta);
-            }
-            if (checkForResuelvo(aud)) {
-                await updateData(dateToUse, aud.numeroLeg, aud.hora, 'horaResuelvo', updateRealTimeFunction());
             }
             await setGuardarInc(false)
             await setGuardando(false)
-            await updateByDate(dateToUse)
+            await updateByDate(date)
         }
     useEffect(() => {
         checkGuardar();
@@ -62,17 +60,25 @@ export default function OficioRightBlock({aud, date}) {
     }, [resuelvo, resuelvo2, minuta, minuta2]);
     useEffect(() => {
         updateComparisson();
+        setGuardando(false)
     }, [aud]);
     if (!aud) return null;
     return (
-        <><div className={styles.oficioRightBlockContainer} >
+        <>{guardarInc && 
+        <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} onClick={() => updateDataAud()}>
+            <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
+            <span className={`${styles.guardar}`}>GUARDAR</span>
+            <span className={`${styles.guardando}`}>GUARDANDO...</span>
+        </button>}
+        <div className={styles.oficioRightBlockContainer} >
             <span className={styles.tabsSelector}>
                 <button onClick={() => setMinutaShow('caratula')} className={minutaShow === 'caratula' ? `${styles.tab} ${styles.tabSelected}` : `${styles.tab}`}>Carátula</button>
                 <button onClick={() => setMinutaShow('minuta')} className={minutaShow === 'minuta' ? `${styles.tab} ${styles.tabSelected}` : `${styles.tab}`}>Minuta</button>
                 <button onClick={() => setMinutaShow('resuelvo')} className={minutaShow === 'resuelvo' ? `${styles.tab} ${styles.tabSelected}` : `${styles.tab}`}>Resuelvo</button></span>
-            <div className={styles.editSectionOficio}>{aud.minuta ? (minutaShow ? <TextEditor textValue={minuta} setTextValue={setMinuta}/> : <p></p>) : <p></p>}
-            {aud && aud.estado && minutaShow === 'caratula' && <div className={styles.oficioText}>{caratulaGenerator(aud, date)}</div>}
-            {aud.resuelvoText ? (minutaShow ? <p></p> :<TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>) : <p></p>}</div>
+            <div className={styles.editSectionOficio}>
+                {aud && aud.minuta && minutaShow === 'minuta' && <TextEditor textValue={minuta} setTextValue={setMinuta}/>}
+                {aud && aud.estado && minutaShow === 'caratula' && <div className={styles.oficioText}>{caratulaGenerator(aud, date)}</div>}
+                {aud.resuelvoText && minutaShow === 'resuelvo' && <TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>}</div>
         </div>
         <button className={styles.oficioButton} onClick={() => handleShow()}>{showStop ? 'FALTAN DATOS' : 'GENERAR OFICIO'}</button>
         {showOficio && <GeneradorOficioBlock item={aud} date={date}/>}</>
