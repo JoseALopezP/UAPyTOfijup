@@ -8,8 +8,6 @@ export default async function updateListItem(collectionName, documentId, searchV
         if (typeof collectionName !== "string" || typeof documentId !== "string") {
             throw new Error("Collection name and document ID must be strings.");
         }
-        console.log("🗂️ Actualizando en colección:", collectionName, "docId:", documentId);
-        console.log(newValue)
         const docRef = doc(db, collectionName, documentId);
         const docSnapshot = await getDoc(docRef);
         if (!docSnapshot.exists()) {

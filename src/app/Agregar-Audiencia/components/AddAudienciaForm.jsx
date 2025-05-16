@@ -103,15 +103,13 @@ export function AddAudienciaForm ({dateFunction, date}) {
             setTimeout(function(){
                 setErrorMessage(false)
             }, 3000);
-            setTimeout(function(){
-                setHoraError(false)
-                setSalaError(false)
-                setLegajo2Error(false)
-                setLegajo3Error(false)
-                setTipoError(false)
-                setJuezError(false)
-                setDupliCheck(false)
-            }, 1000);
+            setHoraError(false)
+            setSalaError(false)
+            setLegajo2Error(false)
+            setLegajo3Error(false)
+            setTipoError(false)
+            setJuezError(false)
+            setDupliCheck(false)
         }
     }, [horaError, salaError, legajo2Error, legajo3Error, tipoError, juezError, dupliCheck])
     useEffect(() => {

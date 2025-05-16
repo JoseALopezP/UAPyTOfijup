@@ -242,26 +242,26 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
             {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux}/> : ''}
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
             {mpf.map((input, index) => (
-                    <div key={input.id + input.nombre} className={`${styles.inputRow}`}>
-                        <input
-                            list='mpf'
-                            className={`${styles.inputLeft} ${styles.inputTyped70}`}
-                            value={input.nombre}
-                            onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
-                        />
-                        <datalist id='mpf'>
-                            {desplegables.fiscal && desplegables.fiscal.map(option => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </datalist>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
-                            {input.asistencia ?  'PRE' : 'AUS'}
-                        </button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
-                    </div>
-                ))}
+                <div key={input.id} className={`${styles.inputRow}`}>
+                    <input
+                        list='mpf'
+                        className={`${styles.inputLeft} ${styles.inputTyped70}`}
+                        value={input.nombre}
+                        onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
+                    />
+                    <datalist id='mpf'>
+                        {desplegables.fiscal && desplegables.fiscal.map(option => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </datalist>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
+                        {input.asistencia ?  'PRE' : 'AUS'}
+                    </button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
+                </div>
+            ))}
             <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
@@ -271,7 +271,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                     ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
                 {imputado.map((input, index) => (
-                    <><div key={input.id + input.nombre} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                    <><div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
                         <span className={`${styles.condenadoimputadoFlag}`}><p>{input.condenado ? "CONDENADO" : "IMPUTADO"}</p></span>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
