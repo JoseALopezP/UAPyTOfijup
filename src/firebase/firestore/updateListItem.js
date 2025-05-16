@@ -19,6 +19,7 @@ export default async function updateListItem(collectionName, documentId, searchV
             const match = (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2;
             return match;
         });
+        console.log("Item encontrado:", foundItem);
         if (foundItem) {
             if (newValue !== undefined && newValue !== '') {
                 foundItem[propertyToUpdate] = newValue;
@@ -40,6 +41,13 @@ export default async function updateListItem(collectionName, documentId, searchV
                 console.warn("No se pudo crear un nuevo item porque el valor es vacío o indefinido.");
             }
         }
+        console.log("Actualizando doc", collectionName, documentId, {
+        list,
+        searchValue1,
+        searchValue2,
+        propertyToUpdate,
+        newValue
+        });
     } catch (error) {
         console.error("Error updating document:", error);
     }
