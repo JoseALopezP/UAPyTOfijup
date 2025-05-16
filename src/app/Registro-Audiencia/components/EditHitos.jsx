@@ -8,9 +8,7 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
   const [items, setItems] = useState([]);
   const [saving, setSaving] = useState(false);
   const isSavingRef = useRef(false);
-  const hasChangesRef = useRef(false); // para saber si hubo edición manual
-
-  // Inicializar los hitos solo si no hay cambios en curso
+  const hasChangesRef = useRef(false);
   useEffect(() => {
     if (!hasChangesRef.current) {
       setItems(hitos || []);
