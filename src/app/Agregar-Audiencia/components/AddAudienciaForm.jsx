@@ -200,7 +200,8 @@ export function AddAudienciaForm ({dateFunction, date}) {
                 <p className={`${styles.titleInput}`}>SITUACIÓN</p>
                 <input className={`${styles.inputSituacion}`} value={situacion} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
             </div>
-            <div className={`${styles.inputItemBlock}`}><button type="submit" className={`${styles.submitButton}`} onClick={()=>{handleSubmit; errorChecking()}}>AGREGAR</button></div>
+            <div className={`${styles.inputItemBlock}`}>
+                <button type="submit" className={`${styles.submitButton}`}>AGREGAR</button></div>
         </form>
         </>
     )
