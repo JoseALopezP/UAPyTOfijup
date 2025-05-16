@@ -3,7 +3,7 @@ import styles from '../Oficios.module.css'
 import { DataContext } from '@/context/DataContext';
 import { generateOficioSection } from '@/utils/resuelvoUtils';
 
-export default function GeneradorOficioBlock({item, date}) {
+export default function GeneradorOficioBlock({item, date, resuelvo, minuta}) {
     const {desplegables} = useContext(DataContext)
     const [traslado, setTraslado] = useState(`Se informa que la fecha de detención del Sr. XXX fue el día XXXX, habiendo intervenido Comisaría XXX; por lo que se solicita que cuando se efectivice el traslado del mencionado al SERVICIO PENITENCIARIO PROVINCIAL, se informe dicha circunstancia a la Oficina Judicial Penal al correo: casosofijup@jussanjuan.gov.ar y/o al teléfono 2644554725 de la Unidad de Administración de Casos.`)
     const [inputList, setInputList] = useState([]);
@@ -23,7 +23,7 @@ export default function GeneradorOficioBlock({item, date}) {
     };
     const submitHandler = (e) => {
         e.preventDefault();
-        generateOficioSection(item,date,traslado,inputList)
+        generateOficioSection(item,date,traslado,inputList, resuelvo)
     };
     return (
         <form className={styles.generadorOficioForm} onSubmit={(event) => submitHandler(event)}>

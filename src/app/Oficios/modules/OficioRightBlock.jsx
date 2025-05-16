@@ -81,6 +81,6 @@ export default function OficioRightBlock({aud, date}) {
                 {aud.resuelvoText && minutaShow === 'resuelvo' && <TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>}</div>
         </div>
         <button className={styles.oficioButton} onClick={() => handleShow()}>{showStop ? 'FALTAN DATOS' : 'GENERAR OFICIO'}</button>
-        {showOficio && <GeneradorOficioBlock item={aud} date={date}/>}</>
+        {showOficio && <GeneradorOficioBlock item={aud} date={date} resuelvo={resuelvo}/>}</>
     )
 }

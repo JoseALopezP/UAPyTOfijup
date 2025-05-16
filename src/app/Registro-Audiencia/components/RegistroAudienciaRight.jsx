@@ -130,6 +130,8 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     }, [resuelvo, minuta, cierre, checkGuardar]);
     useEffect(() => {
         updateComparisson();
+        setGuardarInc(false)
+        setGuardando(false)
     }, [item]);
     useEffect(() => {
         checkGuardar();
