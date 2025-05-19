@@ -19,8 +19,9 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const [newColor, setNewColor] = useState('#6c757d')
     const [guardando, setGuardando] = useState(false)
     const [newState, setNewState] = useState('')
-
-    const [pidiente, setPidiente] = useState(false)
+    const [cuartoShow, setCuartoShow] = useState(false)
+    const [pidiente, setPidiente] = useState('')
+    const [pedido, setPedido] = useState('')
     const {updateData, pushtToArray, updateByDate} = useContext(DataContext)
 
     const [stopwatchRunning, setStopwatchRunning] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? true : false)
@@ -153,6 +154,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
             setStopwatchRunning(false)
             setStopwatchCurrent(0)
         }
+        setCuartoShow(false)
     }, [item.numeroLeg])
     useEffect(()=>{
         setStopwatchAccum(item.stopwatch ? item.stopwatch : 0)
@@ -165,18 +167,18 @@ export default function Cronometro({item, dateToUse, isHovered}) {
                 "--percentage": progress
             }}>
             <span className={``}>
-            <button onMouseDown={() => {setIsPressing(true), setNewColor('#17a2b8'), setNewState('EN_CURSO')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
+            <button onMouseDown={() => {states[estadoActual].includes('INICIAR') && (setIsPressing(true), setNewColor('#17a2b8'), setNewState('EN_CURSO'))}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('INICIAR') && styles.INICIAR}`}>
                 {(estadoActual === 'FINALIZADA') ? 'Reiniciar' : (estadoActual === 'PROGRAMADA') ? 'Iniciar' : 'Continuar'}</button>
-            <button onMouseDown={() => {setIsPressing(true), setNewColor(translateColor['CUARTO_INTERMEDIO']), setNewState('CUARTO_INTERMEDIO')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}} 
+            <button onMouseDown={() => {states[estadoActual].includes('CUARTO_INTERMEDIO') && (setIsPressing(true), setNewColor(translateColor['CUARTO_INTERMEDIO'])), setNewState('CUARTO_INTERMEDIO')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}} 
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('CUARTO_INTERMEDIO') && styles.CUARTOINTERMEDIO}`}>1/4 Intermedio</button>
-            <button onMouseDown={() => {setIsPressing(true), setNewColor(translateColor['FINALIZADA']), setNewState('FINALIZADA')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
+            <button onMouseDown={() => {states[estadoActual].includes('FINALIZAR') && (setIsPressing(true), setNewColor(translateColor['FINALIZADA'])), setNewState('FINALIZADA')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('FINALIZAR') && styles.FINALIZAR}`}>Finalizar</button>
-            <button onMouseDown={() => {setIsPressing(true), setNewColor(translateColor['REPROGRAMADA']), setNewState('REPROGRAMADA')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
+            <button onMouseDown={() => {states[estadoActual].includes('REPROGRAMAR') && (setIsPressing(true), setNewColor(translateColor['REPROGRAMADA'])), setNewState('REPROGRAMADA')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('REPROGRAMAR') && styles.REPROGRAMAR}`}>Reprogramar</button>
-            <button onMouseDown={() => {setIsPressing(true), setNewColor(translateColor['CANCELADA']), setNewState('CANCELADA')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
+            <button onMouseDown={() => {states[estadoActual].includes('CANCELAR') && (setIsPressing(true), setNewColor(translateColor['CANCELADA'])), setNewState('CANCELADA')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('CANCELAR') && styles.CANCELAR}`}>Cancelar</button>
-            <button onMouseDown={() => {setIsPressing(true), setNewColor(translateColor['RESUELVO']), setNewState('RESUELVO')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
+            <button onMouseDown={() => {states[estadoActual].includes('RESUELVO') && (setIsPressing(true), setNewColor(translateColor['RESUELVO'])), setNewState('RESUELVO')}} onMouseUp={() => {setIsPressing(false), setNewColor(prevColor)}} onMouseLeave={() => {setIsPressing(false), setNewColor(prevColor)}}
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('RESUELVO') && styles.RESUELVOSUB}`}>Resuelvo</button>
             </span>
             <span className={isPressing ? `${styles.cronoBlock} ${styles.cronoBlockPressing}` : `${styles.cronoBlock}`}>
