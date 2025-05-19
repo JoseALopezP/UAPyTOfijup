@@ -635,6 +635,18 @@
 .guardarButtonSaving{
     background-color: #ffc107;
 }
+.inputCrono{
+    border-radius: 4px;
+    width: 90%;
+}
+.confirmarButton{
+    width: 35%;
+    height: 40px;
+    border-radius: 4px;
+    align-self: center;
+    margin-right: 10px;
+}
+
 @keyframes growOnHoverHitos{
     from{
         width: 25vw;

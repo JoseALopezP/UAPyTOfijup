@@ -19,7 +19,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
     const [newColor, setNewColor] = useState('#6c757d')
     const [guardando, setGuardando] = useState(false)
     const [newState, setNewState] = useState('')
-    const [cuartoShow, setCuartoShow] = useState(false)
+    const [cuartoShow, setCuartoShow] = useState(true)
     const [pidiente, setPidiente] = useState('')
     const [pedido, setPedido] = useState('')
     const {updateData, pushtToArray, updateByDate} = useContext(DataContext)
@@ -154,7 +154,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
             setStopwatchRunning(false)
             setStopwatchCurrent(0)
         }
-        setCuartoShow(false)
+        /*setCuartoShow(false)*/
     }, [item.numeroLeg])
     useEffect(()=>{
         setStopwatchAccum(item.stopwatch ? item.stopwatch : 0)
@@ -182,11 +182,39 @@ export default function Cronometro({item, dateToUse, isHovered}) {
                 className={`${styles.buttonEstado} ${states[estadoActual].includes('RESUELVO') && styles.RESUELVOSUB}`}>Resuelvo</button>
             </span>
             <span className={isPressing ? `${styles.cronoBlock} ${styles.cronoBlockPressing}` : `${styles.cronoBlock}`}>
-                <p className={`${styles.stateTitle}`}>{guardando ? 'GUARDANDO...' : estadoActual.split('_').join(' ')}</p>
+                {cuartoShow ? 
+                <><button className={`${styles.confirmarButton}`}>CONFIRMAR</button>
+                    <span className={`${styles.timeBlock}`}><p>PEDIDO POR:</p>
+                        <input
+                            list='pidiente'
+                            className={`${styles.inputCrono} ${styles.inputPidiente}`}
+                            value={pidiente}
+                            onChange={(e) => setPidiente(e.target.value)}
+                        />
+                        <datalist id='pidiente'>
+                            <option value={'JUEZ'}>JUEZ</option>
+                            <option value={'AUDIENCIA ANTERIOR'}>AUDIENCIA ANTERIOR</option>
+                            <option value={'COMISARIA'}>COMISARIA</option>
+                            <option value={'FISCAL'}>FISCAL</option>
+                            <option value={'IMPUTADO'}>IMPUTADO</option>
+                            <option value={'OFIJUP - AGENDAMIENTO'}>OFIJUP - AGENDAMIENTO</option>
+                            <option value={'OFIJUP - NOTIFICACIÓN'}>OFIJUP - NOTIFICACIÓN</option>
+                            <option value={'OFIJUP - OTROS'}>OFIJUP - OTROS</option>
+                            <option value={'PROBLEMA TECNICO'}>PROBLEMA TECNICO</option>
+                            <option value={'QUERELLA'}>QUERELLA</option>
+                            <option value={'SERVICIO PENITENCIARIO'}>SERVICIO PENITENCIARIO</option>
+                            <option value={'TRASLADO DE DETENIDO'}>TRASLADO DE DETENIDO</option>
+                            <option value={'VICTIMA'}>VICTIMA</option>
+                        </datalist>
+                        </span>
+                    <span className={`${styles.timeBlock}`}><p>TIEMPO PEDIDO:</p>
+                        <input className={`${styles.inputCrono} ${styles.inputTiempoPedido}`} value={pedido} onChange={(e) => setPedido(e.target.value)}/></span>
+                </>
+                :<><p className={`${styles.stateTitle}`}>{guardando ? 'GUARDANDO...' : estadoActual.split('_').join(' ')}</p>
                 <span className={`${styles.timeBlock}`}><p>ACUMULADO</p>
                 <p className={`${styles.timeNumbers}`}>{formatTime((stopwatchCurrent ? stopwatchCurrent : 0) + (stopwatchAccum ? stopwatchAccum : 0))}</p></span>
                 <span className={`${styles.timeBlock}`}><p>ACTUAL</p>
-                <p className={`${styles.timeNumbers}`}>{formatTime(stopwatchCurrent)}</p></span>
+                <p className={`${styles.timeNumbers}`}>{formatTime(stopwatchCurrent)}</p></span></>}
             </span>
         </div>
     );
