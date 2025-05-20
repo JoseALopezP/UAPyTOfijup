@@ -638,6 +638,10 @@
 .inputCrono{
     border-radius: 4px;
     width: 90%;
+    text-align: center;
+    outline: none;
+    border: none;
+    height: 22px;
 }
 .confirmarButton{
     width: 35%;
@@ -645,6 +649,7 @@
     border-radius: 4px;
     align-self: center;
     margin-right: 10px;
+    background-color: #000000aa;
 }
 
 @keyframes growOnHoverHitos{

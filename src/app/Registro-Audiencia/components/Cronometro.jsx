@@ -13,15 +13,14 @@ const translateColor = {
     'RESUELVO': '#1F572B'
 }
 export default function Cronometro({item, dateToUse, isHovered}) {
-    const [tiempoPedido, setTiempoPedido] = useState(false)
     const [estadoActual, setEstadoActual] = useState(item.estado)
     const [prevColor, setPrevColor] = useState('#6c757d')
     const [newColor, setNewColor] = useState('#6c757d')
     const [guardando, setGuardando] = useState(false)
     const [newState, setNewState] = useState('')
-    const [cuartoShow, setCuartoShow] = useState(true)
-    const [pidiente, setPidiente] = useState('')
-    const [pedido, setPedido] = useState('')
+    const [cuartoShow, setCuartoShow] = useState(false)
+    const [pidiente, setPidiente] = useState('JUEZ')
+    const [pedido, setPedido] = useState(0)
     const {updateData, pushtToArray, updateByDate} = useContext(DataContext)
 
     const [stopwatchRunning, setStopwatchRunning] = useState((item.stopwatchStart !==0 && item.stopwatchStart) ? true : false)
@@ -69,7 +68,12 @@ export default function Cronometro({item, dateToUse, isHovered}) {
         await updateByDate(dateToUse)
     };
     const isSaving = useRef(false);
+
     const changeState = async () => {
+        if(newState === 'CUARTO_INTERMEDIO' && !cuartoShow){
+            setCuartoShow(true)
+            return
+        }
         if (isSaving.current) return;
         isSaving.current = true;
         setGuardando(true);
@@ -86,9 +90,10 @@ export default function Cronometro({item, dateToUse, isHovered}) {
                 await stopwatch();
             }
             const entry = newState === 'CUARTO_INTERMEDIO'
-                ? `${updateRealTimeFunction()} | ${newState} | ${tiempoPedido || 0} | ${pidiente || "juez"}`
+                ? `${updateRealTimeFunction()} | ${newState} | ${pedido || 0} | ${pidiente || "juez"}`
                 : `${updateRealTimeFunction()} | ${newState}`;
             await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry);
+            setCuartoShow(false)
         }
         await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState);
         setEstadoActual(newState);
@@ -154,7 +159,7 @@ export default function Cronometro({item, dateToUse, isHovered}) {
             setStopwatchRunning(false)
             setStopwatchCurrent(0)
         }
-        /*setCuartoShow(false)*/
+        setCuartoShow(false)
     }, [item.numeroLeg])
     useEffect(()=>{
         setStopwatchAccum(item.stopwatch ? item.stopwatch : 0)
