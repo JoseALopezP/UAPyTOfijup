@@ -75,46 +75,16 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
         setGuardarInc(guardarStatus);
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const handleDescargar = () =>{
-        switch(checkCompletion(item)){
-            case 'mpf':
-                setCheckDescarga('Faltan datos fiscal ¿Quiere continuar con la descarga?');
-                console.log('Faltan datos fiscal ¿Quiere continuar con la descarga?')
-                break;
-            case 'defensa':
-                setCheckDescarga('Faltan datos de la defensa ¿Quiere continuar con la descarga?');
-                console.log('Faltan datos de la defensa ¿Quiere continuar con la descarga?')
-                break;
-            case 'noListo':
-                setErrorDescarga(true);
-                setInterval(function(){setErrorDescarga(false)},3000)
-                console.log('noListo')
-                break;
-            case 'completo':
-                const aux = {
-                    resuelvoText: resuelvo,
-                    minuta: minuta,
-                    cierre: cierre,
-                    sala: sala,
-                    saeNum: saeNum,
-                    caratula: caratula,
-                    razonDemora: razonDemora,
-                    mpf: mpf,
-                    ufi: ufi,
-                    estado: estado,
-                    defensa: defensa,
-                    imputado: imputado,
-                    tipo: tipo,
-                    tipo2: tipo2,
-                    tipo3: tipo3,
-                    partes: partes,
-                    numeroLeg: item.numeroLeg,
-                    operador: item.operador,
-                    hora: item.hora,
-                    hitos: item.hitos,
-                    juez: item.juez
-                };
-                generatePDF(aux, dateToUse)
-            break;
+        const aux = {
+                resuelvoText: resuelvo, minuta: minuta, cierre: cierre, sala: sala, saeNum: saeNum, caratula: caratula, razonDemora: razonDemora,
+                mpf: mpf, ufi: ufi, estado: estado, defensa: defensa, imputado: imputado, tipo: tipo, tipo2: tipo2, tipo3: tipo3, partes: partes,
+                numeroLeg: item.numeroLeg, operador: item.operador, hora: item.hora, hitos: item.hitos, juez: item.juez
+            };
+        const aux2 = checkCompletion(aux)
+        if(aux2 === 'completo'){
+            generatePDF(aux, dateToUse)
+        }else{
+            alert(aux2)
         }
     }
     useEffect(() => {
