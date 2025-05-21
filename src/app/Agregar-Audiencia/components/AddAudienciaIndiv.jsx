@@ -21,6 +21,7 @@ export function AddAudienciaIndiv({date, element}) {
     const [horaBis, setHoraBis] = useState(element.hora.split(':')[0] || '')
     const [minutoBis, setMinutoBis] = useState(element.hora.split(':')[1] || '')
     const [salaBis, setSalaBis] = useState(element.sala || '')
+    const [alertSent, setAlertSent] = useState(false)
     const [legajoBis, setLegajoBis]= useState(element.numeroLeg || '')
     const [tipoBis, setTipoBis]= useState(element.tipo || '')
     const [tipo2Bis, setTipo2Bis]= useState(element.tipo2 || '')
@@ -62,6 +63,11 @@ export function AddAudienciaIndiv({date, element}) {
     }
     const handleSubmit = async(event) =>{
         event.preventDefault();
+        if(del && !alertSent){
+            alert('Estás por eliminar la audiencia ' + legajo + ' programada a las ' + hora +':'+minuto+ '. Presiona nuevamente guardar de así quererlo.')
+            setAlertSent(true)
+            return
+        }
         if(cambios){
             if((minuto !== minutoBis || hora !== horaBis) && hora !== '' && minuto !== ''){
                 await updateData(date, element.numeroLeg, element.hora, 'hora', `${hora}:${minuto}`);
@@ -97,6 +103,7 @@ export function AddAudienciaIndiv({date, element}) {
             }
             setCambios(false)
         }
+        setAlertSent(false)
     }
     useEffect(() => {
         checkEditing();
