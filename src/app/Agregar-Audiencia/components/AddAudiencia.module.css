@@ -76,10 +76,10 @@
 }
 .tableCellJuez{
     justify-content: space-around;
-    width: 25vw;
+    width: 26vw;
 }
 .tableCellJuezInput{
-    width: calc(33% - 6px);
+    width: calc(33% - 30px);
     border: solid 1px #2B2B2B;
     border-radius: 2px;
     height: 24px;
@@ -266,11 +266,22 @@
 .tableCellAccion svg{
     width: 16px;
 }
-.delButton, .cambiosButton{
+.delButton, .cambiosButton, .colButton{
     border: none;
     outline: none;
     border-radius: 2px;
     cursor: pointer;
+}
+.colButton{
+    height: 26px;
+    margin-top: 2px;
+    width: 26px;
+    padding: 0;
+}
+.colButton svg{
+    width: 15px;
+    padding: 0;
+    margin: 0;
 }
 .cambiosButton{
     opacity: 0.1;
