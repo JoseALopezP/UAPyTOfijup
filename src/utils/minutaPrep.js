@@ -1,7 +1,7 @@
 import { removeHtmlTags } from "./removeHtmlTags";
 
 function extractTimestamp(text) {
-    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\/(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/i;
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/i;
     const match = text.match(timestampRegex);
     if (!match) return null;
 
@@ -13,7 +13,7 @@ function extractTimestamp(text) {
 }
 
 function splitByTimestamps(text) {
-    const timestampRegex = /(?:<[^>]+>\s*)*\(?\bminuto\b\s*\d{2}:\d{2}:\d{2}(?:\/\d{2}:\d{2}:\d{2})?\s*\bvideo\b\s*\d+\)?/gi;
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/gi;
     let matches, lastIndex = 0;
     let result = [];
 
