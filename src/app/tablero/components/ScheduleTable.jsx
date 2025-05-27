@@ -52,7 +52,7 @@ export function ScheduleTable({filterValue}) {
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
                             .map((el, i) => {
                                 return (
-                                    <tr key={el.numeroLeg} className={`${styles["fila" + el.estado]}`}>
+                                    <tr key={el.numeroLeg+el.hora} className={`${styles["fila" + el.estado]}`}>
                                         <td>{el.hora}</td>
                                         <td>SALA {el.sala}</td>
                                         <td>{el.numeroLeg}</td>
