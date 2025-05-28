@@ -98,9 +98,12 @@ function extractFundamento(text) {
 
 export const minutaPrep = (item) => {
     const processText = (text, resBool = false) => splitByTimestamps(text).map(el => ({
-        text: splitNormalBold(resBool ? resuelvoStructure(item.juez) + "\n" +  el.text : el.text),
-        timestamp: el.timestamp,
+    text: splitNormalBold(
+        (resBool && el.timestamp ? resuelvoStructure(item.juez) + "\n" : "") + el.text
+    ),
+    timestamp: el.timestamp,
     }));
+
     const auxMin = processText(item.minuta);
     const auxRes = processText(extractFundamento(item.resuelvoText), true);
     const auxCie = processText(item.cierre);
