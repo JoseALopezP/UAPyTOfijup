@@ -3,11 +3,28 @@
     margin-left: 2.5vw;
     height: 99vh;
 }
+.copyButton{
+    height: 30px;
+    margin: 0 40px 0 0;
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 16px;
+}
 .selectDateBlock{
     width: 100%;
     display: inline-flex;
     flex-direction: row;
     justify-content: center;
+}
+.copyMessage{
+    position: fixed;
+    background-color: #CCCCCC;
+    height: 30px;
+    left: 100px;
+    top: -10px;
 }
 .audienciaSelectDateBlock{
     width: 250px;
