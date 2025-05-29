@@ -57,10 +57,9 @@ const demoraPorTipo = {
   };
   export default function demoraCalculator(tipo) {
     const searchValue = tipo.toLowerCase();
-
     function getMatchScore(name) {
         const nameWords = name.toLowerCase().split(" ");
-        const searchWords = searchValue.split(" ");
+        const searchWords =searchValue.split(" ");
         let score = 0;
         for (let word of searchWords) {
             if (nameWords.includes(word)) {
