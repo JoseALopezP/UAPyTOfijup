@@ -137,7 +137,8 @@ export function AddAudienciaIndiv({date, element}) {
 
     return(
         <form onSubmit={(event) => handleSubmit(event)} className={`${styles.tableRow}`}>
-            <span className={`${styles.tableCell} ${styles.tableCellState} ${styles[element.estado]}`} title={element.estado.split('_').join(' ')}></span>
+            {element.estado ? <span className={`${styles.tableCell} ${styles.tableCellState} ${styles[element.estado]}`} title={element.estado.split('_').join(' ')}></span> : 
+                <span className={`${styles.tableCell} ${styles.tableCellState} ${styles[element.estado]}`} title={'PROGRAMADA'}></span>}
             <span className={`${styles.tableCell} ${styles.tableCellHora}`}><InputReloj horaF={setHora} minutF={setMinuto} hora={hora} minut={minuto}/></span>
             <span className={`${styles.tableCell} ${styles.tableCellSala}`}>
                 <input list='sala' className={`${styles.tableCellInput} ${styles.salaSelect}`} value={sala} onChange={e => setSala(e.target.value)}/>
