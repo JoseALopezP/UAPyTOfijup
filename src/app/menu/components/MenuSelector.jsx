@@ -27,8 +27,6 @@ export default function MenuSelector() {
       <section className={`${styles.selectorSection}`}>
         <div className={`${styles.selectorBody}`}>
             <Link href="/tablero" className={`${styles.linkRedirection}`}>TABLERO</Link>
-            <Link href="/audienciasUGA/tablero" className={`${styles.linkRedirection}`}>UGA TABLERO</Link>
-            <Link href={'/audienciasUGA/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UGA CARGA</Link>
             <Link href="/audienciasUGA/listaAudiencias" className={`${styles.linkRedirection}`}>UGA OPERADOR</Link>
             <Link href="/audienciasUAC/tablero" className={`${styles.linkRedirection}`}>UAC TABLERO</Link>
             <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
