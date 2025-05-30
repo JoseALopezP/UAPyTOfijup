@@ -1,208 +1,444 @@
-"use client"
-import { useState, useContext, useEffect } from 'react';
-import styles from './AddAudiencia.module.css'
-import { DataContext } from '@/context/DataContext';
-import { SelectDate } from '@/app/components/SelectDate';
+"use client";
+import { useState, useContext, useEffect } from "react";
+import styles from "./AddAudiencia.module.css";
+import { DataContext } from "@/context/DataContext";
+import { SelectDate } from "@/app/components/SelectDate";
 
-export function AddAudienciaForm ({dateFunction, date}) {
-    const {updateTiposAudiencias, updateByDate, tiposAudiencias, updateDesplegables, addAudiencia, bydate, desplegables} = useContext(DataContext);
-    const [hora, setHora] = useState('')
-    const [hora2, setHora2] = useState('')
-    const [horaProgramada, setHoraProgramada] = useState(45)
-    const [sala, setSala] = useState('-')
-    const [legajo1, setLegajo1] = useState('MPF-SJ')
-    const [legajo2, setLegajo2] = useState('-')
-    const [legajo3, setLegajo3] = useState('-')
-    const [tipo, setTipo] = useState('')
-    const [tipo2, setTipo2] = useState('')
-    const [tipo3, setTipo3] = useState('')
-    const [colegiado, setColegiado] = useState(false)
-    const [juez, setJuez] = useState('-')
-    const [juez2, setJuez2] = useState('-')
-    const [juez3, setJuez3] = useState('-')
-    const [situacion, setSituacion] = useState('')
-    
-    const [horaError, setHoraError] = useState(false)
-    const [horaProgramadaError, setHoraProgramadaError] = useState(false)
-    const [salaError, setSalaError] = useState(false)
-    const [legajo2Error, setLegajo2Error] = useState(false)
-    const [legajo3Error, setLegajo3Error] = useState(false)
-    const [tipoError, setTipoError] = useState(false)
-    const [juezError, setJuezError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState(false)
-    
-    const [dupliCheck, setDupliCheck] = useState(false)
-    
-    const errorChecking = () =>{
-        (hora && hora2) ? setHoraError(false) : setHoraError(true);
-        (sala || sala=='-') ? setSalaError(false) : setSalaError(true);
-        (legajo2 && (`${legajo2}`.length < 6)) ? setLegajo2Error(false) : setLegajo2Error(true);
-        (legajo3 || legajo3 =='-') ? setLegajo3Error(false) : setLegajo3Error(true);    
-        (tipo || tipo == '-' || !desplegables.tipos.includes(tipo)) ? setTipoError(false) : setTipoError(true);
-        (horaProgramada || horaProgramada === 0) ? setHoraProgramadaError(false) : setHoraProgramadaError(true);
-        if(colegiado){
-            ((juez || juez == '-' || desplegables.jueces.includes(juez)) && (juez2 || juez2 == '-' || desplegables.jueces.includes(juez2)) && (juez3 || juez3 == '-' || desplegables.jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
-        }else{
-            (juez || juez == '-' || desplegables.jueces.includes(juez)) ? setJuezError(false) : setJuezError(true);
-        }
-        if(colegiado){
-            ((desplegables.jueces.includes(juez)) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) ? setJuezError(false) : setJuezError(true);
-        }else{
-            desplegables.jueces.includes(juez) ? setJuezError(false) : setJuezError(true);
-        }
-        const formattedHora = `${hora && hora.padStart(2,'0')}:${hora2 && hora2.padStart(2,'0')}`;
-        const formattedNumeroLeg = `${legajo1}-${legajo2.padStart(5,'0')}-${legajo3}`;
-        const isDuplicate = bydate.some(el => el.hora === formattedHora && el.numeroLeg === formattedNumeroLeg);
-        setDupliCheck(isDuplicate);
+export function AddAudienciaForm({ dateFunction, date }) {
+  const {
+    updateTiposAudiencias,
+    updateByDate,
+    tiposAudiencias,
+    updateDesplegables,
+    addAudiencia,
+    bydate,
+    desplegables,
+  } = useContext(DataContext);
+
+  const [formData, setFormData] = useState({
+    hora: "",
+    hora2: "",
+    horaProgramada: 45,
+    sala: "-",
+    legajo1: "MPF-SJ",
+    legajo2: "",
+    legajo3: "",
+    tipo: "",
+    tipo2: "",
+    tipo3: "",
+    colegiado: false,
+    juez: "",
+    juez2: "",
+    juez3: "",
+    situacion: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Función para validar todo el formulario y devolver objeto con errores
+  const validate = (data) => {
+    const errs = {};
+
+    if (!data.hora || !data.hora2) errs.hora = "Hora de inicio incompleta";
+    if (!data.sala || data.sala === "") errs.sala = "Sala requerida";
+
+    if (!data.legajo2 || data.legajo2.length > 5) {
+      errs.legajo2 = "Legajo medio debe tener hasta 5 dígitos";
     }
-    const addToFirebase = async() =>{
-        const newAudiencia = {
-            hora: `${hora.padStart(2,'0')}:${hora2.padStart(2,'0')}`,
-            horaProgramada: horaProgramada,
-            sala: sala,
-            numeroLeg: (legajo1 + "-" + legajo2.padStart(5,'0') + "-" + legajo3),
-            tipo: tipo,
-            tipo2: ((tipo2 == '-') ? '' : tipo2),
-            tipo3: ((tipo3 == '-' | tipo2 == '-') ? '' : tipo3),
-            juez: (colegiado ? (juez + "+" + juez2 + "+" + juez3) : juez),
-            estado: "PROGRAMADA",
-            situacion: (situacion ? situacion : '')
-        }
-        await addAudiencia(newAudiencia, `${date}`)
-        document.getElementById('addingForm').reset();
-        await updateByDate(date)
+    if (!data.legajo3 || data.legajo3.length > 4) {
+      errs.legajo3 = "Año inválido (máx. 4 dígitos)";
     }
-    const restore = () =>{
-        setHora('');
-        setHora2('');
-        setSala('-');
-        setLegajo1('MPF-SJ');
-        setLegajo2('');
-        setLegajo3('');
-        setTipo('-')
-        setTipo2('-')
-        setTipo3('-')
-        setColegiado(false)
-        setJuez('')
-        setJuez2('')
-        setJuez3('')
-        setHoraProgramada(45)
-        setSituacion('')
+
+    if (!data.tipo || !desplegables.tipos.includes(data.tipo)) {
+      errs.tipo = "Tipo de audiencia inválido o no seleccionado";
     }
-    const handleSubmit = async(event) =>{
-        event.preventDefault();
-        errorChecking()
-        if(!(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck || horaProgramadaError)){
-            await addToFirebase()
-            await restore()
-        }
+
+    if (data.colegiado) {
+      if (
+        !desplegables.jueces.includes(data.juez) ||
+        !desplegables.jueces.includes(data.juez2) ||
+        !desplegables.jueces.includes(data.juez3)
+      ) {
+        errs.juez = "Todos los jueces deben ser válidos";
+      }
+    } else {
+      if (!desplegables.jueces.includes(data.juez)) {
+        errs.juez = "Juez inválido o no seleccionado";
+      }
     }
-    useEffect(() => {
-        if(horaError || salaError || legajo2Error || legajo3Error || tipoError || juezError || dupliCheck){
-            setErrorMessage(true)
-            setTimeout(function(){
-                setErrorMessage(false)
-            }, 3000);
-            setHoraError(false)
-            setSalaError(false)
-            setLegajo2Error(false)
-            setLegajo3Error(false)
-            setTipoError(false)
-            setJuezError(false)
-            setDupliCheck(false)
-        }
-    }, [horaError, salaError, legajo2Error, legajo3Error, tipoError, juezError, dupliCheck])
-    useEffect(() => {
-        updateTiposAudiencias()
-        updateDesplegables()
-    }, [])
-    return(
-        <>
-        {errorMessage && 
-            (<div className={`${styles.errorMessage}`}>{dupliCheck ? 'AUDIENCIA DUPLICADA' : 'DATOS INSUFICIENTES O INCORRECTOS'}</div>)}
-        <form id='addingForm' onSubmit={(event) => handleSubmit(event)} className={`${styles.addAudienciaFormBlock}`}>
-            <SelectDate dateFunction={dateFunction} date={date}/>
-            <div className={`${styles.inputProgramadaBlock}`}>
-                <div className={`${styles.inputHoraProgramada}`}>
-                    <p className={`${styles.titleInput}`}>DURACIÓN</p>
-                    <input value={horaProgramada} onChange={e => {setHoraProgramada(e.target.value)}}/>
-                </div>
-                <div className={horaError ? `${styles.inputHoraBlock} ${styles.inputError} ${styles.inputItemBlock}` : ` ${styles.inputHoraBlock} ${styles.inputItemBlock}`}>
-                    <p className={`${styles.titleInput}`}>HORA</p>
-                    <div className={`${styles.inputTimeBlock}`}>
-                        <input placeholder='00' min='0' value={hora} max='24' onChange={e => {setHora(e.target.value)}}/>
-                        <p className={`${styles.separatorDots}`}>:</p>
-                        <input placeholder='00' min='0' value={hora2} max='59' onChange={e => {setHora2(e.target.value)}}/>
-                    </div>
-                </div>    
-            </div>
-        
-            <div className={salaError ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputSalaBlock} ${styles.inputItemBlock}` }>
-                <p className={`${styles.titleInput}`}>SALA</p>
-                <span className={`${styles.inputSalaSelectBlock}`}>
-                    <input list='sala2' onChange={e => setSala(e.target.value)}/>
-                    <datalist id='sala2' className={`${styles.tableCellInput}`}>
-                    {desplegables.salas && desplegables.salas.map(el =>(
-                        <option key={el} value={el}>{el}</option>
-                    ))}</datalist></span>
-            </div>
-            <div className={`${styles.inputLegajoBlock} ${styles.inputItemBlock}`}>
-                <p className={`${styles.titleInput}`}>LEGAJO</p>
-                <div className={`${styles.legajoBlock}`}>
-                    <input list='legajoPrefijo' value={legajo1} className={`${styles.legajo1}`} onChange={e => setLegajo1(e.target.value)}/>
-                    <datalist id='legajoPrefijo' className={`${styles.tableCellInput}`}>
-                    {desplegables.legajosPrefijo && desplegables.legajosPrefijo.map(el =>(
-                        <option key={el} value={el}>{el}</option>
-                    ))}</datalist>
-                <input className={legajo2Error ? `${styles.inputAreaError} ${styles.legajo2}` : `${styles.legajo2}` } min='1' max='99999' id="IngresarNumero" placeholder="00000" onChange={e => setLegajo2(e.target.value)}/>
-                <input list='anio' className={`${styles.legajo3}`} placeholder="1970" onChange={e => setLegajo3(e.target.value)}/>
-                    <datalist id='anio' className={`${styles.tableCellInput}`}>
-                    {desplegables.años && desplegables.años.map(el =>(
-                        <option key={el} value={el}>{el}</option>
-                ))}</datalist></div>
-            </div>
-            <div className={tipoError ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError} ` : `${styles.inputTipoBlock} ${styles.inputItemBlock}`}>
-                <p className={`${styles.titleInput}`}>TIPO</p>
-                <input list="tipo" value={tipo} className={`${styles.tipoInput}`} onChange={(e)=>{setTipo(e.target.value)}}/>
-                {(tipo && tipo =='-' || tipo =='') ||
-                <input list="tipo" value={tipo2} className={`${styles.tipoInput}`} onChange={(e)=>{setTipo2(e.target.value)}}/>}
-                {((tipo && tipo =='-' || tipo =='') || (tipo2 && tipo2 =='-' || tipo2 =='')) ||
-                    <input list="tipo" className={`${styles.tipoInput}`} onChange={(e)=>{setTipo3(e.target.value)}}/>}
-                <datalist id='tipo'>
-                    {desplegables.tipos && desplegables.tipos.sort().map((el) =>{
-                        return(
-                            <option key={el} value={el}>{el}</option>
-                        )
-                    })}
-                </datalist>
-            </div>
-            <div className={juezError ? `${styles.inputJuezBlock} ${styles.inputItemBlock} ${styles.inputError}` : `${styles.inputJuezBlock} ${styles.inputItemBlock}`}>
-                <p className={`${styles.titleInput}`}>JUEZ</p>
-                <div className={`${styles.juecesButtonBlock}`}>
-                <button className={`${styles.uniButton}`}  type = "button" id="colegiadoButton" onClick={() => setColegiado(!colegiado)}>{colegiado ? 'COL' : 'UNI'}</button>
-                <input list="juez" className={`${styles.juecesSelect1}`} onChange={(e)=>{setJuez(e.target.value)}}/>
-                </div>
-            {(colegiado) && (
-                <>
-                <input list="juez" className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez2(e.target.value)}}/>
-                <input list="juez" className={`${styles.juecesSelect}`} onChange={(e)=>{setJuez3(e.target.value)}}/>
-                </>
+
+    if (data.horaProgramada === "" || isNaN(data.horaProgramada)) {
+      errs.horaProgramada = "Duración inválida";
+    }
+
+    // Validar duplicado
+    const formattedHora = `${data.hora.padStart(2, "0")}:${data.hora2.padStart(
+      2,
+      "0"
+    )}`;
+    const formattedNumeroLeg = `${data.legajo1}-${data.legajo2.padStart(
+      5,
+      "0"
+    )}-${data.legajo3}`;
+
+    const isDuplicate = bydate.some(
+      (el) => el.hora === formattedHora && el.numeroLeg === formattedNumeroLeg
+    );
+    if (isDuplicate) {
+      errs.duplicado = "Ya existe una audiencia con ese número de legajo y hora";
+    }
+
+    return errs;
+  };
+
+  // Actualizar campo y validar formulario en cada cambio para actualizar errores
+  const updateField = (field, value) => {
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+
+      // Actualiza errores con la validación del nuevo estado
+      const newErrors = validate(newData);
+
+      setErrors(newErrors);
+      return newData;
+    });
+  };
+
+  // Manejador de submit
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const errs = validate(formData);
+    setErrors(errs);
+
+    if (Object.keys(errs).length === 0) {
+      setIsSaving(true);
+      setErrorMessage("");
+
+      const newAudiencia = {
+        hora: `${formData.hora.padStart(2, "0")}:${formData.hora2.padStart(
+          2,
+          "0"
+        )}`,
+        horaProgramada: formData.horaProgramada,
+        sala: formData.sala,
+        numeroLeg: `${formData.legajo1}-${formData.legajo2.padStart(
+          5,
+          "0"
+        )}-${formData.legajo3}`,
+        tipo: formData.tipo,
+        tipo2: formData.tipo2 === "-" ? "" : formData.tipo2,
+        tipo3:
+          formData.tipo3 === "-" || formData.tipo2 === "" || formData.tipo2 === "-"
+            ? ""
+            : formData.tipo3,
+        juez: formData.colegiado
+          ? `${formData.juez}+${formData.juez2}+${formData.juez3}`
+          : formData.juez,
+        estado: "PROGRAMADA",
+        situacion: formData.situacion || "",
+      };
+
+      try {
+        await addAudiencia(newAudiencia, date);
+        document.getElementById("addingForm").reset();
+        await updateByDate(date);
+
+        // Resetear formulario y errores
+        setFormData({
+          hora: "",
+          hora2: "",
+          horaProgramada: 45,
+          sala: "-",
+          legajo1: "MPF-SJ",
+          legajo2: "",
+          legajo3: "",
+          tipo: "",
+          tipo2: "",
+          tipo3: "",
+          colegiado: false,
+          juez: "",
+          juez2: "",
+          juez3: "",
+          situacion: "",
+        });
+        setErrors({});
+      } catch (error) {
+        setErrorMessage("Error al guardar audiencia");
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      // Mostrar mensaje de errores combinados
+      const msg = Object.values(errs).join(", ");
+      setErrorMessage(`Errores: ${msg}`);
+
+      // Quitar mensaje después de 4 seg
+      setTimeout(() => setErrorMessage(""), 4000);
+    }
+  };
+
+  useEffect(() => {
+    updateTiposAudiencias();
+    updateDesplegables();
+  }, []);
+
+  // Para mostrar clases de error en inputs
+  const horaError = errors.hora;
+  const salaError = errors.sala;
+  const legajo2Error = errors.legajo2;
+  const tipoError = errors.tipo;
+  const juezError = errors.juez;
+  const horaProgramadaError = errors.horaProgramada;
+
+  // Para inputs controlar valores del estado
+  const {
+    hora,
+    hora2,
+    horaProgramada,
+    sala,
+    legajo1,
+    legajo2,
+    legajo3,
+    tipo,
+    tipo2,
+    tipo3,
+    colegiado,
+    juez,
+    juez2,
+    juez3,
+    situacion,
+  } = formData;
+
+  return (
+    <>
+      {errorMessage && (
+        <div className={`${styles.errorMessage}`}>
+          {errors.duplicado ? "AUDIENCIA DUPLICADA" : errorMessage}
+        </div>
+      )}
+
+      <form
+        id="addingForm"
+        onSubmit={handleSubmit}
+        className={`${styles.addAudienciaFormBlock}`}
+      >
+        <SelectDate dateFunction={dateFunction} date={date} />
+
+        <div className={`${styles.inputProgramadaBlock}`}>
+          <div className={`${styles.inputHoraProgramada}`}>
+            <p className={`${styles.titleInput}`}>DURACIÓN</p>
+            <input
+              value={horaProgramada}
+              onChange={(e) => updateField("horaProgramada", e.target.value)}
+            />
+            {horaProgramadaError && (
+              <small className={styles.errorText}>{horaProgramadaError}</small>
             )}
-            <datalist id="juez">
-                {desplegables.jueces && desplegables.jueces.sort().map((el) =>{
-                    return(
-                        <option key={el} value={el}></option>
-                    )
-                })}
+          </div>
+
+          <div
+            className={
+              horaError
+                ? `${styles.inputHoraBlock} ${styles.inputError} ${styles.inputItemBlock}`
+                : `${styles.inputHoraBlock} ${styles.inputItemBlock}`
+            }
+          >
+            <p className={`${styles.titleInput}`}>HORA</p>
+            <div className={`${styles.inputTimeBlock}`}>
+              <input
+                placeholder="00"
+                min="0"
+                max="24"
+                value={hora}
+                onChange={(e) => updateField("hora", e.target.value)}
+              />
+              <p className={`${styles.separatorDots}`}>:</p>
+              <input
+                placeholder="00"
+                min="0"
+                max="59"
+                value={hora2}
+                onChange={(e) => updateField("hora2", e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={
+            salaError
+              ? `${styles.inputSalaBlock} ${styles.inputItemBlock} ${styles.inputError}`
+              : `${styles.inputSalaBlock} ${styles.inputItemBlock}`
+          }
+        >
+          <p className={`${styles.titleInput}`}>SALA</p>
+          <span className={`${styles.inputSalaSelectBlock}`}>
+            <input
+              list="sala2"
+              value={sala}
+              onChange={(e) => updateField("sala", e.target.value)}
+            />
+            <datalist id="sala2" className={`${styles.tableCellInput}`}>
+              {desplegables.salas &&
+                desplegables.salas.map((el) => (
+                  <option key={el} value={el}>
+                    {el}
+                  </option>
+                ))}
             </datalist>
-            </div>
-            <div className={`${styles.inputItemBlock}`}>
-                <p className={`${styles.titleInput}`}>SITUACIÓN</p>
-                <input className={`${styles.inputSituacion}`} value={situacion} type="text" id="IngresarComentario" placeholder="opcional" onChange={e => setSituacion(e.target.value)}/>
-            </div>
-            <div className={`${styles.inputItemBlock}`}>
-                <button type="submit" className={`${styles.submitButton}`}>AGREGAR</button></div>
-        </form>
-        </>
-    )
+          </span>
+        </div>
+
+        <div className={`${styles.inputLegajoBlock} ${styles.inputItemBlock}`}>
+          <p className={`${styles.titleInput}`}>LEGAJO</p>
+          <div className={`${styles.legajoBlock}`}>
+            <input
+              list="legajoPrefijo"
+              value={legajo1}
+              className={`${styles.legajo1}`}
+              onChange={(e) => updateField("legajo1", e.target.value)}
+            />
+            <datalist id="legajoPrefijo" className={`${styles.tableCellInput}`}>
+              {desplegables.legajosPrefijo &&
+                desplegables.legajosPrefijo.map((el) => (
+                  <option key={el} value={el}>
+                    {el}
+                  </option>
+                ))}
+            </datalist>
+
+            <input
+              className={legajo2Error ? `${styles.inputAreaError} ${styles.legajo2}` : `${styles.legajo2}`}
+              min="1"
+              max="99999"
+              id="IngresarNumero"
+              placeholder="00000"
+              value={legajo2}
+              onChange={(e) => updateField("legajo2", e.target.value)}
+            />
+
+            <input
+              list="anio"
+              className={`${styles.legajo3}`}
+              placeholder="1970"
+              value={legajo3}
+              onChange={(e) => updateField("legajo3", e.target.value)}
+            />
+            <datalist id="anio" className={`${styles.tableCellInput}`}>
+              {desplegables.años &&
+                desplegables.años.map((el) => (
+                  <option key={el} value={el}>
+                    {el}
+                  </option>
+                ))}
+            </datalist>
+          </div>
+        </div>
+
+        <div
+          className={
+            tipoError
+              ? `${styles.inputTipoBlock} ${styles.inputItemBlock} ${styles.inputError}`
+              : `${styles.inputTipoBlock} ${styles.inputItemBlock}`
+          }
+        >
+          <p className={`${styles.titleInput}`}>TIPO</p>
+          <input
+            list="tipo"
+            value={tipo}
+            className={`${styles.tipoInput}`}
+            onChange={(e) => updateField("tipo", e.target.value)}
+          />
+          {(tipo && tipo !== "-" && tipo !== "") && (
+            <>
+              <input
+                list="tipo"
+                value={tipo2}
+                className={`${styles.tipoInput}`}
+                onChange={(e) => updateField("tipo2", e.target.value)}
+              />
+              {(tipo2 && tipo2 !== "-" && tipo2 !== "") && (
+                <input
+                  list="tipo"
+                  value={tipo3}
+                  className={`${styles.tipoInput}`}
+                  onChange={(e) => updateField("tipo3", e.target.value)}
+                />
+              )}
+            </>
+          )}
+          <datalist id="tipo" className={`${styles.tableCellInput}`}>
+            {tiposAudiencias &&
+              tiposAudiencias.map((el) => (
+                <option key={el} value={el}>
+                  {el}
+                </option>
+              ))}
+          </datalist>
+        </div>
+
+        <div className={`${styles.inputJuezBlock} ${styles.inputItemBlock}`}>
+          <p className={`${styles.titleInput}`}>JUEZ</p>
+          <input
+            list="jueces"
+            className={juezError ? `${styles.inputError}` : ""}
+            value={juez}
+            onChange={(e) => updateField("juez", e.target.value)}
+          />
+          {colegiado && (
+            <>
+              <input
+                list="jueces"
+                className={juezError ? `${styles.inputError}` : ""}
+                value={juez2}
+                onChange={(e) => updateField("juez2", e.target.value)}
+              />
+              <input
+                list="jueces"
+                className={juezError ? `${styles.inputError}` : ""}
+                value={juez3}
+                onChange={(e) => updateField("juez3", e.target.value)}
+              />
+            </>
+          )}
+          <datalist id="jueces" className={`${styles.tableCellInput}`}>
+            {desplegables.jueces &&
+              desplegables.jueces.map((el) => (
+                <option key={el} value={el}>
+                  {el}
+                </option>
+              ))}
+          </datalist>
+
+          <label className={`${styles.checkColegiado}`}>
+            COLEGIADO
+            <input
+              type="checkbox"
+              checked={colegiado}
+              onChange={(e) => updateField("colegiado", e.target.checked)}
+            />
+          </label>
+        </div>
+
+        <div className={`${styles.inputSituacionBlock} ${styles.inputItemBlock}`}>
+          <p className={`${styles.titleInput}`}>SITUACIÓN</p>
+          <input
+            value={situacion}
+            onChange={(e) => updateField("situacion", e.target.value)}
+          />
+        </div>
+
+        <button
+          disabled={isSaving}
+          className={`${styles.submitButton}`}
+          type="submit"
+        >
+          {isSaving ? "GUARDANDO..." : "AGREGAR"}
+        </button>
+      </form>
+    </>
+  );
 }
