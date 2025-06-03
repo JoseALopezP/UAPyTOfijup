@@ -16,7 +16,7 @@ function extractNames(obj) {
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
-    const {updateData, updateByDate, modelosMinuta} = useContext(DataContext)
+    const {updateData, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -78,6 +78,9 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
             !deepEqual(cierre2, cierre)
         setGuardarInc(guardarStatus);
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
+    const callUpdateModelosMinuta = () =>{
+        updateModelosMinuta()
+    }
     const handleDescargar = () =>{
         const aux = {
                 resuelvoText: resuelvo, minuta: minuta, cierre: cierre, sala: sala, saeNum: saeNum, caratula: caratula, razonDemora: razonDemora,
@@ -123,11 +126,11 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
                 <span className={`${styles.guardando}`}>GUARDANDO...</span>
             </button>}
             <div className={`${styles.topBlockMinuta}`}>
-                <span className={`${styles.insertarModeloBlock}`}>
+                <span className={`${styles.insertarModeloBlock}`} onClick={() => callUpdateModelosMinuta()}>
                 <select className={`${styles.inputLeft} ${styles.inputModelo}`}
                     onChange={(e) => setModeloSelector(e.target.value)}>
                     <option value={''}></option>
-                    {extractNames(modelosMinuta).map(mod =>
+                    {modelosMinuta && extractNames(modelosMinuta).map(mod =>
                         <option key={mod} value={mod}>{mod.split('_').join(' ')}</option>
                     )}
                 </select>
