@@ -651,6 +651,13 @@
     margin-right: 10px;
     background-color: #000000aa;
 }
+.backupList{
+    font-family: inherit;
+    background-color: transparent;
+    color: #C7C7C7;
+    border: none;
+    outline: none;
+}
 
 @keyframes growOnHoverHitos{
     from{

@@ -1,5 +1,6 @@
 'use client'
 import { useContext, useState, useCallback, useEffect } from 'react';
+import { saveBackUp } from '@/utils/localBackup';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
@@ -10,6 +11,7 @@ import TextEditor from './TextEditor';
 import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
+import HistorialDeVersiones from './HistorialVersiones';
 
 function extractNames(obj) {
     return Object.keys(obj);
@@ -95,6 +97,26 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
         }
     }
     useEffect(() => {
+    const interval = setInterval(() => {
+        const cambios = {};
+
+        if (resuelvo && removeHtmlTags(resuelvo) !== '') {
+        cambios.resuelvoText = resuelvo;
+        }
+        if (minuta && removeHtmlTags(minuta) !== '') {
+        cambios.minuta = minuta;
+        }
+        if (cierre && removeHtmlTags(cierre) !== '') {
+        cambios.cierre = cierre;
+        }
+
+        if (Object.keys(cambios).length > 0) {
+        saveBackUp(dateToUse, item.numeroLeg, item.hora, cambios);
+        }
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+    }, [resuelvo, minuta, cierre, dateToUse, item.numeroLeg, item.hora]);
+    useEffect(() => {
         const interval = setInterval(() => {
             if(document.getElementById('submit-btn')){
                 document.getElementById('submit-btn').click();
@@ -135,6 +157,18 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
                     )}
                 </select>
                 <button type='button' onClick={() => insertarModelo()} className={`${styles.inputLeft} ${styles.insertarButton}`}>INSERTAR MODELO</button></span>
+                <HistorialDeVersiones
+                fecha={dateToUse}
+                legajo={item.numeroLeg}
+                hora={item.hora}
+                onSeleccionar={(cambios) => {
+                    if (confirm("¿Seguro que querés cargar esta versión anterior?")) {
+                    if (cambios.minuta) setMinuta(cambios.minuta);
+                    if (cambios.resuelvoText) setResuelvo(cambios.resuelvoText);
+                    if (cambios.cierre) setCierre(cambios.cierre);
+                    }
+                }}
+                />
                 <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
             <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
