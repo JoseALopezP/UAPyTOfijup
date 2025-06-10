@@ -1,41 +1,58 @@
-import { useContext, useEffect, useState } from 'react'
-import { DataContext } from '@/context/DataContext'
-import TableIndiv from './tableIndiv'
+import { useContext, useEffect, useState, useMemo } from 'react';
+import { DataContext } from '@/context/DataContext';
+import TableIndiv from './tableIndiv';
 
-export default function TableBody({date, filterValue}){
-    const {bydate, updateByDateListener} = useContext(DataContext)
-    const [todayFiltered, setTodayFiltered] = useState(bydate)
-    useEffect(()=>{
-        if(date && date.toString().length===8){
-            updateByDateListener(date)
+export default function TableBody({ date, filterValue }) {
+    const { bydate, updateByDateListener } = useContext(DataContext);
+
+    useEffect(() => {
+        if (date && typeof date === 'number' && date.toString().length === 8) {
+            updateByDateListener(date);
         }
-    }, [date])
-    useEffect(()=>{
-        const filteredData = bydate?.filter((sentence) => {
+    }, [date, updateByDateListener]);
+
+    const filteredAndSortedData = useMemo(() => {
+        if (!bydate) {
+            return [];
+        }
+
+        const lowerCaseFilterValue = filterValue.toLowerCase();
+        const filterWords = lowerCaseFilterValue.split(' ').filter(Boolean);
+
+        const filtered = bydate.filter((sentence) => {
+            const hora = sentence.hora ?? '';
+            const estado = sentence.estado ?? '';
+            const numeroLeg = sentence.numeroLeg ?? '';
+            const juez = sentence.juez ?? '';
+            const tipo = sentence.tipo ?? '';
+            const tipo2 = sentence.tipo2 ?? '';
+            const tipo3 = sentence.tipo3 ?? '';
+
             const searchableText = [
-                sentence.hora,
-                sentence.estado,
-                sentence.numeroLeg,
-                sentence.juez,
-                sentence.tipo,
-                sentence.tipo2,
-                sentence.tipo3
+                hora,
+                estado,
+                numeroLeg,
+                juez,
+                tipo,
+                tipo2,
+                tipo3
             ].join(' ').toLowerCase();
-            return filterValue
-                .toLowerCase()
-                .split(' ')
-                .every((word) => searchableText.includes(word));
+
+            return filterWords.every((word) => searchableText.includes(word));
         });
-        setTodayFiltered(filteredData)
-    }, [filterValue, bydate])
-    return (<>
-        {todayFiltered &&
-            todayFiltered
-            .filter(sentence =>
-                filterValue.toLowerCase().split(' ').every(word =>
-                    (sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3.toLowerCase().includes(word))
-                )
-            ).sort((a,b) => a.hora.split(':').join('') - b.hora.split(':').join('')).map(el=>
-            (<TableIndiv item={el} date={date} key={el.numeroLeg}/>)
-        )}</>)
+
+        return filtered.sort((a, b) => {
+            const timeA = parseInt((a.hora ?? '').split(':').join(''), 10);
+            const timeB = parseInt((b.hora ?? '').split(':').join(''), 10);
+            return timeA - timeB;
+        });
+    }, [bydate, filterValue]);
+
+    return (
+        <>
+            {filteredAndSortedData.map((el) => (
+                <TableIndiv item={el} date={date} key={el.numeroLeg || JSON.stringify(el)} />
+            ))}
+        </>
+    );
 }
