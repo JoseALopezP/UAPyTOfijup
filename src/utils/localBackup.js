@@ -1,4 +1,3 @@
-// utils/localBackup.js
 const DB_NAME = "BackupAudiencias";
 const STORE_NAME = "dias";
 const DB_VERSION = 1;
@@ -47,7 +46,7 @@ function normalizeCambios(cambios) {
   return JSON.parse(JSON.stringify(cambios));
 }
 
-export async function guardarBackup(fecha, legajo, hora, cambios) {
+export async function saveBackUp(fecha, legajo, hora, cambios) {
   const db = await openDB();
   const tx = db.transaction(STORE_NAME, "readwrite");
   const store = tx.objectStore(STORE_NAME);

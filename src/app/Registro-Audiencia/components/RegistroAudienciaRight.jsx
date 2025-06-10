@@ -11,7 +11,7 @@ import TextEditor from './TextEditor';
 import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
-import HistorialDeVersiones from './HistorialVersiones';
+import HistorialDeVersiones from './HistorialDeVersiones';
 
 function extractNames(obj) {
     return Object.keys(obj);

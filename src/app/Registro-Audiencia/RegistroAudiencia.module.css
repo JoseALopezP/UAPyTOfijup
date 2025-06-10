@@ -652,6 +652,7 @@
     background-color: #000000aa;
 }
 .backupList{
+    width: 200px;
     font-family: inherit;
     background-color: transparent;
     color: #C7C7C7;
