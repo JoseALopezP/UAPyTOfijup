@@ -80,17 +80,18 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
               className={styles.inputTime}
             />
             <select
-              value={status}
-              onChange={(e) => handleChange(index, "status", e.target.value)}
-              className={styles.inputStatus}
-            >
-              <option value="FINALIZADA">FINALIZADA</option>
-              <option value="EN_CURSO">EN CURSO</option>
-              <option value="PROGRAMADA">PROGRAMADA</option>
-              <option value="CANCELADA">CANCELADA</option>
-              <option value="REPROGRAMADA">REPROGRAMADA</option>
-              <option value="RESUELVO">RESUELVO</option>
-            </select>
+            value={status}
+            onChange={(e) => handleChange(index, "status", e.target.value)}
+            className={styles.inputStatus}
+          >
+            <option value="FINALIZADA">FINALIZADA</option>
+            <option value="CUARTO_INTERMEDIO">CUARTO INTERMEDIO</option>
+            <option value="EN_CURSO">EN CURSO</option>
+            <option value="PROGRAMADA">PROGRAMADA</option>
+            <option value="CANCELADA">CANCELADA</option>
+            <option value="REPROGRAMADA">REPROGRAMADA</option>
+            <option value="RESUELVO">RESUELVO</option>
+          </select>
             <button onClick={() => removeItem(index)} className={styles.deleteButton}>❌</button>
           </div>
         );

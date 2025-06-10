@@ -79,7 +79,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         await pushToHitos('legajos', searchValLeg, date, searchValHora, newValue)
     }
     const updateData = async (date, searchValLeg, searchValHora, property, newValue) => {
-        if (!newValue) {
+        if (!newValue && newValue !== 0) {
             console.warn("❌ Ignorado updateData: newValue es inválido", newValue);
             return;
         }

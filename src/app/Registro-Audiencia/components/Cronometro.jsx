@@ -87,36 +87,45 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
     };
 
     const changeState = async () => {
-        if (newState === 'CUARTO_INTERMEDIO' && !cuartoShow) {
-            setCuartoShow(true);
-            return;
-        }
-        if (savingRef.current) return;
+  if (newState === 'CUARTO_INTERMEDIO' && !cuartoShow) {
+    setCuartoShow(true);
+    return;
+  }
+  if (savingRef.current) return;
 
-        savingRef.current = true;
-        setGuardando(true);
+  savingRef.current = true;
+  setGuardando(true);
 
-        if (newState === 'RESUELVO') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction());
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`);
-        } else {
-            if (newState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
-            if (estadoActual === 'EN_CURSO' && newState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
+  console.log('Change state to:', newState);  // Para debugging
 
-            const entry = newState === 'CUARTO_INTERMEDIO'
-                ? `${updateRealTimeFunction()} | ${newState} | ${pedido || 0} | ${pidiente || "juez"}`
-                : `${updateRealTimeFunction()} | ${newState}`;
+  if (newState === 'RESUELVO') {
+    await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction());
+    await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`);
+  } else {
+    // Control cronómetro para cambio EN_CURSO
+    if (newState === 'EN_CURSO' && !stopwatchRunning) {
+      await stopwatch();  // inicia cronómetro
+    }
+    if (estadoActual === 'EN_CURSO' && newState !== 'EN_CURSO' && stopwatchRunning) {
+      await stopwatch();  // para cronómetro
+    }
 
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry);
-            setCuartoShow(false);
-        }
+    // Construcción correcta de la entrada
+    let entry = `${updateRealTimeFunction()} | ${newState}`;
+    if (newState === 'CUARTO_INTERMEDIO') {
+      entry = `${updateRealTimeFunction()} | ${newState} | ${pedido || 0} | ${pidiente || 'JUEZ'}`;
+    }
 
-        await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState);
-        setEstadoActual(newState);
-        setGuardando(false);
-        await updateByDate(dateToUse);
-        savingRef.current = false;
-    };
+    await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry);
+    setCuartoShow(false);
+  }
+
+  await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState);
+  setEstadoActual(newState);
+  setGuardando(false);
+  await updateByDate(dateToUse);
+  savingRef.current = false;
+};
 
     useEffect(() => {
         if (isPressing) {
@@ -167,6 +176,15 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
     useEffect(() => {
         setStopwatchAccum(item.stopwatch || 0);
     }, [item.stopwatch]);
+    useEffect(() => {
+        if (estadoActual === 'EN_CURSO' && !stopwatchRunning) {
+            setStopwatchRunning(true);
+        }
+        if (estadoActual !== 'EN_CURSO' && stopwatchRunning) {
+            setStopwatchRunning(false);
+        }
+    }, [estadoActual]);
+
 
     return (
         <div
