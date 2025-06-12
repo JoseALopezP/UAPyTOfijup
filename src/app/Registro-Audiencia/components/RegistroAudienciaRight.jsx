@@ -99,7 +99,6 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     useEffect(() => {
     const interval = setInterval(() => {
         const cambios = {};
-
         if (resuelvo && removeHtmlTags(resuelvo) !== '') {
         cambios.resuelvoText = resuelvo;
         }
@@ -109,7 +108,6 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
         if (cierre && removeHtmlTags(cierre) !== '') {
         cambios.cierre = cierre;
         }
-
         if (Object.keys(cambios).length > 0) {
         saveBackUp(dateToUse, item.numeroLeg, item.hora, cambios);
         }
