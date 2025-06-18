@@ -1,6 +1,6 @@
 'use client'
 import { useContext, useState, useCallback, useEffect } from 'react';
-import { saveBackUp } from '@/utils/localBackup';
+import { guardarBackup } from '@/utils/localBackup';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
@@ -28,6 +28,7 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     const [selectedTab, setSelectedTab] = useState('Cuerpo minuta');
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
+    const [reloadHistorial, setReloadHistorial] = useState(0);
     const updateComparisson = () => {
         setResuelvo(item.resuelvoText || '');
         setResuelvo2(item.resuelvoText || '');
@@ -109,7 +110,8 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
         cambios.cierre = cierre;
         }
         if (Object.keys(cambios).length > 0) {
-        saveBackUp(dateToUse, item.numeroLeg, item.hora, cambios);
+        guardarBackup(dateToUse, item.numeroLeg, item.hora, cambios);
+        setReloadHistorial(prev => prev + 1);
         }
     }, 5 * 60 * 1000);
     return () => clearInterval(interval);
@@ -166,7 +168,9 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
                     if (cambios.cierre) setCierre(cambios.cierre);
                     }
                 }}
+                reloadTrigger={reloadHistorial}
                 />
+
                 <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
             <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>

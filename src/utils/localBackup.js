@@ -61,7 +61,7 @@ export async function guardarBackup(fecha, legajo, hora, cambios) {
       (a) => a.legajo === legajo && a.hora === hora
     );
 
-    const timestamp = new Date().toLocaleString("es-AR", { hour12: false });
+    const timestamp = new Date().toISOString();
     const entrada = { cambios: normalizeCambios(cambios), timestamp };
 
     if (existente) {
