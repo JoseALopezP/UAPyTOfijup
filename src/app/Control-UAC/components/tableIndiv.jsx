@@ -31,7 +31,7 @@ export default function TableIndiv({item, date}){
         <>
         {saved ? <></> : <span className={`${styles.saveButton}`} onClick={() => handleSave()}>{saving ? 'Guardando' : 'Guardar'}</span>}
         <div className={`${styles.tableRowControlUac}`}>
-            <div className={`${styles.tableCell} ${styles.numeroLegCell}`} title={item.estado. split('_').join(' ')}>
+            <div className={`${styles.tableCell} ${styles.numeroLegCell}`} title={item.estado ? item.estado.split('_').join(' ') : ''}>
                 <p className={`${styles.horaCellP}`}><strong className={`${styles[item.estado]}`}>⬤</strong> 
                 {item.hora}</p>
                 <p className={`${styles.numeroLegCellP}`}>
