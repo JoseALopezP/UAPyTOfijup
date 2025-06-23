@@ -256,13 +256,16 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                             </option>
                         ))}
                     </datalist>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
                         {input.asistencia ?  'PRE' : 'AUS'}
+                    </button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setMpf, index, 'presencial', (!input.presencial))}>
+                        {input.presencial ?  'FIS' : 'VIR'}
                     </button>
                     <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
                 </div>
             ))}
-            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true })}>+ FISCAL</button></span>
+            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true, presencial: true })}>+ FISCAL</button></span>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
@@ -283,7 +286,10 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                             value={input.dni}
                             onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
                             placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft20}`} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
+                            {input.presencial ?  'FIS' : 'VIR'}
+                        </button>
                         <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
                     </div>
                         {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
@@ -295,8 +301,8 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                         </>
                 ))}
                 <span className={styles.imputadoButtons}>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: ''  })}>+ IMPUTADO</button>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: ''  })}>+ CONDENADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true  })}>+ IMPUTADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true  })}>+ CONDENADO</button>
                 </span></span>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
                     {defensa.map((input, index) => (
@@ -341,25 +347,32 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
                                         {imputadoItem.nombre}
                                     </option>))}
                             </select>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>
+                                {input.presencial ?  'FIS' : 'VIR'}
+                            </button>
                             <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true})}>+ DEFENSA</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true})}>+ DEFENSA</button></span>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
                     {partes.map((input, index) => (
                         <div key={input.id}>
-                            <select className={`${styles.inputLeft} ${styles.inputLeft15}  ${styles.inputLeftSelect}`} value={input.role} onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}>
+                            <select className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`} value={input.role} onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}>
                             <option value=""></option>
                             {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte =>(
                                     <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
                             </select>
-                            <input className={`${styles.inputLeft} ${styles.inputLeft33}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
-                            <input className={`${styles.inputLeft} ${styles.inputLeft33}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
+                            <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
+                            <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
+                                {input.presencial ?  'FIS' : 'VIR'}
+                            </button>
                             <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '' })}>+ PARTE</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', asistencia: true, presencial: true  })}>+ PARTE</button></span>
             {(item.hora && item.hitos && checkHoraDiff() > 5) &&
                 <>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
