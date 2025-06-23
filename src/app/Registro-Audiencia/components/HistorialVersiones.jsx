@@ -17,7 +17,7 @@ export default function HistorialDeVersiones({ fecha, legajo, hora, onSelecciona
 
   return (
     <select className={`${styles.backupList}`} onChange={(e) => {
-        const seleccion = versiones[e.target.value];n
+        const seleccion = versiones[e.target.value];
         if (seleccion) onSeleccionar(seleccion.cambios);
     }}>
         {versiones.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map((v, i) => (

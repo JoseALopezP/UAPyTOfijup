@@ -23,7 +23,7 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction, 
         <><div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>
             <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={[styles.listadoBlock]}>{bydate && bydate.sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el =>(
-                <AudienciaRegistroIndiv key={el.numeroLeg+el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud===el.numeroLeg+el.hora}/>
+                <AudienciaRegistroIndiv key={el.numeroLeg + el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud===el.numeroLeg+el.hora}/>
             ))}</div>
         </div>
         <div className={isHovered ? `${styles.expandBlock} ${styles.expandBlockHovered}` : `${styles.expandBlock}`}>

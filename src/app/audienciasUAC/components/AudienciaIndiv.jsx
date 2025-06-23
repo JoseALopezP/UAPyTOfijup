@@ -146,7 +146,7 @@ export function AudienciaIndiv({ date, element }) {
                     {(element.estado == 'PROGRAMADA') ? <><button type="button" className={cancelar ? `${styles.cancelarButton} ${styles.cancelarButtonClicked}` : `${styles.cancelarButton}`} onClick={()=>setCancelar(!cancelar)}>CANCELAR</button> 
                     <button type="button" className={reprogramar ? `${styles.reprogramarButton} ${styles.reprogramarButtonClicked}` : `${styles.reprogramarButton}`} onClick={()=>setReprogramar(!reprogramar)}>REPROGRAMAR</button> 
                     </>:
-                    <>{checkForResuelvo(element) ? <button className={oficio ? `${styles.controlButton} ${styles.controlButtonOficio} ${styles.controlButtonOficioClicked}` : `${styles.controlButton} ${styles.controlButtonOficio}`} onClick={() => setOficio(!oficio)}>OFICIO</button> : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado.split('_').join(' ')}</p>}
+                    <>{checkForResuelvo(element) ? <button className={oficio ? `${styles.controlButton} ${styles.controlButtonOficio} ${styles.controlButtonOficioClicked}` : `${styles.controlButton} ${styles.controlButtonOficio}`} onClick={() => setOficio(!oficio)}>OFICIO</button> : <p className={`${styles.audienciaCancelada} ${styles[element.estado]}`}>{element.estado ? element.estado.split('_').join(' ') : ''}</p>}
                     </>}
                 </span>
                 <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span></>
