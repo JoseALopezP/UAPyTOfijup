@@ -384,7 +384,7 @@ export function AddAudienciaForm({ dateFunction, date }) {
           <p className={`${styles.titleInput}`}>JUEZ</p>
           <input
             list="jueces"
-            className={juezError ? `${styles.inputError}` : ""}
+            className={juezError ? `${styles.inputError} ${styles.tableCellInput}` : `${styles.tableCellInput}`}
             value={juez}
             onChange={(e) => updateField("juez", e.target.value)}
           />
@@ -392,13 +392,13 @@ export function AddAudienciaForm({ dateFunction, date }) {
             <>
               <input
                 list="jueces"
-                className={juezError ? `${styles.inputError}` : ""}
+                className={juezError ? `${styles.inputError} ${styles.tableCellInput}` : `${styles.tableCellInput}`}
                 value={juez2}
                 onChange={(e) => updateField("juez2", e.target.value)}
               />
               <input
                 list="jueces"
-                className={juezError ? `${styles.inputError}` : ""}
+                className={juezError ? `${styles.inputError} ${styles.tableCellInput}` : `${styles.tableCellInput}`}
                 value={juez3}
                 onChange={(e) => updateField("juez3", e.target.value)}
               />
@@ -412,20 +412,19 @@ export function AddAudienciaForm({ dateFunction, date }) {
                 </option>
               ))}
           </datalist>
-
-          <label className={`${styles.checkColegiado}`}>
-            COLEGIADO
-            <input
-              type="checkbox"
+        </div>
+        <div className={`${styles.inputSituacionBlock} ${styles.inputItemBlock}`}>
+          <p className={`${styles.titleInput}`}>COLEGIADO</p>
+          <input
+              type="checkbox" className={`${styles.uniButton}`}
               checked={colegiado}
               onChange={(e) => updateField("colegiado", e.target.checked)}
             />
-          </label>
         </div>
-
         <div className={`${styles.inputSituacionBlock} ${styles.inputItemBlock}`}>
           <p className={`${styles.titleInput}`}>SITUACIÓN</p>
           <input
+            className={`${styles.tableCellInput}`}
             value={situacion}
             onChange={(e) => updateField("situacion", e.target.value)}
           />
