@@ -7,7 +7,7 @@ import { minutaPrep } from "./minutaPrep";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -15,7 +15,7 @@ export function listFiscal(arr, ufi) {
 export function listDefensa(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `Defensa ${el.tipo}: ${el.nombre} ${el.imputado ? `(En representación de ${el.imputado})` : ''} ${el.asistencia ? '' : '(ausente)'}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `Defensa ${el.tipo}: ${el.nombre} ${el.imputado ? `(En representación de ${el.imputado})` : ''} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -23,7 +23,7 @@ export function listDefensa(arr) {
 export function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'}`;
+        aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}`;
         if (el.detenido && el.detenido !== '') {
             aux += `\nFecha de detención: ${el.detenido}`;
         }
@@ -40,7 +40,7 @@ export function listPartes(arr) {
         }
         let personInfo = el.name ? el.name : '';
         if (el.dni) {
-            personInfo += ` D.N.I. N.°:${el.dni}`;
+            personInfo += ` D.N.I. N.°:${el.dni} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}`;
         }
         if (personInfo.trim() !== '') {
             groupedRoles[el.role].push(personInfo);
