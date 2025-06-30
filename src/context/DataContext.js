@@ -28,6 +28,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
     const [años, setAños] = useState(defaultValue);
     const [jueces, setJueces] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
+    const [byLegajo, setByLegajo] = useState(defaultValue)
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState('')
     const [sorteoList, setSorteoList] = useState([])
@@ -49,6 +50,9 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
             setToday(updatedData);
         });
         return unsubscribe;
+    }
+    const updateByLegajo = async(leg) =>{
+        setByLegajo(await getDocument('legajos',leg))
     }
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))
@@ -150,6 +154,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         deleteDesplegable,
         getByDate,
         updateByDateSorteo,
+        updateByLegajo,
         modelosMinuta,
         dateToUse,
         desplegables,
@@ -158,6 +163,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         años,
         today,
         bydate,
+        byLegajo,
         informacion,
         tiposAudiencias,
         jueces,

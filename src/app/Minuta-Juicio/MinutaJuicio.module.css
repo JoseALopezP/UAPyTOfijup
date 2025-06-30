@@ -1,0 +1,23 @@
+.selectorBar{
+    margin-left: 2.4vw;
+    width: 18vw;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2px;
+    border-right: solid 1px #2B2B2B;
+    height: 99vh;
+}
+.legajo1, .legajo2, .legajo3, .buttonSearch{
+    height: 24px;
+    background-color: transparent;
+    color: #f4f4f4;
+    width: 80px;
+    text-align: center;
+    border: 1px solid #212121;
+    border-radius: 2px;
+}
+.buttonSearch{
+    padding: 3px;
+    cursor: pointer;
+}

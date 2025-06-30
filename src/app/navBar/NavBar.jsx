@@ -9,6 +9,7 @@ export default function NavBar() {
             <IconNavBar iconRoute={'tablero'}/>
             <IconNavBar iconRoute={'Agregar-Audiencia'}/>
             <IconNavBar iconRoute={'Registro-Audiencia'}/>
+            <IconNavBar iconRoute={'Minuta-Juicio'}/>
             <IconNavBar iconRoute={'Sorteo-Operador'}/>
             <IconNavBar iconRoute={'Oficios'}/>
             <IconNavBar iconRoute={'Control-UAC'}/>

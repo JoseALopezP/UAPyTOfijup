@@ -37,7 +37,6 @@ export function AddAudienciaForm({ dateFunction, date }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // Función para validar todo el formulario y devolver objeto con errores
   const validate = (data) => {
     const errs = {};
 
@@ -72,8 +71,6 @@ export function AddAudienciaForm({ dateFunction, date }) {
     if (data.horaProgramada === "" || isNaN(data.horaProgramada)) {
       errs.horaProgramada = "Duración inválida";
     }
-
-    // Validar duplicado
     const formattedHora = `${data.hora.padStart(2, "0")}:${data.hora2.padStart(
       2,
       "0"
@@ -93,12 +90,10 @@ export function AddAudienciaForm({ dateFunction, date }) {
     return errs;
   };
 
-  // Actualizar campo y validar formulario en cada cambio para actualizar errores
   const updateField = (field, value) => {
     setFormData((prev) => {
       const newData = { ...prev, [field]: value };
 
-      // Actualiza errores con la validación del nuevo estado
       const newErrors = validate(newData);
 
       setErrors(newErrors);
@@ -106,7 +101,6 @@ export function AddAudienciaForm({ dateFunction, date }) {
     });
   };
 
-  // Manejador de submit
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -146,7 +140,6 @@ export function AddAudienciaForm({ dateFunction, date }) {
         document.getElementById("addingForm").reset();
         await updateByDate(date);
 
-        // Resetear formulario y errores
         setFormData({
           hora: "",
           hora2: "",
@@ -171,11 +164,8 @@ export function AddAudienciaForm({ dateFunction, date }) {
         setIsSaving(false);
       }
     } else {
-      // Mostrar mensaje de errores combinados
       const msg = Object.values(errs).join(", ");
       setErrorMessage(`Errores: ${msg}`);
-
-      // Quitar mensaje después de 4 seg
       setTimeout(() => setErrorMessage(""), 4000);
     }
   };
@@ -185,7 +175,6 @@ export function AddAudienciaForm({ dateFunction, date }) {
     updateDesplegables();
   }, []);
 
-  // Para mostrar clases de error en inputs
   const horaError = errors.hora;
   const salaError = errors.sala;
   const legajo2Error = errors.legajo2;
@@ -193,7 +182,6 @@ export function AddAudienciaForm({ dateFunction, date }) {
   const juezError = errors.juez;
   const horaProgramadaError = errors.horaProgramada;
 
-  // Para inputs controlar valores del estado
   const {
     hora,
     hora2,
