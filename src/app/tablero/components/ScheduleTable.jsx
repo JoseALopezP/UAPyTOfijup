@@ -46,7 +46,7 @@ export function ScheduleTable({filterValue}) {
                         todayFiltered
                         .filter(sentence =>
                             filterValue.toLowerCase().split(' ').every(word =>
-                                (sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3.toLowerCase().includes(word))
+                                ((sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3).toLowerCase().includes(word))
                             )
                         )
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
@@ -57,11 +57,11 @@ export function ScheduleTable({filterValue}) {
                                         <td>SALA {el.sala}</td>
                                         <td>{el.numeroLeg}</td>
                                         <td>{el.tipo.split('').slice(0,40).join('')}{el.tipo.split('').length>39 ? '...' : ''}</td>
-                                        <td>{el.juez.split('+').map(e => <span key={e}>{e}<br /></span>)}</td>
+                                        <td>{el.juez ? el.juez.split('+').map(e => <span key={e}>{e}<br /></span>) : <span>NA</span>}</td>
                                         {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
                                             <td className={`${styles.DEMORADA}`}>DEMORADA</td>
                                         ) : (
-                                            <td className={el.estado === 'RESUELVO' ? `${styles.FINALIZADA}` : `${styles[el.estado]}`}>{el.estado === 'RESUELVO' ? "FINALIZADA" : el.estado.split('_').join(' ')}</td>
+                                            <td className={el.estado === 'RESUELVO' ? `${styles.FINALIZADA}` : `${styles[el.estado]}`}>{el.estado ? (el.estado === 'RESUELVO' ? "FINALIZADA" : el.estado.split('_').join(' ')) : "NA"}</td>
                                         )}
                                     </tr>
                                 );
