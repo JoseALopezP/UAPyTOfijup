@@ -16,8 +16,10 @@
     text-align: center;
     border: 1px solid #212121;
     border-radius: 2px;
+    font-family: inherit;
 }
 .buttonSearch{
     padding: 3px;
     cursor: pointer;
+    height: 30px;
 }
