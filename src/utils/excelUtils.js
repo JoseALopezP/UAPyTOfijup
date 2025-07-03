@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import excelTranslate from './uploadTranslates';
 
 export function formatDate(date) {
   const day = String(date.getDate()).padStart(2, '0');
@@ -87,10 +88,10 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
             ,cantidadImp: item.imputado ? `${item.imputado.length}` : ''
             ,tipoVict: ''
             ,sala: `${item.sala}`
-            ,operador: `${item.operador}`
-            ,fiscal: item?.mpf?.[0]?.nombre ? `${item.mpf?.[0]?.nombre}` : ''
-            ,defensor: item?.defensa?.[0]?.nombre ? `${item.defensa?.[0]?.nombre}` : ''
-            ,juez: `${item.juez.split('. ')[1]}`
+            ,operador: excelTranslate(`${item.operador}`,'operador')
+            ,fiscal: excelTranslate(item?.mpf?.[0]?.nombre ? `${item.mpf?.[0]?.nombre}` : '', 'fiscal') 
+            ,defensor: excelTranslate(item?.defensa?.[0]?.nombre ? `${item.defensa?.[0]?.nombre}` : '', 'defensa')
+            ,juez: excelTranslate(`${item.juez.split('. ')[1]}`,'juez')
         });
       });
       currentDate.setDate(currentDate.getDate() + 1);
