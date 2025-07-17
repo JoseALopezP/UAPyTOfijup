@@ -52,7 +52,7 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         return unsubscribe;
     }
     const updateByLegajo = async(leg) =>{
-        setByLegajo(await getDocument('legajos',leg))
+        setByLegajo(await getDocument('legajos', leg))
     }
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))

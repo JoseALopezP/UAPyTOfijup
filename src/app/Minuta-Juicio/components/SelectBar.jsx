@@ -4,7 +4,7 @@ import { DataContext } from '@/context/DataContext';
 import styles from '../MinutaJuicio.module.css'
 import AudList from './AudList';
 
-export default function SelectBar(selectedList, setSelectedList) {
+export default function SelectBar({selectedList, setSelectedList}) {
     const {updateByLegajo, byLegajo, desplegables, updateDesplegables} = useContext(DataContext);
     const [legajo1, setLegajo1] = useState('MPF-SJ')
     const [legajo2, setLegajo2] = useState('')
@@ -16,7 +16,7 @@ export default function SelectBar(selectedList, setSelectedList) {
         updateDesplegables()
     }, [])
     return (
-        <><section className={`${styles.selectorBar}`}>
+        <div className={`${styles.leftColumn}`}><section className={`${styles.selectorBar}`}>
             <span className={`${styles.legajoSelectorBlock}`}><input
                 list="legajoPrefijo"
                 value={legajo1}
@@ -49,6 +49,6 @@ export default function SelectBar(selectedList, setSelectedList) {
             />
             <button type='button' className={`${styles.buttonSearch}`} onClick={() => updateLegajo()}>BUSCAR</button></span>
         </section>
-        <AudList list={byLegajo.filter(value => value.tipo === "DEBATE")} setSelected={setSelectedList}/></>
+        <AudList list={byLegajo /*.filter(value => value.tipo === "DEBATE")*/} setSelected={setSelectedList}/></div>
     )
 }
