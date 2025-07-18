@@ -30,3 +30,15 @@
     display: inline-flex;
     flex-direction: column;
 }
+.audListIndiv{
+    margin: 4px;
+    color: #f4f4f4;
+    border-radius: 4px;
+    padding: 10px;
+    border: solid 1px #2B2B2B;
+    cursor: pointer;
+}
+.audListIndiv:hover{
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
