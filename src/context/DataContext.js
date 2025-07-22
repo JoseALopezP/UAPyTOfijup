@@ -51,9 +51,14 @@ export const DataContextProvider = ({defaultValue = [], children}) => {
         });
         return unsubscribe;
     }
-    const updateByLegajo = async(leg) =>{
-        setByLegajo(await getDocument('legajos', leg))
-    }
+    const updateByLegajo = async (leg) => {
+        const documentData = await getDocument('legajos', leg);
+        if (documentData === null || documentData === undefined ) {
+            setByLegajo([0]);
+        } else {
+            setByLegajo(documentData);
+        }
+    };
     const updateByDate = async(date) => {
         setBydate(await getDocument('audiencias', date))
     }
