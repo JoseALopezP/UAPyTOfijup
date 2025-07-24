@@ -25,7 +25,8 @@ export const nameTranslate = (operadorName) =>{
         "Fernández Chipre, Cecilia": 'CHECHU',
         "Martinazzo, Ignacio": 'IGNA',
         "Venerado, Tomás": 'TOMI',
-        "Narvaez, Facundo Nahuel": 'FACU'
+        "Narvaez, Facundo Nahuel": 'FACU',
+        "Paroli, Carla Antonela": 'ANTO'
     }
     return traducciones[operadorName]
 }
