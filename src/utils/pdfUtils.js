@@ -90,7 +90,6 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
       const availableWidth = isFirstLine ? textWidth - indent : textWidth;
 
       if (index === lines.length - 1) {
-        // Última línea: alineada normal (sin justificación)
         let x = xStart;
         words.forEach(({ word, bold }) => {
           doc.setFont(bold ? "arialbd" : "arial", "normal");
@@ -98,7 +97,6 @@ function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, inde
           x += doc.getTextWidth(word + " ");
         });
       } else {
-        // Justificar línea
         const totalWordWidth = words.reduce((sum, { word, bold }) => {
           doc.setFont(bold ? "arialbd" : "arial", "normal");
           return sum + doc.getTextWidth(word);

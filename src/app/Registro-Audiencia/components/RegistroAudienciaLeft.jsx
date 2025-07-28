@@ -182,14 +182,6 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
         return hora2 - hora1;
     };
     useEffect(() => {
-        const interval = setInterval(() => {
-            if(document.getElementById('submit-btn') && !showReconversion){
-                document.getElementById('submit-btn').click();
-            }
-        }, 60000);
-        return () => clearInterval(interval);
-      }, []);
-    useEffect(() => {
         checkUFI()
     }, [mpf])
     useEffect(() => {

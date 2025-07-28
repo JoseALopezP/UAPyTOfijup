@@ -117,14 +117,6 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     return () => clearInterval(interval);
     }, [resuelvo, minuta, cierre, dateToUse, item.numeroLeg, item.hora]);
     useEffect(() => {
-        const interval = setInterval(() => {
-            if(document.getElementById('submit-btn')){
-                document.getElementById('submit-btn').click();
-            }
-        }, 60000);
-        return () => clearInterval(interval);
-      }, []);
-    useEffect(() => {
         checkGuardar();
     }, [resuelvo, minuta, cierre, checkGuardar]);
     useEffect(() => {
