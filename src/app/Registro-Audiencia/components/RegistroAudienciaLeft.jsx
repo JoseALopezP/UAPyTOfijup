@@ -31,6 +31,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
     const [removedImputado, setRemovedImputado] = useState([]);
     const [removedPartes, setRemovedPartes] = useState([]);
     const [showEditHitos, setShowEditHitos] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
     const checkUFI = () =>{
         if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
             setUfi(mpf[0].nombre.split(' - ')[1])
@@ -75,6 +76,8 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
         setTipo2Aux(item.tipo2 || '');
         setTipo3(item.tipo3 || '');
         setTipo3Aux(item.tipo3 || '');
+
+        setIsInitialized(true);
     };
     
     const updateDataAud = async() =>{
@@ -188,8 +191,10 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
         updateDesplegables();
     }, []);
     useEffect(() => {
+    if (isInitialized) {
         checkGuardar();
-    }, [caratula, mpf, defensa, imputado, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3]);
+    }
+    }, [caratula, mpf, defensa, imputado, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3, isInitialized]);
     useEffect(() => {
         updateComparisson();
     }, [item]);
@@ -197,9 +202,6 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
         setSala(item.sala);
         setShowEditHitos(false)
     }, [item]);
-    useEffect(() => {
-        checkGuardar();
-    }, [guardarInc]);
     useEffect(() => {
         updateDesplegables()
     }, [])

@@ -12,6 +12,7 @@ import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 import HistorialDeVersiones from './HistorialVersiones';
+import normalizeHtml from '@/utils/normalizeHtml';
 
 function extractNames(obj) {
     return Object.keys(obj);
@@ -29,6 +30,7 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const [reloadHistorial, setReloadHistorial] = useState(0);
+    const [isInitialized, setIsInitialized] = useState(false);
     const updateComparisson = () => {
         setResuelvo(item.resuelvoText || '');
         setResuelvo2(item.resuelvoText || '');
@@ -36,6 +38,7 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
         setMinuta2(item.minuta || '');
         setCierre(item.cierre || '');
         setCierre2(item.cierre || '');
+        setIsInitialized(true);
     };
     const insertarModelo = () =>{
         if(minuta.replace(/<[^>]*>/g, '') !== '' || resuelvo.replace(/<[^>]*>/g, '') !== ''){
@@ -77,8 +80,8 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     }
     const checkGuardar = useCallback(() => {
         const guardarStatus = !deepEqual(resuelvo2, resuelvo) ||
-            !deepEqual(minuta2, minuta) ||
-            !deepEqual(cierre2, cierre)
+            !deepEqual(normalizeHtml(minuta2), normalizeHtml(minuta)) ||
+            !deepEqual(normalizeHtml(cierre2), normalizeHtml(cierre))
         setGuardarInc(guardarStatus);
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const callUpdateModelosMinuta = () =>{
@@ -117,17 +120,16 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     return () => clearInterval(interval);
     }, [resuelvo, minuta, cierre, dateToUse, item.numeroLeg, item.hora]);
     useEffect(() => {
-        checkGuardar();
-    }, [resuelvo, minuta, cierre, checkGuardar]);
+        if (isInitialized) {
+            checkGuardar();
+        }
+    }, [resuelvo, minuta, cierre, isInitialized]);
+
     useEffect(() => {
         updateComparisson();
         setGuardarInc(false)
         setGuardando(false)
     }, [item]);
-    useEffect(() => {
-        checkGuardar();
-    }, [guardarInc]);
-
     return (
         <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
                 <p>{checkDescarga}</p>
