@@ -10,7 +10,7 @@ import deepEqual from '@/utils/deepEqual';
 import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
 
-export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
@@ -177,6 +177,7 @@ export default function RegistroAudienciaLeft({ item, dateToUse, isHovered, sala
             !deepEqual(ufi2, ufi);
     
         setGuardarInc(guardarStatus);
+        setNeedsSaving1(guardarStatus)
     }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion, saeNum, saeNum2]);
 
     const checkHoraDiff = () => {

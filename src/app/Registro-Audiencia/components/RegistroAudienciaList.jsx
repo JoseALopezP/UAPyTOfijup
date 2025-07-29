@@ -8,7 +8,7 @@ import { useAuthContext } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
-export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered}) {
+export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered, needsSaving1, needsSaving2}) {
     const router = useRouter()
     const {updateByDate, bydate} = useContext(DataContext)
     const { user } = useAuthContext()
@@ -23,7 +23,7 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction, 
         <><div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>
             <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={[styles.listadoBlock]}>{bydate && bydate.sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el =>(
-                <AudienciaRegistroIndiv key={el.numeroLeg + el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud===el.numeroLeg+el.hora}/>
+                <AudienciaRegistroIndiv key={el.numeroLeg + el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud===el.numeroLeg+el.hora} needsSaving1={needsSaving1} needsSaving2={needsSaving2}/>
             ))}</div>
         </div>
         <div className={isHovered ? `${styles.expandBlock} ${styles.expandBlockHovered}` : `${styles.expandBlock}`}>

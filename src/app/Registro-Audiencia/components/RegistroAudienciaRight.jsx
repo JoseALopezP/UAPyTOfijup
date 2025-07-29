@@ -18,7 +18,7 @@ function extractNames(obj) {
     return Object.keys(obj);
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
-export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
+export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
     const {updateData, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
@@ -83,6 +83,7 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
             !deepEqual(normalizeHtml(minuta2), normalizeHtml(minuta)) ||
             !deepEqual(normalizeHtml(cierre2), normalizeHtml(cierre))
         setGuardarInc(guardarStatus);
+        setNeedsSaving2(guardarStatus)
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const callUpdateModelosMinuta = () =>{
         updateModelosMinuta()
@@ -103,7 +104,7 @@ export default function RegistroAudienciaRight({ item, dateToUse, resuelvo, setR
     useEffect(() => {
     const interval = setInterval(() => {
         const cambios = {};
-        if (resuelvo && removeHtmlTags(resuelvo) !== '') {
+        if (resuelvo && removeHtmlTags(resuelvo) !== '') { 
         cambios.resuelvoText = resuelvo;
         }
         if (minuta && removeHtmlTags(minuta) !== '') {

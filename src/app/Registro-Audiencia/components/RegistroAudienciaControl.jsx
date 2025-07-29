@@ -5,7 +5,7 @@ import { DataContext } from '@/context/DataContext';
 import RegistroAudienciaLeft from './RegistroAudienciaLeft';
 import RegistroAudienciaRight from './RegistroAudienciaRight';
 
-export default function RegistroAudienciaControl({ aud, dateToUse, isHovered}) {
+export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, setNeedsSaving1, setNeedsSaving2}) {
     const {updateDesplegables} = useContext(DataContext)
     const [resuelvo, setResuelvo] = useState('');
     const [minuta, setMinuta] = useState('');
@@ -41,8 +41,10 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered}) {
                 tipo={tipo} setTipo={setTipo} 
                 tipo2={tipo2} setTipo2={setTipo2} 
                 tipo3={tipo3} setTipo3={setTipo3} 
-                partes={partes} setPartes={setPartes}/>
+                partes={partes} setPartes={setPartes}
+                setNeedsSaving1={setNeedsSaving1}/>
             <RegistroAudienciaRight item={aud} dateToUse={dateToUse}
+                setNeedsSaving2={setNeedsSaving2}
                 resuelvo={resuelvo} setResuelvo={setResuelvo}
                 minuta={minuta} setMinuta={setMinuta}
                 cierre={cierre} setCierre={setCierre}
