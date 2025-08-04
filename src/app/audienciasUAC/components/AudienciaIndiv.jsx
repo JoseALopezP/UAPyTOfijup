@@ -5,7 +5,7 @@ import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { Oficio } from './Oficio';
 
 export function AudienciaIndiv({ date, element }) {
-    const { updateByDate, jueces, updateData, deleteAudiencia } = useContext(DataContext);
+    const { updateByDate, updateData, deleteAudiencia, updateDesplegables, desplegables } = useContext(DataContext);
     const [oficio, setOficio] = useState(false);
     const [editable, setEditable] = useState(false);
     const [changeButton, setChangeButton] = useState(false);
@@ -100,7 +100,9 @@ export function AudienciaIndiv({ date, element }) {
         setComentario('');
         setControl('nocontrolado');
     };
-
+    useEffect(() => {
+        updateDesplegables()
+    }, [])
     useEffect(() => {
         checkEditing();
     }, [deleteAud, comentario, control, admin, resultado, cancelar, reprogramar, juezN, situacion, hora]);
@@ -156,7 +158,7 @@ export function AudienciaIndiv({ date, element }) {
             <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>
                 <select onChange={(e)=>{setJuezN(e.target.value)}}>
                     {element.juezN ? <option key={element.juezN} value={element.juezN}>{element.juezN.split(' ').slice(1,4).map(word => word.substring(0, 1))}</option> : <option></option>}
-                    {jueces && jueces.sort().map((el) =>{
+                    {desplegables.jueces && desplegables.jueces.sort().map((el) =>{
                         return(
                             <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
                         )

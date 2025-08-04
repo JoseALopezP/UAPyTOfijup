@@ -189,9 +189,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         checkUFI()
     }, [mpf])
     useEffect(() => {
-        updateDesplegables();
-    }, []);
-    useEffect(() => {
     if (isInitialized) {
         checkGuardar();
     }

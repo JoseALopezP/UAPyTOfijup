@@ -1,32 +1,16 @@
-import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);
 
-export default async function pushToHitos(collectionName, documentId, searchValue1, searchValue2, newHitosItem) {
+export default async function pushToHitos(collectionName, fechaId, hora, numeroLeg, nuevoHito) {
     try {
-        const docRef = doc(db, collectionName, documentId);
-        const docSnapshot = await getDoc(docRef);
-
-        if (docSnapshot.exists()) {
-            let { list } = docSnapshot.data();
-            const listItem = list.find(item => (item.numeroLeg === searchValue1 || item.fecha === searchValue1) && item.hora === searchValue2);
-            if (listItem) {
-                if (!listItem.hasOwnProperty("hitos")) {
-                    listItem.hitos = [];
-                }
-                let { hitos } = listItem;
-                hitos.push(newHitosItem);
-                listItem.hitos = hitos;
-                list[list.indexOf(listItem)] = listItem;
-                await updateDoc(docRef, { list });
-            } else {
-                console.log("List item not found for search values:", searchValue1, searchValue2);
-            }
-        } else {
-            console.log("Document not found.");
-        }
-    } catch (error) {
-        console.error("Error updating document:", error);
+        const docId = `${hora}${numeroLeg}`;
+        const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
+        await updateDoc(docRef, {
+            hitos: arrayUnion(nuevoHito)
+        });
+    } catch (e) {
+        console.error("Error pushing to hitos:", e);
     }
 }

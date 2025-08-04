@@ -2,17 +2,17 @@ import firebase_app from "../config";
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 
 const db = getFirestore(firebase_app)
-export default async function getDocument(collectionName, documentId) {
+export default async function getDocument(collectionName, fechaId, hora, numeroLeg) {
     try {
-        const docRef = doc(db, collectionName, documentId);
-        const docSnapshot = await getDoc(docRef);
-        if (docSnapshot.exists()) {
-            return docSnapshot.data().list;
-        } else {
-            return [];
+        const docId = `${hora}${numeroLeg}`;
+        const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+            return snapshot.data();
         }
+        return null;
     } catch (e) {
-        console.log(e);
-        return []
+        console.error("Error getting document:", e);
+        return null;
     }
 }

@@ -1,18 +1,14 @@
 import firebase_app from "../config";
-import { getFirestore, getDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, getDocs} from "firebase/firestore";
 
 const db = getFirestore(firebase_app)
-export default async function getList(collectionName, documentId) {
+export default async function getList(collectionName, fechaId) {
     try {
-        const docRef = doc(db, collectionName, documentId);
-        const docSnapshot = await getDoc(docRef);
-        if (docSnapshot.exists()) {
-            return docSnapshot.data();
-        } else {
-            return [];
-        }
+        const subcol = collection(db, collectionName, fechaId, "audiencias");
+        const snapshot = await getDocs(subcol);
+        return snapshot.docs.map(doc => doc.data());
     } catch (e) {
-        console.log(e);
-        return []
+        console.error("Error fetching list:", e);
+        return [];
     }
 }

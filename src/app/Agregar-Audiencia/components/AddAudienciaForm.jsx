@@ -6,9 +6,7 @@ import { SelectDate } from "@/app/components/SelectDate";
 
 export function AddAudienciaForm({ dateFunction, date }) {
   const {
-    updateTiposAudiencias,
     updateByDate,
-    tiposAudiencias,
     updateDesplegables,
     addAudiencia,
     bydate,
@@ -56,17 +54,18 @@ export function AddAudienciaForm({ dateFunction, date }) {
 
     if (data.colegiado) {
       if (
-        !desplegables.jueces.includes(data.juez) ||
-        !desplegables.jueces.includes(data.juez2) ||
-        !desplegables.jueces.includes(data.juez3)
+        !desplegables.jueces?.includes(data.juez) ||
+        !desplegables.jueces?.includes(data.juez2) ||
+        !desplegables.jueces?.includes(data.juez3)
       ) {
         errs.juez = "Todos los jueces deben ser válidos";
       }
     } else {
-      if (!desplegables.jueces.includes(data.juez)) {
+      if (!desplegables.jueces?.includes(data.juez)) {
         errs.juez = "Juez inválido o no seleccionado";
       }
     }
+
 
     if (data.horaProgramada === "" || isNaN(data.horaProgramada)) {
       errs.horaProgramada = "Duración inválida";
@@ -171,9 +170,11 @@ export function AddAudienciaForm({ dateFunction, date }) {
   };
 
   useEffect(() => {
-    updateTiposAudiencias();
     updateDesplegables();
   }, []);
+  useEffect(() => {
+    console.log("Desplegables actualizados:", desplegables);
+  }, [desplegables]);
 
   const horaError = errors.hora;
   const salaError = errors.sala;
@@ -359,8 +360,8 @@ export function AddAudienciaForm({ dateFunction, date }) {
             </>
           )}
           <datalist id="tipo" className={`${styles.tableCellInput}`}>
-            {tiposAudiencias &&
-              tiposAudiencias.map((el) => (
+            {desplegables.tipos &&
+              desplegables.tipos.map((el) => (
                 <option key={el} value={el}>
                   {el}
                 </option>
