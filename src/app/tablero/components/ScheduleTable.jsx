@@ -5,11 +5,15 @@ import { DataContext } from '@/context/DataContext';
 export function ScheduleTable({filterValue}) {
     const { updateToday, today, realTime} = useContext(DataContext);
     const [todayFiltered, setTodayFiltered] = useState(today)
-    useEffect(() => {
+    const tick = () =>{
         updateToday()
-    }, []);
+    }
     useEffect(() => {
-    }, [today]);
+        const timerID = setInterval(() => tick(), 60000);
+        return function cleanup() {
+            clearInterval(timerID);
+        };
+    }, []);
     useEffect(()=>{
         const filteredData = today?.filter((sentence) => {
             const searchableText = [
