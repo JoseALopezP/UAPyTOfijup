@@ -171,13 +171,18 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
   };
 
   const deleteAudiencia = async (date, searchValLeg, searchValHora) => {
+    const sanitizedHora = searchValHora.replace(/:/g, '');
+    const docId = sanitizedHora + searchValLeg;
     await removeFromArray("audiencias", date, searchValHora, searchValLeg);
-    await removeStringFromList("legajos", searchValLeg, "list", {
+    await removeStringFromList("legajos", docId, "list", {
       hora: searchValHora,
       numeroLeg: searchValLeg,
       fecha: date,
     });
   };
+
+
+
 
 
   const addInfo = async (data) => {
