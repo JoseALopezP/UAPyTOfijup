@@ -17,9 +17,6 @@ export default function ListFormAudList({filtroValue,operadorFilled}) {
             case 'JUEZ':
                 return (!a.juez ? 1 : !b.juez ? -1 : a.juez.localeCompare(b.juez));
             case 'DURACIÓN':
-                //const durationA = a.tipo ? demoraCalculator(a.tipo) : 0;
-                //const durationB = b.tipo ? demoraCalculator(b.tipo) : 0;
-                //return durationA - durationB;
             default:
                 return 0;
         }

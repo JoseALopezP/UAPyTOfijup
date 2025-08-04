@@ -98,7 +98,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     }
   };
 
-
   const updateModelosMinuta = async () => {
     const docData = await getDocumentGeneral("desplegables", "modelosMinuta");
     if (docData) {
