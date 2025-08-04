@@ -49,14 +49,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
   };
 
   const updateToday = async () => {
-    const unsubscribe = updateDocumentListener(
-      "audiencias",
-      todayFunction(),
-      (updatedData) => {
-        setToday(updatedData);
-      }
-    );
-    return unsubscribe;
+    const data = await getList("audiencias", todayFunction());
+    setToday(data || []);
   };
 
   const updateByLegajo = async (leg) => {
@@ -106,8 +100,12 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
 
 
   const updateModelosMinuta = async () => {
-    const data = await getList("desplegables", "modelosMinuta");
-    setModelosMinuta(data || []);
+    const docData = await getDocumentGeneral("desplegables", "modelosMinuta");
+    if (docData) {
+      setModelosMinuta(docData);
+    } else {
+      setModelosMinuta({});
+    }
   };
 
   const pushtToArray = async (date, searchValLeg, searchValHora, newValue) => {
