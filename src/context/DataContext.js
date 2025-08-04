@@ -181,10 +181,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     });
   };
 
-
-
-
-
   const addInfo = async (data) => {
     await addData("informacion", data);
   };

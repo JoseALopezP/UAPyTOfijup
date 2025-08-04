@@ -8,7 +8,7 @@ import SitCorporalList from './SitCorporalList';
 export default function SitCorporalBlock() {
     const [dateToUSe, setDateToUse] = useState(null);
     const [legSearch, setLegSearch] = useState('');
-    const { updateByDateListener, bydate } = useContext(DataContext);
+    const { updateByDate, bydate } = useContext(DataContext);
     const mensajeCopiaRef = useRef(null);
     const [manualCopyText, setManualCopyText] = useState('');
 
@@ -57,14 +57,8 @@ export default function SitCorporalBlock() {
         }
     }, []);
     useEffect(() => {
-        let unsubscribe;
-        if (updateByDateListener && dateToUSe) {
-            unsubscribe = updateByDateListener(dateToUSe);
-        }
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
-    }, [dateToUSe, updateByDateListener]);
+        updateByDate(dateToUSe)
+    }, [dateToUSe]);
 
     return (
     <div className={`${styles.sitCorporalContainer}`}>

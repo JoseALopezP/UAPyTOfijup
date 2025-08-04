@@ -22,7 +22,7 @@ export async function getAudienciasByLegajo(numeroLeg) {
 }
 
 export async function deleteAudiencia(fechaId, numeroLeg, hora) {
-  const audId = `${hora}${numeroLeg}`;
+  const audId = `${hora.replace(/:/g, '')}${numeroLeg}`;
   const docRefFecha = doc(db, "audiencias", fechaId, "audiencias", audId);
   await deleteDoc(docRefFecha);
   const docRefLegajo = doc(db, "legajos", numeroLeg, "audiencias", audId);

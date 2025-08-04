@@ -10,11 +10,10 @@ import { useRouter } from 'next/navigation';
 
 export default function AudienciasListBlock({audFunction, dateFunction, dateToUse, showList, setShowList}) {
     const router = useRouter()
-    const {updateByDateListener, bydate, updateDesplegables, updateByDate} = useContext(DataContext)
+    const {bydate, updateDesplegables, updateByDate} = useContext(DataContext)
     const { user } = useAuthContext()
     useEffect(() => {
-        const unsubscribe = updateByDateListener(dateToUse);
-        return () => unsubscribe();
+        updateByDate(dateToUse)
     }, [dateToUse]);
     useEffect(() => {
         if (user == null) router.push("/signin")

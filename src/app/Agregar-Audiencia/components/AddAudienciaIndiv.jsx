@@ -94,7 +94,7 @@ export function AddAudienciaIndiv({date, element}) {
         }
         if(cambios){
             if((minuto !== minutoBis || hora !== horaBis) && hora !== '' && minuto !== ''){
-                await updateData(date, element.numeroLeg, element.hora, 'hora', `${hora}:${minuto}`);
+                await updateData(date, element.numeroLeg, element.hora, 'hora', `${hora.replace(/:/g, '')}:${minuto}`);
                 setHoraBis(hora)
                 setMinutoBis(minuto)}
             if(sala !== salaBis && sala !== ''){
