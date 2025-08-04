@@ -6,13 +6,13 @@ const db = getFirestore(firebase_app);
 export async function saveAudienciaByFecha(fechaId, data) {
   const audId = `${data.hora}${data.numeroLeg}`;
   const docRef = doc(db, "audiencias", fechaId, "audiencias", audId);
-  await setDoc(docRef, data);
+  await setDoc(docRef, data, { merge: true });
 }
 
 export async function saveAudienciaByLegajo(numeroLeg, data) {
   const audId = `${data.hora}${data.numeroLeg}`;
   const docRef = doc(db, "legajos", numeroLeg, "audiencias", audId);
-  await setDoc(docRef, data);
+  await setDoc(docRef, data, { merge: true });
 }
 
 export async function getAudienciasByLegajo(numeroLeg) {
@@ -34,7 +34,7 @@ export default async function addOrUpdateDocument(collectionName, fechaId, data)
     const cleanHora = data.hora.replace(/:/g, '');
     const docId = `${cleanHora}${data.numeroLeg}`;
     const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
-    await setDoc(docRef, data);
+    await setDoc(docRef, data, { merge: true });
   } catch (e) {
     console.error("Error in addOrUpdateDocument:", e);
   }
