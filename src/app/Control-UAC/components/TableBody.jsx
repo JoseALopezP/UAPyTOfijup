@@ -3,13 +3,8 @@ import { DataContext } from '@/context/DataContext'
 import TableIndiv from './tableIndiv'
 
 export default function TableBody({date, filterValue}){
-    const {bydate, updateByDateListener} = useContext(DataContext)
+    const {bydate} = useContext(DataContext)
     const [todayFiltered, setTodayFiltered] = useState(bydate)
-    useEffect(()=>{
-        if(date && date.toString().length===8){
-            updateByDateListener(date)
-        }
-    }, [date])
     useEffect(()=>{
         const filteredData = bydate?.filter((sentence) => {
             const searchableText = [
@@ -28,6 +23,14 @@ export default function TableBody({date, filterValue}){
         });
         setTodayFiltered(filteredData)
     }, [filterValue, bydate])
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (date) {
+                updateByDate(date);
+            }
+        }, 60000); 
+        return () => clearTimeout(handler);
+    }, []);
     return (<>
         {todayFiltered &&
             todayFiltered

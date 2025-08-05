@@ -12,21 +12,9 @@ export function AudienciaAddList() {
             if (dateToUse) {
                 updateByDate(dateToUse);
             }
-        }, 1500); 
+        }, 60000); 
         return () => clearTimeout(handler);
     }, [dateToUse]);
-    function tick() {
-        if (dateToUse) {
-            updateByDate(dateToUse);
-        }
-    }
-    useEffect(() => {
-        const timerID = setInterval(() => tick(), 30000);
-        return function cleanup() {
-            clearInterval(timerID);
-        };
-    }, [dateToUse]);
-
     return (
         <section className={styles.audienciaListSection}>
             <div className={styles.audienciaListTable}>

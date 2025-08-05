@@ -18,10 +18,6 @@ export function AddAudienciaBlock() {
         updateByDate(dateToUse)
     }
     useEffect(() => {
-        updateByDate(dateToUse)
-    }, [dateToUse])
-    useEffect(() => {
-        updateByDate(dateToUse)
         updateDesplegables()
     }, [])
     useEffect(() => {
