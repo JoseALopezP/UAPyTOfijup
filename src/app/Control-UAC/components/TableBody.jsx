@@ -25,12 +25,15 @@ export default function TableBody({date, filterValue}){
     }, [filterValue, bydate])
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (date) {
-                updateByDate(date);
+            if (dateToUse) {
+                updateByDate(dateToUse);
             }
         }, 60000); 
         return () => clearTimeout(handler);
-    }, []);
+    },[]);
+    useEffect(()=>{
+        updateByDate(dateToUse);
+    },[dateToUse])
     return (<>
         {todayFiltered &&
             todayFiltered
