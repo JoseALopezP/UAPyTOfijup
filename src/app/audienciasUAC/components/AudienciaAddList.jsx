@@ -8,13 +8,12 @@ export function AudienciaAddList() {
     const { updateByDate, bydate } = useContext(DataContext);
     const [dateToUse, setDateToUse] = useState('');
     useEffect(() => {
+        if (!dateToUse) return;
         updateByDate(dateToUse);
-        const handler = setTimeout(() => {
-            if (dateToUse) {
-                updateByDate(dateToUse);
-            }
-        }, 60000); 
-        return () => clearTimeout(handler);
+        const interval = setInterval(() => {
+            updateByDate(dateToUse);
+        }, 30000);
+        return () => clearInterval(interval); 
     }, [dateToUse]);
     return (
         <section className={styles.audienciaListSection}>
