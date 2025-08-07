@@ -390,7 +390,7 @@ const operadoresTranslate = {
   "Soria, Martín": "MARTIN SORIA",
   "Naranjo, María Agustina": "AGUSTINA NARANJO",
   "Zamudio, Francisco": "FRANCISCO ZAMUDIO",
-  "Manzione, Juliana": "JULIANA MANZION",
+  "Manzione, Juliana": "JULIANA MANZIONE",
   "Carpio, Florencia": "FLORENCIA CARPIO",
   "Sánchez, Martina": "MARTINA SANCHEZ",
   "González, Sofía": "SOFIA GONZALEZ",

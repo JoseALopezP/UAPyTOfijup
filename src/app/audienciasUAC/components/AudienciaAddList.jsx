@@ -8,6 +8,7 @@ export function AudienciaAddList() {
     const { updateByDate, bydate } = useContext(DataContext);
     const [dateToUse, setDateToUse] = useState('');
     useEffect(() => {
+        updateByDate(dateToUse);
         const handler = setTimeout(() => {
             if (dateToUse) {
                 updateByDate(dateToUse);
