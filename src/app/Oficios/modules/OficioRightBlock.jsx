@@ -27,14 +27,8 @@ export default function OficioRightBlock({aud, date}) {
         setMinuta2(aud.minuta || '');
     };
     const handleShow = () =>{
-        if(testOficio(aud)){
-            setShowOficio(!showOficio)
-        }else{
-            setShowStop(true)
-            setTimeout(() =>{
-                setShowStop(false)
-            }, 2000)
-        }
+        setShowOficio(!showOficio)
+ 
     }
     const updateDataAud = async() =>{
             setGuardando(true)
@@ -80,7 +74,7 @@ export default function OficioRightBlock({aud, date}) {
                 {aud && aud.estado && minutaShow === 'caratula' && <div className={styles.oficioText}>{caratulaGenerator(aud, date)}</div>}
                 {aud.resuelvoText && minutaShow === 'resuelvo' && <TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>}</div>
         </div>
-        <button className={styles.oficioButton} onClick={() => handleShow()}>{showStop ? 'FALTAN DATOS' : 'GENERAR OFICIO'}</button>
+        <button className={styles.oficioButton} onClick={() => handleShow()}>GENERAR OFICIO</button>
         {showOficio && <GeneradorOficioBlock item={aud} date={date} resuelvo={resuelvo}/>}</>
     )
 }
