@@ -10,6 +10,7 @@
 .audienciaListTableHead{
     width: calc(100vw - (100vw - 100%));
     text-align: center;
+    position: sticky;
 }
 .inputLegajoBlock{
     display: inline-flex;
@@ -516,7 +517,13 @@
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
 }
-
+.buttonRefresh{
+    width: 24px;
+    height: 20px;
+    background-color: white;
+    border-radius: 2px;
+    cursor: pointer;
+}
 .oficioBlock{
     display: inline-flex;
     flex-direction: row;

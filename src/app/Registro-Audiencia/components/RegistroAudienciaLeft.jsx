@@ -350,11 +350,15 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
                     {partes.map((input, index) => (
                         <div key={input.id}>
-                            <select className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`} value={input.role} onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}>
-                            <option value=""></option>
-                            {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte =>(
-                                    <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
-                            </select>
+                            <input list='partesVarias'
+                                className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`}
+                                value={input.role}
+                                onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
+                                placeholder="tipo"/>
+                            <datalist id='partesVarias'>
+                                {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte =>(
+                                <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
+                            </datalist>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>

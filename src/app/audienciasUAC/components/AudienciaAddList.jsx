@@ -29,6 +29,7 @@ export function AudienciaAddList() {
                             value={dateToUse}
                             onChange={(e) => setDateToUse(e.target.value)}
                         />
+                        <button className={styles.buttonRefresh} onClick={() => updateByDate(dateToUse)}>⟳</button>
                     </span>
                     <span className={`${styles.tableCell} ${styles.tableCellJuez}`}>JUEZ</span>
                     <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>NAT</span>
