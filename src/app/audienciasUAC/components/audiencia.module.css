@@ -10,7 +10,6 @@
 .audienciaListTableHead{
     width: calc(100vw - (100vw - 100%));
     text-align: center;
-    position: sticky;
 }
 .inputLegajoBlock{
     display: inline-flex;
