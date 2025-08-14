@@ -2,6 +2,8 @@
 import { nameTranslateActuario } from '@/utils/traductorNombres'
 import styles from '../Oficios.module.css'
 import { oficioState } from '@/utils/oficioState'
+import { useContext, useEffect, useState } from 'react'
+import { DataContext } from '@/context/DataContext'
 
 const SVGs = {
     'vacio': (
@@ -27,16 +29,32 @@ const SVGs = {
     )
     
 }
-export default function AudienciasListIndiv({item, audFunction}) {
+export default function AudienciasListIndiv({item, audFunction, dateToUse}) {
+    const [actuario, setActuario] = useState(nameTranslateActuario(item.actuario) || '');
+    const {desplegables, updateData, updateDesplegables} = useContext(DataContext);
+    const handleChange = (value) =>{
+        setActuario(value)
+        updateData(dateToUse, item.numeroLeg, item.hora, 'actuario', value);
+    }
+    useEffect(() => {
+        updateDesplegables()
+    }, []);
     return (
         <div onClick={()=> (item.estado==='FINALIZADA' || item.estado==='RESUELVO') && audFunction(item)} className={`${styles.audienciasListIndivBlock}`} title={oficioState(item)}>
             <div className={styles.block1}>
                 {SVGs[oficioState(item)]}
             </div>
             <div className={styles.block2}>
-                <span className={styles.legajoActuarioSpan}><p className={styles.legajoTitle}>{item.numeroLeg}</p>{item.actuario && <p className={styles.actuarioName}>{nameTranslateActuario(item.actuario)}</p>}</span>
+                <span className={styles.legajoActuarioSpan}><p className={styles.legajoTitle}>{item.numeroLeg}</p>
+                {item.actuario && <select className={styles.actuarioName} onChange={(e)=>{handleChange(e.target.value)}} value={actuario}>
+                    <option>{nameTranslateActuario(item.actuario)}</option>
+                    <option value={''}></option>
+                    {desplegables.actuario && desplegables.actuario.map(el => {
+                        return <option key={el} value={el}>{nameTranslateActuario(el)}</option>
+                    })}
+                </select>}</span>
                 <p className={styles.tipoTitle}>{item.tipo}</p>
-                <p className={styles.juezTitle}>{item.juez.split(' ').splice(1,1)} {item.juez.split(' ').splice(2,2).join(' ')}</p>
+                <p className={styles.juezTitle}>{item.juez && item.juez.split(' ').splice(1,1)} {item.juez && item.juez.split(' ').splice(2,2).join(' ')}</p>
             </div>
         </div>
     )

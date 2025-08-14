@@ -29,7 +29,7 @@ export default function AudienciasListBlock({audFunction, dateFunction, dateToUs
                 <SelectDate dateFunction={dateFunction} date={dateToUse}/> 
                 <SorteoModule date={dateToUse} arr={bydate}/></>}
                 </span>
-            {bydate && <AudienciasListDisplay arr={bydate} audFunction={audFunction}/>}
+            {bydate && <AudienciasListDisplay arr={bydate} audFunction={audFunction} dateToUse={dateToUse}/>}
         </div>
     )
 }

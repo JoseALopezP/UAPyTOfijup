@@ -161,10 +161,13 @@
     height: 18px;
 }
 .actuarioName{
-    height: 14px;
+    height: 20px;
     background-color: #d7d7d718;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 1px;
+    border-radius: 2px;
+    border: none;
+    outline: none;
+    text-decoration: none;
 }
 
 .oficioBlockContainer{

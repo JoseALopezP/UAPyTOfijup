@@ -28,7 +28,7 @@ export const caratulaGenerator = (item, date) =>{
         Legajo: N° {item.numeroLeg}{item.saeNum ? ` / ${item.saeNum}` : ''} Caratulado {item.caratula}.<br/>
         Sala de Audiencias: {item.sala}.<br/>
         Hora programada: {item.hora} horas.<br/>
-        Hora real de inicio: {item.hitos[0].split(' | ')[0]} horas.<br/>
+        Hora real de inicio: {item.hitos && item.hitos[0].split(' | ')[0]} horas.<br/>
         Juez Interviniente: {item.juez}<br/>
         {safeRender(listFiscal(item.mpf, item.ufi))}<br/>
         {safeRender(listDefensa(item.defensa))}<br/>

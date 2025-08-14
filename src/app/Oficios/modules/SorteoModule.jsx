@@ -4,7 +4,7 @@ import { DataContext } from '@/context/DataContext'
 import { nameTranslateActuario } from '@/utils/traductorNombres'
 
 export default function SorteoModule({date, arr}) {
-    const {updateDesplegables, desplegables, updateData} = useContext(DataContext)
+    const {updateDesplegables, desplegables, updateData, updateByDate} = useContext(DataContext)
     const [showRaffle, setShowRaffle] = useState(false)
     const [listaOriginal, setListaOriginal] = useState(desplegables.actuario || []);
     const [listaSeleccionado, setListaSeleccionado] = useState([]);
@@ -32,6 +32,7 @@ export default function SorteoModule({date, arr}) {
                 await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
         }
+        await updateByDate(date)
     };
     useEffect(() => {
         updateDesplegables()
