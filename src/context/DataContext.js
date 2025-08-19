@@ -15,6 +15,7 @@ import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction"
 import updateDocumentListener from "@/firebase/firestore/updateDocumentListener";
 import removeStringFromList from "@/firebase/firestore/removeStringFromList";
 import getDocumentGeneral from "@/firebase/firestore/getDocumentGeneral";
+import oldAddOrUpdateDocument from "@/firebase/firestore/oldAddOrUpdateDocument";
 
 export const DataContext = createContext({});
 
@@ -73,8 +74,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
   };
 
   const updateByDateSorteo = async (date) => {
-    const data = await getDocument("sorteos", date);
-    setSorteoList(data || []);
+    const data = await getDocumentGeneral("sorteos", date);
+    setSorteoList(data.list || []);
   };
 
   const updateByDateListener = (date) => {
@@ -156,7 +157,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
   };
 
   const addSorteo = async (data, date) => {
-    await addOrUpdateDocument("sorteos", date, data);
+    await oldAddOrUpdateDocument("sorteos", date, data);
   };
 
   const addDesplegable = async (type, data) => {
