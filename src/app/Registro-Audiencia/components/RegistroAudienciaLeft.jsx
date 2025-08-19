@@ -195,6 +195,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     }, [caratula, mpf, defensa, imputado, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3, isInitialized]);
     useEffect(() => {
         updateComparisson();
+        setShowReconversion(false)
     }, [item]);
     useEffect(() => {
         setSala(item.sala);
