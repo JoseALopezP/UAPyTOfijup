@@ -9,6 +9,7 @@ export function ScheduleTable({filterValue}) {
         updateToday()
     }
     useEffect(() => {
+        tick()
         const timerID = setInterval(() => tick(), 60000);
         return function cleanup() {
             clearInterval(timerID);
