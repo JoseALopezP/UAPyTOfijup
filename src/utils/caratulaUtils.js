@@ -12,7 +12,7 @@ export function getMonthName(number) {
     const date = new Date(0, number - 1);
     return date.toLocaleString('es-AR', { month: 'long' });
 }
-function safeRender(fnResult) {
+export function safeRender(fnResult) {
     if (!fnResult) return '';
     if (typeof fnResult === 'string' || typeof fnResult === 'number') return fnResult;
     if (Array.isArray(fnResult)) return fnResult.join(', ');
