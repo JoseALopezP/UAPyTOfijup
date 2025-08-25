@@ -22,9 +22,9 @@ export default function AddToListBlock({desplegablesOption}) {
                 <button className={`${styles.addButton}`} onClick={()=>uploadDesplegable()}>AGREGAR</button></span>
             </span>
             <span className={`${styles.selectedListBlock}`}>
-                {desplegablesOption && desplegables[desplegablesOption].map(el=>(
+                {desplegablesOption && desplegables[desplegablesOption].map((el,i)=>(
                     <>{el.toUpperCase().includes(inputValue.toUpperCase()) && 
-                        <span className={`${styles.inputList}`} key={el}><p>{el}</p>
+                        <span className={`${styles.inputList}`} key={el+i}><p>{el}</p>
                         <button className={`${styles.deleteButton}`} onClick={() => deleteDesplegableFir(el)}>ELIMINAR</button>
                     </span>}</>
                 ))}

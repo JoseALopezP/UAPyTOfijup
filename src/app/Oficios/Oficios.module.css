@@ -453,6 +453,38 @@
     font-size: x-large;
     font-family: inherit;
 }
+.selectImputadoBlock{
+    width: 98%;
+    margin-bottom: 10px;
+}
+.selectImputadoIndiv{
+    display: inline-flex;
+    flex-direction: row;
+    height: 30px;
+    width: 100%;
+}
+.selectImputadoIndiv:nth-child(odd){
+    background-color: #ffffff1a;
+}
+.selectImputadoIndiv p{
+    height: 28px;
+    margin: 1px;
+    margin-left: 10px;
+}
+.selectImputadoIndiv button{
+    height: 28px;
+    width: 28px;
+    margin: -3px 1px 1px 1px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 24px;
+    padding: 0;
+    outline: none;
+    border: none;
+    border-radius: 2px;
+    background-color: transparent;
+    color: #d7d7d7;
+}
 @keyframes showHidden {
     0% {
         opacity: 1;

@@ -1,12 +1,13 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styles from '../Oficios.module.css'
 import { DataContext } from '@/context/DataContext';
 import { generateOficioSection } from '@/utils/resuelvoUtils';
 
-export default function GeneradorOficioBlock({item, date, resuelvo, minuta}) {
+export default function GeneradorOficioBlock({item, date, resuelvo}) {
     const {desplegables} = useContext(DataContext)
     const [traslado, setTraslado] = useState(`Se informa que la fecha de detención del Sr. XXX fue el día XXXX, habiendo intervenido Comisaría XXX; por lo que se solicita que cuando se efectivice el traslado del mencionado al SERVICIO PENITENCIARIO PROVINCIAL, se informe dicha circunstancia a la Oficina Judicial Penal al correo: casosofijup@jussanjuan.gov.ar y/o al teléfono 2644554725 de la Unidad de Administración de Casos.`)
     const [inputList, setInputList] = useState([]);
+    const [imputadoList, setImputadoList] = useState([])
     const handleInputChange = (e, index) => {
         const { value } = e.target;
         const list = [...inputList];
@@ -23,8 +24,22 @@ export default function GeneradorOficioBlock({item, date, resuelvo, minuta}) {
     };
     const submitHandler = (e) => {
         e.preventDefault();
-        generateOficioSection(item,date,traslado,inputList, resuelvo)
+        generateOficioSection(item,date,traslado,inputList, resuelvo, imputadoList.filter(item => item.selected === true))
     };
+    function editarPropiedad(arr, idBuscado, nuevoValor) {
+      const nuevoArray = arr.map((item, i) => {
+        if (i === idBuscado) {
+            return { ...item,
+              selected: nuevoValor
+            };
+          }
+          return item;
+        });
+      return nuevoArray;
+    }
+      useEffect(()=>{
+      setImputadoList(item.imputado.map(el=>({...el,selected: true})))
+    },[item.imputado])
     return (
         <form className={styles.generadorOficioForm} onSubmit={(event) => submitHandler(event)}>
             {inputList.map((input, index) => (
@@ -46,6 +61,15 @@ export default function GeneradorOficioBlock({item, date, resuelvo, minuta}) {
           ))}
           <button type='button' className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
           <textarea spellCheck='true' className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
+          <div className={`${styles.selectImputadoBlock}`}>
+            {imputadoList.length > 0 ? <>{imputadoList.map((el, i) =>(
+              <span className={`${styles.selectImputadoIndiv}`}>
+              <button type='button' onClick={() => setImputadoList(editarPropiedad(imputadoList,i,!el.selected))}>{el.selected ? "🗹" : "☐"}</button>
+              <p>{el.nombre} - {el.dni}{el.detenido && '- ' + el.detenido}</p>
+              </span>
+            ))}</>:
+            <p>No hay imputados cargados</p>}
+          </div>
           <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit">DESCARGAR</button>
         </form>
     )

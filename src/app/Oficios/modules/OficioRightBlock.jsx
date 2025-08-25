@@ -17,7 +17,6 @@ export default function OficioRightBlock({aud, date}) {
     const [resuelvo2, setResuelvo2] = useState('');
     const [minuta2, setMinuta2] = useState('');
     const [minutaShow, setMinutaShow] = useState('caratula');
-    const [partHover, setPartHover] = useState(false)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const updateComparisson = () => {
@@ -74,7 +73,9 @@ export default function OficioRightBlock({aud, date}) {
                 {aud && aud.estado && minutaShow === 'caratula' && <div className={styles.oficioText}>{caratulaGenerator(aud, date)}</div>}
                 {aud.resuelvoText && minutaShow === 'resuelvo' && <TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>}</div>
         </div>
-        <button className={styles.oficioButton} onClick={() => handleShow()}>GENERAR OFICIO</button>
+        <button className={styles.oficioButton} onClick={() => handleShow()}>
+            OFICIO
+        </button>
         {showOficio && <GeneradorOficioBlock item={aud} date={date} resuelvo={resuelvo}/>}</>
     )
 }
