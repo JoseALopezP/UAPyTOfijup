@@ -148,12 +148,13 @@ function removeTimeMarks(text) {
     return text.replace(/\(\s*(?:minuto\s*)?\d{1,2}:\d{2}(?::\d{2})?(?:\s*\/\s*\d{1,2}:\d{2}(?::\d{2})?)?\s*(?:video\s*\d+)?\s*\)/gi, "").trim();
 }
 
-export async function generateOficioSection(item, date, traslado='', oficiados, resuelvo) {
+export async function generateOficioSection(item, date, traslado='', oficiados, resuelvo, imputadoList) {
+    const today = todayFunction();
     const sections = [];
-    sections.push({ right: `San Juan, ${date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}.` });
+    sections.push({ right: `San Juan, ${today.slice(0, 2)} de ${getMonthName(today.slice(2, 4))} de ${today.slice(4, 8)}.` });
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
-        text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${todayFunction() === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
+        text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
     En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`).join(' ') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
         `+traslado : ''}
     Saluda atte.`});

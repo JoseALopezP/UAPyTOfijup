@@ -37,7 +37,7 @@ export default function GeneradorOficioBlock({item, date, resuelvo}) {
         });
       return nuevoArray;
     }
-      useEffect(()=>{
+    useEffect(()=>{
       setImputadoList(item.imputado.map(el=>({...el,selected: true})))
     },[item.imputado])
     return (

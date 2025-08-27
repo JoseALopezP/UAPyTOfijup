@@ -26,7 +26,7 @@ export const nameTranslate = (operadorName) =>{
         "Martinazzo, Ignacio": 'IGNA',
         "Venerado, Tomás": 'TOMI',
         "Narvaez, Facundo Nahuel": 'FACU',
-        "Paroli, Carla Antonela": 'ANTO'
+        "Paroli, Carla Antonela": 'ANTO' 
     }
     return traducciones[operadorName]
 }

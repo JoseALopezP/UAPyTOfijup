@@ -400,7 +400,8 @@ const operadoresTranslate = {
   "Waisman, Natasha": "WAISMAN NATASHA",
   "Martinazzo, Ignacio": "MARTINAZZO IGNACIO",
   "Venerado, Tomás": "VENERANDO TOMAS",
-  "Narvaez, Facundo Nahuel": "FACUNDO NARVAEZ"
+  "Narvaez, Facundo Nahuel": "FACUNDO NARVAEZ",
+  "Paroli, Carla Antonela": 'PAROLI ANTONELA' 
 };
 const oficialesTranslate = {
   "Dr. García, Martín Alejandro - Defensoría N°11": "MARTIN GARCÍA ALEJANDRO (OFICIAL)",
