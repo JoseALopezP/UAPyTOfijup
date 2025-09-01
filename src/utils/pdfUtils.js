@@ -161,7 +161,7 @@ const processSections = (sections, doc) => {
     const titleWidth = doc.getTextWidth(titleLines[0]) + 3;
     textWidth -= titleWidth;
   }
-  if (section.text && !section.title) {
+    if (section.text && !section.title) {
     doc.setFontSize(11);
     doc.setFont("arial", "normal");
     const startX = 20;
@@ -169,48 +169,57 @@ const processSections = (sections, doc) => {
     const indentFactor = minutaBool ? 0 : 0.4;
     const paragraphSpacing = 0;
     let newY = justifyText(doc, section.text, textWidth, startX, startY, lineHeight, indentFactor, paragraphSpacing);
-      if (newY > (pageHeight - bottomMargin)) {
-        while (newY > (pageHeight - bottomMargin)) {
-          doc.addPage();
-          newY -= (pageHeight - bottomMargin);
-        }
-        currentY = topMargin + newY;
-      } else {
-        currentY = newY;
-      }
+    currentY = newY + sectionSpacingWithTitle;
+  }
 
-      currentY += sectionSpacingWithTitle; 
-    }
     if (section.text && section.title) {
-      doc.setFontSize(11);
-      doc.setFont("arialbd", "normal");
-      const titleY = currentY;
-      const titleLines = doc.splitTextToSize(section.title, textWidth * 0.4);
-      let maxTitleWidth = 0;
-      titleLines.forEach((line) => {
-        if (currentY > (pageHeight - bottomMargin)) {
-          doc.addPage();
-          currentY = topMargin;
-        }
-        doc.text(line, 20, titleY);
-        maxTitleWidth = Math.max(maxTitleWidth, doc.getTextWidth(line));
-      });
-      const availableTextWidth = textWidth - maxTitleWidth - 5;
-      const textStartX = 20 + maxTitleWidth + 2;
-      doc.setFont("arial", "normal");
-      const textLines = doc.splitTextToSize(section.text, availableTextWidth);
-      let firstLineY = titleY;
-      textLines.forEach((line) => {
-        if (firstLineY > (pageHeight - bottomMargin)) {
-          doc.addPage();
-          firstLineY = topMargin;
-        }
-        doc.text(line, textStartX, firstLineY);
-        firstLineY += lineHeight;
-      });
+  doc.setFontSize(11);
 
-      currentY = firstLineY + sectionSpacingWithTitle;
+  // Layout
+  const leftX = 20;
+  const titleColMax = textWidth * 0.4; // max width to wrap the title column
+  const gap = 2; // space between title and text columns
+
+  // Prepare title column
+  doc.setFont("arialbd", "normal");
+  const titleLines = doc.splitTextToSize(section.title, titleColMax);
+  let measuredTitleWidth = 0;
+  titleLines.forEach(line => {
+    measuredTitleWidth = Math.max(measuredTitleWidth, doc.getTextWidth(line));
+  });
+  const titleColWidth = Math.min(measuredTitleWidth, titleColMax);
+
+  // Prepare right column
+  const textStartX = leftX + titleColWidth + gap;
+  const availableTextWidth = textWidth - titleColWidth - gap;
+
+  doc.setFont("arial", "normal");
+  const textLines = doc.splitTextToSize(section.text, availableTextWidth);
+
+  // Draw rows side-by-side so they stay aligned
+  const rows = Math.max(titleLines.length, textLines.length);
+  for (let i = 0; i < rows; i++) {
+    // Pre-check: if the next row won't fit, go to a new page first
+    if (currentY + lineHeight > (pageHeight - bottomMargin)) {
+      doc.addPage();
+      currentY = topMargin;
     }
+
+    if (i < titleLines.length) {
+      doc.setFont("arialbd", "normal");
+      doc.text(titleLines[i], leftX, currentY);
+    }
+    if (i < textLines.length) {
+      doc.setFont("arial", "normal");
+      doc.text(textLines[i], textStartX, currentY);
+    }
+
+    currentY += lineHeight;
+  }
+
+  currentY += sectionSpacingWithTitle;
+}
+
   });
 };
 

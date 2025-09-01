@@ -27,7 +27,7 @@ export default function ListIndiv({item}) {
             <p className={styles.legajoItem}>{item.numeroLeg.split('-SJ-')[1]}</p>
             <p className={styles.tipoItem}>{item.tipo}</p>
             <p className={styles.juezItem}>{item.juez ? item.juez.split('+').map(el=>el.split(' ').splice(1,3).join(' ')).join(' ') : "NA"}</p>
-            <p className={styles.demoraItem}>{/*demoraCalculator(item.tipo+item.tipo2+item.tipo3)*/}</p>
+            <p className={styles.demoraItem}>{demoraCalculator(item.tipo+item.tipo2+item.tipo3)}</p>
         </div>
     );
 }
