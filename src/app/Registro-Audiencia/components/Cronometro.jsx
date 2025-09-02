@@ -74,14 +74,14 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
 
             const newAccum = stopwatchAccum + elapsed;
             setStopwatchAccum(newAccum);
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatch', newAccum);
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', 0);
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatch', newAccum, (item.aId || false));
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', 0, (item.aId || false));
             setStopwatchCurrent(0);
             setStopwatchRunning(false);
         } else {
             const now = Date.now();
             setTimeStampStart(now);
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', now);
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', now, (item.aId || false));
             setStopwatchRunning(true);
         }
     };
@@ -97,7 +97,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
         setGuardando(true);
 
         if (newState === 'RESUELVO') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction());
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction(), (item.aId || false));
             await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`);
         } else {
             if (newState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
@@ -111,7 +111,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
             setCuartoShow(false);
         }
 
-        await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState);
+        await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState, (item.aId || false));
         setEstadoActual(newState);
         setGuardando(false);
         await updateByDate(dateToUse);

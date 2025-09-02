@@ -5,11 +5,15 @@ const db = getFirestore(firebase_app);
 
 export default async function updateListItem(collectionName, fechaId, data) {
   try {
-    const safeHora = data.hora.replace(/:/g, "");
-    const docId = `${safeHora}${data.numeroLeg}`;
-    const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
-
-    await setDoc(docRef, data, { merge: true });
+    if(data.aId){
+      const docRef = doc(db, collectionName, fechaId, "audiencias", aId);
+      await setDoc(docRef, data, { merge: true });
+    }else{
+      const safeHora = data.hora.replace(/:/g, "");
+      const docId = `${safeHora}${data.numeroLeg}`;
+      const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
+      await setDoc(docRef, data, { merge: true });
+    }
   } catch (e) {
     console.error("Error en updateListItem:", e);
   }

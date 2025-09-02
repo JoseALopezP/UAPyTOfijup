@@ -174,13 +174,9 @@ const processSections = (sections, doc) => {
 
     if (section.text && section.title) {
   doc.setFontSize(11);
-
-  // Layout
   const leftX = 20;
-  const titleColMax = textWidth * 0.4; // max width to wrap the title column
-  const gap = 2; // space between title and text columns
-
-  // Prepare title column
+  const titleColMax = textWidth * 0.4;
+  const gap = 2;
   doc.setFont("arialbd", "normal");
   const titleLines = doc.splitTextToSize(section.title, titleColMax);
   let measuredTitleWidth = 0;
@@ -188,18 +184,12 @@ const processSections = (sections, doc) => {
     measuredTitleWidth = Math.max(measuredTitleWidth, doc.getTextWidth(line));
   });
   const titleColWidth = Math.min(measuredTitleWidth, titleColMax);
-
-  // Prepare right column
   const textStartX = leftX + titleColWidth + gap;
   const availableTextWidth = textWidth - titleColWidth - gap;
-
   doc.setFont("arial", "normal");
   const textLines = doc.splitTextToSize(section.text, availableTextWidth);
-
-  // Draw rows side-by-side so they stay aligned
   const rows = Math.max(titleLines.length, textLines.length);
   for (let i = 0; i < rows; i++) {
-    // Pre-check: if the next row won't fit, go to a new page first
     if (currentY + lineHeight > (pageHeight - bottomMargin)) {
       doc.addPage();
       currentY = topMargin;

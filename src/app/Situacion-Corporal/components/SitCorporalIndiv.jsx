@@ -7,7 +7,7 @@ export default function SitCorporalIndiv({aud, date, selected, selectedF}) {
     const {updateData} = useContext(DataContext)
     const handleSave = () =>{
         if(aud.situacion !== sit){
-            updateData(date, aud.numeroLeg, aud.hora, 'situacion', sit);
+            updateData(date, aud.numeroLeg, aud.hora, 'situacion', sit, (aud.aId || false));
         }
     }
     return (

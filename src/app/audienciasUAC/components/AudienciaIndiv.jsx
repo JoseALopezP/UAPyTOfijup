@@ -29,39 +29,39 @@ export function AudienciaIndiv({ date, element }) {
         event.preventDefault();
         if (editable) {
             if (cancelar) {
-                await updateData(date, element.numeroLeg, element.hora, 'estado', 'CANCELADA');
+                await updateData(date, element.numeroLeg, element.hora, 'estado', 'CANCELADA', (element.aId || false));
             }
             if (reprogramar) {
-                await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA');
+                await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA', (element.aId || false));
             }
             if (situacion !== originalSituacion) {
-                await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion);
+                await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion, (element.aId || false));
                 setOriginalSituacion(situacion);
             }
             if (admin !== originalAdmin) {
-                await updateData(date, element.numeroLeg, element.hora, 'admin', admin);
+                await updateData(date, element.numeroLeg, element.hora, 'admin', admin, (element.aId || false));
                 setOriginalAdmin(admin);
             }
             if (juezN && originalJuezN !== juezN) {
-                await updateData(date, element.numeroLeg, element.hora, 'juezN', juezN);
+                await updateData(date, element.numeroLeg, element.hora, 'juezN', juezN, (element.aId || false));
                 setOriginalJuezN(juezN);
             }
             if (deleteAud) {
                 await deleteAudiencia(date, element.numeroLeg, element.hora);
             }
             if (resultado !== originalResultado) {
-                await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado);
+                await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado, (element.aId || false));
                 setOriginalResultado(resultado);
             }
             if (hora !== originalHora) {
-                await updateData(date, element.numeroLeg, element.hora, 'hora', hora);
+                await updateData(date, element.numeroLeg, element.hora, 'hora', hora, (element.aId || false));
                 setOriginalHora(hora);
             }
             if (comentario) {
-                await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario);
+                await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario, (element.aId || false));
             }
             if (control !== 'nocontrolado') {
-                await updateData(date, element.numeroLeg, element.hora, 'control', control);
+                await updateData(date, element.numeroLeg, element.hora, 'control', control, (element.aId || false));
                 setControl('nocontrolado');
             }
             resetEditableState();

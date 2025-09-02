@@ -34,7 +34,7 @@ export default function AudienciasListIndiv({item, audFunction, dateToUse}) {
     const {desplegables, updateData, updateDesplegables} = useContext(DataContext);
     const handleChange = (value) =>{
         setActuario(value)
-        updateData(dateToUse, item.numeroLeg, item.hora, 'actuario', value);
+        updateData(dateToUse, item.numeroLeg, item.hora, 'actuario', value, (element.aId || false));
     }
     useEffect(() => {
         updateDesplegables()

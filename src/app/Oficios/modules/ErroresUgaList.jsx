@@ -10,13 +10,13 @@ export default function ErroresUgaList({ aud, date, errores, setErrores }) {
             i === index ? { ...error, estado: !error.estado } : error
         );
         setErrores(updatedErrores);
-        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', updatedErrores);
+        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', updatedErrores, (aud.aId || false));
     };
 
     const handleRemoveError = async (index) => {
         const newErrores = errores.filter((_, i) => i !== index);
         setErrores(newErrores);
-        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', newErrores);
+        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', newErrores, (aud.aId || false));
     };
 
     return (

@@ -6,14 +6,14 @@ export default function ControlButtonsBlock({date, aud, control, controlFunction
     const {updateData} = useContext(DataContext)
     const handleClickControlado = () => {
         if(control !== 'controlado'){
-        updateData(date, aud.numeroLeg, aud.hora, 'control', 'controlado')
+        updateData(date, aud.numeroLeg, aud.hora, 'control', 'controlado', (aud.aId || false))
         setAuxControl('controlado')
         controlFunction('controlado')
         }
     }
     const handleClickGuardar = () => {
         if(auxControl !== control){
-            updateData(date, aud.numeroLeg, aud.hora, 'control', control)
+            updateData(date, aud.numeroLeg, aud.hora, 'control', control, (aud.aId || false))
             setAuxControl(control)
             controlFunction(control)
         }

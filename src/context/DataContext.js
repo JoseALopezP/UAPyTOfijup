@@ -113,20 +113,22 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     await pushToHitos("legajos", searchValLeg, date, searchValHora, newValue);
   };
 
-  const updateData = async (date, searchValLeg, searchValHora, property, newValue) => {
+  const updateData = async (date, searchValLeg, searchValHora, property, newValue, aId) => {
     await updateListItem("audiencias", date, {
       hora: searchValHora,
+      aId: aId,
       numeroLeg: searchValLeg,
       [property]: newValue,
     });
     await updateListItem("legajos", searchValLeg, {
       hora: searchValHora,
+      aId: aId,
       fecha: date,
       [property]: newValue,
     });
   };
 
-  const updateDataToday = async (searchValLeg, searchValHora, property, newValue) => {
+  const updateDataToday = async (searchValLeg, searchValHora, property, newValue, aId) => {
     const todayId = new Date()
       .toLocaleDateString("es-AR", {
         day: "2-digit",
@@ -137,11 +139,13 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
       .join("");
     await updateListItem("audiencias", todayId, {
       hora: searchValHora,
+      aId: aId,
       numeroLeg: searchValLeg,
       [property]: newValue,
     });
     await updateListItem("legajos", searchValLeg, {
       hora: searchValHora,
+      aId: aId,
       fecha: todayId,
       [property]: newValue,
     });

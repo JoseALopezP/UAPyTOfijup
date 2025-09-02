@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 
-export default function RegistroChangeState({estado, dateToUse, numeroLegajo, audienciaHora, estadoFunction}) {
+export default function RegistroChangeState({estado, dateToUse, numeroLegajo, audienciaHora, estadoFunction, aId}) {
     const [changeToMake, setChangeToMake] = useState('')
     const [tiempoPedido, setTiempoPedido] = useState(false)
     const [pidiente, setPidiente] = useState(false)
@@ -30,12 +30,12 @@ export default function RegistroChangeState({estado, dateToUse, numeroLegajo, au
     const handleSubmit = async() =>{
         await updateRealTime()
         if(changeToMake==='RESUELVO'){
-            await updateData(dateToUse, numeroLegajo, audienciaHora, 'resuelvo', realTime)
+            await updateData(dateToUse, numeroLegajo, audienciaHora, 'resuelvo', realTime, (aId || false))
             await pushtToArray(dateToUse, numeroLegajo, audienciaHora, `${realTime} | ${translate[changeToMake]}`)
             setChangeToMake('')
         }
         if(changeToMake && changeToMake!=='RESUELVO'){
-            await updateData(dateToUse, numeroLegajo, audienciaHora, 'estado', translate[changeToMake])
+            await updateData(dateToUse, numeroLegajo, audienciaHora, 'estado', translate[changeToMake], (aId || false))
             if(changeToMake == 'CUARTO INTERMEDIO'){
                 await pushtToArray(dateToUse, numeroLegajo, audienciaHora, `${realTime} | ${translate[changeToMake]} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
             }else{

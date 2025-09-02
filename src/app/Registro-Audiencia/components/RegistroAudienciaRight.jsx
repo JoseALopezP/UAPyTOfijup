@@ -52,19 +52,19 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     const updateDataAud = async() =>{
         setGuardando(true)
         if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvoText', resuelvo);
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvoText', resuelvo, (item.aId || false));
             setResuelvo2(resuelvo);
         }
         if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'minuta', minuta);
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'minuta', minuta, (item.aId || false));
             setMinuta2(minuta);
         }
         if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'cierre', cierre);
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'cierre', cierre, (item.aId || false));
             setCierre2(cierre);
         }        
         if (checkForResuelvo(item)) {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', updateRealTimeFunction());
+            await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', updateRealTimeFunction(), (item.aId || false));
         }
         await setGuardarInc(false)
         await setGuardando(false)

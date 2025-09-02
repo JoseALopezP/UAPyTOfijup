@@ -32,11 +32,11 @@ export default function OficioRightBlock({aud, date}) {
     const updateDataAud = async() =>{
             setGuardando(true)
             if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-                await updateData(date, aud.numeroLeg, aud.hora, 'resuelvoText', resuelvo);
+                await updateData(date, aud.numeroLeg, aud.hora, 'resuelvoText', resuelvo, (aud.aId || false));
                 setResuelvo2(resuelvo);
             }
             if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-                await updateData(date, aud.numeroLeg, aud.hora, 'minuta', minuta);
+                await updateData(date, aud.numeroLeg, aud.hora, 'minuta', minuta, (aud.aId || false));
                 setMinuta2(minuta);
             }
             await setGuardarInc(false)

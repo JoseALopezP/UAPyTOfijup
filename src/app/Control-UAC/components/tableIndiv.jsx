@@ -12,10 +12,10 @@ export default function TableIndiv({item, date}){
     const handleSave = async() =>{
         await setSaving(true)
         if(comment !== item.comentario){
-            await updateData(date, item.numeroLeg, item.hora, 'comentario', comment);
+            await updateData(date, item.numeroLeg, item.hora, 'comentario', comment, (item.aId || false));
         }
         if(result !== item.resultado){
-            await updateData(date, item.numeroLeg, item.hora, 'resultado', result);
+            await updateData(date, item.numeroLeg, item.hora, 'resultado', result, (item.aId || false));
         }
         await setSaving(false)
         await setSaved(true)

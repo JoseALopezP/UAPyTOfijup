@@ -18,12 +18,12 @@ export default function OficioLeftBlock({ date, aud }) {
         event.preventDefault();
         const newError = { tipo: errorTipo, comentario: errorInput, estado: false };
         setErrores((prev) => [...prev, newError]);
-        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', [...errores, newError]);
+        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', [...errores, newError], (aud.aId || false));
         setErrorTipo('');
         setErrorInput('');
     };
     const handleSave = async() =>{
-        await updateData(date, aud.numeroLeg, aud.hora, 'resultado', resultado)
+        await updateData(date, aud.numeroLeg, aud.hora, 'resultado', resultado, (aud.aId || false))
         setResultadoSave(false)
     }
     useEffect(() => {

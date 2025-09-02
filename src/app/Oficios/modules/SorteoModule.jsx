@@ -24,12 +24,10 @@ export default function SorteoModule({date, arr}) {
     const handleAsignacion = async () => {
         for (const [index, el] of arr.entries()) {
             if(turno === true && parseInt(el.hora.split(':')[0], 10) < 14) {
-                console.log(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
-                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
+                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length], (element.el || false));
             }
             if(turno === false && parseInt(el.hora.split(':')[0], 10) >= 14){
-                console.log(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
-                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
+                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length], (element.el || false));
             }
         }
         await updateByDate(date)

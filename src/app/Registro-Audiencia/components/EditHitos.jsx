@@ -48,7 +48,7 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
     isSavingRef.current = true;
 
     try {
-      await updateData(dateToUse, item.numeroLeg, item.hora, 'hitos', items);
+      await updateData(dateToUse, item.numeroLeg, item.hora, 'hitos', items, (item.aId || false));
       hasChangesRef.current = false; // ya se guardaron
     } catch (err) {
       console.error('Error guardando hitos:', err);

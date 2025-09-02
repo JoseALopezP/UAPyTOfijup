@@ -8,7 +8,7 @@ export default function ListIndiv({item}) {
     const {desplegables, updateDataToday} = useContext(DataContext)
     const [operadorAud, setOperadorAud] = useState(item.operador || '')
     const handleOperadorChange = (value) =>{
-        updateDataToday(item.numeroLeg, item.hora, 'operador', value);
+        updateDataToday(item.numeroLeg, item.hora, 'operador', value, (item.aId || false));
         setOperadorAud(value)
     }
     useEffect(()=>{
