@@ -166,14 +166,9 @@ export function AddAudienciaForm({ dateFunction, date }) {
       setTimeout(() => setErrorMessage(""), 4000);
     }
   };
-
   useEffect(() => {
     updateDesplegables();
   }, []);
-  useEffect(() => {
-    console.log("Desplegables actualizados:", desplegables);
-  }, [desplegables]);
-
   const horaError = errors.hora;
   const salaError = errors.sala;
   const legajo2Error = errors.legajo2;

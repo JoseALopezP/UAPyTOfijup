@@ -9,6 +9,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     const {updateDesplegables} = useContext(DataContext)
     const [resuelvo, setResuelvo] = useState('');
     const [minuta, setMinuta] = useState('');
+    const [operadorAud, setOperadorAud] = useState('')
     const [cierre, setCierre] = useState('');
     const [sala, setSala] = useState('')
     const [saeNum, setSaeNum] = useState('');
@@ -30,6 +31,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         <div className={`${styles.controlBlock}`}>
             {aud && <><RegistroAudienciaLeft item={aud} dateToUse={dateToUse} isHovered={isHovered}
                 sala={sala} setSala={setSala} 
+                operadorAud={operadorAud} setOperadorAud={setOperadorAud}
                 saeNum={saeNum} setSaeNum={setSaeNum} 
                 caratula={caratula} setCaratula={setCaratula} 
                 razonDemora={razonDemora} setRazonDemora={setRazonDemora} 

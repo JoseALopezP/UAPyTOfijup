@@ -9,8 +9,9 @@ import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import deepEqual from '@/utils/deepEqual';
 import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
+import { nameTranslate } from '@/utils/traductorNombres';
 
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
@@ -76,7 +77,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setTipo2Aux(item.tipo2 || '');
         setTipo3(item.tipo3 || '');
         setTipo3Aux(item.tipo3 || '');
-
+        setOperadorAud(item.operador || '')
         setIsInitialized(true);
     };
     
@@ -179,7 +180,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setGuardarInc(guardarStatus);
         setNeedsSaving1(guardarStatus)
     }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion, saeNum, saeNum2]);
-
+    const operadorChange = (valueAux) =>{
+        updateData(dateToUse, item.numeroLeg, item.hora, 'operador', valueAux, (item.aId || false))
+        setOperadorAud(valueAux)
+    }
     const checkHoraDiff = () => {
         const hora1 = parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]);
         const hora2 = parseInt(item.hitos[0].split('|')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split('|')[0].split(':')[1]);
@@ -206,6 +210,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     }, [])
     return (
         <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
+            
             {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
                 <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
                 <span className={`${styles.guardar}`}>GUARDAR</span>
@@ -220,11 +225,18 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
             <RegistroChangeState estadoFunction={setEstado} estado={estado} numeroLegajo={item.numeroLeg} audienciaHora={item.hora} dateToUse={dateToUse} aId={(item.aId || false)}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
-                <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft40} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
-                <datalist id='sala' className={`${styles.tableCellInput}`}><option>{sala}</option>
+                <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
+                <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>
                 {desplegables.salas && desplegables.salas.map(el =>(
                     <option key={el} value={el}>SALA {el}</option>
-                ))}</datalist></span>
+                ))}</datalist>
+                    <select value={nameTranslate(operadorAud)} className={`${styles.inputLeft} ${styles.inputLeft35} ${styles.selectOperador}`}
+                        onChange={e => operadorChange(e.target.value)}>
+                        {desplegables.operador && desplegables.operador.map(el =>(
+                            <option key={el} value={el}>{nameTranslate(el)}</option>
+                        ))}
+                    </select>
+                </span>
             {item.tipo === "TRÁMITES DE EJECUCIÓN" &&
                 <><span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>SAE:</label>
                 <input className={`${styles.inputTyped100} ${styles.inputLeft}`} value={saeNum} onChange={(e) => setSaeNum(e.target.value)}/></span></>}
