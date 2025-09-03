@@ -111,7 +111,7 @@ export function AddAudienciaForm({ dateFunction, date }) {
       setErrorMessage("");
 
       const newAudiencia = {
-        aId: `${formData.hora.replace(/:/g, "")}${formData.legajo1}-${formData.legajo2.padStart(5,"0")}-${formData.legajo3}`,
+        aId: `${formData.hora.replace(/:/g, "")}${formData.hora2.replace(/:/g, "")}${formData.legajo1}-${formData.legajo2.padStart(5,"0")}-${formData.legajo3}`,
         hora: `${formData.hora.padStart(2, "0")}:${formData.hora2.padStart(
           2,
           "0"
