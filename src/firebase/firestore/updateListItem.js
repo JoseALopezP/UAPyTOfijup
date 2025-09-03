@@ -6,7 +6,7 @@ const db = getFirestore(firebase_app);
 export default async function updateListItem(collectionName, fechaId, data) {
   try {
     if(data.aId){
-      const docRef = doc(db, collectionName, fechaId, "audiencias", aId);
+      const docRef = doc(db, collectionName, fechaId, "audiencias", data.aId);
       await setDoc(docRef, data, { merge: true });
     }else{
       const safeHora = data.hora.replace(/:/g, "");
