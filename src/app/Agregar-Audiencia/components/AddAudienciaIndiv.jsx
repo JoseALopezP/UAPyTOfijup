@@ -130,19 +130,15 @@ export function AddAudienciaIndiv({date, element}) {
             if(tipo3 !== tipo3Bis){
                 await updateData(date, element.numeroLeg, element.hora, 'tipo3', tipo3, (element.aId || false));
                 setTipo3Bis(tipo3)}
-            console.log((juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis) && juez !== '')
             if((juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis) && juez !== ''){
-                console.log(juez.includes('+'))
                 if(juez.includes('+')){
                     (desplegables.jueces.includes(juez1) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) && 
                     await updateData(date, element.numeroLeg, element.hora, 'juez', `${juez1}+${juez2}+${juez3}`, (element.aId || false));
-                    console.log((desplegables.jueces.includes(juez1) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))))
                     setJuez1Bis(juez1)
                     setJuez2Bis(juez2)
                     setJuez3Bis(juez3)
                     setJuezBis(juez)
                 }else{
-                    console.log(desplegables.jueces.includes(juez1))
                     desplegables.jueces.includes(juez1) && 
                     await updateData(date, element.numeroLeg, element.hora, 'juez', juez1, (element.aId || false));
                     setJuez1Bis(juez1)

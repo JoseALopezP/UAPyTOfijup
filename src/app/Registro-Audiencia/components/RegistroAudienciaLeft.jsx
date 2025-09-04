@@ -278,9 +278,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <option key={option} value={option}>{option}</option>
                     ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
-                {imputado.map((input, index) => (
+                {imputado.filter(el => !el.condenado).map((input, index) => (
                     <><div key={input.id+input.nombre} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
-                        <span className={`${styles.condenadoimputadoFlag}`}><p>{input.condenado ? "CONDENADO" : "IMPUTADO"}</p></span>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.nombre}
@@ -306,9 +305,36 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </>
                 ))}
                 <span className={styles.imputadoButtons}>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true  })}>+ IMPUTADO</button>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft50}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true  })}>+ CONDENADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true  })}>+ IMPUTADO</button>
                 </span></span>
+                <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Condenados</label></span>
+                {imputado.filter(el => el.condenado).map((input, index) => (
+                    <><div key={input.id+input.nombre} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                            type="text"
+                            value={input.nombre}
+                            onChange={(e) => handleInputChange(setImputado, index, 'nombre', e.target.value)}
+                            placeholder="Nombre"/>
+                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                            type="text"
+                            value={input.dni}
+                            onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
+                            placeholder="DNI"/>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
+                            {input.presencial ?  'FIS' : 'VIR'}
+                        </button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
+                    </div>
+                        {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
+                        <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
+                        type="text"
+                        value={input.detenido}
+                        onChange={(e) => handleInputChange(setImputado, index, 'detenido', e.target.value)}
+                        placeholder="detenido en... 00/00/00"/>}
+                        </>
+                ))}
+                <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true  })}>+ CONDENADO</button>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
                     {defensa.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
