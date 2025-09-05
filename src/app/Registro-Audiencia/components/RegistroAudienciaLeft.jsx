@@ -372,7 +372,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                     </datalist></>
                                 )
                             )}
-                            <select className={`${styles.inputLeft} ${styles.inputLeft70}  ${styles.inputLeftSelect}`} value={input.imputado} onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}>
+                            <select multiple size="5" className={`${styles.inputLeft} ${styles.inputLeft70}  ${styles.inputLeftSelect}`} value={input.imputado} onChange={(e) => handleInputChange(setDefensa, index, 'imputado', e.target.value)}>
                                 <option value="" >imputado - (opcional)</option>
                                 {imputado.map(imputadoItem =>(
                                     <option key={imputadoItem.nombre} value={imputadoItem.nombre}>
