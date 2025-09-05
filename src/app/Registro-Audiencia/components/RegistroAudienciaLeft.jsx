@@ -232,8 +232,9 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 ))}</datalist>
                     <select value={nameTranslate(operadorAud)} className={`${styles.inputLeft} ${styles.inputLeft35} ${styles.selectOperador}`}
                         onChange={e => operadorChange(e.target.value)}>
+                        <><option key={operadorAud+"selected"} value={operadorAud} selected>{nameTranslate(operadorAud)}</option></>
                         {desplegables.operador && desplegables.operador.map(el =>(
-                            <option key={el} value={el}>{nameTranslate(el)}</option>
+                            <><option key={el} value={el} selected>{nameTranslate(el)}</option></>
                         ))}
                     </select>
                 </span>
@@ -414,7 +415,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     <select className={`${styles.inputLeft} ${styles.inputLeft100}  ${styles.inputLeftSelect}`} onChange={(e) => setRazonDemora(e.target.value)}>
                         <option value={razonDemora}>{razonDemora}</option>
                         {desplegables.motivoDemora && desplegables.motivoDemora.map(el => <option key={el} value={el}>{el}</option>)}
-                    </select></span>
+                    </select></span>19618
                 </>
             }
             <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
