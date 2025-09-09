@@ -314,7 +314,7 @@
     cursor: pointer;
 }
 .inputLeftDeSelected{
-    opacity: .5;
+    opacity: .3;
 }
 .inputLeft:hover{
     border: solid 1px #3C3C3C;
