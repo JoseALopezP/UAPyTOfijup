@@ -1,5 +1,5 @@
 'use client'
-import { useContext, useEffect, useState, useCallback } from 'react';
+import { useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { Reconversion } from './Reconversion';
 import styles from '../RegistroAudiencia.module.css';
 import RegistroChangeState from './RegistroChangeState';
@@ -33,33 +33,77 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const [removedPartes, setRemovedPartes] = useState([]);
     const [showEditHitos, setShowEditHitos] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
+    const mpfCounter = useRef(0);
+    const defensaCounter = useRef(0);
+    const imputadoCounter = useRef(0);
+    const partesCounter = useRef(0);
+
     const checkUFI = () =>{
         if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
             setUfi(mpf[0].nombre.split(' - ')[1])
         }
     }
-    const handleInputChange = (setter, index, key, value, toggleArray = false) => {
-    setter(prev => {
-        const updated = [...prev];
-        const current = updated[index] || {};
-        if (toggleArray) {
-        const arr = Array.isArray(current[key]) ? [...current[key]] : [];
+    const updateImputado = (id, newData) => {
+        setImputado(prev =>
+            prev.map(p => (p.id === id ? { ...p, ...newData } : p))
+        );
+        setDefensa(prev =>
+            prev.map(def => ({
+            ...def,
+            imputado: Array.isArray(def.imputado)
+                ? def.imputado.map(v =>
+                    v.id === id ? { ...v, ...newData } : v
+                )
+                : def.imputado,
+            condenado: Array.isArray(def.condenado)
+                ? def.condenado.map(v =>
+                    v.id === id ? { ...v, ...newData } : v
+                )
+                : def.condenado,
+        }))
+    )};
 
-        if (arr.includes(value)) {
-            updated[index] = { ...current, [key]: arr.filter(v => v !== value) };
-        } else {
-            updated[index] = { ...current, [key]: [...arr, value] };
-        }
-        } else {
-        updated[index] = { ...current, [key]: value };
-        }
-        return updated;
-    });
-    };
-    
-    const addNewInput = (setter, template) => {
-        setter(prev => [...prev, { ...template, id: prev.length + 1 }]);
-    };
+    const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
+  setter(prev => {
+    const updated = [...prev];
+    const current = updated[index] || {};
+
+    if (toggleArray) {
+      const arr = Array.isArray(current[key]) ? [...current[key]] : [];
+      const exists = arr.some(item => item.id === valueObj.id);
+
+      updated[index] = {
+        ...current,
+        [key]: exists
+          ? arr.filter(item => item.id !== valueObj.id) // remove by id
+          : [...arr, valueObj] // add object {id, nombre}
+      };
+    } else {
+      updated[index] = { ...current, [key]: valueObj };
+    }
+    return updated
+    })};
+
+    const addNewInput = (setter, template, prefix, counter) => {
+    setter(prev => {
+        counter.current += 1;
+        const nextId = `${prefix}${counter.current}`;
+        return [...prev, { ...template, id: nextId }];
+    })};
+    const removeImputado = (id) => {
+    setImputado(prev => prev.filter(p => p.id !== id));
+
+    setDefensa(prev =>
+        prev.map(def => ({
+        ...def,
+        imputado: Array.isArray(def.imputado)
+            ? def.imputado.filter(v => v !== id)
+            : def.imputado,
+        condenado: Array.isArray(def.condenado)
+            ? def.condenado.filter(v => v !== id)
+            : def.condenado
+        }))
+    )};
     const removeInput = (setter, index, removedSetter, items) => {
         setter(prev => prev.filter((_, i) => i !== index));
         removedSetter(prev => [...prev, items[index]]);
@@ -282,7 +326,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
                 </div>
             ))}
-            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true, presencial: true })}>+ FISCAL</button></span>
+            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true, presencial: true }, 'f')}>+ FISCAL</button></span>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
@@ -295,18 +339,18 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.nombre}
-                            onChange={(e) => handleInputChange(setImputado, index, 'nombre', e.target.value)}
+                            onChange={(e) => updateImputado(input.id, { nombre: e.target.value })}
                             placeholder="Nombre"/>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.dni}
-                            onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
+                            onChange={(e) => updateImputado(input.id, { dni: e.target.value })}
                             placeholder="DNI"/>
                         <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                         <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
                             {input.presencial ?  'FIS' : 'VIR'}
                         </button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
                     </div>
                         {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
                         <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
@@ -317,7 +361,9 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </>
                 ))}
                 <span className={styles.imputadoButtons}>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true  })}>+ IMPUTADO</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
+                    onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
+                        >+ IMPUTADO</button>
                 </span></span>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Condenados</label></span>
                 {imputado.filter(el => el.condenado).map((input, index) => (
@@ -336,7 +382,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
                             {input.presencial ?  'FIS' : 'VIR'}
                         </button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setImputado, index, setRemovedImputado, imputado)}><DeleteSVGF/></button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
                     </div>
                         {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
                         <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
@@ -346,7 +392,9 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         placeholder="detenido en... 00/00/00"/>}
                         </>
                 ))}
-                <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true  })}>+ CONDENADO</button>
+                <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
+                onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
+                    >+ CONDENADO</button>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
                     {defensa.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
@@ -385,17 +433,25 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 )
                             )}
                             <div className={`${styles.inputLeftColumn}`}>
-                            {imputado.length > 0 && imputado.map(el => (
+                            {imputado.length > 0 && imputado.map(el => {
+                            const isSelected = Array.isArray(defensa[index].imputado) &&
+                                defensa[index].imputado.some(item => item.id === el.id); // check by id
+
+                            return (
                                 <span
-                                    key={el.nombre}
-                                    className={(Array.isArray(defensa[index].imputado) && defensa[index].imputado.includes(el.nombre))
+                                key={el.id}
+                                className={
+                                    isSelected
                                     ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
-                                    : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`}
-                                    onClick={() => handleInputChange(setDefensa, index, 'imputado', el.nombre, true)}
+                                    : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
+                                }
+                                onClick={() => handleInputChange(setDefensa, index, "imputado", { id: el.id, nombre: el.nombre }, true)}
                                 >
-                                    {el.nombre}
+                                {el.nombre}
                                 </span>
-                            ))}</div>
+                            );
+                            })}
+                            </div>
                             <button className={`${styles.inputLeft} ${styles.inputLeft40}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRESENTE' : 'AUSENTE'}</button>
                             <button className={`${styles.inputLeft} ${styles.inputLeft40}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FISICAMENTE' : 'VIRTUALMENTE'}
@@ -403,7 +459,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true})}>+ DEFENSA</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true }, 'd', defensaCounter)}>+ DEFENSA</button></span>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
                     {partes.map((input, index) => (
                         <div key={input.id}>
@@ -425,7 +481,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', asistencia: true, presencial: true  })}>+ PARTE</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', asistencia: true, presencial: true }, 'p', partesCounter)}>+ PARTE</button></span>
             {(item.hora && item.hitos && checkHoraDiff() > 5) &&
                 <>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
