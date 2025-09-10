@@ -16,7 +16,7 @@ export function listFiscal(arr, ufi) {
 export function listDefensa(arr) {
   let aux = '';
   arr && arr.forEach((el, i) => {
-    const imputados = el.imputado
+    const imputados = (el.imputado & el.imputado.length > 1)
       ? el.imputado
           .map((p, idx) => {
             if (idx === 0) return p.nombre.split(',').join('');
