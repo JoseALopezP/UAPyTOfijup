@@ -14,11 +14,25 @@ export function listFiscal(arr, ufi) {
 }
 
 export function listDefensa(arr) {
-    let aux = '';
-    arr && arr.forEach((el, i) => {
-        aux += `Defensa ${el.tipo}: ${el.nombre} ${el.imputado ? `(En representación de ${el.imputado})` : ''} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
-    });
-    return aux;
+  let aux = '';
+  arr && arr.forEach((el, i) => {
+    const imputados = el.imputado
+      ? el.imputado
+          .map((p, idx) => {
+            if (idx === 0) return p.nombre;
+            if (idx === el.imputado.length - 1) return ` y ${p.nombre}`;
+            return `, ${p.nombre}`;
+          })
+          .join('')
+      : '';
+
+    aux += `Defensa ${el.tipo}: ${el.nombre} ${
+      imputados ? `(En representación de ${imputados})` : ''
+    } ${el.asistencia ? '' : '(ausente)'} ${
+      el.presencial ? '' : '(virtual)'
+    }${arr.length !== i + 1 ? '\n' : ''}`;
+  });
+  return aux;
 }
 
 export function listImputado(arr) {

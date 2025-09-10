@@ -310,6 +310,12 @@
     background-color: #1F1F1F;
     vertical-align: bottom;
 }
+.inputLeftSelected, .inputLeftDeSelected{
+    cursor: pointer;
+}
+.inputLeftDeSelected{
+    opacity: .3;
+}
 .inputLeft:hover{
     border: solid 1px #3C3C3C;
 }
