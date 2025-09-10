@@ -488,7 +488,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     <select className={`${styles.inputLeft} ${styles.inputLeft100}  ${styles.inputLeftSelect}`} onChange={(e) => setRazonDemora(e.target.value)}>
                         <option value={razonDemora}>{razonDemora}</option>
                         {desplegables.motivoDemora && desplegables.motivoDemora.map(el => <option key={el} value={el}>{el}</option>)}
-                    </select></span>19618
+                    </select></span>
                 </>
             }
             <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
