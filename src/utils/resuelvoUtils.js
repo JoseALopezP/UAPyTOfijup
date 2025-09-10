@@ -19,9 +19,9 @@ export function listDefensa(arr) {
     const imputados = el.imputado
       ? el.imputado
           .map((p, idx) => {
-            if (idx === 0) return p.nombre;
-            if (idx === el.imputado.length - 1) return ` y ${p.nombre}`;
-            return `, ${p.nombre}`;
+            if (idx === 0) return p.nombre.split(',').join('');
+            if (idx === el.imputado.length - 1) return ` y ${p.nombre.split(',').join('')}`;
+            return `, ${p.nombre.split(',').join('')}`;
           })
           .join('')
       : '';
