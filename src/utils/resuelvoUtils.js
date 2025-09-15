@@ -5,7 +5,7 @@ import { removeHtmlTags } from "./removeHtmlTags";
 import { minutaPrep } from "./minutaPrep";
 import { todayFunction } from "./dateUtils";
 
-export function listFiscal(arr, ufi) {
+export function listFiscal(arr, ufi) {  
     let aux = '';
     arr && arr.forEach((el, i) => {
         aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
@@ -14,9 +14,10 @@ export function listFiscal(arr, ufi) {
 }
 
 export function listDefensa(arr) {
+    console.log(arr)
   let aux = '';
   arr && arr.forEach((el, i) => {
-    const imputados = (el.imputado & el.imputado.length > 1)
+    const imputados = (el.imputado && el.imputado.length > 0)
       ? el.imputado
           .map((p, idx) => {
             if (idx === 0) return p.nombre.split(',').join('');
@@ -25,7 +26,6 @@ export function listDefensa(arr) {
           })
           .join('')
       : '';
-
     aux += `Defensa ${el.tipo}: ${el.nombre} ${
       imputados ? `(En representación de ${imputados})` : ''
     } ${el.asistencia ? '' : '(ausente)'} ${
