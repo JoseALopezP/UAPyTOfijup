@@ -1,0 +1,17 @@
+.viewBlock{
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+    font-family: inherit;
+    color: #fff;
+    height: 99.5vh;
+    margin-left: 2.5%;
+}
+.addJuicioSection{
+    width: 30%;
+    height: 100%;
+    border: solid #303030;
+    border-width: 0 1px 0 0;
+    display: inline-flex;
+    flex-direction: column;
+}

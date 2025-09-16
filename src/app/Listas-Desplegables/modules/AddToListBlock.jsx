@@ -14,7 +14,6 @@ export default function AddToListBlock({desplegablesOption}) {
         await deleteDesplegable(desplegablesOption, element)
         await updateDesplegables()
     }
-    
     return (
         <div className={styles.addToListBlock}>
             <span className={`${styles.inputDesplegableBlock}`}>
