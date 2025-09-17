@@ -8,10 +8,37 @@
     margin-left: 2.5%;
 }
 .addJuicioSection{
-    width: 30%;
+    width: 20%;
     height: 100%;
     border: solid #303030;
     border-width: 0 1px 0 0;
     display: inline-flex;
     flex-direction: column;
+}
+.cargaLabel{
+    text-align: center;
+}
+
+.multiInput{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+.multiJuicioInput, .juicioInput{
+    background-color: #2B2B2B;
+    color: #fff;
+    outline: none;
+    border: #303030 solid 1px;
+    font-size: 16px;
+    border-radius: 2px;
+    text-align: center;
+    padding: 2px;
+}
+.multiJuicioInput{
+    width: 29%;
+    margin: 0 1% 0 1%;
+}
+.juicioInput{
+    margin: 0 10px 0 10px;
 }
