@@ -56,3 +56,8 @@
 .juicioInput{
     margin: 0 10px 5px 10px;
 }
+.erroresList{
+    background-color: #8a2222;
+    margin: 16px;
+    border-radius: 4px;
+}
