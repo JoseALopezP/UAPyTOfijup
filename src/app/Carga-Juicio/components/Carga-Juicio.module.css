@@ -61,3 +61,11 @@
     margin: 16px;
     border-radius: 4px;
 }
+.bloqueListSection{
+    display: inline-flex;
+    flex-direction: column;
+    width: 30%;
+    height: 100%;
+    border: solid #303030;
+    border-width: 0 1px 0 0;
+}

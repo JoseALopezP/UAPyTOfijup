@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context/DataContext'
 
-export default function AddJuicioInfo(){
+export default function AddJuicioInfo({setBloquesArray}){
     const {updateDesplegables, desplegables} = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true) 
@@ -138,6 +138,10 @@ export default function AddJuicioInfo(){
             navigator.clipboard.writeText(cells);
         }
     }
+    const handleGenerar = () => {
+        const aux = []
+        
+    }
     useEffect(() => {
         updateDesplegables()
     }, []);
@@ -259,7 +263,7 @@ export default function AddJuicioInfo(){
                     </option>))}
             </datalist>
             <span className={`${styles.multiInput}`}>
-                <button type='button' className={`${styles.juicioButton}`}>GENERAR</button>
+                <button type='button' className={`${styles.juicioButton}`} onClick={() => handleGenerar()}>GENERAR</button>
                 <button type='button' className={`${styles.juicioButton}`} onClick={() => handleCopiar()}>COPIAR</button>
             </span>
             <span className={`${styles.erroresList}`}>{erroresList}</span>
