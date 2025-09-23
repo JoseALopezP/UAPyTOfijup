@@ -5,8 +5,8 @@ export function BloqueList ({array=[{fechaD: '21',fechaM: '09',fechaA: '2025', h
     return(
         <section className={`${styles.bloqueListSection}`}>
             <span className={`${styles.timeSelectorBar}`}>
-                <select>
-                    <label>Seleccionar horario</label>
+                <label className={`${styles.timeSelectorLabel}`}>Seleccionar horario:</label>
+                <select className={`${styles.timeSelector}`}>
                     <option value={'16'}>8</option>
                     <option value={'16'}>16</option>
                 </select>

@@ -69,3 +69,72 @@
     border: solid #303030;
     border-width: 0 1px 0 0;
 }
+.timeSelectorBar{
+    height: 40px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    border: solid #303030;
+    border-width: 0 0 1px 0;
+}
+.bloqueJuicioSection{
+    width: calc(100% - 28px);
+    height: 40px;
+    padding: 6px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    border: solid #303030 1px;
+    border-radius: 4px;
+    margin: 10px;
+}
+.timeSelectorLabel{
+    height: 30px;
+    margin: 5px;
+    font-size: large;
+    width: 40%;
+}
+.timeSelector{
+    background-color: #303030;
+    color: #fff;
+    margin: 2px;
+    height: calc(100% - 8px);
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+    cursor: pointer;
+}
+.lineSeparator{
+    font-size: 20px;
+    margin: 0 10px;
+}
+.inputDateTime, .inputDateTimeDouble{
+    background-color: #2B2B2B;
+    border-radius: 4px;
+    font-size: 18px;
+    outline: none;
+    margin: 4px;
+    border: none;
+    padding: 0 8px;
+    text-align: center;
+    color: #cecece;
+}
+.inputDateTime{
+    width: 28px;
+}
+.inputDateTimeDouble{
+    width: 56px;
+}
+.dateTimeJuicio{
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.horizontalSeparator{
+    width: 90%;
+    margin: 8px 5%;
+    border: #cecece solid;
+    border-width: 1px 0 0 0;
+    height: 1px;
+    height: 0;
+}
