@@ -79,7 +79,7 @@
 }
 .bloqueJuicioSection{
     width: calc(100% - 28px);
-    height: 40px;
+    height: fit-content;
     padding: 6px;
     display: inline-flex;
     flex-direction: column;
@@ -137,4 +137,46 @@
     border-width: 1px 0 0 0;
     height: 1px;
     height: 0;
+}
+.controlJuicio{
+    display: inline-flex;
+    flex-direction: row;
+}
+.testigosList{
+    height: fit-content;
+    display: inline-flex;
+    flex-direction: column;
+    width: 50%;
+    border: #838383 solid;
+    border-width: 0 1px 0 0;
+}
+.testigoIndiv{
+    width: 100%;
+    height: fit-content;
+    border: #363636 solid;
+    border-width: 1px 0 0 0;
+    border-radius: 4px;
+    display: inline-flex;
+    flex-direction: row;
+}
+.testigoIndiv:nth-child(1){
+    border-width: 0;
+}
+.testigoIndiv p{
+    margin: 4px 0;
+}
+.completado{
+    color: #28a745;
+}
+.noCompletado{
+    color: #ffc107;
+}
+.estadoBlock{
+    width: 50%;
+}
+.estadoBlock p{
+    text-align: center;
+    width: 100%;
+    height: fit-content;
+    margin: 4px 0;
 }

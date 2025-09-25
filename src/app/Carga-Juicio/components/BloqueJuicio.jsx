@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 
-export function BloqueJuicio ({bloque, testigos}){
+export function BloqueJuicio ({bloque, testigos=[{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '00', completo: true, dni:12121212},{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '30', completo: false, dni:12121212}]}){
     const [fechaD, setFechaD] = useState(bloque.fechaD)
     const [fechaM, setFechaM] = useState(bloque.fechaM)
     const [fechaA, setFechaA] = useState(bloque.fechaA)
@@ -19,7 +19,15 @@ export function BloqueJuicio ({bloque, testigos}){
             </span>
             <span className={`${styles.horizontalSeparator}`}></span>
             <span className={`${styles.controlJuicio}`}>
-                {}
+                <span className={`${styles.testigosList}`}>
+                    {testigos && testigos.filter(el => (el.fechaD === fechaD && el.fechaM === fechaM && el.fechaA === fechaA)).map(el =>(
+                        <span className={`${styles.testigoIndiv}`}>{el.completo === true ? <p className={`${styles.completado}`}>&nbsp;⬤</p> : <p className={`${styles.noCompletado}`}>◯</p>}<p>&nbsp;{el.nombre}</p></span>
+                    ))}
+                </span>
+                <span className={`${styles.estadoBlock}`}>
+                    <p>BLOQUE 1</p>
+                    <p>FINALIZADA</p>
+                </span>
             </span>
         </div>
     )
