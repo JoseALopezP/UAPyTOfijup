@@ -41,6 +41,8 @@ export default function AddJuicioInfo({setBloquesArray}){
     const [fiscalError, setFiscalError] = useState(true)
     const [defensa, setDefensa] = useState('')
     const [defensaError, setDefensaError] = useState(true)
+    const [defensaCargo, setDefensaCargo] = useState('')
+    const [defensaCargoError, setDefensaCargoError] = useState(true)
     const [querella, setQuerella] = useState('')
     const [querellaError, setQuerellaError] = useState(true)
     const [juez1, setJuez1] = useState('')
@@ -67,6 +69,7 @@ export default function AddJuicioInfo({setBloquesArray}){
         listCheck(tipoDelito, setTipoDelitoError, desplegables.delitosTipos)
         listCheck(fiscal, setFiscalError, desplegables.fiscal)
         listCheck(defensa, setDefensaError, desplegables.defensa)
+        listCheck(defensaCargo, setDefensaCargoError, desplegables.defensorias)
         typeCheck(querella, setQuerellaError, 'string')
         listCheck(juez1, setJuez1Error, desplegables.jueces)
         if(tipoTribunal === "COLEGIADO"){
@@ -110,7 +113,7 @@ export default function AddJuicioInfo({setBloquesArray}){
         if(value >= min && value <= max){
             setter(true)
         }else{
-            setter(false)
+            setter(false) 
         }
     }
     const listCheck = (value, setter, list) =>{
@@ -130,6 +133,17 @@ export default function AddJuicioInfo({setBloquesArray}){
     const changeHandler = (value, setter, errorSetter, errorchecker, check1, check2=0) =>{
         setter(value)
         errorchecker(value, errorSetter, check1, check2)
+    }
+    const changeHandlerSplitter = (value, setter, errorSetter, errorchecker, check1, check2, setterCargo, setterCargoError) =>{
+        const aux = value.split(' - ')[1]
+        setter(value)
+        errorchecker(value, errorSetter, check1)
+        if(check2.includes(aux)){
+            listCheck(aux,setterCargoError, check2)
+            setterCargo(aux)
+        }else{
+            setterCargo('')
+        }
     }
     const handleCopiar = () =>{
         if(checkCompletion()){
@@ -156,9 +170,6 @@ export default function AddJuicioInfo({setBloquesArray}){
                     placeholder='00000' value={numeroLeg2}/>
                 <input className={numeroLeg3Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
                     placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, numberCheck,0,2100)} value={numeroLeg3}/></span>
-            <label className={`${styles.cargaLabel}`}>UFI</label>
-            <input className={ufiError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setUfi,setUfiError,listCheck,desplegables.ufi)} value={ufi} list='ufi'/>
             <label className={`${styles.cargaLabel}`}>Auto de Apertura</label>
                 <span className={`${styles.multiInput}`}>
                     <input className={fechadError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
@@ -201,13 +212,19 @@ export default function AddJuicioInfo({setBloquesArray}){
             </select>
             <label className={`${styles.cargaLabel}`}>Fiscal</label>
             <input className={fiscalError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setFiscal,setFiscalError,listCheck,desplegables.fiscal)} value={fiscal} list='fiscal'/>
+                onChange={e => changeHandlerSplitter(e.target.value,setFiscal,setFiscalError,listCheck,desplegables.fiscal, desplegables.ufi, setUfi, setUfiError)} value={fiscal} list='fiscal'/>
+            <label className={`${styles.cargaLabel}`}>UFI</label>
+            <input className={ufiError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
+                onChange={e => changeHandler(e.target.value,setUfi,setUfiError,listCheck,desplegables.ufi)} value={ufi} list='ufi'/>
             <label className={`${styles.cargaLabel}`}>Cantidad de testigos</label>
             <input className={cantTestigosError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
                 onChange={e => changeHandler(e.target.value, setCantTestigos, setCantTestigosError, numberCheck, 0, 999)} value={cantTestigos}/>
             <label className={`${styles.cargaLabel}`}>Defensa</label>
             <input className={defensaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setDefensa,setDefensaError,listCheck,desplegables.defensa)} value={defensa} list='defensa'/>
+                onChange={e => changeHandlerSplitter(e.target.value,setDefensa,setDefensaError,listCheck,desplegables.defensa, desplegables.defensorias, setDefensaCargo, setDefensaCargoError)} value={defensa} list='defensa'/>
+            <label className={`${styles.cargaLabel}`}>Defensoria</label>
+            <input className={defensaCargoError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value,setDefensaCargo,setDefensaCargoError,listCheck,desplegables.defensaCargo)} value={defensaCargo} list='defensorias'/>
             <label className={`${styles.cargaLabel}`}>Querella</label>
             <input className={querellaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
                 onChange={e => changeHandler(e.target.value,setQuerella,setQuerellaError,typeCheck,'string')} value={querella}/>
@@ -237,6 +254,13 @@ export default function AddJuicioInfo({setBloquesArray}){
                     <option key={el} value={el}>
                     {el}
                 </option>))}
+            </datalist>
+            <datalist id="defensorias" className={`${styles.tableCellInput}`}>
+                {desplegables.defensorias && desplegables.defensorias.map((el) => (
+                    <option key={el} value={el}>
+                    {el}
+                    </option>))}
+                    <option key={''} value={''}></option>
             </datalist>
             <datalist id="jueces" className={`${styles.tableCellInput}`}>
                 {desplegables.jueces && desplegables.jueces.map((el) => (
