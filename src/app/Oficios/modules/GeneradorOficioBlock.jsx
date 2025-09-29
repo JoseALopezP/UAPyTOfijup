@@ -23,8 +23,22 @@ export default function GeneradorOficioBlock({item, date, resuelvo}) {
         setInputList(list);
     };
     const submitHandler = (e) => {
+      const errorM = 'Falta:'
+      item.numeroLeg ? errorM+='' : errorM+=' número de legajo,'
+      item.caratula ? errorM+='' : errorM+=' carátula,'
+      item.tipo ? errorM+='' : errorM+=' tipo,'
+      item.juez ? errorM+='' : errorM+=' juez,'
+      item.resuelvo ? errorM+='' : errorM+=' resuelvo,'
+      item.mpf ? errorM+='' : errorM+=' mpf,'
+      item.defensa ? errorM+='' : errorM+=' defensa,'
+      item.imputado ? errorM+='' : errorM+=' imputado,'
+      item.operador ? errorM+='' : errorM+=' operador,'
+      if(errorM === 'Falta:'){
         e.preventDefault();
         generateOficioSection(item,date,traslado,inputList, resuelvo, imputadoList.filter(item => item.selected === true))
+      }else{
+        alert(errorM)
+      }
     };
     function editarPropiedad(arr, idBuscado, nuevoValor) {
       const nuevoArray = arr.map((item, i) => {
