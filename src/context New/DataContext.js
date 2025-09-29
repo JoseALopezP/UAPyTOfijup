@@ -1,21 +1,21 @@
 import React, { createContext, useState } from "react";
-import getCollection from "@/firebase/firestore/getCollection";
-import addData from "@/firebase/firestore/addData";
-import removeFromArray from "@/firebase/firestore/removeFromArray";
-import removeData from "@/firebase/firestore/removeData";
-import getDocument from "@/firebase/firestore/getDocument";
-import checkDoc from "@/firebase/firestore/checkDoc";
-import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument";
-import pushToHitos from "@/firebase/firestore/pushToHitos";
-import updateListItem from "@/firebase/firestore/updateListItem";
-import getList from "@/firebase/firestore/getList";
-import addStringToList from "@/firebase/firestore/addStringToList";
+import getCollection from "@/firebase new/firestore/getCollection";
+import addData from "@/firebase new/firestore/addData";
+import removeFromArray from "@/firebase new/firestore/removeFromArray";
+import removeData from "@/firebase new/firestore/removeData";
+import getDocument from "@/firebase new/firestore/getDocument";
+import checkDoc from "@/firebase new/firestore/checkDoc";
+import addOrUpdateDocument from "@/firebase new/firestore/addOrUpdateDocument";
+import pushToHitos from "@/firebase new/firestore/pushToHitos";
+import updateListItem from "@/firebase new/firestore/updateListItem";
+import getList from "@/firebase new/firestore/getList";
+import addStringToList from "@/firebase new/firestore/addStringToList";
 import { todayFunction } from "@/utils/dateUtils";
-import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
-import updateDocumentListener from "@/firebase/firestore/updateDocumentListener";
-import removeStringFromList from "@/firebase/firestore/removeStringFromList";
-import getDocumentGeneral from "@/firebase/firestore/getDocumentGeneral";
-import oldAddOrUpdateDocument from "@/firebase/firestore/oldAddOrUpdateDocument";
+import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunction";
+import updateDocumentListener from "@/firebase new/firestore/updateDocumentListener";
+import removeStringFromList from "@/firebase new/firestore/removeStringFromList";
+import getDocumentGeneral from "@/firebase new/firestore/getDocumentGeneral";
+import oldAddOrUpdateDocument from "@/firebase new/firestore/oldAddOrUpdateDocument";
 
 export const DataContext = createContext({});
 
@@ -53,12 +53,14 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             alert(`Error: ${error.message}`);
         }
     }
+    const addAudiencia = async (data, date) => {
+        await addOrUpdateDocument("audiencias", date, data);
+        await addStringToList("legajos", data.numeroLeg, "list", { ...data, fecha: date });
+    };
 
     const context = {
         updateToday,
         updateByDate,
-        updateInformacion,
-        docExists,
         addAudiencia,
         addSorteo,
         deleteAudiencia,
