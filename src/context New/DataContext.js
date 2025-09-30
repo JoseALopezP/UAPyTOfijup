@@ -23,6 +23,7 @@ const { Provider } = DataContext;
 
 export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [today, setToday] = useState(defaultValue);
+    const [errorMessage, setErrorMessage] = useState('')
     const [dateToUse, setDateToUse] = useState("");
     const [desplegables, setDesplegables] = useState(defaultValue);
     const [modelosMinuta, setModelosMinuta] = useState(defaultValue);
@@ -41,7 +42,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         setToday(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
-            alert(`Error: ${error.message}`);
+            setErrorMessage(`${error.message}`);
         }
     }
     const updateByDate = async (date) =>{
@@ -50,7 +51,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         setBydate(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
-            alert(`Error: ${error.message}`);
+            setErrorMessage(`${error.message}`);
         }
     }
     const addAudiencia = async (data, date) => {
@@ -58,17 +59,30 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         await addOrUpdateDocument("audiencias", date, data);
         } catch (error) {
             console.error("Failed to add document:", error.message);
-            alert(`Error: ${error.message}`);
+            setErrorMessage(`${error.message}`);
         }
     };
     const updateLegajosDatabase = async (data) => {
-        await addOrUpdateDocument("legajos", data.numeroLeg, data);
+        try {
+            await addOrUpdateDocument("legajos", data.numeroLeg, data);
+        } catch (error) {
+            console.error("Failed to add document:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
     }
-
+    const addSorteo = async (data) =>{
+        try {
+        await addOrUpdateDocument("sorteo", date, data);
+        } catch (error) {
+            console.error("Failed to add sorteo:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const context = {
         updateToday,
         updateByDate,
         addAudiencia,
+        updateLegajosDatabase,
         addSorteo,
         deleteAudiencia,
         addInfo,
