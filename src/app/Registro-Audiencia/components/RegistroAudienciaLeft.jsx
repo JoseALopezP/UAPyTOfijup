@@ -143,8 +143,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 if (itemList.includes(item)) {
                     await updateData(dateToUse, item.numeroLeg, item.hora, field, itemList.filter(i => i !== item), (item.aId || false));
                 }
-            }
-        }
+        }}
         await handleRemove(mpf, removedMpf, 'mpf');
         await handleRemove(defensa, removedDefensa, 'defensa');
         await handleRemove(imputado, removedImputado, 'imputado');
@@ -201,7 +200,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             setTipo3Aux(tipo3)
         }
         }
-        if (await checkForResuelvo(item)) {
+        if (await checkForResuelvo(item)){
             await updateRealTime();
             await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', realTime, (item.aId || false));
         }

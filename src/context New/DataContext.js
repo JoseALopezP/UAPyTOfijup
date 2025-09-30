@@ -16,6 +16,7 @@ import updateDocumentListener from "@/firebase new/firestore/updateDocumentListe
 import removeStringFromList from "@/firebase new/firestore/removeStringFromList";
 import getDocumentGeneral from "@/firebase new/firestore/getDocumentGeneral";
 import oldAddOrUpdateDocument from "@/firebase new/firestore/oldAddOrUpdateDocument";
+import deleteDocumentAndObject from "@/firebase new/firestore/deleteDocumentAndObject";
 
 export const DataContext = createContext({});
 
@@ -70,11 +71,19 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
-    const addSorteo = async (data) =>{
+    const addSorteo = async (data) =>{ //revisar esto, que guarde todo en un mismo documento y no un nuevo documento por sorteo, innecesario
         try {
         await addOrUpdateDocument("sorteo", date, data);
         } catch (error) {
             console.error("Failed to add sorteo:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const deleteAudiencia = async (date, audId) =>{
+        try {
+        await deleteDocumentAndObject(date, audId);
+        } catch (error) {
+            console.error("Failed to delete audiencia:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
