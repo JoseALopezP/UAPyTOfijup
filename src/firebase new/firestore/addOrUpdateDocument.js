@@ -2,9 +2,9 @@ import { doc, setDoc, deleteDoc, getDocs, collection, getFirestore } from "fireb
 import firebase_app from "../config";
 const db = getFirestore(firebase_app);
 
-export default async function addOrUpdateDocument(collectionName, fechaId, data) {
+export default async function addOrUpdateDocument(collectionName, colName, data) {
     try {
-        const targetCollectionRef = collection(db, collectionName, fechaId);
+        const targetCollectionRef = collection(db, collectionName, colName);
         await addDoc(targetCollectionRef, data);
     } catch (e) {
         console.error("Error adding document:", e);

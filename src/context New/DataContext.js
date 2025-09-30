@@ -54,9 +54,16 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const addAudiencia = async (data, date) => {
+        try {
         await addOrUpdateDocument("audiencias", date, data);
-        await addStringToList("legajos", data.numeroLeg, "list", { ...data, fecha: date });
+        } catch (error) {
+            console.error("Failed to add document:", error.message);
+            alert(`Error: ${error.message}`);
+        }
     };
+    const updateLegajosDatabase = async (data) => {
+        await addOrUpdateDocument("legajos", data.numeroLeg, data);
+    }
 
     const context = {
         updateToday,
