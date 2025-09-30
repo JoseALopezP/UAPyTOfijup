@@ -23,12 +23,12 @@ export default function GeneradorOficioBlock({item, date, resuelvo}) {
         setInputList(list);
     };
     const submitHandler = (e) => {
-      const errorM = 'Falta:'
+      let errorM = 'Falta:'
       item.numeroLeg ? errorM+='' : errorM+=' número de legajo,'
       item.caratula ? errorM+='' : errorM+=' carátula,'
       item.tipo ? errorM+='' : errorM+=' tipo,'
       item.juez ? errorM+='' : errorM+=' juez,'
-      item.resuelvo ? errorM+='' : errorM+=' resuelvo,'
+      item.resuelvoText ? errorM+='' : errorM+=' resuelvo,'
       item.mpf ? errorM+='' : errorM+=' mpf,'
       item.defensa ? errorM+='' : errorM+=' defensa,'
       item.imputado ? errorM+='' : errorM+=' imputado,'
