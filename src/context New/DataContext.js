@@ -1,22 +1,24 @@
 import React, { createContext, useState } from "react";
 import getCollection from "@/firebase new/firestore/getCollection";
 import addData from "@/firebase new/firestore/addData";
-import removeFromArray from "@/firebase new/firestore/removeFromArray";
 import removeData from "@/firebase new/firestore/removeData";
 import getDocument from "@/firebase new/firestore/getDocument";
 import checkDoc from "@/firebase new/firestore/checkDoc";
 import addOrUpdateDocument from "@/firebase new/firestore/addOrUpdateDocument";
 import pushToHitos from "@/firebase new/firestore/pushToHitos";
 import updateListItem from "@/firebase new/firestore/updateListItem";
-import getList from "@/firebase new/firestore/getList";
-import addStringToList from "@/firebase new/firestore/addStringToList";
+import getListCollection from "@/firebase new/firestore/getListCollection";
+import addStringToList from "@/firebase new/firestore/addStringToArray";
 import { todayFunction } from "@/utils/dateUtils";
 import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunction";
 import updateDocumentListener from "@/firebase new/firestore/updateDocumentListener";
-import removeStringFromList from "@/firebase new/firestore/removeStringFromList";
 import getDocumentGeneral from "@/firebase new/firestore/getDocumentGeneral";
 import oldAddOrUpdateDocument from "@/firebase new/firestore/oldAddOrUpdateDocument";
 import deleteDocumentAndObject from "@/firebase new/firestore/deleteDocumentAndObject";
+import addSorteoFirebase from "@/firebase new/firestore/addSorteoFirebase";
+import { updateDocumentAndObjectField } from "@/firebase new/firestore/updateDocumentAndObjectField";
+import addStringToArray from "@/firebase new/firestore/addStringToArray";
+import removeStringFromArray from "@/firebase new/firestore/removeStringFromArray";
 
 export const DataContext = createContext({});
 
@@ -24,14 +26,14 @@ const { Provider } = DataContext;
 
 export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [today, setToday] = useState(defaultValue);
+    const [todayView, setTodayView] = useState(defaultValue);
     const [errorMessage, setErrorMessage] = useState('')
     const [dateToUse, setDateToUse] = useState("");
     const [desplegables, setDesplegables] = useState(defaultValue);
     const [modelosMinuta, setModelosMinuta] = useState(defaultValue);
     const [realTime, setRealTime] = useState(null);
-    const [años, setAños] = useState(defaultValue);
-    const [jueces, setJueces] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
+    const [bydateView, setBydateView] = useState(defaultValue);
     const [byLegajo, setByLegajo] = useState(defaultValue);
     const [informacion, setInformacion] = useState(defaultValue);
     const [userType, setUsertype] = useState("");
@@ -39,8 +41,17 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
 
     const updateToday = async () =>{
         try {
-        const data = await getList(collectionName, todayFunction);
+        const data = await getListCollection('audiencias', todayFunction);
         setToday(data)
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const updateTodayView = async () =>{
+        try {
+        const data = await getDocument('audienciasView', todayFunction);
+        setTodayView(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
@@ -48,8 +59,17 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     }
     const updateByDate = async (date) =>{
         try {
-        const data = await getList(collectionName, date);
+        const data = await getListCollection('audiencias', date);
         setBydate(data)
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const updateByDateView = async (date) =>{
+        try {
+        const data = await getDocument('audienciasView', date);
+        setBydateView(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
@@ -71,60 +91,73 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
-    const addSorteo = async (data) =>{ //revisar esto, que guarde todo en un mismo documento y no un nuevo documento por sorteo, innecesario
+    const addSorteo = async (data, date) =>{
         try {
-        await addOrUpdateDocument("sorteo", date, data);
+        await addSorteoFirebase("sorteo", date, data);
         } catch (error) {
-            console.error("Failed to add sorteo:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const getSorteoList = async (date) =>{
+        try {
+        const data = await getDocument('sorteos', date);
+        setSorteoList(data)
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
     const deleteAudiencia = async (date, audId) =>{
         try {
-        await deleteDocumentAndObject(date, audId);
+            await deleteDocumentAndObject(date, audId);
         } catch (error) {
-            console.error("Failed to delete audiencia:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
+    const updateData = async (date, audId, property, newValue) =>{
+        try {
+            await updateDocumentAndObjectField(date, audId, property, newValue)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const addDesplegable = async (type, data) => {
+        try{
+            await addStringToArray("desplegables", "desplegables", type, data);
+        } catch (error) {
+            setErrorMessage(`${error.message}`)
+        }
+    };
+    const deleteDesplegable = async (type, data) => {
+        await removeStringFromArray("desplegables", "desplegables", type, data);
+    };
+    const updateDesplegables = async () => {
+        try {
+            const data = await getDocument('desplegables', 'desplegables');
+            if (data) {
+                setDesplegables(data);
+            } else {
+                setDesplegables({});
+            }
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    };
+    const addModeloMinuta = async () =>{
+
+    }
+    const removeModeloMinuta = async () =>{
+
+    }
+    const updateModelosMinuta = async () =>{
+        
+    }
+
     const context = {
-        updateToday,
-        updateByDate,
-        addAudiencia,
-        updateLegajosDatabase,
-        addSorteo,
-        deleteAudiencia,
-        addInfo,
-        deleteInfo,
-        updateJueces,
-        updateAños,
-        updateData,
-        updateDataToday,
-        pushtToArray,
-        addUser,
-        checkUserType,
-        updateRealTime,
-        updateDesplegables,
-        updateModelosMinuta,
-        addDesplegable,
-        setDateToUse,
-        updateByDateListener,
-        deleteDesplegable,
-        getByDate,
-        updateByDateSorteo,
-        updateByLegajo,
-        modelosMinuta,
-        dateToUse,
-        desplegables,
-        realTime,
-        userType,
-        años,
-        today,
-        bydate,
-        byLegajo,
-        informacion,
-        jueces,
-        sorteoList,
+        updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
+        addDesplegable, deleteDesplegable, updateDesplegables,
+        todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables
     };
     return <Provider value={context}>{children}</Provider>;
 };

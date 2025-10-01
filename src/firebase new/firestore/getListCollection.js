@@ -3,9 +3,9 @@ import { getFirestore, collection, getDocs} from "firebase/firestore";
 
 const db = getFirestore(firebase_app);
 
-export default async function getList(collectionName, fechaId) {
+export default async function getListCollection(collectionName, date) {
     try {
-        const subcol = collection(db, collectionName, fechaId);
+        const subcol = collection(db, collectionName, date);
         const snapshot = await getDocs(subcol);
         return snapshot.docs.map(doc => doc.data());
     } catch (e) {
