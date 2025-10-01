@@ -43,19 +43,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             setUfi(mpf[0].nombre.split(' - ')[1])
         }
     }
-    const normalizeDefensa = arr =>
-        Array.isArray(arr)
-            ? arr.map(d => ({
-                id: d.id,
-                nombre: d.nombre?.trim() || "",
-                matricula: d.matricula?.trim() || ""
-            }))
-            : [];
-        const deepEqualById = (a, b) => {
-        const aIds = a.map(d => d.id).sort();
-        const bIds = b.map(d => d.id).sort();
-        return JSON.stringify(aIds) === JSON.stringify(bIds);
-    };
     const updateImputado = (id, newData) => {
         setImputado(prev =>
             prev.map(p => (p.id === id ? { ...p, ...newData } : p))
@@ -75,7 +62,11 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 : def.condenado,
         }))
     )};
-
+    const updateById = (setter, id, newData) => {
+        setter(prev =>
+            prev.map(item => (item.id === id ? { ...item, ...newData } : item))
+        );
+    };
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
     setter(prev => {
     const updated = [...prev];
@@ -233,12 +224,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setTipo3(tipo3Aux)
     }
     const checkGuardar = useCallback(async() => {
-        const defensaClean = normalizeDefensa(defensa);
-        const defensa2Clean = normalizeDefensa(defensa2);
         const guardarStatus = !deepEqual(caratula2, caratula) ||
             !deepEqual(mpf2, mpf) ||
             !deepEqual(razonDemora2, razonDemora) ||
-            !deepEqualById(defensaClean, defensa2Clean) ||
+            !deepEqual(defensa, defensa2) ||
             (showReconversion & !deepEqual(tipoAux, tipo)) ||
             (showReconversion & !deepEqual(tipo2Aux, tipo2)) ||
             (showReconversion & !deepEqual(tipo3Aux, tipo3)) ||
@@ -288,7 +277,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             </button>}
             {item.hitos &&
                 <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
-                <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg></span>
             }
             {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse}/>}
@@ -386,15 +375,15 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.nombre}
-                            onChange={(e) => handleInputChange(setImputado, index, 'nombre', e.target.value)}
+                            onChange={(e) => updateById(setImputado, input.id, { nombre: e.target.value })}
                             placeholder="Nombre"/>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.dni}
-                            onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
+                            onChange={(e) => updateById(setImputado, input.id, { dni: e.target.value })}
                             placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => updateById(setImputado, input.id, { asistencia: !input.asistencia })}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => updateById(setImputado, input.id, { presencial: !input.presencial })}>
                             {input.presencial ?  'FIS' : 'VIR'}
                         </button>
                         <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
@@ -450,8 +439,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <div className={`${styles.inputLeftColumn}`}>
                             {imputado.length > 0 && imputado.map(el => {
                             const isSelected = Array.isArray(defensa[index].imputado) &&
-                                defensa[index].imputado.some(item => item.id === el.id); // check by id
-
+                                defensa[index].imputado.some(item => item.id === el.id);
                             return (
                                 <span
                                 key={el.id}
