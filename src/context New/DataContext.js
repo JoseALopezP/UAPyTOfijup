@@ -19,6 +19,7 @@ import addSorteoFirebase from "@/firebase new/firestore/addSorteoFirebase";
 import { updateDocumentAndObjectField } from "@/firebase new/firestore/updateDocumentAndObjectField";
 import addStringToArray from "@/firebase new/firestore/addStringToArray";
 import removeStringFromArray from "@/firebase new/firestore/removeStringFromArray";
+import { removeObject } from "@/firebase new/firestore/removeObject";
 
 export const DataContext = createContext({});
 
@@ -140,23 +141,39 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
                 setDesplegables({});
             }
         } catch (error) {
-            console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
         }
     };
-    const addModeloMinuta = async () =>{
-
+    const addOrUpdateModeloMinuta = async (name, data) =>{
+        try{
+            await setOrUpdateObject('desplegables', 'modelosMinuta', name, data)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
     }
-    const removeModeloMinuta = async () =>{
-
+    const removeModeloMinuta = async (name) =>{
+        try{
+            await removeObject('desplegables', 'modelosMinuta', name)
+        } catch (error) {
+            removeObject(`${error.message}`);
+        }
     }
     const updateModelosMinuta = async () =>{
-        
+        try {
+            const data = await getDocument('desplegables', 'modelosMinuta');
+            if (data) {
+                setDesplegables(data);
+            } else {
+                setDesplegables({});
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
     }
 
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
-        addDesplegable, deleteDesplegable, updateDesplegables,
+        addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta,
         todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables
     };
     return <Provider value={context}>{children}</Provider>;

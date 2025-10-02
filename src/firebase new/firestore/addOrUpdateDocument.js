@@ -5,10 +5,10 @@ const db = getFirestore(firebase_app);
 
 export default async function addOrUpdateDocument(collectionName, colName, data) {
   try {
-    const targetCollectionRef = collection(db, collectionName, colName, "audiencias");
+    const targetCollectionRef = collection(db, collectionName, colName);
     const newDocRef = await addDoc(targetCollectionRef, data);
     const audId = newDocRef.id;
-    const audienciasViewRef = doc(db, "audienciasView", "audiencias");
+    const audienciasViewRef = doc(db, "audienciasView", colName);
     await setDoc(
       audienciasViewRef,
       { [audId]: data },
