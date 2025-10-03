@@ -10,6 +10,7 @@ import addStringToArray from "@/firebase new/firestore/addStringToArray";
 import removeStringFromArray from "@/firebase new/firestore/removeStringFromArray";
 import { removeObject } from "@/firebase new/firestore/removeObject";
 import { addOrUpdateObject } from "@/firebase new/firestore/addOrUpdateObject";
+import { countDocs } from "@/firebase new/firestore/countDocs";
 
 export const DataContext = createContext({});
 
@@ -166,18 +167,18 @@ const { Provider } = DataContext;
         }
     }
     const moveBetween = async (date) =>{
-        const 
-        try {
-        await addOrUpdateDocument("audiencias", date, data);
-        } catch (error) {
-            console.error("Failed to add document:", error.message);
-            setErrorMessage(`${error.message}`);
+        const data = await getList("audiencias", date);
+        await data.forEach(el =>{
+            addOrUpdateDocument("audiencias", date, el);
+        })
+        const amount = await countDocs('audiencias/'+date+'/audiencias')
+        if(amount > 1){
+            
         }
     }
-
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
-        addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo,
+        addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween,
         todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo
     };
     return <Provider value={context}>{children}</Provider>;
