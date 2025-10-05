@@ -5,7 +5,7 @@ import { useContext, useEffect } from "react"
 import AudienciasListDisplay from './AudienciasListDisplay'
 import { DataContext } from '@/context/DataContext'
 import SorteoModule from './SorteoModule'
-import { useAuthContext } from '@/context/AuthContext'
+import { useAuthContext } from '@/context New/AuthContext'
 import { useRouter } from 'next/navigation';
 
 export default function AudienciasListBlock({audFunction, dateFunction, dateToUse, showList, setShowList}) {

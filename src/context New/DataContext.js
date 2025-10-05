@@ -25,6 +25,7 @@ const { Provider } = DataContext;
     const [bydate, setBydate] = useState(defaultValue);
     const [bydateView, setBydateView] = useState(defaultValue);
     const [byLegajo, setByLegajo] = useState(defaultValue);
+    const [releaseNotes, setReleaseNotes] = useState(defaultValue);
     const [sorteoList, setSorteoList] = useState([]);
 
     const updateToday = async () =>{
@@ -100,7 +101,6 @@ const { Provider } = DataContext;
         const data = await getDocument('sorteos', date);
         setSorteoList(data)
         } catch (error) {
-            console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
@@ -173,10 +173,26 @@ const { Provider } = DataContext;
         })
         const amount = await countDocs('audiencias/'+date+'/audiencias')
     }
+    const addReleaseNote = async (name, data) =>{
+        try{
+            await addOrUpdateObject('informacion', 'releaseNotes', name, data)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const updateReleaseNotes = async () =>{
+        try {
+        const data = await getDocument('informacion', 'releaseNotes');
+        setReleaseNotes(data)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
-        addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween,
-        todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo
+        addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote,
+        updateReleaseNotes,
+        todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes
     };
     return <Provider value={context}>{children}</Provider>;
 };

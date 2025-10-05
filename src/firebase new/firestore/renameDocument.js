@@ -5,7 +5,7 @@ import {
   doc,
   setDoc
 } from "firebase/firestore";
-import firebase_app from "../config";
+import firebase_app from "../../firebase/config";
 
 const db = getFirestore(firebase_app);
 

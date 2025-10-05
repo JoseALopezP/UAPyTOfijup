@@ -1,6 +1,6 @@
 'use client'
 import styles from './ControlUac.module.css'
-import { AuthContextProvider} from "@/context/AuthContext";
+import { AuthContextProvider} from "@/context New/AuthContext";
 import { DataContextProvider } from "@/context/DataContext";
 import TableHead from './components/TableHead';
 import { useEffect, useState } from 'react';

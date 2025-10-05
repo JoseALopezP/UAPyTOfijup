@@ -5,7 +5,7 @@ import { DataContext } from '@/context/DataContext'
 import { todayFunction } from '@/utils/dateUtils'
 import { AddAudienciaList } from './AddAudienciasList'
 import { AddAudienciaForm } from './AddAudienciaForm'
-import { useAuthContext } from '@/context/AuthContext'
+import { useAuthContext } from '@/context New/AuthContext'
 import { useRouter } from 'next/navigation';
 
 export function AddAudienciaBlock() {

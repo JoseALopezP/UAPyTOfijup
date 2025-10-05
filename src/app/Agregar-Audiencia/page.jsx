@@ -1,5 +1,5 @@
 'use client'
-import { AuthContextProvider } from '@/context/AuthContext';
+import { AuthContextProvider } from '@/context New/AuthContext';
 import { AddAudienciaBlock } from "./components/AddAudienciaBlock";
 
 import { DataContextProvider } from '@/context/DataContext';

@@ -4,7 +4,7 @@ import RegistroAudienciaList from './components/RegistroAudienciaList';
 import { todayFunction } from '@/utils/dateUtils';
 import styles from './RegistroAudiencia.module.css'
 import { DataContextProvider } from '@/context/DataContext';
-import { AuthContextProvider } from '@/context/AuthContext';
+import { AuthContextProvider } from '@/context New/AuthContext';
 import RegistroAudienciaControl from './components/RegistroAudienciaControl';
 
 export default function Page() {

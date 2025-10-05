@@ -4,7 +4,7 @@ import { useContext, useEffect } from 'react';
 import { SelectDate } from '../../components/SelectDate';
 import AudienciaRegistroIndiv from './AudienciaRegistroIndiv';
 import { DataContext} from '@/context/DataContext';
-import { useAuthContext } from '@/context/AuthContext'
+import { useAuthContext } from '@/context New/AuthContext'
 import { useRouter } from 'next/navigation';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 

@@ -2,7 +2,7 @@ import { Clock } from './Clock'
 import styles from './ScheduleTable.module.css'
 import { InfoBlock } from './InfoBlock'
 import { useEffect, useState } from 'react';
-import { useAuthContext } from '@/context/AuthContext';
+import { useAuthContext } from '@/context New/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export function InformationSection ({setFilterValue, filterValue}) {

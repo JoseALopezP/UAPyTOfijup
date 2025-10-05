@@ -1,10 +1,10 @@
 'use client'
 import styles from './administracionLogistica.module.css'
-import { AuthContextProvider} from "@/context/AuthContext";
-import { DataContextProvider } from "@/context/DataContext";
+import { AuthContextProvider} from "@/context New/AuthContext";
+import { DataContextProvider } from "@/context New/DataContext";
 import DownloadXLSX from './modules/DownloadXLSX';
 import DownloadXLSXInforme from './modules/DownloadXLSXInforme';
-import renameDocument from '@/firebase/firestore/renameDocument';
+import renameDocument from '@/firebase new/firestore/renameDocument';
 
 export default function page() {
     return (

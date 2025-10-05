@@ -1,5 +1,5 @@
 'use client'
-import { AuthContextProvider} from "@/context/AuthContext";
+import { AuthContextProvider} from "@/context New/AuthContext";
 import { DataContextProvider } from "@/context/DataContext";
 import MenuSelector from "./menu/components/MenuSelector";
 

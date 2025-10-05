@@ -1,6 +1,6 @@
 'use client'
 import styles from './components/Carga-Juicio.module.css'
-import { AuthContextProvider} from "@/context/AuthContext";
+import { AuthContextProvider} from "@/context New/AuthContext";
 import { DataContextProvider } from "@/context/DataContext";
 import AddJuicioInfo from './components/AddJuicioInfo';
 import { BloqueList } from './components/BloqueList';
