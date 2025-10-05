@@ -5,13 +5,13 @@ import { AddBlock } from './AddBlock';
 import { AudienciaIndiv } from './AudienciaIndiv';
 
 export function AudienciaAddList() {
-    const { updateByDate, bydate } = useContext(DataContext);
+    const { updateByDateView, bydate } = useContext(DataContext);
     const [dateToUse, setDateToUse] = useState('');
     useEffect(() => {
         if (!dateToUse) return;
-        updateByDate(dateToUse);
+        updateByDateView(dateToUse);
         const interval = setInterval(() => {
-            updateByDate(dateToUse);
+            updateByDateView(dateToUse);
         }, 30000);
         return () => clearInterval(interval); 
     }, [dateToUse]);
