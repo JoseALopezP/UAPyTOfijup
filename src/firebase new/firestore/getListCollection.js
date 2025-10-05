@@ -4,12 +4,15 @@ import { getFirestore, collection, getDocs} from "firebase/firestore";
 const db = getFirestore(firebase_app);
 
 export default async function getListCollection(collectionName, date) {
-    try {
-        const subcol = collection(db, collectionName, date);
-        const snapshot = await getDocs(subcol);
-        return snapshot.docs.map(doc => doc.data());
-    } catch (e) {
-        console.error("Firebase fetch error:", e);
-        throw new Error(e.message || "Failed to fetch data from Firestore.");
-    }
+  try {
+    const subcol = collection(db, collectionName, date);
+    const snapshot = await getDocs(subcol);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (e) {
+    console.error("Firebase fetch error:", e);
+    throw new Error(e.message || "Failed to fetch data from Firestore.");
+  }
 }
