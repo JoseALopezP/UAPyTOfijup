@@ -55,6 +55,15 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
+    const getByDate = async (date) =>{
+        try {
+        const data = await getListCollection('audiencias', date);
+        return data
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const updateByDateView = async (date) =>{
         try {
         const data = await getDocument('audienciasView', date);
@@ -191,7 +200,7 @@ const { Provider } = DataContext;
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
         addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote,
-        updateReleaseNotes,
+        updateReleaseNotes, getByDate,
         todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes
     };
     return <Provider value={context}>{children}</Provider>;

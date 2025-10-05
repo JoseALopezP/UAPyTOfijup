@@ -1,6 +1,6 @@
 import { useEffect, useContext, useState } from 'react';
 import styles from './AddAudiencia.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import InputReloj from '@/app/components/InputReloj';
 
 export function AddAudienciaIndiv({date, element}) {
@@ -112,39 +112,39 @@ export function AddAudienciaIndiv({date, element}) {
         }
         if(cambios){
             if((minuto !== minutoBis || hora !== horaBis) && hora !== '' && minuto !== ''){
-                await updateData(date, element.numeroLeg, element.hora, 'hora', `${hora.replace(/:/g, '')}:${minuto}`, (element.aId || false));
+                await updateData(date, element.id, 'hora', `${hora.replace(/:/g, '')}:${minuto}`);
                 setHoraBis(hora)
                 setMinutoBis(minuto)}
             if(sala !== salaBis && sala !== ''){
-                await updateData(date, element.numeroLeg, element.hora, 'sala', sala, (element.aId || false));
+                await updateData(date, element.id, 'sala', sala);
                 setSalaBis(sala)}
             if(legajo !== legajoBis && legajo !== ''){
-                await updateData(date, element.numeroLeg, element.hora, 'numeroLeg', legajo, (element.aId || false));
+                await updateData(date, element.id, 'numeroLeg', legajo);
                 setLegajoBis(legajo)}
             if(tipo !== tipoBis && tipo !== ''){
-                await updateData(date, element.numeroLeg, element.hora, 'tipo', tipo, (element.aId || false));
+                await updateData(date, element.id, 'tipo', tipo);
                 setTipoBis(tipo)}
             if(tipo2 !== tipo2Bis){
-                await updateData(date, element.numeroLeg, element.hora, 'tipo2', tipo2, (element.aId || false));
+                await updateData(date, element.id, 'tipo2', tipo2);
                 setTipo2Bis(tipo2)}
             if(tipo3 !== tipo3Bis){
-                await updateData(date, element.numeroLeg, element.hora, 'tipo3', tipo3, (element.aId || false));
+                await updateData(date, element.id, 'tipo3', tipo3,);
                 setTipo3Bis(tipo3)}
             if((juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis) && juez !== ''){
                 if(juez.includes('+')){
                     (desplegables.jueces.includes(juez1) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) && 
-                    await updateData(date, element.numeroLeg, element.hora, 'juez', `${juez1}+${juez2}+${juez3}`, (element.aId || false));
+                    await updateData(date, element.id, 'juez', `${juez1}+${juez2}+${juez3}`);
                     setJuez1Bis(juez1)
                     setJuez2Bis(juez2)
                     setJuez3Bis(juez3)
                     setJuezBis(juez)
                 }else{
                     desplegables.jueces.includes(juez1) && 
-                    await updateData(date, element.numeroLeg, element.hora, 'juez', juez1, (element.aId || false));
+                    await updateData(date, element.id, 'juez', juez1);
                     setJuez1Bis(juez1)
                 }}
             if(del){
-                await deleteAudiencia(date, element.numeroLeg, element.hora);
+                await deleteAudiencia(date, element.id);
             }
             setCambios(false)
         }

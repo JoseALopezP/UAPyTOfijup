@@ -2,7 +2,7 @@
 import { getValuesInDateRangeInforme } from '@/utils/excelUtils'
 import styles from '../administracionLogistica.module.css'
 import { useState, useContext } from 'react'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 
 export default function DownloadXLSXInforme() {
     const [fechaInicio, setFechaInicio] = useState('')

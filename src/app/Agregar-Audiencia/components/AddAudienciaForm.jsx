@@ -1,7 +1,7 @@
 "use client";
 import { useState, useContext, useEffect } from "react";
 import styles from "./AddAudiencia.module.css";
-import { DataContext } from "@/context/DataContext";
+import { DataContext } from "@/context New/DataContext";
 import { SelectDate } from "@/app/components/SelectDate";
 
 export function AddAudienciaForm({ dateFunction, date }) {
