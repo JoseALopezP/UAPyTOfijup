@@ -1,11 +1,11 @@
 import { useEffect, useContext, useState } from 'react';
 import styles from './audiencia.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { Oficio } from './Oficio';
 
 export function AudienciaIndiv({ date, element }) {
-    const { updateByDate, updateData, deleteAudiencia, updateDesplegables, desplegables } = useContext(DataContext);
+    const { updateByDateView, updateData, deleteAudiencia, updateDesplegables, desplegables } = useContext(DataContext);
     const [oficio, setOficio] = useState(false);
     const [editable, setEditable] = useState(false);
     const [changeButton, setChangeButton] = useState(false);
@@ -29,43 +29,43 @@ export function AudienciaIndiv({ date, element }) {
         event.preventDefault();
         if (editable) {
             if (cancelar) {
-                await updateData(date, element.numeroLeg, element.hora, 'estado', 'CANCELADA', (element.aId || false));
+                await updateData(date, element.id, 'estado', 'CANCELADA');
             }
             if (reprogramar) {
-                await updateData(date, element.numeroLeg, element.hora, 'estado', 'REPROGRAMADA', (element.aId || false));
+                await updateData(date, element.id, 'estado', 'REPROGRAMADA');
             }
             if (situacion !== originalSituacion) {
-                await updateData(date, element.numeroLeg, element.hora, 'situacion', situacion, (element.aId || false));
+                await updateData(date, element.id, 'situacion', situacion);
                 setOriginalSituacion(situacion);
             }
             if (admin !== originalAdmin) {
-                await updateData(date, element.numeroLeg, element.hora, 'admin', admin, (element.aId || false));
+                await updateData(date, element.id, 'admin', admin);
                 setOriginalAdmin(admin);
             }
             if (juezN && originalJuezN !== juezN) {
-                await updateData(date, element.numeroLeg, element.hora, 'juezN', juezN, (element.aId || false));
+                await updateData(date, element.id, 'juezN', juezN);
                 setOriginalJuezN(juezN);
             }
             if (deleteAud) {
-                await deleteAudiencia(date, element.numeroLeg, element.hora);
+                await deleteAudiencia(date, element.id);
             }
             if (resultado !== originalResultado) {
-                await updateData(date, element.numeroLeg, element.hora, 'resultado', resultado, (element.aId || false));
+                await updateData(date, element.id, 'resultado', resultado);
                 setOriginalResultado(resultado);
             }
             if (hora !== originalHora) {
-                await updateData(date, element.numeroLeg, element.hora, 'hora', hora, (element.aId || false));
+                await updateData(date, element.id, 'hora', hora);
                 setOriginalHora(hora);
             }
             if (comentario) {
-                await updateData(date, element.numeroLeg, element.hora, 'comentario', comentario, (element.aId || false));
+                await updateData(date, element.id, 'comentario', comentario);
             }
             if (control !== 'nocontrolado') {
-                await updateData(date, element.numeroLeg, element.hora, 'control', control, (element.aId || false));
+                await updateData(date, element.id, 'control', control);
                 setControl('nocontrolado');
             }
             resetEditableState();
-            await updateByDate(date);
+            await updateByDateView(date);
         }
     };
 

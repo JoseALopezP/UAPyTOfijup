@@ -5,7 +5,7 @@ import { AddBlock } from './AddBlock';
 import { AudienciaIndiv } from './AudienciaIndiv';
 
 export function AudienciaAddList() {
-    const { updateByDateView, bydate } = useContext(DataContext);
+    const { updateByDateView, bydateView } = useContext(DataContext);
     const [dateToUse, setDateToUse] = useState('');
     useEffect(() => {
         if (!dateToUse) return;
@@ -38,7 +38,7 @@ export function AudienciaAddList() {
                     <span className={`${styles.tableCell} ${styles.tableCellAction}`}>ACCIÓN</span>
                 </div>
                 <AddBlock date={dateToUse} />
-                {bydate && bydate.sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el => (
+                {bydateView && bydateView.sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el => (
                     <AudienciaIndiv date={dateToUse} element={el} key={el.numeroLeg + el.hora} />
                 ))}
             </div>

@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import styles from './audiencia.module.css'
 import { generateOficioSection, generateResuelvoSection } from '@/utils/resuelvoUtils';
 
