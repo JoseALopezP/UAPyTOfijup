@@ -3,11 +3,12 @@ import styles from './AudienciaList.module.css'
 import { useContext, useEffect } from 'react'
 import { DataContext } from '@/context/DataContext';
 import { titillium } from '../ui/fonts';
+import { todayFunction } from '@/utils/dateUtils';
 
 export function AudienciaList () {
-    const {updateToday, today} = useContext(DataContext);
+    const {updateByDate, bydate} = useContext(DataContext);
     useEffect(() =>{
-        updateToday()
+        updateByDate(todayFunction())
     }, [])
     return(
         <>
@@ -24,7 +25,7 @@ export function AudienciaList () {
                     </tr>
                 </thead>
                 <tbody className={`${styles.tableBody}`}>
-                    {today && today.sort((a,b) => a-b).map(el =>
+                    {bydate && bydate.sort((a,b) => a-b).map(el =>
                     (<tr key={el.numeroLeg + el.hora}>
                         <td>{el.hora}</td>
                         <td>SALA {el.sala}</td>
