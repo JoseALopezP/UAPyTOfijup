@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useContext } from 'react'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 import styles from '../ControlUac.module.css'
 
 export default function TableIndiv({item, date}){
@@ -12,10 +12,10 @@ export default function TableIndiv({item, date}){
     const handleSave = async() =>{
         await setSaving(true)
         if(comment !== item.comentario){
-            await updateData(date, item.numeroLeg, item.hora, 'comentario', comment, (item.aId || false));
+            await updateData(date, item.id, 'comentario', comment);
         }
         if(result !== item.resultado){
-            await updateData(date, item.numeroLeg, item.hora, 'resultado', result, (item.aId || false));
+            await updateData(date, item.id, 'resultado', result);
         }
         await setSaving(false)
         await setSaved(true)
