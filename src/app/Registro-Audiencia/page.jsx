@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import RegistroAudienciaList from './components/RegistroAudienciaList';
 import { todayFunction } from '@/utils/dateUtils';
 import styles from './RegistroAudiencia.module.css'
-import { DataContextProvider } from '@/context/DataContext';
+import { DataContextProvider } from '@/context New/DataContext';
 import { AuthContextProvider } from '@/context New/AuthContext';
 import RegistroAudienciaControl from './components/RegistroAudienciaControl';
 

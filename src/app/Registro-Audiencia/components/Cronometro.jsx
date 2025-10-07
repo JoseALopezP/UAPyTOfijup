@@ -2,7 +2,7 @@
 
 import styles from '../RegistroAudiencia.module.css';
 import { useState, useContext, useEffect, useRef } from 'react';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 const translateColor = {
@@ -16,8 +16,7 @@ const translateColor = {
 };
 
 export default function Cronometro({ item, dateToUse, isHovered }) {
-    const { updateData, pushtToArray, updateByDate } = useContext(DataContext);
-
+    const { updateData, pushToAudienciaArray, updateByDate } = useContext(DataContext);
     const [estadoActual, setEstadoActual] = useState(item.estado);
     const [prevColor, setPrevColor] = useState(translateColor[item.estado] || '#6c757d');
     const [newColor, setNewColor] = useState(translateColor[item.estado] || '#6c757d');
@@ -74,14 +73,14 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
 
             const newAccum = stopwatchAccum + elapsed;
             setStopwatchAccum(newAccum);
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatch', newAccum, (item.aId || false));
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', 0, (item.aId || false));
+            await updateData(dateToUse, item.is, 'stopwatch', newAccum);
+            await updateData(dateToUse, item.id, 'stopwatchStart', 0);
             setStopwatchCurrent(0);
             setStopwatchRunning(false);
         } else {
             const now = Date.now();
             setTimeStampStart(now);
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'stopwatchStart', now, (item.aId || false));
+            await updateData(dateToUse, item.id, 'stopwatchStart', now);
             setStopwatchRunning(true);
         }
     };
@@ -97,8 +96,8 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
         setGuardando(true);
 
         if (newState === 'RESUELVO') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction(), (item.aId || false));
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`);
+            await updateData(dateToUse, id, 'resuelvo', updateRealTimeFunction());
+            await pushToAudienciaArray(dateToUse, item, 'hitos', `${updateRealTimeFunction()} | ${newState}`);
         } else {
             if (newState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
             if (estadoActual === 'EN_CURSO' && newState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
@@ -111,7 +110,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
             setCuartoShow(false);
         }
 
-        await updateData(dateToUse, item.numeroLeg, item.hora, 'estado', newState, (item.aId || false));
+        await updateData(dateToUse, item.id, 'estado', newState);
         setEstadoActual(newState);
         setGuardando(false);
         await updateByDate(dateToUse);

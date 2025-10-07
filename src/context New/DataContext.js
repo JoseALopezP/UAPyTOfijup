@@ -11,6 +11,7 @@ import removeStringFromArray from "@/firebase new/firestore/removeStringFromArra
 import { removeObject } from "@/firebase new/firestore/removeObject";
 import { addOrUpdateObject } from "@/firebase new/firestore/addOrUpdateObject";
 import { countDocs } from "@/firebase new/firestore/countDocs";
+import { pushItemToDocumentAndObjectField } from "@/firebase new/firestore/pushItemToDocumentAndObjectField";
 
 export const DataContext = createContext({});
 
@@ -127,6 +128,13 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
+    const pushToAudienciaArray = async (date, audId, property, newValue) =>{
+        try {
+            await pushItemToDocumentAndObjectField(date, audId, property, newValue)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const addDesplegable = async (type, data) => {
         try{
             await addStringToArray("desplegables", "desplegables", type, data);
@@ -197,10 +205,11 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
+    
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
         addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote,
-        updateReleaseNotes, getByDate,
+        updateReleaseNotes, getByDate, pushToAudienciaArray,
         todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes
     };
     return <Provider value={context}>{children}</Provider>;

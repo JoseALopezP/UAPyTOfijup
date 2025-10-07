@@ -1,7 +1,7 @@
 'use client'
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
 export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
   const { updateData } = useContext(DataContext);
@@ -48,8 +48,8 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
     isSavingRef.current = true;
 
     try {
-      await updateData(dateToUse, item.numeroLeg, item.hora, 'hitos', items, (item.aId || false));
-      hasChangesRef.current = false; // ya se guardaron
+      await updateData(dateToUse, item.id, 'hitos', items);
+      hasChangesRef.current = false;
     } catch (err) {
       console.error('Error guardando hitos:', err);
     } finally {
