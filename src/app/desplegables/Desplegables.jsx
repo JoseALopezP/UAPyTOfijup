@@ -1,7 +1,7 @@
 'use client'
 import { useContext, useEffect, useState } from 'react';
 import styles from './Desplegables.module.css'
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
 export default function Desplegables() {
     const [newFiscal, setNewFiscal] = useState('')
