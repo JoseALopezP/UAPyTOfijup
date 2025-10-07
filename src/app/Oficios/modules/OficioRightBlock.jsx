@@ -1,17 +1,15 @@
 import { caratulaGenerator } from '@/utils/caratulaUtils'
-import { testOficio } from '@/utils/testOficio';
 import styles from '../Oficios.module.css'
 import GeneradorOficioBlock from './GeneradorOficioBlock';
 import deepEqual from '@/utils/deepEqual';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import TextEditor from '@/app/Registro-Audiencia/components/TextEditor';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
 export default function OficioRightBlock({aud, date}) {
     const {updateData, updateByDate} = useContext(DataContext)
     const [showOficio, setShowOficio] = useState(false)
-    const [showStop, setShowStop] = useState(false)
     const [resuelvo, setResuelvo] = useState('');
     const [minuta, setMinuta] = useState('');
     const [resuelvo2, setResuelvo2] = useState('');
@@ -32,11 +30,11 @@ export default function OficioRightBlock({aud, date}) {
     const updateDataAud = async() =>{
             setGuardando(true)
             if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-                await updateData(date, aud.numeroLeg, aud.hora, 'resuelvoText', resuelvo, (aud.aId || false));
+                await updateData(date, aud.id, 'resuelvoText', resuelvo);
                 setResuelvo2(resuelvo);
             }
             if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-                await updateData(date, aud.numeroLeg, aud.hora, 'minuta', minuta, (aud.aId || false));
+                await updateData(date, aud.id, 'minuta', minuta);
                 setMinuta2(minuta);
             }
             await setGuardarInc(false)

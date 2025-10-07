@@ -1,19 +1,19 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext } from 'react'
 import styles from '../Oficios.module.css'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 
 export default function ControlButtonsBlock({date, aud, control, controlFunction, auxControl, setAuxControl}) {
     const {updateData} = useContext(DataContext)
     const handleClickControlado = () => {
         if(control !== 'controlado'){
-        updateData(date, aud.numeroLeg, aud.hora, 'control', 'controlado', (aud.aId || false))
+        updateData(date, aud.id, 'control', 'controlado')
         setAuxControl('controlado')
         controlFunction('controlado')
         }
     }
     const handleClickGuardar = () => {
         if(auxControl !== control){
-            updateData(date, aud.numeroLeg, aud.hora, 'control', control, (aud.aId || false))
+            updateData(date, aud.id, 'control', control)
             setAuxControl(control)
             controlFunction(control)
         }

@@ -1,7 +1,7 @@
 'use client'
 import styles from './Oficios.module.css'
 import { AuthContextProvider} from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context/DataContext";
+import { DataContextProvider } from "@/context New/DataContext";
 import AudienciasListBlock from './modules/AudienciasListBlock';
 import { todayFunction } from '@/utils/dateUtils';
 import { useState, useEffect } from 'react';

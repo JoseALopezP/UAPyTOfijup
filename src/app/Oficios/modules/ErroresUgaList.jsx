@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import styles from '../Oficios.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
 export default function ErroresUgaList({ aud, date, errores, setErrores }) {
     const { updateData } = useContext(DataContext);
@@ -10,7 +10,7 @@ export default function ErroresUgaList({ aud, date, errores, setErrores }) {
             i === index ? { ...error, estado: !error.estado } : error
         );
         setErrores(updatedErrores);
-        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', updatedErrores, (aud.aId || false));
+        await updateData(date, aud.id, 'erroresUga', updatedErrores);
     };
 
     const handleRemoveError = async (index) => {

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from '../Oficios.module.css';
 import ControlButtonsBlock from './ControlButtonsBlock';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import ErroresUgaList from './ErroresUgaList';
 
 export default function OficioLeftBlock({ date, aud }) {
@@ -18,12 +18,12 @@ export default function OficioLeftBlock({ date, aud }) {
         event.preventDefault();
         const newError = { tipo: errorTipo, comentario: errorInput, estado: false };
         setErrores((prev) => [...prev, newError]);
-        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', [...errores, newError], (aud.aId || false));
+        await updateData(date, aud.id, 'erroresUga', [...errores, newError]);
         setErrorTipo('');
         setErrorInput('');
     };
     const handleSave = async() =>{
-        await updateData(date, aud.numeroLeg, aud.hora, 'resultado', resultado, (aud.aId || false))
+        await updateData(date, aud.id, 'resultado', resultado)
         setResultadoSave(false)
     }
     useEffect(() => {

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from '../Oficios.module.css'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 import { nameTranslateActuario } from '@/utils/traductorNombres'
 
 export default function SorteoModule({date, arr}) {
@@ -24,10 +24,10 @@ export default function SorteoModule({date, arr}) {
     const handleAsignacion = async () => {
         for (const [index, el] of arr.entries()) {
             if(turno === true && parseInt(el.hora.split(':')[0], 10) < 14) {
-                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length], (element.el || false));
+                await updateData(date, el.id, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
             if(turno === false && parseInt(el.hora.split(':')[0], 10) >= 14){
-                await updateData(date, el.numeroLeg, el.hora, 'actuario', listaSeleccionado[index % listaSeleccionado.length], (element.el || false));
+                await updateData(date, el.id, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
         }
         await updateByDate(date)

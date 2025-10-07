@@ -3,7 +3,7 @@ import { SelectDate } from '@/app/components/SelectDate'
 import styles from '../Oficios.module.css'
 import { useContext, useEffect } from "react"
 import AudienciasListDisplay from './AudienciasListDisplay'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 import SorteoModule from './SorteoModule'
 import { useAuthContext } from '@/context New/AuthContext'
 import { useRouter } from 'next/navigation';

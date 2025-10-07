@@ -3,7 +3,7 @@ import { nameTranslateActuario } from '@/utils/traductorNombres'
 import styles from '../Oficios.module.css'
 import { oficioState } from '@/utils/oficioState'
 import { useContext, useEffect, useState } from 'react'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 
 const SVGs = {
     'vacio': (
@@ -34,7 +34,7 @@ export default function AudienciasListIndiv({item, audFunction, dateToUse}) {
     const {desplegables, updateData, updateDesplegables} = useContext(DataContext);
     const handleChange = (value) =>{
         setActuario(value)
-        updateData(dateToUse, item.numeroLeg, item.hora, 'actuario', value, (element.aId || false));
+        updateData(dateToUse, item.id, 'actuario', value);
     }
     useEffect(() => {
         updateDesplegables()
