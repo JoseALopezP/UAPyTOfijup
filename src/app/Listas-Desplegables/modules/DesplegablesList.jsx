@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import styles from '../listasDesplegables.module.css'
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
 export default function DesplegablesList({desplegableFunction}) {
     const { updateDesplegables, desplegables } = useContext(DataContext);

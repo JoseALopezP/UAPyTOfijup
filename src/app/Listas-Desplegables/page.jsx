@@ -1,7 +1,7 @@
 'use client'
 import styles from './listasDesplegables.module.css'
 import { AuthContextProvider} from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context/DataContext";
+import { DataContextProvider } from "@/context New/DataContext";
 import { useState } from 'react';
 import DesplegablesList from './modules/DesplegablesList';
 import AddToListBlock from './modules/AddToListBlock';

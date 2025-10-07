@@ -1,6 +1,6 @@
 import styles from '../listasDesplegables.module.css'
 import { useContext, useState } from "react";
-import { DataContext } from "@/context/DataContext";
+import { DataContext } from "@/context New/DataContext";
 
 export default function AddToListBlock({desplegablesOption}) {
     const { desplegables, addDesplegable, deleteDesplegable, updateDesplegables } = useContext(DataContext);
