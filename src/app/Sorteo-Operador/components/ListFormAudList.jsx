@@ -1,11 +1,11 @@
 import { useEffect, useContext } from 'react';
 import styles from '../sorteoOperador.module.css'
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import ListIndiv from './ListIndiv';
-import demoraCalculator from '@/utils/demoraCalculator';
+import { todayFunction } from '@/utils/dateUtils';
 
 export default function ListFormAudList({filtroValue,operadorFilled}) {
-    const { updateToday, today } = useContext(DataContext);
+    const { updateByDate, bydate } = useContext(DataContext);
     const sortFunction = (a, b) => {
         switch (filtroValue) {
             case 'OPERADOR':
@@ -34,11 +34,11 @@ export default function ListFormAudList({filtroValue,operadorFilled}) {
         }
     };
     useEffect(() => {
-        updateToday()
+        updateByDate(todayFunction())
     }, []);
     return (
         <span className={styles.listFormAudListBlock}>
-            {today && today.filter(el => filterFunction(el)).sort((a,b) => sortFunction(a,b)).map(el=>(
+            {bydate && bydate.filter(el => filterFunction(el)).sort((a,b) => sortFunction(a,b)).map(el=>(
                 <ListIndiv key={el.numeroLeg} item={el}/>
             ))}
         </span>

@@ -1,13 +1,13 @@
 import { useContext, useState } from 'react'
 import styles from '../SituacionCorporal.module.css'
-import { DataContext } from '@/context/DataContext'
+import { DataContext } from '@/context New/DataContext'
 
 export default function SitCorporalIndiv({aud, date, selected, selectedF}) {
     const [sit, setSit] = useState(aud.situacion)
     const {updateData} = useContext(DataContext)
     const handleSave = () =>{
         if(aud.situacion !== sit){
-            updateData(date, aud.numeroLeg, aud.hora, 'situacion', sit, (aud.aId || false));
+            updateData(date, aud.id, 'situacion', sit);
         }
     }
     return (

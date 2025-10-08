@@ -1,12 +1,11 @@
 import { useState, useContext, useEffect } from 'react';
 import styles from '../sorteoOperador.module.css'
-import { formatDate } from '@/utils/excelUtils';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
+import { todayFunction } from '@/utils/dateUtils';
 
 export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr, selectedSorteo, setSelectedSorteo, setEmptyTitle, setTitleSorteo}){
     const [sorteo, setSorteo] = useState([])
     const { addSorteo } = useContext(DataContext);
-    const today = formatDate(new Date())
     function shuffleArray() {
         if(!titleSorteo || titleSorteo === ''){
             setEmptyTitle(true);
@@ -24,7 +23,7 @@ export default function SorteoFunction({selectedList, titleSorteo, sorteoListCur
             addSorteo({
                 title: titleSorteo,
                 sorteo: shuffledArray
-            } , today)
+            } , todayFunction())
             setSorteoListCurr([{title: titleSorteo, sorteo: shuffledArray}, ...sorteoListCurr])
             setSelectedSorteo({title: titleSorteo, sorteo: shuffledArray})
             setTitleSorteo('')

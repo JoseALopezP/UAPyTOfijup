@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, useRef } from 'react'; // Importa useRef
 import styles from '../SituacionCorporal.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import { SitCorporalSelectDate } from './SitCorporalSelectDate';
 import { todayFunction } from '@/utils/dateUtils';
 import SitCorporalList from './SitCorporalList';

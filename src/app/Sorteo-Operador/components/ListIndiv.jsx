@@ -1,14 +1,15 @@
 import styles from '../sorteoOperador.module.css'
 import demoraCalculator from '@/utils/demoraCalculator';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import { nameTranslate } from '@/utils/traductorNombres';
 import { useContext, useEffect, useState } from 'react';
+import { todayFunction } from '@/utils/dateUtils';
 
 export default function ListIndiv({item}) {
-    const {desplegables, updateDataToday} = useContext(DataContext)
+    const {desplegables, updateData} = useContext(DataContext)
     const [operadorAud, setOperadorAud] = useState(item.operador || '')
     const handleOperadorChange = (value) =>{
-        updateDataToday(item.numeroLeg, item.hora, 'operador', value, (item.aId || false));
+        updateData(todayFunction(), item.id, 'operador', value);
         setOperadorAud(value)
     }
     useEffect(()=>{

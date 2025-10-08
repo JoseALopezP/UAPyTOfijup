@@ -30,7 +30,7 @@ const { Provider } = DataContext;
     const [byLegajo, setByLegajo] = useState(defaultValue);
     const [releaseNotes, setReleaseNotes] = useState(defaultValue);
     const [realTime, setRealTime] = useState(null)
-    const [sorteoList, setSorteoList] = useState([]);
+    const [sorteoList, setSorteoList] = useState(defaultValue);
 
     const updateToday = async () =>{
         try {

@@ -1,6 +1,5 @@
 'use client'
-import styles from './SituacionCorporal.module.css'
-import { DataContextProvider } from '@/context/DataContext';
+import { DataContextProvider } from '@/context New/DataContext';
 import { AuthContextProvider } from '@/context New/AuthContext';
 import SitCorporalBlock from './components/SitCorporalBlock';
 

@@ -2,12 +2,13 @@ import { useContext, useEffect, useState } from 'react';
 import OperadorSelector from './OperadorSelector';
 import SorteoFunction from './SorteoFunction';
 import styles from '../sorteoOperador.module.css'
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import SorteoList from './SorteoList';
 import { formatDate } from '@/utils/excelUtils';
+import { todayFunction } from '@/utils/dateUtils';
 
 export default function SorteoBlock() {
-    const { desplegables, updateDesplegables, updateByDateSorteo, sorteoList } = useContext(DataContext);
+    const { desplegables, updateDesplegables, getSorteoList, sorteoList } = useContext(DataContext);
     const [listaOriginal, setListaOriginal] = useState(desplegables.operador || []);
     const [listaSeleccionado, setListaSeleccionado] = useState([]);
     const [emptyTitle, setEmptyTitle] = useState(false)
@@ -17,7 +18,7 @@ export default function SorteoBlock() {
 
     useEffect(() => {
         updateDesplegables();
-        updateByDateSorteo(formatDate(new Date()))
+        getSorteoList(todayFunction())
     }, []);
     useEffect(() => {
         setListaOriginal(desplegables.operador || []);
