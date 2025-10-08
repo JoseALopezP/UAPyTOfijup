@@ -1,13 +1,13 @@
 'use client'
 import { useContext, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
-export default function RegistroChangeState({estado, dateToUse, numeroLegajo, audienciaHora, estadoFunction, aId}) {
+export default function RegistroChangeState({estado, dateToUse, audId, estadoFunction}) {
     const [changeToMake, setChangeToMake] = useState('')
     const [tiempoPedido, setTiempoPedido] = useState(false)
     const [pidiente, setPidiente] = useState(false)
-    const {updateData, updateRealTime, realTime, pushtToArray} = useContext(DataContext)
+    const {updateData, updateRealTime, realTime, pushToAudienciaArray} = useContext(DataContext)
     const states = {
         'FINALIZADA': ['REINICIAR', 'RESUELVO'],
         'CUARTO_INTERMEDIO': ['CONTINUAR'],
@@ -30,16 +30,16 @@ export default function RegistroChangeState({estado, dateToUse, numeroLegajo, au
     const handleSubmit = async() =>{
         await updateRealTime()
         if(changeToMake==='RESUELVO'){
-            await updateData(dateToUse, numeroLegajo, audienciaHora, 'resuelvo', realTime, (aId || false))
-            await pushtToArray(dateToUse, numeroLegajo, audienciaHora, `${realTime} | ${translate[changeToMake]}`)
+            await updateData(dateToUse, audId, 'resuelvo', realTime)
+            await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${translate[changeToMake]}`)
             setChangeToMake('')
         }
         if(changeToMake && changeToMake!=='RESUELVO'){
-            await updateData(dateToUse, numeroLegajo, audienciaHora, 'estado', translate[changeToMake], (aId || false))
+            await updateData(dateToUse, audId, 'estado', translate[changeToMake])
             if(changeToMake == 'CUARTO INTERMEDIO'){
-                await pushtToArray(dateToUse, numeroLegajo, audienciaHora, `${realTime} | ${translate[changeToMake]} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
+                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${translate[changeToMake]} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
             }else{
-                await pushtToArray(dateToUse, numeroLegajo, audienciaHora, `${realTime} | ${translate[changeToMake]}`)
+                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${translate[changeToMake]}`)
             }
         }
         await estadoFunction(translate[changeToMake])

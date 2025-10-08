@@ -3,7 +3,7 @@ import { useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { Reconversion } from './Reconversion';
 import styles from '../RegistroAudiencia.module.css';
 import RegistroChangeState from './RegistroChangeState';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import DeleteSVGF from './DeleteSVGF';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import deepEqual from '@/utils/deepEqual';
@@ -64,19 +64,18 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     )};
 
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
-  setter(prev => {
+    setter(prev => {
     const updated = [...prev];
     const current = updated[index] || {};
 
     if (toggleArray) {
       const arr = Array.isArray(current[key]) ? [...current[key]] : [];
       const exists = arr.some(item => item.id === valueObj.id);
-
       updated[index] = {
         ...current,
         [key]: exists
-          ? arr.filter(item => item.id !== valueObj.id) // remove by id
-          : [...arr, valueObj] // add object {id, nombre}
+          ? arr.filter(item => item.id !== valueObj.id)
+          : [...arr, valueObj]
       };
     } else {
       updated[index] = { ...current, [key]: valueObj };
@@ -141,7 +140,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         const handleRemove = async (itemList, removedList, field) => {
             for (const item of removedList) {
                 if (itemList.includes(item)) {
-                    await updateData(dateToUse, item.numeroLeg, item.hora, field, itemList.filter(i => i !== item), (item.aId || false));
+                    await updateData(dateToUse, item.id, field, itemList.filter(i => i !== item));
                 }
         }}
         await handleRemove(mpf, removedMpf, 'mpf');
@@ -153,48 +152,48 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setRemovedImputado([]);
         setRemovedPartes([]);
         if (!deepEqual(caratula2, caratula)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'caratula', caratula, (item.aId || false));
+            await updateData(dateToUse, item.id, 'caratula', caratula);
             setCaratula2(caratula)}
         if (!deepEqual(mpf2, mpf)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'mpf', mpf, (item.aId || false));
+            await updateData(dateToUse, item.id, 'mpf', mpf);
             setMpf2(mpf)} 
         if (!deepEqual(defensa2, defensa)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'defensa', defensa, (item.aId || false));
+            await updateData(dateToUse, item.id, 'defensa');
             setDefensa2(defensa)}
         if (!deepEqual(imputado2, imputado)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'imputado', imputado, (item.aId || false));
+            await updateData(dateToUse, item.id, 'imputado');
             setImputado2(imputado)}
         if (!deepEqual(partes2, partes)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'partes', partes, (item.aId || false));
+            await updateData(dateToUse, item.id, 'partes');
             setPartes2(partes)}
         if (!deepEqual(razonDemora2, razonDemora)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'razonDemora', razonDemora, (item.aId || false));
+            await updateData(dateToUse, item.id, 'razonDemora');
             setRazonDemora2(razonDemora)}
         if (!deepEqual(ufi2, ufi)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'ufi', ufi, (item.aId || false));
+            await updateData(dateToUse, item.id, 'ufi', ufi);
             setUfi2(ufi)}
         if (!deepEqual(saeNum2, saeNum)){
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'saeNum', saeNum, (item.aId || false));
+            await updateData(dateToUse, item.id, 'saeNum', saeNum);
             setSaeNum2(saeNum)
         }
         if(showReconversion){
         if (!deepEqual(tipo, tipoAux)){
             if(!deepEqual(tipo2, tipo2Aux)){
                 if(!deepEqual(tipo3, tipo3Aux)){
-                    await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo', tipo, (item.aId || false));
-                    await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo2', tipo2, (item.aId || false));
-                    await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo3', tipo3, (item.aId || false));
+                    await updateData(dateToUse, item.id, 'tipo', tipo);
+                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                    await updateData(dateToUse, item.id, 'tipo3', tipo3);
                 }else{
-                    await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo', tipo, (item.aId || false));
-                    await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo2', tipo2, (item.aId || false));
-                    await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo3', '', (item.aId || false));
+                    await updateData(dateToUse, item.id, 'tipo', tipo);
+                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                    await updateData(dateToUse, item.id, 'tipo3', '');
                 }
             }else{
-                await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo', tipo, (item.aId || false));
-                await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo2', '', (item.aId || false));
-                await updateData(dateToUse, item.numeroLeg, item.hora, 'tipo3', '', (item.aId || false));
+                await updateData(dateToUse, item.id, 'tipo', tipo);
+                await updateData(dateToUse, item.id, 'tipo2', '');
+                await updateData(dateToUse, item.id, 'tipo3', '');
             }
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`, (item.aId || false));
+            await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
             setTipoAux(tipo)
             setTipo2Aux(tipo2)
             setTipo3Aux(tipo3)
@@ -202,7 +201,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         }
         if (await checkForResuelvo(item)){
             await updateRealTime();
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', realTime, (item.aId || false));
+            await updateData(dateToUse, item.id, 'horaResuelvo', realTime);
         }
         await setGuardarInc(false)
         await setGuardando(false)
@@ -235,7 +234,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setNeedsSaving1(guardarStatus)
     }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion, saeNum, saeNum2]);
     const operadorChange = (valueAux) =>{
-        updateData(dateToUse, item.numeroLeg, item.hora, 'operador', valueAux, (item.aId || false))
+        updateData(dateToUse, item.id, 'operador', valueAux)
         setOperadorAud(valueAux)
     }
     const checkHoraDiff = () => {
@@ -277,7 +276,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             }
             {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse}/>}
             <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
-            <RegistroChangeState estadoFunction={setEstado} estado={estado} numeroLegajo={item.numeroLeg} audienciaHora={item.hora} dateToUse={dateToUse} aId={(item.aId || false)}/>
+            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
                 <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
                 <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>

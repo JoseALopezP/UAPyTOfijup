@@ -3,7 +3,7 @@ import styles from '../RegistroAudiencia.module.css'
 import { useContext, useEffect } from 'react';
 import { SelectDate } from '../../components/SelectDate';
 import AudienciaRegistroIndiv from './AudienciaRegistroIndiv';
-import { DataContext} from '@/context/DataContext';
+import { DataContext} from '@/context New/DataContext';
 import { useAuthContext } from '@/context New/AuthContext'
 import { useRouter } from 'next/navigation';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';

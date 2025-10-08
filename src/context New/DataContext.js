@@ -12,6 +12,8 @@ import { removeObject } from "@/firebase new/firestore/removeObject";
 import { addOrUpdateObject } from "@/firebase new/firestore/addOrUpdateObject";
 import { countDocs } from "@/firebase new/firestore/countDocs";
 import { pushItemToDocumentAndObjectField } from "@/firebase new/firestore/pushItemToDocumentAndObjectField";
+import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
+import { updateDocumentField } from "@/firebase new/firestore/updateDocumentField";
 
 export const DataContext = createContext({});
 
@@ -27,6 +29,7 @@ const { Provider } = DataContext;
     const [bydateView, setBydateView] = useState(defaultValue);
     const [byLegajo, setByLegajo] = useState(defaultValue);
     const [releaseNotes, setReleaseNotes] = useState(defaultValue);
+    const [realTime, setRealTime] = useState(null)
     const [sorteoList, setSorteoList] = useState([]);
 
     const updateToday = async () =>{
@@ -128,6 +131,13 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
+    const updateDataDeep = async (date, audId, property, newValue) =>{
+        try {
+            await updateDocumentField(date, audId, property, newValue)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const pushToAudienciaArray = async (date, audId, property, newValue) =>{
         try {
             await pushItemToDocumentAndObjectField(date, audId, property, newValue)
@@ -205,12 +215,15 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
+    const updateRealTime = async () => {
+        setRealTime(await updateRealTimeFunction());
+    };
     
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
         addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote,
-        updateReleaseNotes, getByDate, pushToAudienciaArray,
-        todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes
+        updateReleaseNotes, getByDate, pushToAudienciaArray, updateRealTime, updateDataDeep,
+        todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime
     };
     return <Provider value={context}>{children}</Provider>;
 };

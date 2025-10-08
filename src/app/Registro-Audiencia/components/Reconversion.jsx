@@ -1,7 +1,7 @@
 'use client'
 import styles from '../RegistroAudiencia.module.css'
 import { useContext, useEffect} from 'react'
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 
 
 export function Reconversion({ item, setTipo, setTipo2, setTipo3, tipo, tipo2, tipoAux, tipo2Aux}) {

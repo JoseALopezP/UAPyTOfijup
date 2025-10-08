@@ -2,7 +2,7 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
 import { guardarBackup } from '@/utils/localBackup';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { generatePDF } from '@/utils/pdfUtils';
 import deepEqual from '@/utils/deepEqual';
@@ -19,7 +19,7 @@ function extractNames(obj) {
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
-    const {updateData, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
+    const {updateDataDeep, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -52,19 +52,19 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     const updateDataAud = async() =>{
         setGuardando(true)
         if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvoText', resuelvo, (item.aId || false));
+            await updateDataDeep(dateToUse, item.id, 'resuelvoText', resuelvo);
             setResuelvo2(resuelvo);
         }
         if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'minuta', minuta, (item.aId || false));
+            await updateDataDeep(dateToUse, item.id, 'minuta', minuta);
             setMinuta2(minuta);
         }
         if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'cierre', cierre, (item.aId || false));
+            await updateDataDeep(dateToUse, item.id, 'cierre', cierre);
             setCierre2(cierre);
         }        
         if (checkForResuelvo(item)) {
-            await updateData(dateToUse, item.numeroLeg, item.hora, 'horaResuelvo', updateRealTimeFunction(), (item.aId || false));
+            await updateDataDeep(dateToUse, item.id, 'horaResuelvo', updateRealTimeFunction());
         }
         await setGuardarInc(false)
         await setGuardando(false)
