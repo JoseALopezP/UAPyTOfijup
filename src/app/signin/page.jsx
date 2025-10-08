@@ -1,6 +1,6 @@
 'use client'
 import { AuthContextProvider } from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context/DataContext";
+import { DataContextProvider } from "@/context New/DataContext";
 import SignIn from "./components/signin";
 
 export default function Home() {
