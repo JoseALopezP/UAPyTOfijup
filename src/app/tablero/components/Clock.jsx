@@ -1,6 +1,6 @@
 'use client'
 import styles from './ScheduleTable.module.css'
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import { DataContext } from '@/context/DataContext'
 
 export function Clock () {

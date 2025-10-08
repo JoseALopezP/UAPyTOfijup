@@ -1,9 +1,7 @@
 import { Clock } from './Clock'
 import styles from './ScheduleTable.module.css'
 import { InfoBlock } from './InfoBlock'
-import { useEffect, useState } from 'react';
-import { useAuthContext } from '@/context New/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export function InformationSection ({setFilterValue, filterValue}) {
     const [showInfo2, setShowInfo2] = useState(true);

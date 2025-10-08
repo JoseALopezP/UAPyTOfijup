@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState} from 'react';
 import styles from './ScheduleTable.module.css';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
+import { todayFunction } from '@/utils/dateUtils';
 
 export function ScheduleTable({filterValue}) {
-    const { updateToday, today, realTime} = useContext(DataContext);
-    const [todayFiltered, setTodayFiltered] = useState(today)
+    const { updateByDate, bydate, realTime} = useContext(DataContext);
+    const [todayFiltered, setTodayFiltered] = useState(bydate)
     const tick = () =>{
-        updateToday()
+        updateByDate(todayFunction())
     }
     useEffect(() => {
         tick()
@@ -16,7 +17,7 @@ export function ScheduleTable({filterValue}) {
         };
     }, []);
     useEffect(()=>{
-        const filteredData = today?.filter((sentence) => {
+        const filteredData = bydate?.filter((sentence) => {
             const searchableText = [
                 sentence.hora,
                 sentence.estado,
