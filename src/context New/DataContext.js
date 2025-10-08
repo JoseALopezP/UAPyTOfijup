@@ -4,7 +4,6 @@ import addOrUpdateDocument from "@/firebase new/firestore/addOrUpdateDocument";
 import getListCollection from "@/firebase new/firestore/getListCollection";
 import { todayFunction } from "@/utils/dateUtils";
 import deleteDocumentAndObject from "@/firebase new/firestore/deleteDocumentAndObject";
-import addSorteoFirebase from "@/firebase new/firestore/addSorteoFirebase";
 import { updateDocumentAndObjectField } from "@/firebase new/firestore/updateDocumentAndObjectField";
 import addStringToArray from "@/firebase new/firestore/addStringToArray";
 import removeStringFromArray from "@/firebase new/firestore/removeStringFromArray";
@@ -14,6 +13,7 @@ import { countDocs } from "@/firebase new/firestore/countDocs";
 import { pushItemToDocumentAndObjectField } from "@/firebase new/firestore/pushItemToDocumentAndObjectField";
 import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
 import { updateDocumentField } from "@/firebase new/firestore/updateDocumentField";
+import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
 
 export const DataContext = createContext({});
 
@@ -104,7 +104,7 @@ const { Provider } = DataContext;
     }
     const addSorteo = async (data, date) =>{
         try {
-        await addSorteoFirebase("sorteo", date, data);
+        await addObjectToDocument("sorteo", date, data, time);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
@@ -218,11 +218,14 @@ const { Provider } = DataContext;
     const updateRealTime = async () => {
         setRealTime(await updateRealTimeFunction());
     };
+    const addUser = async (data) => {
+        await addObjectToDocument("users", "listaUsuarios", data);
+    };
     
     const context = {
         updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
         addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote,
-        updateReleaseNotes, getByDate, pushToAudienciaArray, updateRealTime, updateDataDeep,
+        updateReleaseNotes, getByDate, pushToAudienciaArray, updateRealTime, updateDataDeep, addUser,
         todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime
     };
     return <Provider value={context}>{children}</Provider>;

@@ -4,7 +4,7 @@ import signUp from '@/firebase/auth/signup';
 import { DataContext } from '@/context/DataContext';
 
 export function SignUpBlock () {
-    const {addUser, addDesplegable, updateDesplegables, desplegables } = useContext(DataContext);
+    const {addUser} = useContext(DataContext);
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [userType, setUserType] = useState('')
@@ -13,7 +13,7 @@ export function SignUpBlock () {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const { result, error } = await signUp(email, password);
+            const { result } = await signUp(email, password);
             setEmail('');
             setPassword('');
             setUserType('');

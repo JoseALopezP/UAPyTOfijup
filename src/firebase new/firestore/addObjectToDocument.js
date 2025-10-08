@@ -3,12 +3,12 @@ import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);
 
-export default async function addObjectToDocument(colName, fechaId, data, idToUse) {
+export default async function addObjectToDocument(colName, docName, data) {
   try {
-    const sorteoDocRef = doc(db, colName, fechaId);
+    const docRef = doc(db, colName, docName);
     await setDoc(
-      sorteoDocRef,
-      { [idToUse]: data },
+      docRef,
+      { [Date.now()]: data },
       { merge: true }
     );
     return sorteoId;
