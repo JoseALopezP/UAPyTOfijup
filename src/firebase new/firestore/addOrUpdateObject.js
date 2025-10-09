@@ -1,5 +1,5 @@
 import firebase_app from "../config";
-import { doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 const db = getFirestore(firebase_app)
 
 export async function addOrUpdateObject(collectionName, docId, objectId, data) {

@@ -1,5 +1,4 @@
-import { getFirestore, collection } from "firebase/firestore";
-import { getCountFromServer } from "firebase/firestore";
+import { getFirestore, collection, getCountFromServer } from "firebase/firestore";
 import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);

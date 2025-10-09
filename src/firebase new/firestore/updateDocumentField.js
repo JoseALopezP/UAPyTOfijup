@@ -1,5 +1,6 @@
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import firebase_app from "../config";
+import { getFirestore, doc, updateDoc } from "firebase/firestore";
+const db = getFirestore(firebase_app);
 
 export const updateDocumentField = async (date, audId, field, value) => {
   try {
