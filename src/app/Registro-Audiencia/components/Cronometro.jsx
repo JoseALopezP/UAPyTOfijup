@@ -176,8 +176,6 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
                 '--prevColor': prevColor,
                 '--percentage': progress
             }}>
-
-            {/* Botones */}
             <span>
                 <button
                     onMouseDown={() => { if (states[estadoActual].includes('INICIAR')) { setIsPressing(true); setNewColor('#17a2b8'); setNewState('EN_CURSO'); } }}
