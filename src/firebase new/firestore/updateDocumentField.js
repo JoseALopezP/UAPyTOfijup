@@ -4,7 +4,7 @@ const db = getFirestore(firebase_app);
 
 export const updateDocumentField = async (date, audId, field, value) => {
   try {
-    const audDocRef = doc(db, "audiencias", date, audId);
+    const audDocRef = doc(db, "audiencias", date, 'audiencias', audId);
     await updateDoc(audDocRef, {
         [field]: value
     });

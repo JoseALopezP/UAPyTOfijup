@@ -2,7 +2,6 @@ import React, { createContext, useState } from "react";
 import getDocument from "@/firebase new/firestore/getDocument";
 import addOrUpdateDocument from "@/firebase new/firestore/addOrUpdateDocument";
 import getListCollection from "@/firebase new/firestore/getListCollection";
-import { todayFunction } from "@/utils/dateUtils";
 import deleteDocumentAndObject from "@/firebase new/firestore/deleteDocumentAndObject";
 import { updateDocumentAndObjectField } from "@/firebase new/firestore/updateDocumentAndObjectField";
 import addStringToArray from "@/firebase new/firestore/addStringToArray";
@@ -11,7 +10,7 @@ import { removeObject } from "@/firebase new/firestore/removeObject";
 import { addOrUpdateObject } from "@/firebase new/firestore/addOrUpdateObject";
 import { countDocs } from "@/firebase new/firestore/countDocs";
 import { pushItemToDocumentAndObjectField } from "@/firebase new/firestore/pushItemToDocumentAndObjectField";
-import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
+import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunction";
 import { updateDocumentField } from "@/firebase new/firestore/updateDocumentField";
 import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
 
@@ -20,8 +19,6 @@ export const DataContext = createContext({});
 const { Provider } = DataContext;
 
     export const DataContextProvider = ({ defaultValue = [], children }) => {
-    const [today, setToday] = useState(defaultValue);
-    const [todayView, setTodayView] = useState(defaultValue);
     const [errorMessage, setErrorMessage] = useState('');
     const [desplegables, setDesplegables] = useState(defaultValue);
     const [modelosMinuta, setModelosMinuta] = useState(defaultValue);
@@ -32,27 +29,9 @@ const { Provider } = DataContext;
     const [realTime, setRealTime] = useState(null)
     const [sorteoList, setSorteoList] = useState(defaultValue);
 
-    const updateToday = async () =>{
-        try {
-        const data = await getListCollection('audiencias', todayFunction());
-        setToday(data)
-        } catch (error) {
-            console.error("An error occurred during data loading:", error.message);
-            setErrorMessage(`${error.message}`);
-        }
-    }
-    const updateTodayView = async () =>{
-        try {
-        const data = await getDocument('audienciasView', todayFunction());
-        setTodayView(data)
-        } catch (error) {
-            console.error("An error occurred during data loading:", error.message);
-            setErrorMessage(`${error.message}`);
-        }
-    }
     const updateByDate = async (date) =>{
         try {
-        const data = await getListCollection('audiencias', date);
+        const data = await getListCollection('audiencias', date, 'audiencias');
         setBydate(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
@@ -61,7 +40,7 @@ const { Provider } = DataContext;
     }
     const getByDate = async (date) =>{
         try {
-        const data = await getListCollection('audiencias', date);
+        const data = await getListCollection('audiencias', date, 'audiencias');
         return data
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
@@ -79,7 +58,7 @@ const { Provider } = DataContext;
     }
     const addAudiencia = async (data, date) => {
         try {
-        await addOrUpdateDocument("audiencias", date, data);
+        await addOrUpdateDocument("audiencias", date, 'audiencias', data);
         } catch (error) {
             console.error("Failed to add document:", error.message);
             setErrorMessage(`${error.message}`);
@@ -93,9 +72,9 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateByLegajo = async (date) =>{
+    const updateByLegajo = async (legajo) =>{
         try {
-            const data = await getDocument('audienciasView', date);
+            const data = await getDocument('legajos', legajo);
             setByLegajo(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
@@ -104,7 +83,7 @@ const { Provider } = DataContext;
     }
     const addSorteo = async (data, date) =>{
         try {
-        await addObjectToDocument("sorteo", date, data, time);
+        await addOrUpdateObject("sorteo", date, time, data);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
@@ -152,7 +131,7 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`)
         }
     };
-    const deleteDesplegable = async (type, data) => {
+    const deleteDesplegables = async (type, data) => {
         await removeStringFromArray("desplegables", "desplegables", type, data);
     };
     const updateDesplegables = async () => {
@@ -196,7 +175,7 @@ const { Provider } = DataContext;
     const moveBetween = async (date) =>{
         const data = await getList("audiencias", date);
         await data.forEach(el =>{
-            addOrUpdateDocument("audiencias", date, el);
+            addOrUpdateDocument("audiencias", date, 'audiencias', data);
         })
         const amount = await countDocs('audiencias/'+date+'/audiencias')
     }
@@ -223,10 +202,10 @@ const { Provider } = DataContext;
     };
     
     const context = {
-        updateToday, updateTodayView, updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, 
-        addDesplegable, deleteDesplegable, updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote,
-        updateReleaseNotes, getByDate, pushToAudienciaArray, updateRealTime, updateDataDeep, addUser,
-        todayView, today, todayView, bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime
+        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables, 
+        updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate, 
+        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser,
+        bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime
     };
     return <Provider value={context}>{children}</Provider>;
 };

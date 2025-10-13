@@ -11,7 +11,7 @@ import updateListItem from "@/firebase/firestore/updateListItem";
 import getList from "@/firebase/firestore/getList";
 import addStringToList from "@/firebase/firestore/addStringToList";
 import { todayFunction } from "@/utils/dateUtils";
-import updateRealTimeFunction from "@/firebase/firestore/updateRealTimeFunction";
+import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunction";
 import updateDocumentListener from "@/firebase/firestore/updateDocumentListener";
 import removeStringFromList from "@/firebase/firestore/removeStringFromList";
 import getDocumentGeneral from "@/firebase/firestore/getDocumentGeneral";

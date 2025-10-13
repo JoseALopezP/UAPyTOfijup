@@ -3,12 +3,12 @@ import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);
 
-export default async function addOrUpdateDocument(collectionName, colName, data) {
+export default async function addOrUpdateDocument(collectionName, date, subCol, data) {
   try {
-    const targetCollectionRef = collection(db, collectionName, colName);
+    const targetCollectionRef = collection(db, collectionName, date, subCol);
     const newDocRef = await addDoc(targetCollectionRef, data);
     const audId = newDocRef.id;
-    const audienciasViewRef = doc(db, "audienciasView", colName);
+    const audienciasViewRef = doc(db, "audienciasView", date);
     await setDoc(
       audienciasViewRef,
       { [audId]: data },

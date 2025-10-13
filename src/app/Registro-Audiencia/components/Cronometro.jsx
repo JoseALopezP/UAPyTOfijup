@@ -3,7 +3,7 @@
 import styles from '../RegistroAudiencia.module.css';
 import { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '@/context New/DataContext';
-import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
+import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
 
 const translateColor = {
     'FINALIZADA': '#28a745',
