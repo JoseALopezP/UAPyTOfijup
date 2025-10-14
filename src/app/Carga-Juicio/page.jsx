@@ -8,12 +8,13 @@ import { useState } from 'react';
 
 export default function page(){
     const [bloquesArray, setBloquesArray] = useState([])
+
     return (
       <AuthContextProvider>
         <DataContextProvider>
           <section className={`${styles.viewBlock}`}>
             <AddJuicioInfo setBloquesArray={setBloquesArray}/>
-            <BloqueList setBloquesArray={setBloquesArray}/>
+            <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray}/>
           </section>
         </DataContextProvider>
       </AuthContextProvider>

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 
-export function BloqueJuicio ({bloque, testigos=[{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '00', completo: true, dni:12121212},{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '30', completo: false, dni:12121212}]}){
+export function BloqueJuicio ({bloque, testigos=[{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '00', completo: true, dni:12121212},{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '30', completo: false, dni:12121212}], last}){
     const [fechaD, setFechaD] = useState(bloque.fechaD)
     const [fechaM, setFechaM] = useState(bloque.fechaM)
     const [fechaA, setFechaA] = useState(bloque.fechaA)
     const [horaH, setHoraH] = useState(bloque.hora)
     const [horaM, setHoraM] = useState(bloque.minuto)
+    const [option, setOption] = useState(last ? 'LECTURA DE SENTENCIA' : 'DEBATE')
     return(
         <div className={`${styles.bloqueJuicioSection}`}>
             <span className={`${styles.dateTimeJuicio}`}>
@@ -28,6 +29,12 @@ export function BloqueJuicio ({bloque, testigos=[{nombre: 'Pepe Honguito',fechaD
                     <p>BLOQUE 1</p>
                     <p>FINALIZADA</p>
                 </span>
+            </span>
+            <span>
+                <select className={`${styles.bloqueTypeSelector}`} value={option} onChange={e => setOption(e.target.value)}>
+                    <option value={'DEBATE'}>DEBATE</option>
+                    <option value={'LECTURA DE SENTENCIA'}>LECTURA DE SENTENCIA</option>
+                </select>
             </span>
         </div>
     )

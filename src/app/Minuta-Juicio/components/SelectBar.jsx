@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useContext } from 'react';
-import { DataContext } from '@/context/DataContext';
+import { DataContext } from '@/context New/DataContext';
 import styles from '../MinutaJuicio.module.css'
 import AudList from './AudList';
 

@@ -13,6 +13,7 @@ import { pushItemToDocumentAndObjectField } from "@/firebase new/firestore/pushI
 import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunction";
 import { updateDocumentField } from "@/firebase new/firestore/updateDocumentField";
 import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
+import { monthYearFunction } from "@/utils/dateUtils";
 
 export const DataContext = createContext({});
 
@@ -27,6 +28,7 @@ const { Provider } = DataContext;
     const [byLegajo, setByLegajo] = useState(defaultValue);
     const [releaseNotes, setReleaseNotes] = useState(defaultValue);
     const [realTime, setRealTime] = useState(null)
+    const [juiciosList, setJuiciosList] = useState(defaultValue)
     const [sorteoList, setSorteoList] = useState(defaultValue);
 
     const updateByDate = async (date) =>{
@@ -64,6 +66,25 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     };
+    const addJuicio = async (data, date) =>{
+        const dateTransform = monthYearFunction(date)
+        try{
+            await addOrUpdateObject("juicios", dateTransform, data.id, data);
+        } catch (error) {
+            console.error("Failed to add object:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const updateJuicios = async (date) =>{
+        const dateTransform = monthYearFunction(date)
+        try {
+            const data = await getDocument('juicios', dateTransform);
+            setJuiciosList(data)
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const updateLegajosDatabase = async (data) => {
         try {
             await addOrUpdateObject("legajos", data.numeroLeg, data.id, data);
@@ -204,8 +225,8 @@ const { Provider } = DataContext;
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables, 
         updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate, 
-        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser,
-        bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime
+        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios,
+        bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
     };
     return <Provider value={context}>{children}</Provider>;
 };
