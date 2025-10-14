@@ -7,8 +7,7 @@ import { BloqueList } from './components/BloqueList';
 import { useState } from 'react';
 
 export default function page(){
-    const [bloquesArray, setBloquesArray] = useState([])
-
+    const [bloquesArray, setBloquesArray] = useState([{fechaD: '21',fechaM: '09',fechaA: '2025', hora:'16', minuto:'00'},{fechaD: '22',fechaM: '09',fechaA: '2025', hora:'16', minuto:'00'}])
     return (
       <AuthContextProvider>
         <DataContextProvider>

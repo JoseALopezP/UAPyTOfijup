@@ -271,7 +271,7 @@ export default function AddJuicioInfo({setBloquesArray}){
             <datalist id="fiscal" className={`${styles.tableCellInput}`}>
                 {desplegables.fiscal && desplegables.fiscal.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el.split(' - ')[0]}
                     </option>))}
             </datalist>
             <datalist id="ufi" className={`${styles.tableCellInput}`}>
