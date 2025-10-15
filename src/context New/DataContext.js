@@ -13,7 +13,7 @@ import { pushItemToDocumentAndObjectField } from "@/firebase new/firestore/pushI
 import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunction";
 import { updateDocumentField } from "@/firebase new/firestore/updateDocumentField";
 import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
-import { monthYearFunction } from "@/utils/dateUtils";
+import { yearFunction } from "@/utils/dateUtils";
 
 export const DataContext = createContext({});
 
@@ -67,7 +67,7 @@ const { Provider } = DataContext;
         }
     };
     const addJuicio = async (data, date) =>{
-        const dateTransform = monthYearFunction(date)
+        const dateTransform = yearFunction(date)
         try{
             await addOrUpdateObject("juicios", dateTransform, data.id, data);
         } catch (error) {
@@ -76,7 +76,7 @@ const { Provider } = DataContext;
         }
     }
     const updateJuicios = async (date) =>{
-        const dateTransform = monthYearFunction(date)
+        const dateTransform = yearFunction(date)
         try {
             const data = await getDocument('juicios', dateTransform);
             setJuiciosList(data)
@@ -209,8 +209,8 @@ const { Provider } = DataContext;
     }
     const updateReleaseNotes = async () =>{
         try {
-        const data = await getDocument('informacion', 'releaseNotes');
-        setReleaseNotes(data)
+            const data = await getDocument('informacion', 'releaseNotes');
+            setReleaseNotes(data)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
