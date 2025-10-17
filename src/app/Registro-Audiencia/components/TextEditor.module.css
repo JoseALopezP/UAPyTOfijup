@@ -20,7 +20,7 @@
   width: 60%;
   display: inline-flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: flex-end;
 }
 .conversionButtonBlock button{
   height: 40px;
