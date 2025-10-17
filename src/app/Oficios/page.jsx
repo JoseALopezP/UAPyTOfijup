@@ -7,7 +7,7 @@ import { todayFunction } from '@/utils/dateUtils';
 import { useState, useEffect } from 'react';
 import OficioBlock from './modules/OficioBlock';
 
-export default function page() {
+export default function Oficios() {
     const [date, setDate] = useState(null)
     const [selectedAud, setSelectedAud] = useState(null)
     const [showList, setShowList] = useState(true)
