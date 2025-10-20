@@ -38,7 +38,7 @@ export default function TextEditor({ textValue, setTextValue }) {
   const toLower = () => transformSelection((t) => t.toLowerCase());
   if (!mounted) return null;
   return (
-    <div>
+    <div className={styles.textEditorWrapper}>
       <div className={styles.conversionButtonBlock}>
         <button type="button" onClick={toUpper}>A↑</button>
         <button type="button" onClick={toLower}>a↓</button>
