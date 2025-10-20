@@ -1,7 +1,32 @@
 import React, { useRef, useState, useEffect } from "react";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styles from './TextEditor.module.css'
+
+const modules = {
+  toolbar: [
+    [{ header: "1" }, { header: "2" }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["bold", "italic", "underline"],
+    [{ align: [] }],
+    [{ color: [] }, { background: [] }],
+    ["blockquote", "code-block"],
+  ],
+};
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "align",
+  "color",
+  "background",
+  "blockquote",
+  "code-block",
+];
+
 
 export default function TextEditor({ textValue, setTextValue }) {
   const quillRef = useRef(null);
@@ -47,6 +72,9 @@ export default function TextEditor({ textValue, setTextValue }) {
         ref={quillRef}
         value={textValue}
         onChange={handleChange}
+        modules={modules}
+        formats={formats}
+        theme="snow"
       />
     </div>
   );
