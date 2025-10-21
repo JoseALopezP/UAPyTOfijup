@@ -64,7 +64,7 @@
 .bloqueListSection{
     display: inline-flex;
     flex-direction: column;
-    width: 30%;
+    width: 35%;
     height: 100%;
     border: solid #303030;
     border-width: 0 1px 0 0;
@@ -86,7 +86,7 @@
     justify-content: center;
     border: solid #303030 1px;
     border-radius: 4px;
-    margin: 10px;
+    margin: 6px 6px 0 6px ;
 }
 .timeSelectorLabel{
     height: 30px;
@@ -187,4 +187,33 @@
     border-radius: 4px;
     cursor: pointer;
     width: 50%;
+}
+.TestigoEditList{
+    width: 30%;
+    border: solid #303030;
+    border-width: 0 1px 0 0;
+    height: 100%;
+}
+.juicioSelectionBlock{
+    width: 15%;
+    overflow-x: hidden;
+}
+
+.dateSelection{
+    height: 40px;
+    width: 100%;
+    border: solid #303030;
+    border-width: 0 0 1px 0;
+}
+.dateSelectionInput{
+    width: 90%;
+    margin: 5px 5%;
+    height: 20px;
+    background-color: transparent;
+    color: #cecece;
+    outline: none;
+    border: solid .5px #2B2B2B;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 18px;
 }

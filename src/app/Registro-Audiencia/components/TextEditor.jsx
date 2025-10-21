@@ -9,7 +9,6 @@ export default function TextEditor({ textValue, setTextValue }) {
   useEffect(() => {
     if (quillRef.current) {
       const instance = quillRef.current.getEditor();
-      console.log("✅ Instancia Quill detectada:", instance);
       setEditor(instance);
     }
   }, []);
@@ -26,13 +25,11 @@ export default function TextEditor({ textValue, setTextValue }) {
   };
   const transformSelection = (transformer) => {
     if (!editor) {
-      console.warn("⚠️ El editor aún no está listo.");
       return;
     }
 
     const range = editor.getSelection();
     if (!range || range.length === 0) {
-      console.warn("⚠️ No hay selección activa.");
       return;
     }
 
