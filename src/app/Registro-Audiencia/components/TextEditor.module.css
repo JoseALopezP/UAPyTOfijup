@@ -12,6 +12,9 @@
   z-index: 1;
   position: relative;
 }
+.textEditorWrapper {
+  overflow-y: scroll;
+}
 .textEditorWrapper :global(.ql-editor) {
     font-size: 18px !important;
     font-family: "Arial", sans-serif;
