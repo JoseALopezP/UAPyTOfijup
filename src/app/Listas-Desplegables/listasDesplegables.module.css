@@ -91,3 +91,30 @@
     border: none;
     border-radius: 2px;
 }
+.listSelector{
+    width: 102.5%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.buttonSelector{
+    width: calc(49.2% - 4px);
+    background-color: transparent;
+    color: #cecece;
+    outline: none;
+    border: solid 1px #2B2B2B;
+    border-radius: 2px;
+    font-size: 18px;
+    margin: 1%;
+    height: 30px;
+    cursor: pointer;
+}
+.buttonSelector:hover, .buttonSelected{
+    background-color: #2B2B2B;
+    color: #000;
+}
+.buttonSelector:hover{
+    border-color:#cecece20;
+    transform: scale(0.98); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}

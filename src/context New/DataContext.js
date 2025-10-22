@@ -22,6 +22,7 @@ const { Provider } = DataContext;
     export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [desplegables, setDesplegables] = useState(defaultValue);
+    const [feriados, setFeriados] = useState(defaultValue);
     const [modelosMinuta, setModelosMinuta] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [bydateView, setBydateView] = useState(defaultValue);
@@ -167,6 +168,28 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     };
+    const addFeriado = async (type, data) => {
+        try{
+            await addStringToArray("desplegables", "feriado", type, data);
+        } catch (error) {
+            setErrorMessage(`${error.message}`)
+        }
+    };
+    const deleteFeriado = async (type, data) => {
+        await removeStringFromArray("desplegables", "feriado", type, data);
+    };
+    const updateFeriados = async () => {
+        try {
+            const data = await getDocument('desplegables', 'feriado');
+            if (data) {
+                setFeriados(data);
+            } else {
+                setFeriados({});
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
     const addOrUpdateModeloMinuta = async (name, data) =>{
         try{
             await addOrUpdateObject('desplegables', 'modelosMinuta', name, data)
@@ -224,9 +247,9 @@ const { Provider } = DataContext;
     
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables, 
-        updateDesplegables, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate, 
+        updateDesplegables, addFeriado, deleteFeriado, updateFeriados, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate, 
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios,
-        bydate, bydateView, errorMessage, sorteoList, desplegables, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
+        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
     };
     return <Provider value={context}>{children}</Provider>;
 };
