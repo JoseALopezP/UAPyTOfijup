@@ -1,18 +1,16 @@
 import styles from '../listasDesplegables.module.css'
-import { useContext, useState } from "react";
-import { DataContext } from "@/context New/DataContext";
+import { useState } from "react";
 
-export default function AddToListBlock({desplegablesOption}) {
-    const { desplegables, addDesplegable, deleteDesplegable, updateDesplegables } = useContext(DataContext);
+export default function AddToListBlock({desplegablesOption, list, addToList, deleteFromList, updateList}) {
     const [inputValue, setInputValue] = useState('')
     const uploadDesplegable = async() =>{
-        await addDesplegable(desplegablesOption, inputValue)
+        await addToList(desplegablesOption, inputValue)
         await setInputValue('')
-        await updateDesplegables()
+        await updateList()
     }
     const deleteDesplegableFir = async(element) =>{
-        await deleteDesplegable(desplegablesOption, element)
-        await updateDesplegables()
+        await deleteFromList(desplegablesOption, element)
+        await updateList()
     }
     return (
         <div className={styles.addToListBlock}>
@@ -21,11 +19,11 @@ export default function AddToListBlock({desplegablesOption}) {
                 <button className={`${styles.addButton}`} onClick={()=>uploadDesplegable()}>AGREGAR</button></span>
             </span>
             <span className={`${styles.selectedListBlock}`}>
-                {desplegablesOption && desplegables[desplegablesOption].map((el,i)=>(
+                {(list && desplegablesOption) && list[desplegablesOption].map((el,i)=>(
                     <>{el.toUpperCase().includes(inputValue.toUpperCase()) && 
                         <span className={`${styles.inputList}`} key={el+i}><p>{el}</p>
-                        <button className={`${styles.deleteButton}`} onClick={() => deleteDesplegableFir(el)}>ELIMINAR</button>
-                    </span>}</>
+                            <button className={`${styles.deleteButton}`} onClick={() => deleteDesplegableFir(el)}>ELIMINAR</button>
+                        </span>}</>
                 ))}
             </span>
         </div>

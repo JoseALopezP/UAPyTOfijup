@@ -7,14 +7,8 @@ export default function DesplegablesList({desplegableFunction, listSelection, se
     const { updateDesplegables, desplegables, updateFeriados, feriados } = useContext(DataContext);
     useEffect(() => {
         updateDesplegables()
+        updateFeriados()
     }, [])
-    useEffect(() => {
-        if(listSelection === 'desplegables'){
-            updateDesplegables()
-        }else{
-            updateFeriados()
-        }
-    }, [listSelection])
     return (
         <div className={styles.listasDesplegablesSelector}>
             <Selector listSelection={listSelection} setListSelection={setListSelection}/>

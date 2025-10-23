@@ -1,21 +1,13 @@
 'use client'
-import styles from './listasDesplegables.module.css'
 import { AuthContextProvider} from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context New/DataContext";
-import { useState } from 'react';
-import DesplegablesList from './modules/DesplegablesList';
-import AddToListBlock from './modules/AddToListBlock';
+import {DataContextProvider } from "@/context New/DataContext";
+import ContextWrapper from './modules/ContextWrapper';
 
 export default function page() {
-    const [desplegableList, setDesplegableList] = useState(null)
-    const [listSelection, setListSelection] = useState('desplegables')
     return (
       <AuthContextProvider>
         <DataContextProvider>
-            <div className={styles.desplegablesContainer}>
-                <DesplegablesList desplegableFunction={setDesplegableList} listSelection={listSelection} setListSelection={setListSelection}/>
-                {desplegableList && <AddToListBlock desplegablesOption={desplegableList}/>}
-            </div>
+            <ContextWrapper />
         </DataContextProvider>
       </AuthContextProvider>
     )

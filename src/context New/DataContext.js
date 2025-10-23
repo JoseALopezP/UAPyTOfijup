@@ -170,17 +170,17 @@ const { Provider } = DataContext;
     };
     const addFeriado = async (type, data) => {
         try{
-            await addStringToArray("desplegables", "feriado", type, data);
+            await addStringToArray("desplegables", "feriados", type, data);
         } catch (error) {
             setErrorMessage(`${error.message}`)
         }
     };
     const deleteFeriado = async (type, data) => {
-        await removeStringFromArray("desplegables", "feriado", type, data);
+        await removeStringFromArray("desplegables", "feriados", type, data);
     };
     const updateFeriados = async () => {
         try {
-            const data = await getDocument('desplegables', 'feriado');
+            const data = await getDocument('desplegables', 'feriados');
             if (data) {
                 setFeriados(data);
             } else {
