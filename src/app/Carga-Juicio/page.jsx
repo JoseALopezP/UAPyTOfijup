@@ -24,7 +24,7 @@ export default function page(){
       {
         nombre: "María López",
         dni: "87654321",
-        fecha: [] 
+        fecha: []
       },
       {
         nombre: "Carlos Gómez",
