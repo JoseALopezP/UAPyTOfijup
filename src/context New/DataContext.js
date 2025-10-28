@@ -14,6 +14,7 @@ import updateRealTimeFunction from "@/firebase new/firestore/updateRealTimeFunct
 import { updateDocumentField } from "@/firebase new/firestore/updateDocumentField";
 import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
 import { yearFunction } from "@/utils/dateUtils";
+import { updateInternalFieldJuicio } from "@/firebase new/firestore/updateInternalFieldJuicio";
 
 export const DataContext = createContext({});
 
@@ -81,6 +82,15 @@ const { Provider } = DataContext;
         try {
             const data = await getDocument('juicios', dateTransform);
             setJuiciosList(data)
+        } catch (error) {
+            console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const changeValueJuicio = async (date, juicioId, field, value) =>{
+        const dateTransform = yearFunction(date)
+        try {
+            await updateInternalFieldJuicio(dateTransform, juicioId, field, value);
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
@@ -248,7 +258,7 @@ const { Provider } = DataContext;
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables, 
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate, 
-        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios,
+        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
     };
     return <Provider value={context}>{children}</Provider>;

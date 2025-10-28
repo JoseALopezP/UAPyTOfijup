@@ -3,7 +3,7 @@ import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
 
 export default function EditExisting({original}){
-    const {updateDesplegables, desplegables} = useContext(DataContext)
+    const {updateDesplegables, desplegables, changeValueJuicio, updateData} = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true) 
     const [numeroLeg2, setNumeroLeg2] = useState(null)
@@ -32,6 +32,7 @@ export default function EditExisting({original}){
     const [fechaiaError, setFechaiaError] = useState(true)
     const [cantBloques, setCantBloques] = useState(null)
     const [cantBloquesError, setCantBloquesError] = useState(true)
+    const [bloques, setBloques] = useState([])
     const [cantTestigos, setCantTestigos] = useState(null)
     const [cantTestigosError, setCantTestigosError] = useState(true)
     const [tipoDelito, setTipoDelito] = useState('')
@@ -52,6 +53,7 @@ export default function EditExisting({original}){
     const [juez3, setJuez3] = useState('')
     const [juez3Error, setJuez3Error] = useState(true)
     const [erroresList, setErroresList] = useState('')
+    cosnt [changes, setChanges] = useState(false)
     const checkCompletion = () =>{
         const aux = []
         listCheck(numeroLeg1,setNumeroLeg1Error, desplegables.legajosPrefijo)
@@ -153,8 +155,26 @@ export default function EditExisting({original}){
         }
     }
     const checkDifferenceSave = (saving) =>{
-        if((numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3) !== original.numeroLeg){
-            
+        const fechaI = fechaid+fechaim+fechaia;
+        setChanges(false)
+        const newNumeroLeg = (numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3)
+        if(newNumeroLeg !== original.numeroLeg){
+            if(saving){
+                changeValueJuicio(fechaI, original.Id, )
+                bloques.forEach(el =>{
+                    updateData(el.fecha, el.audId, 'numeroLeg', newNumeroLeg)
+                })
+            }else{
+                setChanges(true)
+            }
+        }
+        const newAuto = (numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3)
+        if(newAuto !== original.auto){
+            if(saving){
+                changeValueJuicio(fechaI, )
+            }else{
+                setChanges(true)
+            }
         }
     }
     useEffect(() => {
