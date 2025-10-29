@@ -168,14 +168,66 @@ export default function EditExisting({original}){
                 setChanges(true)
             }
         }
-        const newAuto = (numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3)
+        const newAuto = (`${fechad}${fecham}${fechaa} ${fechah}:${fechamm}:${fechas}`)
         if(newAuto !== original.auto){
             if(saving){
-                changeValueJuicio(fechaI, )
+                changeValueJuicio(fechaI, original.id, 'auto', newAuto)
             }else{
                 setChanges(true)
             }
         }
+        const newInicio = (`${fechaid}${fechaim}${fechaia}`)
+        if(newInicio !== original.inicio){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'inicio', newInicio)
+            }else{
+                setChanges(true)
+            }
+        }
+        if(ufi !== original.ufi){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'ufi', ufi)
+            }else{
+                setChanges(true)
+            }
+        }
+        if(fiscal !== original.fiscal){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'fiscal', fiscal)
+            }else{
+                setChanges(true)
+            }
+        }
+        if(tipoDelito !== original.tipoDelito){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'tipoDelito', tipoDelito)
+            }else{
+                setChanges(true)
+            }
+        }
+        if(defensa !== original.defensa){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'defensa', defensa)
+            }else{
+                setChanges(true)
+            }
+        }
+        if(defensaCargo !== original.defensoria){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'defensoria', defensaCargo)
+            }else{
+                setChanges(true)
+            }
+        }
+        const newJueces = `${juez1}+${juez2}+${juez3}` 
+        if(querella !== original.querella){
+            if(saving){
+                changeValueJuicio(fechaI, original.id, 'querella', querella)
+            }else{
+                setChanges(true)
+            }
+        }
+
     }
     useEffect(() => {
         updateDesplegables()
