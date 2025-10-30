@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
+import { ButtonSelection } from './buttonSelection'
 
-export default function EditExisting({original}){
+export default function EditExisting({original, newState, setNewState}){
     const {updateDesplegables, desplegables, changeValueJuicio, updateData} = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true) 
@@ -53,7 +54,7 @@ export default function EditExisting({original}){
     const [juez3, setJuez3] = useState('')
     const [juez3Error, setJuez3Error] = useState(true)
     const [erroresList, setErroresList] = useState('')
-    cosnt [changes, setChanges] = useState(false)
+    const [changes, setChanges] = useState(false)
     const checkCompletion = () =>{
         const aux = []
         listCheck(numeroLeg1,setNumeroLeg1Error, desplegables.legajosPrefijo)
@@ -220,20 +221,20 @@ export default function EditExisting({original}){
             }
         }
         const newJueces = `${juez1}+${juez2}+${juez3}` 
-        if(querella !== original.querella){
+        if(newJueces !== original.jueces){
             if(saving){
-                changeValueJuicio(fechaI, original.id, 'querella', querella)
+                changeValueJuicio(fechaI, original.id, 'jueces', newJueces)
             }else{
                 setChanges(true)
             }
         }
-
     }
     useEffect(() => {
         updateDesplegables()
     }, []);
     return (
         <section className={`${styles.addJuicioSection}`}>
+            <ButtonSelection newState={newState} setNewState={setNewState}/>
             <label className={`${styles.cargaLabel}`}>Número de Legajo</label>
             <span className={`${styles.multiInput}`}>
                 <input className={numeroLeg1Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 

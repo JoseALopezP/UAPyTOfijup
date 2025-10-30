@@ -7,8 +7,12 @@ import { BloqueList } from './components/BloqueList';
 import { useState } from 'react';
 import { TestigoEditList } from './components/TestigoEditList';
 import { JuicioSelection } from './components/JuicioSelection';
+import EditExisting from './components/EditingExisting';
+import { getCurrentYear } from '@/utils/dateUtils';
 
 export default function page(){
+    const [newState, setNewState] = useState(true)
+    const [year, setYear] = useState(getCurrentYear())
     const [bloquesArray, setBloquesArray] = useState([
       { audid: "AUD001", fecha: "01012025", hora: "08:00" },
       { audid: "AUD002", fecha: "01012025", hora: "09:30" },
@@ -36,10 +40,11 @@ export default function page(){
       <AuthContextProvider>
         <DataContextProvider>
           <section className={`${styles.viewBlock}`}>
-            <AddJuicioInfo setBloquesArray={setBloquesArray}/>
+            {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState}/> :
+            <EditExisting newState={newState} setNewState={setNewState}/> }
             <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray}/>
             <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloques={bloquesArray}/>
-            <JuicioSelection />
+            <JuicioSelection year={year} setYear={setYear}/>
           </section>
         </DataContextProvider>
       </AuthContextProvider>

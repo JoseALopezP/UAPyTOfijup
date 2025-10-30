@@ -1,12 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
-import { getCurrentYear } from '@/utils/dateUtils'
 import { DataContext } from '@/context New/DataContext';
 
-export function JuicioSelection ({}){
-    const [year, setYear] = useState(getCurrentYear)
+export function JuicioSelection ({year, setYear}){
     const { updateJuicios, juiciosList } = useContext(DataContext);
-
     useEffect(() =>{
         if(year.length === 4){
             updateJuicios(year)

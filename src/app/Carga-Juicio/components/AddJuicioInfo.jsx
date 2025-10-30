@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
+import { ButtonSelection } from './buttonSelection'
 
-export default function AddJuicioInfo({setBloquesArray}){
+export default function AddJuicioInfo({setBloquesArray, newState, setNewState}){
     const {updateDesplegables, desplegables} = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true) 
@@ -161,6 +162,7 @@ export default function AddJuicioInfo({setBloquesArray}){
     }, []);
     return (
         <section className={`${styles.addJuicioSection}`}>
+            <ButtonSelection newState={newState} setNewState={setNewState}/>
             <label className={`${styles.cargaLabel}`}>Número de Legajo</label>
             <span className={`${styles.multiInput}`}>
                 <input className={numeroLeg1Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
