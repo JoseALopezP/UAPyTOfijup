@@ -15,9 +15,9 @@ export default function page(){
     const [year, setYear] = useState(getCurrentYear())
     const [bloquesArray, setBloquesArray] = useState([
       { audid: "AUD001", fecha: "01012025", hora: "08:00" },
-      { audid: "AUD002", fecha: "01012025", hora: "09:30" },
-      { audid: "AUD003", fecha: "02012025", hora: "10:00" },
-      { audid: "AUD004", fecha: "02012025", hora: "11:15" },
+      { audid: "AUD002", fecha: "02012025", hora: "09:30" },
+      { audid: "AUD003", fecha: "03012025", hora: "10:00" },
+      { audid: "AUD004", fecha: "04012025", hora: "11:15" },
     ])
     const [testigos, setTestigos] = useState([
       {
@@ -42,7 +42,7 @@ export default function page(){
           <section className={`${styles.viewBlock}`}>
             {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState}/> :
             <EditExisting newState={newState} setNewState={setNewState}/> }
-            <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray}/>
+            <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray} testigos={testigos}/>
             <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloques={bloquesArray}/>
             <JuicioSelection year={year} setYear={setYear}/>
           </section>

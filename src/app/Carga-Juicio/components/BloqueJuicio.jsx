@@ -1,13 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 
-export function BloqueJuicio ({bloque, testigos=[{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '00', completo: true, dni:12121212},{nombre: 'Pepe Honguito',fechaD: '21',fechaM: '09',fechaA: '2025',horaH: '17',horaM: '30', completo: false, dni:12121212}], last}){
-    const [fechaD, setFechaD] = useState(bloque.fechaD)
-    const [fechaM, setFechaM] = useState(bloque.fechaM)
-    const [fechaA, setFechaA] = useState(bloque.fechaA)
-    const [horaH, setHoraH] = useState(bloque.hora)
-    const [horaM, setHoraM] = useState(bloque.minuto)
+export function BloqueJuicio ({bloque, testigos, last}){
+    const [fechaD, setFechaD] = useState(bloque.fecha.slice(0,2))
+    const [fechaM, setFechaM] = useState(bloque.fecha.slice(2,4))
+    const [fechaA, setFechaA] = useState(bloque.fecha.slice(4,8))
+    const [horaH, setHoraH] = useState(bloque.hora.split(':')[0])
+    const [horaM, setHoraM] = useState(bloque.hora.split(':')[1])
     const [option, setOption] = useState(last ? 'LECTURA DE SENTENCIA' : 'DEBATE')
+    useEffect(() =>{
+        setFechaD(bloque.fecha.slice(0,2))
+        setFechaD(bloque.fecha.slice(2,4))
+        setFechaD(bloque.fecha.slice(4,8))
+        setHoraH(bloque.hora.split(':')[0])
+        setHoraM(bloque.hora.split(':')[1])
+    }, [bloque.fecha, bloque.hora])
     return(
         <div className={`${styles.bloqueJuicioSection}`}>
             <span className={`${styles.dateTimeJuicio}`}>
@@ -29,6 +36,11 @@ export function BloqueJuicio ({bloque, testigos=[{nombre: 'Pepe Honguito',fechaD
                     <p>BLOQUE 1</p>
                     <p>FINALIZADA</p>
                 </span>
+            </span>
+            <span>
+                {testigos && testigos.filter(el => el.fecha.map(aux => aux.fecha.split('-')[0]).includes(bloque.fecha)).map(el =>(
+                    <p>{el.nombre}{el.dni ? ' - ' +el.dni : ''}</p>
+                ))}
             </span>
             <span>
                 <select className={`${styles.bloqueTypeSelector}`} value={option} onChange={e => setOption(e.target.value)}>
