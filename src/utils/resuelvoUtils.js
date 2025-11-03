@@ -8,7 +8,7 @@ import { todayFunction } from "./dateUtils";
 export function listFiscal(arr, ufi) {  
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi ? (ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`) : ''}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
