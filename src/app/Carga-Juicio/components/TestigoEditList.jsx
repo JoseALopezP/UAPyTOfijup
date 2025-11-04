@@ -67,28 +67,25 @@ export function TestigoEditList({ setTestigos, testigos, bloques }) {
                 return (
                   <div key={index} className={styles.fechaItem}>
                     <span>{item.fecha}</span>
-                    <label>Hora citación:
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginLeft: '4px' }}>
-                        <input type="text" min="0" max="23" value={h} onChange={(e) => actualizarHora(testigo.nombre, index, e.target.value, m)} style={{ width: '50px' }} /> :
-                        <input type="text" min="0" max="59" value={m} onChange={(e) => actualizarHora(testigo.nombre, index, h, e.target.value)} style={{ width: '50px' }} />
+                    <label>Hora citación:</label>
+                      <div>
+                        <input type="text" min="0" max="23" value={h} onChange={(e) => actualizarHora(testigo.nombre, index, e.target.value, m)}/> :
+                        <input type="text" min="0" max="59" value={m} onChange={(e) => actualizarHora(testigo.nombre, index, h, e.target.value)}/>
                       </div>
-                    </label>
-                    <label>Asistencia:
+                    <label>Asistencia:</label>
                       <input type="checkbox" checked={item.asistencia} onChange={(e) => {
                         setTestigos(prev => prev.map((t) => {
                           if (t.nombre !== testigo.nombre) return t;
                           return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, asistencia: e.target.checked } : f) };
                         }));
                       }} />
-                    </label>
-                    <label>Completado:
+                    <label>Completado:</label>
                       <input type="checkbox" checked={item.complete} onChange={(e) => {
                         setTestigos(prev => prev.map((t) => {
                           if (t.nombre !== testigo.nombre) return t;
                           return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, complete: e.target.checked } : f) };
                         }));
                       }} />
-                    </label>
                   </div>
                 );
               })}

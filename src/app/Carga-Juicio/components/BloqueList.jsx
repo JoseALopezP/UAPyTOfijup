@@ -2,13 +2,12 @@ import { BloqueJuicio } from './BloqueJuicio'
 import styles from './Carga-Juicio.module.css'
 
 export function BloqueList ({setBloquesArray, bloquesArray, testigos}){
-    function updateArrayAttribute(arr, attrName, attrValue) {
-        setBloquesArray(arr.map(obj => {
-            const newObj = { ...obj }; 
-            newObj[attrName] = attrValue;
-            return newObj;
-        }));
-        console.log(bloquesArray)
+    function updateArrayAttribute(index, attrName, attrValue) {
+    setBloquesArray(prev =>
+        prev.map((obj, i) =>
+            i === index ? { ...obj, [attrName]: attrValue } : obj
+        )
+    );
     }
     return(
         <section className={`${styles.bloqueListSection}`}>
@@ -20,7 +19,7 @@ export function BloqueList ({setBloquesArray, bloquesArray, testigos}){
                 </select>
             </span>
             {bloquesArray && bloquesArray.map((el, index) => (
-                <BloqueJuicio bloque={el} last={bloquesArray.length === (index - 1)} testigos={testigos}/>
+                <BloqueJuicio bloque={el} index={index} last={bloquesArray.length === (index - 1)} testigos={testigos} updateArrayAttribute={updateArrayAttribute}/>
             ))}
         </section>
     )

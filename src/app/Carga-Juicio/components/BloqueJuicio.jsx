@@ -1,34 +1,22 @@
 import { useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 
-export function BloqueJuicio ({bloque, testigos, last}){
-    const [fechaD, setFechaD] = useState(bloque.fecha.slice(0,2))
-    const [fechaM, setFechaM] = useState(bloque.fecha.slice(2,4))
-    const [fechaA, setFechaA] = useState(bloque.fecha.slice(4,8))
-    const [horaH, setHoraH] = useState(bloque.hora.split(':')[0])
-    const [horaM, setHoraM] = useState(bloque.hora.split(':')[1])
+export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, index}){
     const [option, setOption] = useState(last ? 'LECTURA DE SENTENCIA' : 'DEBATE')
-    useEffect(() =>{
-        setFechaD(bloque.fecha.slice(0,2))
-        setFechaD(bloque.fecha.slice(2,4))
-        setFechaD(bloque.fecha.slice(4,8))
-        setHoraH(bloque.hora.split(':')[0])
-        setHoraM(bloque.hora.split(':')[1])
-    }, [bloque.fecha, bloque.hora])
     return(
         <div className={`${styles.bloqueJuicioSection}`}>
             <span className={`${styles.dateTimeJuicio}`}>
-                <input className={`${styles.inputDateTime}`} type='text' value={fechaD} onChange={e => setFechaD(e.target.value)}/>
-                <input className={`${styles.inputDateTime}`} value={fechaM} onChange={e => setFechaM(e.target.value)}/>
-                <input className={`${styles.inputDateTimeDouble}`} value={fechaA} onChange={e => setFechaA(e.target.value)}/>
+                <input className={`${styles.inputDateTime}`} type='text' value={bloque.fecha.slice(0,2)} onChange={e => updateArrayAttribute(index, 'fecha', (e.target.value+bloque.fecha.slice(2,8)))}/>
+                <input className={`${styles.inputDateTime}`} value={bloque.fecha.slice(2,4)} onChange={e => updateArrayAttribute(index, 'fecha', (bloque.fecha.slice(0,2) + e.target.value + bloque.fecha.slice(4,8)))}/>
+                <input className={`${styles.inputDateTimeDouble}`} value={bloque.fecha.slice(4,8)} onChange={e => updateArrayAttribute(index, 'fecha', (bloque.fecha.slice(0,4) + e.target.value))}/>
                 <label className={`${styles.lineSeparator}`}>|</label>
-                <input className={`${styles.inputDateTime}`} value={horaH} onChange={e => setHoraH(e.target.value)}/>
-                <input className={`${styles.inputDateTime}`} value={horaM} onChange={e => setHoraM(e.target.value)}/>
+                <input className={`${styles.inputDateTime}`} value={bloque.hora.split(':')[0]} onChange={e => updateArrayAttribute(index, 'hora', `${e.target.value}:${bloque.hora.split(':')[1]}`)}/>
+                <input className={`${styles.inputDateTime}`} value={bloque.hora.split(':')[1]} onChange={e => updateArrayAttribute(index, 'hora', `${bloque.hora.split(':')[0]}:${e.target.value}`)}/>
             </span>
             <span className={`${styles.horizontalSeparator}`}></span>
             <span className={`${styles.controlJuicio}`}>
                 <span className={`${styles.testigosList}`}>
-                    {testigos && testigos.filter(el => (el.fechaD === fechaD && el.fechaM === fechaM && el.fechaA === fechaA)).map(el =>(
+                    {testigos && testigos.filter(el => (el.fechaD === bloque.fecha.slice(0,2) && el.fechaM === bloque.fecha.slice(2,4) && el.fechaA === bloque.fecha.slice(4,8))).map(el =>(
                         <span className={`${styles.testigoIndiv}`}>{el.completo === true ? <p className={`${styles.completado}`}>&nbsp;⬤</p> : <p className={`${styles.noCompletado}`}>◯</p>}<p>&nbsp;{el.nombre}</p></span>
                     ))}
                 </span>
