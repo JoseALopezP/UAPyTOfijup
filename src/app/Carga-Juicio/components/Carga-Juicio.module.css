@@ -218,19 +218,11 @@
     font-size: 18px;
 }
 
-.asignado {
-  background-color: green;
-  color: white;
-}
-
-.noAsignado {
-  background-color: gray;
-}
-
-.fechaItem {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+.inputHora{
+    width: 28px;
+    padding: 4px;
+    border-radius: 4px;
+    text-align: center;
 }
 
 .buttonSelectionState{
@@ -253,4 +245,54 @@
     opacity: 1;
     transform: scale(0.98); 
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+}
+
+
+.testigoCard{
+    width: 92%;
+    margin: 2%;
+    padding: 2%;
+    border: solid 1px #363636;
+    border-radius: 4px;
+}
+.testigoHeader{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.deletButton{
+    border-radius: 4px;
+    background-color: tomato;
+    outline: none;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+}
+.noAsignado, .asignado {
+  border-radius: 2px;
+  padding: 2px;
+  width: 110px;
+}
+.asignado {
+  background-color: green;
+  color: white;
+}
+
+.noAsignado {
+  background-color: gray;
+}
+.bloquesWrapper{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    overflow-y: scroll;
+    justify-content: center;
+}
+.tableFechas{
+    width: 100%;
+}
+.tableCell{
+    text-align: center;
+    justify-content: center;
 }

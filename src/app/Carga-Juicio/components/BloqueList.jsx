@@ -19,7 +19,7 @@ export function BloqueList ({setBloquesArray, bloquesArray, testigos}){
                 </select>
             </span>
             {bloquesArray && bloquesArray.map((el, index) => (
-                <BloqueJuicio bloque={el} index={index} last={bloquesArray.length === (index - 1)} testigos={testigos} updateArrayAttribute={updateArrayAttribute}/>
+                <BloqueJuicio key={el.id} bloque={el} index={index} last={bloquesArray.length === (index - 1)} testigos={testigos} updateArrayAttribute={updateArrayAttribute}/>
             ))}
         </section>
     )
