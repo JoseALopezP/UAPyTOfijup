@@ -21,7 +21,7 @@ export function TestigoEditList({ setTestigos, testigos, bloques }) {
     }));
   }, [setTestigos]);
   const actualizarHora = (testigoNombre, index, nuevaHora, nuevosMinutos) => {
-    const horaFormateada = `${String(nuevaHora).padStart(2, '0')}:${String(nuevosMinutos).padStart(2, '0')}`;
+    const horaFormateada = `${String(nuevaHora)}:${String(nuevosMinutos)}`;
     setTestigos(prev => prev.map(t => {
       if (t.nombre !== testigoNombre) return t;
       return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, hora: horaFormateada } : f) };
