@@ -81,14 +81,12 @@ export function TestigoEditList({ setTestigos, testigos, bloques }) {
                         <input className={styles.inputHora} type="text" min="0" max="59" value={m} onChange={(e) => actualizarHora(testigo.nombre, index, h, e.target.value)}/>
                       </td>
                       <td className={`${styles.tableCell} ${styles.cellAsistencia}`}><input type="checkbox" checked={item.asistencia} onChange={(e) => {
-                        setTestigos(prev => prev.map((t) => {
-                          if (t.nombre !== testigo.nombre) return t;
+                        setTestigos(prev => prev.map((t) => { if (t.nombre !== testigo.nombre) return t;
                           return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, asistencia: e.target.checked } : f) };
                         }));
                       }}/></td>
                       <td className={`${styles.tableCell} ${styles.cellFinished}`}><input type="checkbox" checked={item.complete} onChange={(e) => {
-                        setTestigos(prev => prev.map((t) => {
-                          if (t.nombre !== testigo.nombre) return t;
+                        setTestigos(prev => prev.map((t) => { if (t.nombre !== testigo.nombre) return t;
                           return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, complete: e.target.checked } : f) };
                         }));
                       }}/></td>
