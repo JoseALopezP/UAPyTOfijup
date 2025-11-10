@@ -40,10 +40,10 @@ export function TestigoEditList({ setTestigos, testigos, bloques }) {
       {testigos && testigos.map((testigo) => (
         <div key={testigo.nombre} className={styles.testigoCard}>
           <div className={styles.testigoHeader}>
-            <span className={styles.nombre}>{testigo.nombre}</span>
-            <span className={styles.dniInput}>
+            <span className={styles.nombreTestigo}>{testigo.nombre}</span>
+            <span className={styles.dniInputTestigo}>
               <label>DNI:</label>
-              <input type="text" value={testigo.dni || ''} onChange={(e) => handleDniChange(testigo.nombre, e.target.value)} placeholder="Ingrese DNI" style={{ marginLeft: '8px', width: '120px' }} />
+              <input type="text" value={testigo.dni || ''} onChange={(e) => handleDniChange(testigo.nombre, e.target.value)} placeholder="Ingrese DNI"/>
             </span>
             <button type="button" className={styles.deletButton} onClick={() => handleEliminarTestigo(testigo.nombre)}>✖</button>
           </div>
