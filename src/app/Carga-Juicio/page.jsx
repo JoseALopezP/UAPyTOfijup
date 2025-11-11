@@ -14,10 +14,10 @@ export default function page(){
     const [newState, setNewState] = useState(true)
     const [year, setYear] = useState(getCurrentYear())
     const [bloquesArray, setBloquesArray] = useState([
-      { audid: "AUD001", fecha: "01012025", hora: "08:00" },
-      { audid: "AUD002", fecha: "02012025", hora: "09:30" },
-      { audid: "AUD003", fecha: "03012025", hora: "10:00" },
-      { audid: "AUD004", fecha: "04012025", hora: "11:15" },
+      { audid: "AUD001", fecha: "01012025", hora: "08:00", estadoBloque: 'FINALIZADO'},
+      { audid: "AUD002", fecha: "02012025", hora: "09:30", estadoBloque: 'EN_PROCESO'},
+      { audid: "AUD003", fecha: "03012025", hora: "10:00", estadoBloque: 'PROGRAMADO'},
+      { audid: "AUD004", fecha: "04012025", hora: "11:15", estadoBloque: 'PROGRAMADO'},
     ])
     const [testigos, setTestigos] = useState([
       {

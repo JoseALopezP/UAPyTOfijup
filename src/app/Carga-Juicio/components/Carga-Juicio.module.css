@@ -142,6 +142,26 @@
     display: inline-flex;
     flex-direction: row;
 }
+.testigoListBloque{
+    width: 50%;
+    border-right: 2px #cecece solid;
+    margin: 4px 0;
+}
+.dateTimeBloqueLeft, .dateTimeBloqueRight{
+    width: 50%;
+    display: inline-flex;
+    flex-direction: row;
+    
+}
+.dateTimeBloqueLeft{
+    justify-content: flex-end;
+    border-right: 2px #cecece solid;
+    padding-right: 4px;
+}
+.dateTimeBloqueRight{
+    justify-content: flex-start;
+    padding-left: 4px;
+}
 .testigosList{
     height: fit-content;
     display: inline-flex;
@@ -172,6 +192,9 @@
     color: #ffc107;
 }
 .estadoBlock{
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
     width: 50%;
 }
 .estadoBlock p{
@@ -326,8 +349,6 @@
     overflow-y: scroll;
     justify-content: center;
 }
-serafinofabricio@gmail.com
-220625
 .tableFechas{
     width: 100%;
 }
