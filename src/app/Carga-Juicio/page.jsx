@@ -23,7 +23,7 @@ export default function page(){
       {
         nombre: "Juan Pérez",
         dni: "12345678",
-        fecha: []
+        fecha: [{hora: '10:00', fecha: '02012025', asistencia: true, complete: false}]
       },
       {
         nombre: "María López",
