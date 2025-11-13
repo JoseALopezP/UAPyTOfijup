@@ -17,7 +17,7 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
             <span className={`${styles.horizontalSeparator}`}></span>
             <span className={`${styles.controlJuicio}`}>
                 <span className={`${styles.testigoListBloque}`}>
-                    {testigos && testigos.filter(el => el.fecha.map(aux => aux.fecha.split('-')[0]).includes(bloque.fecha)).map(el =>(
+                    {testigos && testigos.filter(t => t.fecha?.some(f => f.audid === bloque.audId)).map(el =>(
                         <p>{el.nombre}{el.dni ? ' - ' +el.dni : ''}</p>
                     ))}
                 </span>

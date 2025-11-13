@@ -13,11 +13,13 @@ export function TestigoEditList({ setTestigos, testigos, bloques }) {
     setNuevoTestigo(''); setNuevoDni('');
   };
   const handleEliminarTestigo = (nombre) => { setTestigos(prev => prev.filter(t => t.nombre !== nombre)); };
-  const handleDateToggle = useCallback((nombre, fecha, horaBloque) => {
+  const handleDateToggle = useCallback((audId, nombre, fecha, horaBloque) => {
+    console.log(bloques)
+    console.log(testigos)
     setTestigos(prev => prev.map(testigo => {
       if (testigo.nombre !== nombre) return testigo;
       const yaExiste = testigo.fecha?.some(f => f.fecha === fecha);
-      return { ...testigo, fecha: yaExiste ? testigo.fecha.filter(f => f.fecha !== fecha) : [ ...(testigo.fecha || []), { fecha, hora: horaBloque, asistencia: false, complete: false } ] };
+      return { ...testigo, fecha: yaExiste ? testigo.fecha.filter(f => f.fecha !== fecha) : [ ...(testigo.fecha || []), { fecha, hora: horaBloque, asistencia: false, complete: false, audid: audId } ] };
     }));
   }, [setTestigos]);
   const actualizarHora = (testigoNombre, index, nuevaHora, nuevosMinutos) => {
@@ -53,7 +55,7 @@ export function TestigoEditList({ setTestigos, testigos, bloques }) {
               const fecha = `${bloque.fecha}`; const horaBloque = bloque.hora;
               const asignado = testigo.fecha?.some((f) => f.fecha === fecha);
               return (
-                <button key={fecha} type="button" className={asignado ? styles.asignado : styles.noAsignado} onClick={() => handleDateToggle(testigo.nombre, fecha, horaBloque)}>
+                <button key={bloque.audId} type="button" className={asignado ? styles.asignado : styles.noAsignado} onClick={() => handleDateToggle(bloque.audId, testigo.nombre, fecha, horaBloque)}>
                   {bloque.fecha.slice(0,2)}/{bloque.fecha.slice(2,4)}/{bloque.fecha.slice(6,8)} {bloque.hora}
                 </button>
               );
