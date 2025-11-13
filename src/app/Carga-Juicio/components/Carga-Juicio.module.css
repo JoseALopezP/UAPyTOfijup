@@ -1,11 +1,42 @@
 .viewBlock{
     display: inline-flex;
     flex-direction: row;
-    width: 100%;
+    width: 97%;
     font-family: inherit;
     color: #fff;
-    height: 99.5vh;
+    height: 97vh;
     margin-left: 2.5%;
+}
+.globalBlock{
+    display: inline-flex;
+    flex-direction: column;
+}
+.saveResetBar{
+    width: 97.6%;
+    margin-left: 2%;
+    height: 2.5vh;
+    border: solid #363636;
+    border-width: 1px 0 0 0;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 2px;
+}
+.reestablecerButton, .guardarButton{
+    width: 150px;
+    margin-right: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: .2;
+}
+.guardarButtonActive{
+    background-color: #47b461;
+    opacity: 1;
+}
+.reestablecerButtonActive{
+    background-color: #fcd256;
+    opacity: 1;
 }
 .addJuicioSection{
     width: 20%;
