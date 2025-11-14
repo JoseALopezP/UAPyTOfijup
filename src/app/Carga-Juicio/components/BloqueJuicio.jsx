@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
+import { DataContext } from '@/context New/DataContext'
 
 export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, index}){
     const [option, setOption] = useState(last ? 'LECTURA DE SENTENCIA' : 'DEBATE')
+    const {desplegables} = useContext(DataContext)
     return(
         <div className={`${styles.bloqueJuicioSection}`}>
             <span className={`${styles.dateTimeJuicio}`}>
@@ -12,6 +14,12 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
                 </span><span className={`${styles.dateTimeBloqueRight}`}>
                     <input className={`${styles.inputDateTime}`} value={bloque.hora.split(':')[0]} onChange={e => updateArrayAttribute(index, 'hora', `${e.target.value}:${bloque.hora.split(':')[1]}`)}/>
                     <input className={`${styles.inputDateTime}`} value={bloque.hora.split(':')[1]} onChange={e => updateArrayAttribute(index, 'hora', `${bloque.hora.split(':')[0]}:${e.target.value}`)}/>
+                    <select onChange={() => (console.log('completar esto'))}>
+                        <option>{bloque.sala ? 'SALA'+bloque.sala : ''}</option>
+                        {desplegables.salas && desplegables.salas.map(el =>(
+                            <option key={el} value={el}>SALA {el}</option>
+                        ))}
+                    </select>
                 </span>
             </span>
             <span className={`${styles.horizontalSeparator}`}></span>

@@ -1,7 +1,7 @@
 .viewBlock{
     display: inline-flex;
     flex-direction: row;
-    width: 97%;
+    width: 97.5vw;
     font-family: inherit;
     color: #fff;
     height: 97vh;
@@ -12,7 +12,7 @@
     flex-direction: column;
 }
 .saveResetBar{
-    width: 97.6%;
+    width: 97.8vw;
     margin-left: 2%;
     height: 2.5vh;
     border: solid #363636;
