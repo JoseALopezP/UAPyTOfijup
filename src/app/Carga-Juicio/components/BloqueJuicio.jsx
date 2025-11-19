@@ -14,7 +14,7 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
                 </span><span className={`${styles.dateTimeBloqueRight}`}>
                     <input className={`${styles.inputDateTime}`} value={bloque.hora.split(':')[0]} onChange={e => updateArrayAttribute(index, 'hora', `${e.target.value}:${bloque.hora.split(':')[1]}`)}/>
                     <input className={`${styles.inputDateTime}`} value={bloque.hora.split(':')[1]} onChange={e => updateArrayAttribute(index, 'hora', `${bloque.hora.split(':')[0]}:${e.target.value}`)}/>
-                    <select onChange={() => (console.log('completar esto'))}>
+                    <select className={`${styles.inputSalaJuicio}`} onChange={() => (console.log('completar esto'))}>
                         <option>{bloque.sala ? 'SALA'+bloque.sala : ''}</option>
                         {desplegables.salas && desplegables.salas.map(el =>(
                             <option key={el} value={el}>SALA {el}</option>
@@ -26,7 +26,7 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
             <span className={`${styles.controlJuicio}`}>
                 <span className={`${styles.testigoListBloque}`}>
                     {testigos && testigos.filter(t => t.fecha?.some(f => f.audid === bloque.audId)).map(el =>(
-                        <p>{el.nombre}{el.dni ? ' - ' +el.dni : ''}</p>
+                        <p key={el.audId}>{el.fecha.hora}{el.nombre}{el.dni ? ' - ' +el.dni : ''}</p>
                     ))}
                 </span>
                 <span className={`${styles.estadoBlock}`}>

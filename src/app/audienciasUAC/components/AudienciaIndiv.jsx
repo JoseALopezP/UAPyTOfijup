@@ -23,7 +23,7 @@ export function AudienciaIndiv({ date, element }) {
     const [originalJuezN, setOriginalJuezN] = useState(element.juezN || '');
     const [deleteAud, setDeleteAud] = useState(false);
     const [comentario, setComentario] = useState(element.comentario || '');
-    const [control, setControl] = useState('nocontrolado');
+    const [control, setControl] = useState('nocontrolado'); 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
