@@ -26,7 +26,9 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
             <span className={`${styles.controlJuicio}`}>
                 <span className={`${styles.testigoListBloque}`}>
                     {testigos && testigos.filter(t => t.fecha?.some(f => f.audid === bloque.audId)).map(el =>(
-                        <p key={el.audId}>{el.fecha.hora}{el.nombre}{el.dni ? ' - ' +el.dni : ''}</p>
+                        el.fecha.map(cita => (
+                            <>{cita.audid === bloque.audId && <p className={`${styles.testigoBloqueIndiv}`} key={cita.audid}>{cita.hora} - {el.nombre}{el.dni ? ' - ' +el.dni : ''}</p>}</>
+                        ))
                     ))}
                 </span>
                 <span className={`${styles.estadoBlock}`}>
