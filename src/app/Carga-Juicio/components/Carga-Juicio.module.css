@@ -1,4 +1,4 @@
-.viewBlock{
+.viewBlock {
     display: inline-flex;
     flex-direction: row;
     width: 97.5vw;
@@ -7,11 +7,13 @@
     height: 97vh;
     margin-left: 2.5%;
 }
-.globalBlock{
+
+.globalBlock {
     display: inline-flex;
     flex-direction: column;
 }
-.saveResetBar{
+
+.saveResetBar {
     width: 97.8vw;
     margin-left: 2%;
     height: 2.5vh;
@@ -22,7 +24,9 @@
     justify-content: flex-end;
     padding: 2px;
 }
-.reestablecerButton, .guardarButton{
+
+.reestablecerButton,
+.guardarButton {
     width: 150px;
     margin-right: 10px;
     font-weight: 700;
@@ -30,15 +34,18 @@
     cursor: pointer;
     opacity: .2;
 }
-.guardarButtonActive{
+
+.guardarButtonActive {
     background-color: #47b461;
     opacity: 1;
 }
-.reestablecerButtonActive{
+
+.reestablecerButtonActive {
     background-color: #fcd256;
     opacity: 1;
 }
-.addJuicioSection{
+
+.addJuicioSection {
     width: 20%;
     height: 100%;
     border: solid #303030;
@@ -46,17 +53,20 @@
     display: inline-flex;
     flex-direction: column;
 }
-.cargaLabel{
+
+.cargaLabel {
     text-align: center;
 }
 
-.multiInput{
+.multiInput {
     display: inline-flex;
     flex-direction: row;
     justify-content: center;
     width: 100%;
 }
-.multiJuicioInput, .juicioInput{
+
+.multiJuicioInput,
+.juicioInput {
     background-color: #2B2B2B;
     color: #fff;
     outline: none;
@@ -66,14 +76,18 @@
     text-align: center;
     padding: 2px;
 }
-.multiJuicioInput{
+
+.multiJuicioInput {
     width: 29%;
     margin: 0 1% 0 1%;
 }
-.multiJuicioInputWrong, .juicioInputWrong{
+
+.multiJuicioInputWrong,
+.juicioInputWrong {
     border-color: #8a2222;
 }
-.juicioButton{
+
+.juicioButton {
     width: 40%;
     margin: 10px;
     height: 30px;
@@ -84,15 +98,18 @@
     border: #303030 solid 1px;
     cursor: pointer;
 }
-.juicioInput{
+
+.juicioInput {
     margin: 0 10px 5px 10px;
 }
-.erroresList{
+
+.erroresList {
     background-color: #8a2222;
     margin: 16px;
     border-radius: 4px;
 }
-.bloqueListSection{
+
+.bloqueListSection {
     display: inline-flex;
     flex-direction: column;
     width: 35%;
@@ -102,7 +119,8 @@
     overflow-y: scroll;
     overflow-x: hidden;
 }
-.timeSelectorBar{
+
+.timeSelectorBar {
     height: 40px;
     display: inline-flex;
     flex-direction: row;
@@ -110,7 +128,8 @@
     border: solid #303030;
     border-width: 0 0 1px 0;
 }
-.bloqueJuicioSection{
+
+.bloqueJuicioSection {
     width: calc(100% - 28px);
     height: fit-content;
     padding: 6px;
@@ -121,13 +140,15 @@
     border-radius: 4px;
     margin: 6px 6px 0 6px;
 }
-.timeSelectorLabel{
+
+.timeSelectorLabel {
     height: 30px;
     margin: 5px;
     font-size: large;
     width: 40%;
 }
-.timeSelector{
+
+.timeSelector {
     background-color: #303030;
     color: #fff;
     margin: 2px;
@@ -137,11 +158,15 @@
     outline: none;
     cursor: pointer;
 }
-.lineSeparator{
+
+.lineSeparator {
     font-size: 20px;
     margin: 0 10px;
 }
-.inputDateTime, .inputDateTimeDouble, .inputSalaJuicio{
+
+.inputDateTime,
+.inputDateTimeDouble,
+.inputSalaJuicio {
     background-color: #2B2B2B;
     border-radius: 4px;
     font-size: 18px;
@@ -152,24 +177,29 @@
     text-align: center;
     color: #cecece;
 }
-.inputDateTime{
+
+.inputDateTime {
     width: 28px;
 }
-.inputDateTimeDouble{
+
+.inputDateTimeDouble {
     width: 56px;
 }
-.inputSalaJuicio{
+
+.inputSalaJuicio {
     font-size: 14px;
     padding: 6px;
     text-align: center;
     width: 84px;
 }
-.dateTimeJuicio{
+
+.dateTimeJuicio {
     display: inline-flex;
     flex-direction: row;
     justify-content: center;
 }
-.horizontalSeparator{
+
+.horizontalSeparator {
     width: 90%;
     margin: 8px 5%;
     border: #cecece solid;
@@ -177,34 +207,42 @@
     height: 1px;
     height: 0;
 }
-.controlJuicio{
+
+.controlJuicio {
     display: inline-flex;
     flex-direction: row;
 }
-.testigoBloqueIndiv{
+
+.testigoBloqueIndiv {
     height: 10px;
 }
-.testigoListBloque{
+
+.testigoListBloque {
     width: 50%;
     border-right: 2px #cecece solid;
     margin: 4px 0;
 }
-.dateTimeBloqueLeft, .dateTimeBloqueRight{
+
+.dateTimeBloqueLeft,
+.dateTimeBloqueRight {
     width: 50%;
     display: inline-flex;
     flex-direction: row;
-    
+
 }
-.dateTimeBloqueLeft{
+
+.dateTimeBloqueLeft {
     justify-content: flex-end;
     border-right: 2px #cecece solid;
     padding-right: 4px;
 }
-.dateTimeBloqueRight{
+
+.dateTimeBloqueRight {
     justify-content: flex-start;
     padding-left: 4px;
 }
-.testigosList{
+
+.testigosList {
     height: fit-content;
     display: inline-flex;
     flex-direction: column;
@@ -212,7 +250,8 @@
     border: #838383 solid;
     border-width: 0 1px 0 0;
 }
-.testigoIndiv{
+
+.testigoIndiv {
     width: 100%;
     height: fit-content;
     border: #363636 solid;
@@ -221,31 +260,38 @@
     display: inline-flex;
     flex-direction: row;
 }
-.testigoIndiv:nth-child(1){
+
+.testigoIndiv:nth-child(1) {
     border-width: 0;
 }
-.testigoIndiv p{
+
+.testigoIndiv p {
     margin: 4px 0;
 }
-.completado{
+
+.completado {
     color: #28a745;
 }
-.noCompletado{
+
+.noCompletado {
     color: #ffc107;
 }
-.estadoBlock{
+
+.estadoBlock {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     width: 50%;
 }
-.estadoBlock p{
+
+.estadoBlock p {
     text-align: center;
     width: 100%;
     height: fit-content;
     margin: 4px 0;
 }
-.bloqueTypeSelector{
+
+.bloqueTypeSelector {
     background-color: #363636;
     padding: 2px;
     color: #cecece;
@@ -253,7 +299,8 @@
     cursor: pointer;
     width: 50%;
 }
-.TestigoEditList{
+
+.TestigoEditList {
     width: 30%;
     border: solid #303030;
     border-width: 0 1px 0 0;
@@ -261,18 +308,20 @@
     overflow-y: scroll;
     overflow-x: hidden;
 }
-.juicioSelectionBlock{
+
+.juicioSelectionBlock {
     width: 15%;
     overflow-x: hidden;
 }
 
-.dateSelection{
+.dateSelection {
     height: 40px;
     width: 100%;
     border: solid #303030;
     border-width: 0 0 1px 0;
 }
-.dateSelectionInput{
+
+.dateSelectionInput {
     width: 90%;
     margin: 5px 5%;
     height: 20px;
@@ -285,21 +334,22 @@
     font-size: 18px;
 }
 
-.inputHora{
+.inputHora {
     width: 28px;
     padding: 4px;
     border-radius: 4px;
     text-align: center;
 }
 
-.buttonSelectionState{
+.buttonSelectionState {
     width: 100%;
     cursor: pointer;
     padding: 0;
     display: inline-flex;
     flex-direction: row;
 }
-.buttonStateIndiv{
+
+.buttonStateIndiv {
     width: 50%;
     border-radius: 4px;
     background-color: #cecece;
@@ -308,13 +358,14 @@
     font-weight: 700;
     text-align: center;
 }
-.buttonStateIndivSelected{
+
+.buttonStateIndivSelected {
     opacity: 1;
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
 
-.agregarTestigo{
+.agregarTestigo {
     width: 100%;
     border: solid #363636;
     border-width: 0 0 1px 0;
@@ -323,35 +374,41 @@
     justify-content: center;
     padding: 4px 0;
 }
-.agregarTestigo input{
+
+.agregarTestigo input {
     border-radius: 4px;
     height: 18px;
 }
-.agregarTestigo button{
+
+.agregarTestigo button {
     background-color: #ffc107;
     outline: none;
     border: none;
     border-radius: 4px;
 }
-.agregarTestigo button:hover{
-    transform: scale(0.98); 
+
+.agregarTestigo button:hover {
+    transform: scale(0.98);
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
     cursor: pointer;
 }
-.testigoCard{
+
+.testigoCard {
     width: 92%;
     margin: 2%;
     padding: 2%;
     border: solid 1px #363636;
     border-radius: 4px;
 }
-.testigoHeader{
+
+.testigoHeader {
     width: 100%;
     display: inline-flex;
     flex-direction: row;
     justify-content: space-between;
 }
-.deletButton{
+
+.deletButton {
     border-radius: 4px;
     background-color: tomato;
     outline: none;
@@ -364,54 +421,72 @@
     top: -6px;
     right: -6px;
 }
-.noAsignado, .asignado {
-  padding: 2px;
-  width: 110px;
-  cursor: pointer;
-}
+
+.noAsignado,
 .asignado {
-  background-color: green;
-  color: white;
+    padding: 2px;
+    width: 110px;
+    cursor: pointer;
 }
-.asignado:nth-last-child(1), .noAsignado:nth-last-child(1){
+
+.asignado {
+    background-color: green;
+    color: white;
+}
+
+.asignado:nth-last-child(1),
+.noAsignado:nth-last-child(1) {
     border-radius: 0 4px 4px 0;
 }
-.asignado:nth-child(1), .noAsignado:nth-child(1){
+
+.asignado:nth-child(1),
+.noAsignado:nth-child(1) {
     border-radius: 4px 0 0 4px;
 }
+
 .noAsignado {
-  background-color: gray;
+    background-color: gray;
 }
-.asignado:hover, .noAsignado:hover{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+
+.asignado:hover,
+.noAsignado:hover {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.bloquesWrapper{
+
+.bloquesWrapper {
     width: 100%;
     display: inline-flex;
     flex-direction: row;
     overflow-y: scroll;
     justify-content: center;
 }
-.tableFechas{
+
+.tableFechas {
     width: 100%;
 }
-.tableCell{
+
+.tableCell {
     text-align: center;
     justify-content: center;
 }
-.cellAsistencia input, .cellFinished input{
+
+.cellAsistencia input,
+.cellFinished input {
     width: 20px;
     height: 20px;
     cursor: pointer;
 }
-.nombreTestigo{
+
+.nombreTestigo {
     width: 45%;
 }
-.dniInputTestigo{
+
+.dniInputTestigo {
     width: 45%;
 }
-.dniInputTestigo input{
+
+.dniInputTestigo input {
     width: 120px;
     border-radius: 4px;
     background-color: #2B2B2B;
