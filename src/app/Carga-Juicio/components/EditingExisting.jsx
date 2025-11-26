@@ -4,70 +4,70 @@ import { DataContext } from '@/context New/DataContext'
 import { ButtonSelection } from './buttonSelection'
 import { numberCheck, listCheck, typeCheck, changeHandler, changeHandlerSplitter } from '@/utils/inputChecks'
 
-export default function EditExisting({original, newState, setNewState}){
-    const {updateDesplegables, desplegables, changeValueJuicio, updateData} = useContext(DataContext)
-    const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
-    const [numeroLeg1Error, setNumeroLeg1Error] = useState(true) 
-    const [numeroLeg2, setNumeroLeg2] = useState(null)
+export default function EditExisting({ original, newState, setNewState, previousVersion, setPreviousVersion }) {
+    const { updateDesplegables, desplegables, changeValueJuicio, updateData } = useContext(DataContext)
+    const [numeroLeg1, setNumeroLeg1] = useState(previousVersion.numeroLeg1 || 'MPF-SJ')
+    const [numeroLeg1Error, setNumeroLeg1Error] = useState(true)
+    const [numeroLeg2, setNumeroLeg2] = useState(previousVersion.numeroLeg2 || null)
     const [numeroLeg2Error, setNumeroLeg2Error] = useState(true)
-    const [numeroLeg3, setNumeroLeg3] = useState(null)
+    const [numeroLeg3, setNumeroLeg3] = useState(previousVersion.numeroLeg3 || null)
     const [numeroLeg3Error, setNumeroLeg3Error] = useState(true)
-    const [ufi, setUfi] = useState('')
+    const [ufi, setUfi] = useState(previousVersion.ufi || '')
     const [ufiError, setUfiError] = useState(true)
-    const [fechad, setFechad] = useState(null)
+    const [fechad, setFechad] = useState(previousVersion.auto.split(' ')[0].slice(0, 2) || null)
     const [fechadError, setFechadError] = useState(true)
-    const [fecham, setFecham] = useState(null)
+    const [fecham, setFecham] = useState(previousVersion.auto.split(' ')[0].slice(3, 5) || null)
     const [fechamError, setFechamError] = useState(true)
-    const [fechaa, setFechaa] = useState(null)
+    const [fechaa, setFechaa] = useState(previousVersion.auto.split(' ')[0].slice(6, 10) || null)
     const [fechaaError, setFechaaError] = useState(true)
-    const [fechah, setFechah] = useState(null)
+    const [fechah, setFechah] = useState(previousVersion.auto.split(' ')[1].slice(0, 2) || null)
     const [fechahError, setFechahError] = useState(true)
-    const [fechamm, setFechamm] = useState(null)
+    const [fechamm, setFechamm] = useState(previousVersion.auto.split(' ')[1].slice(3, 5) || null)
     const [fechammError, setFechammError] = useState(true)
-    const [fechas, setFechas] = useState(null)
+    const [fechas, setFechas] = useState(previousVersion.auto.split(' ')[1].slice(6, 8) || null)
     const [fechasError, setFechasError] = useState(true)
-    const [fechaid, setFechaid] = useState(null)
+    const [fechaid, setFechaid] = useState(previousVersion.inicio.slice(0, 2) || null)
     const [fechaidError, setFechaidError] = useState(true)
-    const [fechaim, setFechaim] = useState(null)
+    const [fechaim, setFechaim] = useState(previousVersion.inicio.slice(3, 5) || null)
     const [fechaimError, setFechaimError] = useState(true)
-    const [fechaia, setFechaia] = useState(null)
+    const [fechaia, setFechaia] = useState(previousVersion.inicio.slice(6, 10) || null)
     const [fechaiaError, setFechaiaError] = useState(true)
-    const [cantBloques, setCantBloques] = useState(null)
+    const [cantBloques, setCantBloques] = useState(previousVersion.bloques.length || null)
     const [cantBloquesError, setCantBloquesError] = useState(true)
-    const [bloques, setBloques] = useState([])
-    const [cantTestigos, setCantTestigos] = useState(null)
+    const [bloques, setBloques] = useState(previousVersion.bloques)
+    const [cantTestigos, setCantTestigos] = useState(previousVersion.testigos.length || null)
     const [cantTestigosError, setCantTestigosError] = useState(true)
-    const [tipoDelito, setTipoDelito] = useState('')
+    const [tipoDelito, setTipoDelito] = useState(previousVersion.tipoDelito)
     const [tipoDelitoError, setTipoDelitoError] = useState(true)
-    const [tipoTribunal, setTipoTribunal] = useState('')
-    const [fiscal, setFiscal] = useState('')
+    const [tipoTribunal, setTipoTribunal] = useState(previousVersion.juces.split('+').length > 1 ? 'COLEGIADO' : 'UNIPERSONAL')
+    const [fiscal, setFiscal] = useState(previousVersion.fiscal || '')
     const [fiscalError, setFiscalError] = useState(true)
-    const [defensa, setDefensa] = useState('')
+    const [defensa, setDefensa] = useState(previousVersion.defensa || '')
     const [defensaError, setDefensaError] = useState(true)
-    const [defensaCargo, setDefensaCargo] = useState('')
+    const [defensaCargo, setDefensaCargo] = useState(previousVersion.defensoria || '')
     const [defensaCargoError, setDefensaCargoError] = useState(true)
-    const [querella, setQuerella] = useState('')
+    const [querella, setQuerella] = useState(previousVersion.querella || '')
     const [querellaError, setQuerellaError] = useState(true)
-    const [juez1, setJuez1] = useState('')
+    const [juez1, setJuez1] = useState(previousVersion.juez.split('+')[0] || '')
     const [juez1Error, setJuez1Error] = useState(true)
-    const [juez2, setJuez2] = useState('')
+    const [juez2, setJuez2] = useState(previousVersion.juez.split('+')[1] || '')
     const [juez2Error, setJuez2Error] = useState(true)
-    const [juez3, setJuez3] = useState('')
+    const [juez3, setJuez3] = useState(previousVersion.juez.split('+')[2] || '')
     const [juez3Error, setJuez3Error] = useState(true)
     const [erroresList, setErroresList] = useState('')
     const [changes, setChanges] = useState(false)
-    const checkCompletion = () =>{
+    const checkCompletion = () => {
         const aux = []
-        listCheck(numeroLeg1,setNumeroLeg1Error, desplegables.legajosPrefijo)
-        numberCheck(numeroLeg2, setNumeroLeg2Error,0,99999)
-        numberCheck(numeroLeg3, setNumeroLeg3Error,0,2100)
+        listCheck(numeroLeg1, setNumeroLeg1Error, desplegables.legajosPrefijo)
+        numberCheck(numeroLeg2, setNumeroLeg2Error, 0, 99999)
+        numberCheck(numeroLeg3, setNumeroLeg3Error, 0, 2100)
         listCheck(ufi, setUfiError, desplegables.ufi)
-        numberCheck(fechad, setFechadError,1,31)
-        numberCheck(fecham, setFechamError,1,12)
-        numberCheck(fechaa, setFechaaError,20,2100)
-        numberCheck(fechah, setFechahError,0,23)
-        numberCheck(fechamm, setFechammError,0,59)
-        numberCheck(fechas, setFechasError,0,59)
+        numberCheck(fechad, setFechadError, 1, 31)
+        numberCheck(fecham, setFechamError, 1, 12)
+        numberCheck(fechaa, setFechaaError, 20, 2100)
+        numberCheck(fechah, setFechahError, 0, 23)
+        numberCheck(fechamm, setFechammError, 0, 59)
+        numberCheck(fechas, setFechasError, 0, 59)
         numberCheck(cantBloques, setCantBloquesError, 0, 100)
         numberCheck(cantTestigos, setCantTestigosError, 0, 999)
         listCheck(tipoDelito, setTipoDelitoError, desplegables.delitosTipos)
@@ -76,7 +76,7 @@ export default function EditExisting({original, newState, setNewState}){
         listCheck(defensaCargo, setDefensaCargoError, desplegables.defensorias)
         typeCheck(querella, setQuerellaError, 'string')
         listCheck(juez1, setJuez1Error, desplegables.jueces)
-        if(tipoTribunal === "COLEGIADO"){
+        if (tipoTribunal === "COLEGIADO") {
             listCheck(juez2, setJuez2Error, desplegables.jueces)
             listCheck(juez3, setJuez3Error, desplegables.jueces)
         } else {
@@ -105,91 +105,91 @@ export default function EditExisting({original, newState, setNewState}){
         !juez1Error && aux.push('juez/presidente no válido')
         !juez2Error && aux.push('juez/vocal 1 no válido')
         !juez3Error && aux.push('juez/vocal 2 no válido')
-        if(aux.length > 0){
+        if (aux.length > 0) {
             setErroresList(aux.join(', '))
-            return(false)
-        }else{
+            return (false)
+        } else {
             setErroresList('')
-            return(true)
+            return (true)
         }
     }
-    const handleCopiar = () =>{
-        if(checkCompletion()){
-            const cells = `${numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3}\t${ufi}\t\t${fechad+'/'+fecham+'/'+fechaa+' '+fechah+':'+fechamm+':'+fechas}\t${fechaid+'/'+fechaim+'/'+fechaia}\t${cantBloques}\t\t\t\t\t\t\t${cantTestigos}\t\t${tipoDelito}\t${tipoTribunal}\t${fiscal}\t${defensa}\t${querella}\t${juez1}\t${tipoTribunal==='COLEGIADO'?'PRESIDENTE':'N/A'}` +
+    const handleCopiar = () => {
+        if (checkCompletion()) {
+            const cells = `${numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3}\t${ufi}\t\t${fechad + '/' + fecham + '/' + fechaa + ' ' + fechah + ':' + fechamm + ':' + fechas}\t${fechaid + '/' + fechaim + '/' + fechaia}\t${cantBloques}\t\t\t\t\t\t\t${cantTestigos}\t\t${tipoDelito}\t${tipoTribunal}\t${fiscal}\t${defensa}\t${querella}\t${juez1}\t${tipoTribunal === 'COLEGIADO' ? 'PRESIDENTE' : 'N/A'}` +
                 `${tipoTribunal === 'COLEGIADO' && '\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t' + juez2 + 'VOCAL'}` + `${tipoTribunal === 'COLEGIADO' && '\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t' + juez3 + 'VOCAL'}`
             navigator.clipboard.writeText(cells);
         }
     }
-    const checkDifferenceSave = (saving) =>{
-        const fechaI = fechaid+fechaim+fechaia;
+    const checkDifferenceSave = (saving) => {
+        const fechaI = fechaid + fechaim + fechaia;
         setChanges(false)
         const newNumeroLeg = (numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3)
-        if(newNumeroLeg !== original.numeroLeg){
-            if(saving){
-                changeValueJuicio(fechaI, original.Id, )
-                bloques.forEach(el =>{
+        if (newNumeroLeg !== original.numeroLeg) {
+            if (saving) {
+                changeValueJuicio(fechaI, original.Id,)
+                bloques.forEach(el => {
                     updateData(el.fecha, el.audId, 'numeroLeg', newNumeroLeg)
                 })
-            }else{
+            } else {
                 setChanges(true)
             }
         }
         const newAuto = (`${fechad}${fecham}${fechaa} ${fechah}:${fechamm}:${fechas}`)
-        if(newAuto !== original.auto){
-            if(saving){
+        if (newAuto !== original.auto) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'auto', newAuto)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
         const newInicio = (`${fechaid}${fechaim}${fechaia}`)
-        if(newInicio !== original.inicio){
-            if(saving){
+        if (newInicio !== original.inicio) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'inicio', newInicio)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
-        if(ufi !== original.ufi){
-            if(saving){
+        if (ufi !== original.ufi) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'ufi', ufi)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
-        if(fiscal !== original.fiscal){
-            if(saving){
+        if (fiscal !== original.fiscal) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'fiscal', fiscal)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
-        if(tipoDelito !== original.tipoDelito){
-            if(saving){
+        if (tipoDelito !== original.tipoDelito) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'tipoDelito', tipoDelito)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
-        if(defensa !== original.defensa){
-            if(saving){
+        if (defensa !== original.defensa) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'defensa', defensa)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
-        if(defensaCargo !== original.defensoria){
-            if(saving){
+        if (defensaCargo !== original.defensoria) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'defensoria', defensaCargo)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
-        const newJueces = `${juez1}+${juez2}+${juez3}` 
-        if(newJueces !== original.jueces){
-            if(saving){
+        const newJueces = `${juez1}+${juez2}+${juez3}`
+        if (newJueces !== original.jueces) {
+            if (saving) {
                 changeValueJuicio(fechaI, original.id, 'jueces', newJueces)
-            }else{
+            } else {
                 setChanges(true)
             }
         }
@@ -199,112 +199,112 @@ export default function EditExisting({original, newState, setNewState}){
     }, []);
     return (
         <section className={`${styles.addJuicioSection}`}>
-            <ButtonSelection newState={newState} setNewState={setNewState}/>
+            <ButtonSelection newState={newState} setNewState={setNewState} />
             <label className={`${styles.cargaLabel}`}>Número de Legajo</label>
             <span className={`${styles.multiInput}`}>
-                <input className={numeroLeg1Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
-                    onChange={e => changeHandler(e.target.value,setNumeroLeg1,setNumeroLeg1Error,listCheck,desplegables.legajosPrefijo)} value={numeroLeg1} list='legajosPrefijo'/>
-                <input className={numeroLeg2Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
-                    onChange={e => changeHandler(e.target.value, setNumeroLeg2, setNumeroLeg2Error, numberCheck,0,99999)} 
-                    placeholder='00000' value={numeroLeg2}/>
-                <input className={numeroLeg3Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
-                    placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, numberCheck,0,2100)} value={numeroLeg3}/></span>
+                <input className={numeroLeg1Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    onChange={e => changeHandler(e.target.value, setNumeroLeg1, setNumeroLeg1Error, listCheck, desplegables.legajosPrefijo)} value={numeroLeg1} list='legajosPrefijo' />
+                <input className={numeroLeg2Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    onChange={e => changeHandler(e.target.value, setNumeroLeg2, setNumeroLeg2Error, numberCheck, 0, 99999)}
+                    placeholder='00000' value={numeroLeg2} />
+                <input className={numeroLeg3Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, numberCheck, 0, 2100)} value={numeroLeg3} /></span>
             <label className={`${styles.cargaLabel}`}>Auto de Apertura</label>
-                <span className={`${styles.multiInput}`}>
-                    <input className={fechadError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setFechad, setFechadError, numberCheck,1,31)} 
-                        placeholder='05' value={fechad}/>
-                    <input className={fechamError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                        placeholder='02' onChange={e => changeHandler(e.target.value, setFecham, setFechamError, numberCheck,1,12)} value={fecham}/>
-                    <input className={fechaaError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
-                        placeholder='2000' onChange={e => changeHandler(e.target.value, setFechaa, setFechaaError, numberCheck,20,2100)} value={fechaa}/>
-                </span>
-                <span className={`${styles.multiInput}`}>
-                    <input className={fechahError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setFechah, setFechahError, numberCheck,0,23)} 
-                        placeholder='hh' value={fechah}/>
-                    <input className={fechammError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                        placeholder='mm' onChange={e => changeHandler(e.target.value, setFechamm, setFechammError, numberCheck,0,59)} value={fechamm}/>
-                    <input className={fechasError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
-                        placeholder='ss' onChange={e => changeHandler(e.target.value, setFechas, setFechasError, numberCheck,0,59)} value={fechas}/>
-                </span>
+            <span className={`${styles.multiInput}`}>
+                <input className={fechadError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    onChange={e => changeHandler(e.target.value, setFechad, setFechadError, numberCheck, 1, 31)}
+                    placeholder='05' value={fechad} />
+                <input className={fechamError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='02' onChange={e => changeHandler(e.target.value, setFecham, setFechamError, numberCheck, 1, 12)} value={fecham} />
+                <input className={fechaaError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='2000' onChange={e => changeHandler(e.target.value, setFechaa, setFechaaError, numberCheck, 20, 2100)} value={fechaa} />
+            </span>
+            <span className={`${styles.multiInput}`}>
+                <input className={fechahError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    onChange={e => changeHandler(e.target.value, setFechah, setFechahError, numberCheck, 0, 23)}
+                    placeholder='hh' value={fechah} />
+                <input className={fechammError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='mm' onChange={e => changeHandler(e.target.value, setFechamm, setFechammError, numberCheck, 0, 59)} value={fechamm} />
+                <input className={fechasError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='ss' onChange={e => changeHandler(e.target.value, setFechas, setFechasError, numberCheck, 0, 59)} value={fechas} />
+            </span>
             <label className={`${styles.cargaLabel}`}>Fecha de inicio juicio</label>
-                <span className={`${styles.multiInput}`}>
-                    <input className={fechaidError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setFechaid, setFechaidError, numberCheck,1,31)} 
-                        placeholder='05' value={fechaid}/>
-                    <input className={fechaimError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                        placeholder='02' onChange={e => changeHandler(e.target.value, setFechaim, setFechaimError, numberCheck,1,12)} value={fechaim}/>
-                    <input className={fechaiaError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`} 
-                        placeholder='2000' onChange={e => changeHandler(e.target.value, setFechaia, setFechaiaError, numberCheck,20,2100)} value={fechaia}/>
-                </span>
+            <span className={`${styles.multiInput}`}>
+                <input className={fechaidError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    onChange={e => changeHandler(e.target.value, setFechaid, setFechaidError, numberCheck, 1, 31)}
+                    placeholder='05' value={fechaid} />
+                <input className={fechaimError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='02' onChange={e => changeHandler(e.target.value, setFechaim, setFechaimError, numberCheck, 1, 12)} value={fechaim} />
+                <input className={fechaiaError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
+                    placeholder='2000' onChange={e => changeHandler(e.target.value, setFechaia, setFechaiaError, numberCheck, 20, 2100)} value={fechaia} />
+            </span>
             <label className={`${styles.cargaLabel}`}>Cantidad de bloques</label>
-            <input className={cantBloquesError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value, setCantBloques, setCantBloquesError, numberCheck, 0, 100)} value={cantBloques}/>
+            <input className={cantBloquesError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value, setCantBloques, setCantBloquesError, numberCheck, 0, 100)} value={cantBloques} />
             <label className={`${styles.cargaLabel}`}>Tipo de delito</label>
-            <input className={tipoDelitoError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setTipoDelito,setTipoDelitoError,listCheck,desplegables.delitosTipos)} value={tipoDelito} list='delitosTipos'/>
+            <input className={tipoDelitoError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value, setTipoDelito, setTipoDelitoError, listCheck, desplegables.delitosTipos)} value={tipoDelito} list='delitosTipos' />
             <label className={`${styles.cargaLabel}`}>Tipo de tribunal</label>
             <select className={`${styles.juicioInput}`} onChange={e => setTipoTribunal(e.target.value)} value={tipoTribunal}>
                 <option key={'UNIPERSONAL'} value={"UNIPERSONAL"}>UNIPERSONAL</option>
                 <option key={'COLEGIADO'} value={"COLEGIADO"}>COLEGIADO</option>
             </select>
             <label className={`${styles.cargaLabel}`}>Fiscal</label>
-            <input className={fiscalError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandlerSplitter(e.target.value,setFiscal,setFiscalError,listCheck,desplegables.fiscal, desplegables.ufi, setUfi, setUfiError)} value={fiscal} list='fiscal'/>
+            <input className={fiscalError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandlerSplitter(e.target.value, setFiscal, setFiscalError, listCheck, desplegables.fiscal, desplegables.ufi, setUfi, setUfiError)} value={fiscal} list='fiscal' />
             <label className={`${styles.cargaLabel}`}>UFI</label>
-            <input className={ufiError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setUfi,setUfiError,listCheck,desplegables.ufi)} value={ufi} list='ufi'/>
+            <input className={ufiError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value, setUfi, setUfiError, listCheck, desplegables.ufi)} value={ufi} list='ufi' />
             <label className={`${styles.cargaLabel}`}>Cantidad de testigos</label>
-            <input className={cantTestigosError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value, setCantTestigos, setCantTestigosError, numberCheck, 0, 999)} value={cantTestigos}/>
+            <input className={cantTestigosError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value, setCantTestigos, setCantTestigosError, numberCheck, 0, 999)} value={cantTestigos} />
             <label className={`${styles.cargaLabel}`}>Defensa</label>
-            <input className={defensaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandlerSplitter(e.target.value,setDefensa,setDefensaError,listCheck,desplegables.defensa, desplegables.defensorias, setDefensaCargo, setDefensaCargoError)} value={defensa} list='defensa'/>
+            <input className={defensaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandlerSplitter(e.target.value, setDefensa, setDefensaError, listCheck, desplegables.defensa, desplegables.defensorias, setDefensaCargo, setDefensaCargoError)} value={defensa} list='defensa' />
             <label className={`${styles.cargaLabel}`}>Defensoria</label>
             <input className={defensaCargoError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                onChange={e => changeHandler(e.target.value,setDefensaCargo,setDefensaCargoError,listCheck,desplegables.defensaCargo)} value={defensaCargo} list='defensorias'/>
+                onChange={e => changeHandler(e.target.value, setDefensaCargo, setDefensaCargoError, listCheck, desplegables.defensaCargo)} value={defensaCargo} list='defensorias' />
             <label className={`${styles.cargaLabel}`}>Querella</label>
-            <input className={querellaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setQuerella,setQuerellaError,typeCheck,'string')} value={querella}/>
+            <input className={querellaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value, setQuerella, setQuerellaError, typeCheck, 'string')} value={querella} />
             <label className={`${styles.cargaLabel}`}>Jueces</label>
-            <input className={juez1Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                onChange={e => changeHandler(e.target.value,setJuez1,setJuez1Error,listCheck,desplegables.jueces)} 
-                value={juez1} list='jueces' placeholder={tipoTribunal === "COLEGIADO" ? 'presidente' : 'juez'}/>
+            <input className={juez1Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                onChange={e => changeHandler(e.target.value, setJuez1, setJuez1Error, listCheck, desplegables.jueces)}
+                value={juez1} list='jueces' placeholder={tipoTribunal === "COLEGIADO" ? 'presidente' : 'juez'} />
             {tipoTribunal === "COLEGIADO" &&
                 <>
-                    <input className={juez2Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                        onChange={e => changeHandler(e.target.value,setJuez2,setJuez2Error,listCheck,desplegables.jueces)} value={juez2} list='jueces'/>
-                    <input className={juez3Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`} 
-                        onChange={e => changeHandler(e.target.value,setJuez3,setJuez3Error,listCheck,desplegables.jueces)} value={juez3} list='jueces'/>
+                    <input className={juez2Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                        onChange={e => changeHandler(e.target.value, setJuez2, setJuez2Error, listCheck, desplegables.jueces)} value={juez2} list='jueces' />
+                    <input className={juez3Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
+                        onChange={e => changeHandler(e.target.value, setJuez3, setJuez3Error, listCheck, desplegables.jueces)} value={juez3} list='jueces' />
                 </>}
             <datalist id="delitosTipos" className={`${styles.tableCellInput}`}>
                 {desplegables.delitosTipos && desplegables.delitosTipos.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el}
                     </option>))}
             </datalist>
             <datalist id="defensa" className={`${styles.tableCellInput}`}>
                 {desplegables.defensa && desplegables.defensa.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el}
                     </option>))}
                 {desplegables.defensaParticular && desplegables.defensaParticular.map((el) => (
                     <option key={el} value={el}>
-                    {el}
-                </option>))}
+                        {el}
+                    </option>))}
             </datalist>
             <datalist id="defensorias" className={`${styles.tableCellInput}`}>
                 {desplegables.defensorias && desplegables.defensorias.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el}
                     </option>))}
-                    <option key={''} value={''}></option>
+                <option key={''} value={''}></option>
             </datalist>
             <datalist id="jueces" className={`${styles.tableCellInput}`}>
                 {desplegables.jueces && desplegables.jueces.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el}
                     </option>))}
             </datalist>
             <datalist id="fiscal" className={`${styles.tableCellInput}`}>
@@ -316,13 +316,13 @@ export default function EditExisting({original, newState, setNewState}){
             <datalist id="ufi" className={`${styles.tableCellInput}`}>
                 {desplegables.ufi && desplegables.ufi.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el}
                     </option>))}
             </datalist>
             <datalist id="legajosPrefijo" className={`${styles.tableCellInput}`}>
                 {desplegables.legajosPrefijo && desplegables.legajosPrefijo.map((el) => (
                     <option key={el} value={el}>
-                    {el}
+                        {el}
                     </option>))}
             </datalist>
             <span className={`${styles.multiInput}`}>
