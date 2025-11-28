@@ -8,6 +8,7 @@ import { JuicioSelection } from './JuicioSelection';
 import EditExisting from './EditingExisting';
 import { getCurrentYear } from '@/utils/dateUtils';
 import { DataContext } from '@/context New/DataContext';
+import { ButtonSelection } from './ButtonSelection';
 
 export default function JuicioFrame() {
   const { changeValueJuicio, desplegables, updateDesplegables } = useContext(DataContext)
@@ -20,6 +21,10 @@ export default function JuicioFrame() {
   useEffect(() => {
     updateDesplegables()
   }, [])
+  const handleReset = () => {
+    setBloquesArray(previousVersion.bloques)
+    setTestigos(previousVersion.testigos)
+  }
   useEffect(() => {
     if (bloquesArray !== null) {
       if (confirm("¿Editar otra audiencia?")) {
@@ -34,13 +39,15 @@ export default function JuicioFrame() {
   return (
     <div className={`${styles.globalBlock}`}><section className={`${styles.viewBlock}`}>
       {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState} /> :
-        <EditExisting newState={newState} setNewState={setNewState} previousVersion={previousVersion} setPreviousVersion={setPreviousVersion} />}
+        <>{previousVersion.bloques ? <EditExisting newState={newState} setNewState={setNewState} previousVersion={previousVersion} setPreviousVersion={setPreviousVersion} /> :
+          <><section className={`${styles.addJuicioSection}`}><ButtonSelection newState={newState} setNewState={setNewState} />No hay juicio seleccionado</section></>}</>}
       <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray} testigos={testigos} />
       <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloques={bloquesArray} />
       <JuicioSelection year={year} setYear={setYear} setPreviousVersion={setPreviousVersion} />
     </section>
       <div className={`${styles.saveResetBar}`}>
-        <button className={changesToSave ? `${styles.reestablecerButton} ${styles.reestablecerButtonActive}` : `${styles.reestablecerButton}`}>REESTABLECER</button>
+        <button className={changesToSave ? `${styles.reestablecerButton} ${styles.reestablecerButtonActive}` : `${styles.reestablecerButton}`}
+          onClick={() => handleReset()}>REESTABLECER</button>
         <button className={changesToSave ? `${styles.guardarButton} ${styles.guardarButtonActive}` : `${styles.guardarButton}`}>GUARDAR</button>
       </div></div>
   )
