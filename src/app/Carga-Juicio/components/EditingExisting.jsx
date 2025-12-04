@@ -326,7 +326,6 @@ export default function EditExisting({ original, newState, setNewState, previous
                     </option>))}
             </datalist>
             <span className={`${styles.multiInput}`}>
-                <button type='button' className={`${styles.juicioButton}`} onClick={() => handleGenerar()}>GENERAR</button>
                 <button type='button' className={`${styles.juicioButton}`} onClick={() => handleCopiar()}>COPIAR</button>
             </span>
             <span className={`${styles.erroresList}`}>{erroresList}</span>
