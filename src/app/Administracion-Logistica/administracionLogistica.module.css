@@ -72,3 +72,34 @@
     color: #CCCCCC;
 
 }
+
+.titleSaveSpan {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0;
+}
+
+.saveDateButton {
+    background-color: springgreen;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+}
+
+.addDateBlock {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.addDateInput {
+    width: 40%;
+}
+
+.addValueInput {
+    width: 60%;
+}

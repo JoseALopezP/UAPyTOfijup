@@ -4,19 +4,13 @@ import styles from '../administracionLogistica.module.css'
 import { DataContext } from '@/context New/DataContext'
 
 export default function ImportantDates() {
-    const { importantDates } = useContext(DataContext)
+    const { importantDates, updateImportantDates } = useContext(DataContext)
     const [dates, setDates] = useState({})
     const [newEntryKey, setNewEntryKey] = useState('')
     const [newEntryValue, setNewEntryValue] = useState('')
     const [filteredSuggestions, setFilteredSuggestions] = useState([])
-    useEffect(() => {
-        if (importantDates) {
-            setDates(importantDates)
-        }
-    }, [importantDates])
-    const handleUpdateList = async () => {
-        console.log("Saving full list:", dates);
-        alert("Update functionality to be implemented by user. Check console for data object.");
+    const handleUpdateList = () => {
+
     }
     const handleRenameCategory = (oldKey, newKey) => {
         if (!newKey || oldKey === newKey) return;
@@ -69,16 +63,22 @@ export default function ImportantDates() {
             setFilteredSuggestions([]);
         }
     }
+    useEffect(() => {
+        setDates(importantDates)
+    }, [importantDates])
+    useEffect(() => {
+        updateImportantDates()
+    }, [])
     return (
         <>
             <div className={`${styles.importantDatesContainer}`}>
-                <button onClick={handleUpdateList} style={{ cursor: 'pointer', background: 'lightgreen', border: '1px solid green', padding: '5px', borderRadius: '5px' }}>
-                    💾
-                </button>
                 <div style={{ marginBottom: '20px', padding: '15px', background: '#f5f5f5', borderRadius: '5px', border: '1px solid #ddd' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>Fechas importantes:</h3>
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1, minWidth: '200px' }}>
+                    <span className={`${styles.titleSaveSpan}`}><h3 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>Fechas importantes:</h3>
+                        <button onClick={() => handleUpdateList()} className={`${styles.saveDateButton}`}>
+                            💾
+                        </button></span>
+                    <div className={`${styles.addDateBlock}`}>
+                        <div className={`${styles.addDateInput}`}>
                             <input
                                 placeholder="Category Name (e.g. Feriados)"
                                 value={newEntryKey}
@@ -90,7 +90,7 @@ export default function ImportantDates() {
                                 {dates && Object.keys(dates).map(key => <option key={key} value={key} />)}
                             </datalist>
                         </div>
-                        <div style={{ flex: 2, minWidth: '200px' }}>
+                        <div className={`${styles.addValueInput}`}>
                             <input
                                 placeholder="Value (e.g. 25 de Mayo)"
                                 value={newEntryValue}
