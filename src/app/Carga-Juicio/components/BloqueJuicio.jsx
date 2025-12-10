@@ -36,7 +36,6 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
                     <p>{bloque.estadoBloque.split('_').join(' ')}</p>
                 </span>
             </span>
-            
             <span>
                 <select className={`${styles.bloqueTypeSelector}`} value={option} onChange={e => setOption(e.target.value)}>
                     <option value={'DEBATE'}>DEBATE</option>

@@ -1,10 +1,11 @@
-.container{
+.container {
     width: 98vw;
-    margin: 0; 
+    margin: 0;
     height: calc(100vh - 5px);
     margin-left: 2.3vw;
 }
-.downloadXLSXcontainer{
+
+.downloadXLSXcontainer {
     width: 50%;
     height: 30%;
     border: solid 1px #2B2B2B;
@@ -13,22 +14,26 @@
     flex-direction: column;
     justify-content: space-between;
 }
-.downloadXLSXsubContainer{
+
+.downloadXLSXsubContainer {
     display: inline-flex;
     flex-direction: column;
 }
-.title{
+
+.title {
     color: #ffffff;
     font-size: 22px;
     font-weight: 500;
     width: 100%;
     text-align: center;
 }
-.subtitle{
+
+.subtitle {
     font-size: 20px;
     margin-left: 5px;
 }
-.inputxlsx{
+
+.inputxlsx {
     border: solid 1px #2B2B2B;
     height: 30px;
     background-color: transparent;
@@ -37,7 +42,8 @@
     font-size: 22px;
     outline: none;
 }
-.buttonxlsx{
+
+.buttonxlsx {
     width: calc(100% - 10px);
     margin: 5px;
     height: 40px;
@@ -49,7 +55,20 @@
     border-radius: 6px;
     border: none;
 }
-.buttonxlsx:hover{
+
+.buttonxlsx:hover {
     background-color: #2D2E2E;
     color: #FFFFFF;
+}
+
+.importantDatesContainer {
+    width: 100%;
+    border: solid 1px #2B2B2B;
+}
+
+.iDTitle {
+    width: 100%;
+    text-align: center;
+    color: #CCCCCC;
+
 }

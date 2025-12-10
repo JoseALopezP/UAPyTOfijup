@@ -11,9 +11,11 @@
     color: #fff;
     overflow: hidden;
 }
-.container input{
+
+.container input {
     font-family: inherit;
 }
+
 .listaBlock {
     display: inline-flex;
     flex-direction: column;
@@ -25,16 +27,18 @@
     z-index: 2;
 }
 
-.listaBlock:hover{
+.listaBlock:hover {
     animation: appearOnHover .2s both;
 }
-.listadoBlock{
+
+.listadoBlock {
     overflow-y: scroll;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
 }
-.listadoAudiencias{
+
+.listadoAudiencias {
     cursor: pointer;
     display: inline-flex;
     flex-direction: row;
@@ -46,15 +50,19 @@
     width: 95%;
     opacity: .7;
 }
-.listadoAudiencias:hover{
+
+.listadoAudiencias:hover {
     opacity: 1;
 }
-.listadoAudienciasSelected{
+
+.listadoAudienciasSelected {
     opacity: 1;
 }
+
 .block1 {
     width: 75%;
 }
+
 .block2 {
     width: 25%;
     height: 100%;
@@ -63,24 +71,30 @@
     flex-direction: column;
     border: 1px solid #fff;
 }
+
 .text {
     text-align: center;
     margin: 0;
 }
+
 .textEstado {
     font-weight: 400;
 }
+
 .textLegajo {
     font-weight: 600;
 }
+
 .textHora {
     color: #ffffffd1;
     font-weight: 600;
 }
+
 .textoperador {
     font-weight: 500;
 }
-.buttonEstado{
+
+.buttonEstado {
     border-radius: 2px;
     width: 33%;
     margin-left: .33%;
@@ -88,69 +102,88 @@
     border: none;
     opacity: .1;
 }
-.DEMORADA{
+
+.DEMORADA {
     border-color: #fd7e14;
     background-color: #fd7d14a0;
 }
-.PROGRAMADA{
+
+.PROGRAMADA {
     border-color: #007bff;
     background-color: #007bffa0;
 }
-.EN_CURSO{
+
+.EN_CURSO {
     border-color: #17a2b8;
     background-color: #17a2b8a0;
 }
-.CANCELADA{
+
+.CANCELADA {
     border-color: #dc3545;
     background-color: #dc3545a0;
 }
-.CUARTO_INTERMEDIO{
+
+.CUARTO_INTERMEDIO {
     border-color: #ffc107;
     background-color: #ffc107a0;
 }
-.FINALIZADA{
+
+.FINALIZADA {
     border-color: #28a745;
     background-color: #28a745a0;
 }
-.REPROGRAMADA{
+
+.REPROGRAMADA {
     border-color: #6c757d;
     background-color: #6c757da0;
 }
-.RESUELVO{
+
+.RESUELVO {
     border-color: #1F572B;
     background-color: #1F572Ba0;
 }
-.DEMORADA:hover{
+
+.DEMORADA:hover {
     background-color: #fd7d14e0;
 }
-.PROGRAMADA:hover{
+
+.PROGRAMADA:hover {
     background-color: #007bffe0;
 }
-.EN_CURSO:hover{
+
+.EN_CURSO:hover {
     background-color: #17a2b8e0;
 }
-.CANCELADA:hover{
-    background-color: #dc3545e0; 
+
+.CANCELADA:hover {
+    background-color: #dc3545e0;
 }
-.CUARTO_INTERMEDIO:hover{
+
+.CUARTO_INTERMEDIO:hover {
     background-color: #ffc107e0;
 }
-.FINALIZADA:hover{
+
+.FINALIZADA:hover {
     background-color: #28a745e0;
 }
-.REPROGRAMADA:hover{
+
+.REPROGRAMADA:hover {
     background-color: #6c757de0;
 }
-.condenadoInput{
+
+.condenadoInput {
     background-color: #ffc107a0;
 }
-.condenadoInput .condenadoimputadoFlag{
+
+.condenadoInput .condenadoimputadoFlag {
     background-color: #ffc107;
 }
-.imputadoInput .condenadoimputadoFlag{
-    background-color: #6c757d; 
+
+.imputadoInput .condenadoimputadoFlag {
+    background-color: #6c757d;
 }
-.condenadoimputadoFlag{
+
+.condenadoimputadoFlag {
     display: inline-flex;
     visibility: hidden;
     flex-direction: row;
@@ -160,27 +193,31 @@
     position: absolute;
     border-radius: 4px;
     padding: 0;
-    animation: onDissapear 2s ;
+    animation: onDissapear 2s;
 }
-.condenadoimputadoFlag p{
+
+.condenadoimputadoFlag p {
     height: 100%;
     padding: 0;
     margin: 0;
     font-size: 22px;
 }
-.controlChangeStateButtonBlock{
+
+.controlChangeStateButtonBlock {
     display: inline-flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
 }
-.controlBlock{
+
+.controlBlock {
     width: 95vw;
     background-color: #1F1F1F;
     display: inline-flex;
     flex-direction: row;
 }
-.controlBlockLeft{
+
+.controlBlockLeft {
     width: 36%;
     height: 100%;
     border-right: solid 1px #2B2B2B;
@@ -188,117 +225,145 @@
     overflow-x: hidden;
     background-color: #181818;
 }
-.buttonChange{
+
+.buttonChange {
     border-radius: 2px;
     height: 40px;
     font-weight: 700;
     opacity: .1;
     cursor: pointer;
 }
-.REINICIAR{
+
+.REINICIAR {
     background-color: #6c757d;
     opacity: 1;
 }
-.CONTINUAR{
+
+.CONTINUAR {
     opacity: 1;
     background-color: #17a2b8;
 }
-.FINALIZAR{
+
+.FINALIZAR {
     opacity: 1;
     background-color: #28a745;
 }
-.CUARTOINTERMEDIO{
+
+.CUARTOINTERMEDIO {
     opacity: 1;
     background-color: #ffc107;
 }
-.INICIAR{
+
+.INICIAR {
     opacity: 1;
     background-color: #17a2b8;
 }
-.CANCELAR{
-    opacity: 1;
+
+.CAbidetcaNCELAR {
+    opacity: bacha lavadero1;
     background-color: #dc3545;
 }
-.REPROGRAMAR{
+
+.REPROGRAMAR {
     opacity: 1;
     background-color: #6c757d;
 }
-.RESUELVOSUB{
+
+.RESUELVOSUB {
     opacity: 1;
     background-color: #1F572B;
 }
-.audControlTitle{
+
+.audControlTitle {
     text-align: center;
     margin: 10px 0 0 0;
 }
-.inputLeftRow{
+
+.inputLeftRow {
     width: calc(100% - 10px);
     display: inline-flex;
     flex-direction: row;
     justify-content: space-between;
     height: 30px;
 }
-.inputLeftColumn{
+
+.inputLeftColumn {
     width: 100%;
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
 }
-.inputLeftNameDRow{
+
+.inputLeftNameDRow {
     width: 50%;
     font-size: 20px;
     font-weight: 700;
     text-align: center;
 }
-.inputLeftNameDColumn{
+
+.inputLeftNameDColumn {
     width: 100%;
     text-align: center;
     font-size: 20px;
 }
-.inputLeftDRow{
+
+.inputLeftDRow {
     width: 50%;
     text-align: center;
     font-size: 16px;
 }
-.inputLeftColumn{
+
+.inputLeftColumn {
     display: inline-flex;
     flex-direction: column;
     width: 100%;
 }
-.inputLeft10{
+
+.inputLeft10 {
     width: 10%;
 }
-.inputLeft15{
+
+.inputLeft15 {
     width: 15%;
 }
-.inputLeft20{
+
+.inputLeft20 {
     width: 20%;
 }
-.inputLeft25{
+
+.inputLeft25 {
     width: 25%;
 }
-.inputLeft33{
+
+.inputLeft33 {
     width: calc(100% / 3);
 }
-.inputLeft35{
+
+.inputLeft35 {
     width: 35%;
 }
-.inputLeft40{
+
+.inputLeft40 {
     width: 40%;
 }
-.inputLeft50{
+
+.inputLeft50 {
     width: 49%;
 }
-.inputLeft70{
+
+.inputLeft70 {
     width: 70%;
 }
-.inputLeft85{
+
+.inputLeft85 {
     width: 85%;
 }
-.inputLeft100{
+
+.inputLeft100 {
     width: 100%;
 }
-.inputLeft{
+
+.inputLeft {
     height: 30px;
     font-size: 18px;
     border: none;
@@ -310,53 +375,66 @@
     background-color: #1F1F1F;
     vertical-align: bottom;
 }
-.inputLeftSelected, .inputLeftDeSelected{
+
+.inputLeftSelected,
+.inputLeftDeSelected {
     cursor: pointer;
 }
-.inputLeftDeSelected{
+
+.inputLeftDeSelected {
     opacity: .3;
 }
-.inputLeft:hover{
+
+.inputLeft:hover {
     border: solid 1px #3C3C3C;
 }
-.inputLeftDelete{
+
+.inputLeftDelete {
     background-color: #dc3545;
     width: 10%;
 }
-.inputLeftSelect{
+
+.inputLeftSelect {
     padding: 0;
     margin: 0;
     height: 30px;
 }
-.inputTyped100{
+
+.inputTyped100 {
     border: solid 1px #3C3C3C;
     width: calc(100% - 2px);
     height: 26px;
 }
-.inputTyped70{
+
+.inputTyped70 {
     border: solid 1px #3C3C3C;
     width: calc(70% - 3px);
     height: 25px;
 }
-.inputTyped35{
+
+.inputTyped35 {
     border: solid 1px #3C3C3C;
     width: calc(35% - 3px);
     height: 25px;
 }
-.inputTyped50{
+
+.inputTyped50 {
     border: solid 1px #3C3C3C;
     width: calc(50% - 2px);
     height: 26px;
 }
-.deleteSVG{
+
+.deleteSVG {
     padding: 0;
     width: 75%;
     height: 75%;
 }
-.selectOperador{
+
+.selectOperador {
     margin-left: 2%;
 }
-.guardarButton{
+
+.guardarButton {
     font-size: 20px;
     background-color: #28a745;
     cursor: pointer;
@@ -367,38 +445,49 @@
     font-weight: 700;
     opacity: .9;
 }
-.dropDownSelect{
+
+.dropDownSelect {
     height: 28px;
 }
-.guardar{
+
+.guardar {
     display: none;
 }
-.guardarButton:hover .guardar{
+
+.guardarButton:hover .guardar {
     display: block;
 }
-.guardarButton:hover .sinGuardar{
+
+.guardarButton:hover .sinGuardar {
     display: none;
 }
-.guardando{
+
+.guardando {
     display: none;
 }
-.guardandoButton .guardando{
+
+.guardandoButton .guardando {
     display: block;
 }
-.guardandoButton .guardar, .guardandoButton .sinGuardar, .guardandoButton:hover .guardar{
+
+.guardandoButton .guardar,
+.guardandoButton .sinGuardar,
+.guardandoButton:hover .guardar {
     display: none;
 }
-.controlBlockRight{
+
+.controlBlockRight {
     display: inline-flex;
     flex-direction: column;
     width: 100%;
 }
 
-.textArea{
+.textArea {
     font-size: 22px;
     font-family: inherit;
 }
-.checkDescargaFalta{
+
+.checkDescargaFalta {
     position: fixed;
     border: solid 1px #2B2B2B;
     border-radius: 2px;
@@ -412,7 +501,8 @@
     flex-direction: column;
     padding: 8px;
 }
-.buttonDownload2{
+
+.buttonDownload2 {
     outline: none;
     width: 80%;
     margin: 0 10%;
@@ -423,30 +513,35 @@
     cursor: pointer;
     border-radius: 2px;
 }
-.controlBlock button{
+
+.controlBlock button {
     font-family: inherit;
     font-weight: 700;
     cursor: pointer;
 }
-.topBlockMinuta{
+
+.topBlockMinuta {
     display: inline-flex;
     flex-direction: row;
     width: 100%;
     height: 3%;
     padding: 0;
 }
-.footerSpace{
+
+.footerSpace {
     width: 100%;
     height: 140px;
 }
-.insertarModeloBlock{
+
+.insertarModeloBlock {
     width: 80%;
     border: none;
     outline: none;
     padding: 0;
     background-color: #181818;
 }
-.buttonDownload{
+
+.buttonDownload {
     width: 20%;
     font-family: inherit;
     font-size: 16px;
@@ -460,7 +555,8 @@
     color: #C7C7C7;
     background-color: #181818;
 }
-.inputModelo{
+
+.inputModelo {
     width: 75%;
     height: 100%;
     font-size: 18px;
@@ -470,7 +566,8 @@
     margin: none;
     color: #C7C7C7;
 }
-.insertarButton{
+
+.insertarButton {
     width: 20%;
     padding: 0;
     font-size: 16px;
@@ -479,11 +576,14 @@
     margin: 0;
     color: #C7C7C7;
 }
-.insertarButton:hover, .buttonDownload:hover, .controlBlock button:hover{
+
+.insertarButton:hover,
+.buttonDownload:hover,
+.controlBlock button:hover {
     background-color: #2D2E2E;
 }
 
-.stateBlock{
+.stateBlock {
     position: fixed;
     left: 4.5vw;
     top: 85vh;
@@ -492,10 +592,12 @@
     flex-direction: column;
     z-index: 25;
 }
-.stateBlockHovered{
+
+.stateBlockHovered {
     animation: growOnHover .2s both;
 }
-.cronoBlock{
+
+.cronoBlock {
     width: 100%;
     margin-left: .33%;
     height: 80px;
@@ -506,34 +608,42 @@
     justify-content: flex-end;
     line-height: 10px;
 }
+
 .cronoBlockPressing {
     animation: gradientPressing 2s both;
     animation-timing-function: ease-in-out;
     background: linear-gradient(to right, var(--newColor), var(--newColor) 50%, var(--prevColor) 55%);
     background-size: 210% 100%;
 }
-.stateTitle{
+
+.stateTitle {
     width: 40%;
     text-align: center;
     line-height: 20px;
 }
-.timeBlock{
+
+.timeBlock {
     width: 30%;
 }
-.timeBlock p{
+
+.timeBlock p {
     width: 100%;
     text-align: center;
     line-height: 16px;
 }
-.stateTitle, .timeSpacer{
+
+.stateTitle,
+.timeSpacer {
     display: inline-flex;
     flex-direction: column;
     justify-content: space-around;
 }
-.timeNumbers{
+
+.timeNumbers {
     font-size: 20px;
 }
-.navBarBlock{
+
+.navBarBlock {
     width: 100%;
     height: 40px;
     display: inline-flex;
@@ -541,7 +651,8 @@
     justify-content: flex-start;
     border-top: solid 1px #2B2B2B;
 }
-.tab{
+
+.tab {
     vertical-align: middle;
     border: none;
     border-right: solid 1px #2B2B2B;
@@ -549,22 +660,26 @@
     padding: 5px 15px;
     color: #9D9D9D;
 }
-.tab p{
+
+.tab p {
     width: 130px;
     cursor: pointer;
     padding: 0;
     margin: 0;
 }
-.selectedTab{
+
+.selectedTab {
     border-top: solid 2px #0078D4;
     color: #ffffff;
 }
-.textEditorContainer{
+
+.textEditorContainer {
     height: 100%;
     border: solid 1px #2B2B2B;
     border-left: none;
 }
-.expandBlock{
+
+.expandBlock {
     position: fixed;
     font-size: 32px;
     height: 100vh;
@@ -577,10 +692,12 @@
     width: 1.2vw;
     border-right: solid 1px #2B2B2B;
 }
-.expandBlockHovered{
+
+.expandBlockHovered {
     animation: disappear .3s both;
 }
-.editHitosButtonBlock{
+
+.editHitosButtonBlock {
     left: 27vw;
     top: 10px;
     position: fixed;
@@ -590,14 +707,17 @@
     border-radius: 20px;
     background-color: transparent;
 }
-.editHitosButtonBlockHovered{
+
+.editHitosButtonBlockHovered {
     animation: moveOnHover .15s both;
 }
-.editHitosButtonSVG{
+
+.editHitosButtonSVG {
     width: 100%;
     color: #000;
 }
-.editHitosBlock{
+
+.editHitosBlock {
     position: fixed;
     top: 6vh;
     width: 25vw;
@@ -609,10 +729,12 @@
     display: inline-flex;
     flex-direction: column;
 }
-.editHitosBlockHovered{
+
+.editHitosBlockHovered {
     animation: growOnHoverHitos .15s both;
 }
-.hitoIndiv{
+
+.hitoIndiv {
     width: 100%;
     display: inline-flex;
     flex-direction: row;
@@ -621,7 +743,12 @@
     border: solid 1px #1f1f1f;
     margin: 0;
 }
-.inputTime, .inputStatus, .addHitoButton, .deleteButton, .guardarHitosButton{
+
+.inputTime,
+.inputStatus,
+.addHitoButton,
+.deleteButton,
+.guardarHitosButton {
     background-color: transparent;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -631,23 +758,29 @@
     border: none;
     text-align: center;
 }
-.inputTime{
+
+.inputTime {
     width: 8%;
 }
-.deleteButton{
+
+.deleteButton {
     width: 10%;
 }
-.inputStatus{
+
+.inputStatus {
     width: 70%;
     cursor: pointer;
 }
-.guardarHitosButton{
+
+.guardarHitosButton {
     margin-top: 20px;
 }
-.guardarButtonSaving{
+
+.guardarButtonSaving {
     background-color: #ffc107;
 }
-.inputCrono{
+
+.inputCrono {
     border-radius: 4px;
     width: 90%;
     text-align: center;
@@ -655,7 +788,8 @@
     border: none;
     height: 22px;
 }
-.confirmarButton{
+
+.confirmarButton {
     width: 35%;
     height: 40px;
     border-radius: 4px;
@@ -663,7 +797,8 @@
     margin-right: 10px;
     background-color: #000000aa;
 }
-.backupList{
+
+.backupList {
     font-family: inherit;
     background-color: transparent;
     color: #C7C7C7;
@@ -671,26 +806,31 @@
     outline: none;
 }
 
-@keyframes growOnHoverHitos{
-    from{
+@keyframes growOnHoverHitos {
+    from {
         width: 25vw;
     }
-    to{
+
+    to {
         width: 22.5vw;
     }
 }
+
 @keyframes moveOnHover {
-    from{
+    from {
         left: 27vw;
     }
-    to{
+
+    to {
         left: 35vw;
     }
 }
+
 @keyframes gradientPressing {
     from {
         background-position: right;
     }
+
     to {
         background-position: left;
     }
@@ -700,40 +840,47 @@
     0% {
         visibility: visible;
     }
-    1%{
+
+    1% {
         opacity: 1;
     }
-    99%{
+
+    99% {
         opacity: 0;
     }
-    100%{
+
+    100% {
         visibility: none;
     }
 }
-@keyframes appearOnHover {
-    0% {
 
-    }
-    100%{
+@keyframes appearOnHover {
+    0% {}
+
+    100% {
         width: 14vw;
         opacity: 1;
     }
 }
+
 @keyframes growOnHover {
     0% {
         left: 5vw;
         width: 24vw;
     }
-    100%{
+
+    100% {
         left: 15.2vw;
         width: 22vw;
     }
 }
+
 @keyframes disappear {
     0% {
         opacity: 1;
     }
-    100%{
+
+    100% {
         opacity: 0;
     }
 }

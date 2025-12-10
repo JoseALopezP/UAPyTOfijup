@@ -20,10 +20,11 @@ export const DataContext = createContext({});
 
 const { Provider } = DataContext;
 
-    export const DataContextProvider = ({ defaultValue = [], children }) => {
+export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [desplegables, setDesplegables] = useState(defaultValue);
     const [feriados, setFeriados] = useState(defaultValue);
+    const [importantDates, setImportantDates] = useState(defaultValue);
     const [modelosMinuta, setModelosMinuta] = useState(defaultValue);
     const [bydate, setBydate] = useState(defaultValue);
     const [bydateView, setBydateView] = useState(defaultValue);
@@ -33,28 +34,28 @@ const { Provider } = DataContext;
     const [juiciosList, setJuiciosList] = useState(defaultValue)
     const [sorteoList, setSorteoList] = useState(defaultValue);
 
-    const updateByDate = async (date) =>{
+    const updateByDate = async (date) => {
         try {
-        const data = await getListCollection('audiencias', date, 'audiencias');
-        setBydate(data)
+            const data = await getListCollection('audiencias', date, 'audiencias');
+            setBydate(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
-    const getByDate = async (date) =>{
+    const getByDate = async (date) => {
         try {
-        const data = await getListCollection('audiencias', date, 'audiencias');
-        return data
+            const data = await getListCollection('audiencias', date, 'audiencias');
+            return data
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateByDateView = async (date) =>{
+    const updateByDateView = async (date) => {
         try {
-        const data = await getDocument('audienciasView', date);
-        setBydateView(data)
+            const data = await getDocument('audienciasView', date);
+            setBydateView(data)
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
@@ -62,22 +63,22 @@ const { Provider } = DataContext;
     }
     const addAudiencia = async (data, date) => {
         try {
-        await addOrUpdateDocument("audiencias", date, 'audiencias', data);
+            await addOrUpdateDocument("audiencias", date, 'audiencias', data);
         } catch (error) {
             console.error("Failed to add document:", error.message);
             setErrorMessage(`${error.message}`);
         }
     };
-    const addJuicio = async (data, date) =>{
+    const addJuicio = async (data, date) => {
         const dateTransform = yearFunction(date)
-        try{
+        try {
             await addOrUpdateObject("juicios", dateTransform, data.id, data);
         } catch (error) {
             console.error("Failed to add object:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateJuicios = async (date) =>{
+    const updateJuicios = async (date) => {
         const dateTransform = yearFunction(date)
         try {
             const data = await getDocument('juicios', dateTransform);
@@ -87,7 +88,7 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
-    const changeValueJuicio = async (date, juicioId, field, value) =>{
+    const changeValueJuicio = async (date, juicioId, field, value) => {
         const dateTransform = yearFunction(date)
         try {
             await updateInternalFieldJuicio(dateTransform, juicioId, field, value);
@@ -104,7 +105,7 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateByLegajo = async (legajo) =>{
+    const updateByLegajo = async (legajo) => {
         try {
             const data = await getDocument('legajos', legajo);
             setByLegajo(data)
@@ -113,43 +114,43 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
-    const addSorteo = async (data, date) =>{
+    const addSorteo = async (data, date) => {
         try {
-        await addOrUpdateObject("sorteo", date, time, data);
+            await addOrUpdateObject("sorteo", date, time, data);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const getSorteoList = async (date) =>{
+    const getSorteoList = async (date) => {
         try {
-        const data = await getDocument('sorteos', date);
-        setSorteoList(data)
+            const data = await getDocument('sorteos', date);
+            setSorteoList(data)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const deleteAudiencia = async (date, audId) =>{
+    const deleteAudiencia = async (date, audId) => {
         try {
             await deleteDocumentAndObject(date, audId);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateData = async (date, audId, property, newValue) =>{
+    const updateData = async (date, audId, property, newValue) => {
         try {
             await updateDocumentAndObjectField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateDataDeep = async (date, audId, property, newValue) =>{
+    const updateDataDeep = async (date, audId, property, newValue) => {
         try {
             await updateDocumentField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const pushToAudienciaArray = async (date, audId, property, newValue) =>{
+    const pushToAudienciaArray = async (date, audId, property, newValue) => {
         try {
             await pushItemToDocumentAndObjectField(date, audId, property, newValue)
         } catch (error) {
@@ -157,7 +158,7 @@ const { Provider } = DataContext;
         }
     }
     const addDesplegable = async (type, data) => {
-        try{
+        try {
             await addStringToArray("desplegables", "desplegables", type, data);
         } catch (error) {
             setErrorMessage(`${error.message}`)
@@ -179,7 +180,7 @@ const { Provider } = DataContext;
         }
     };
     const addFeriado = async (type, data) => {
-        try{
+        try {
             await addStringToArray("desplegables", "feriados", type, data);
         } catch (error) {
             setErrorMessage(`${error.message}`)
@@ -200,21 +201,43 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     };
-    const addOrUpdateModeloMinuta = async (name, data) =>{
-        try{
+    const addImportantDate = async (type, data) => {
+        try {
+            await addStringToArray("informacion", "importantDates", type, data);
+        } catch (error) {
+            setErrorMessage(`${error.message}`)
+        }
+    };
+    const deleteImportantDate = async (type, data) => {
+        await removeStringFromArray("informacion", "importantDates", type, data);
+    };
+    const updateImportantDates = async () => {
+        try {
+            const data = await getDocument('informacion', 'importantDates');
+            if (data) {
+                setImportantDates(data);
+            } else {
+                setImportantDates([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+    const addOrUpdateModeloMinuta = async (name, data) => {
+        try {
             await addOrUpdateObject('desplegables', 'modelosMinuta', name, data)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const removeModeloMinuta = async (name) =>{
-        try{
+    const removeModeloMinuta = async (name) => {
+        try {
             await removeObject('desplegables', 'modelosMinuta', name)
         } catch (error) {
             removeObject(`${error.message}`);
         }
     }
-    const updateModelosMinuta = async () =>{
+    const updateModelosMinuta = async () => {
         try {
             const data = await getDocument('desplegables', 'modelosMinuta');
             if (data) {
@@ -226,21 +249,21 @@ const { Provider } = DataContext;
             setErrorMessage(`${error.message}`);
         }
     }
-    const moveBetween = async (date) =>{
+    const moveBetween = async (date) => {
         const data = await getList("audiencias", date);
-        await data.forEach(el =>{
+        await data.forEach(el => {
             addOrUpdateDocument("audiencias", date, 'audiencias', data);
         })
-        const amount = await countDocs('audiencias/'+date+'/audiencias')
+        const amount = await countDocs('audiencias/' + date + '/audiencias')
     }
-    const addReleaseNote = async (name, data) =>{
-        try{
+    const addReleaseNote = async (name, data) => {
+        try {
             await addOrUpdateObject('informacion', 'releaseNotes', name, data)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
-    const updateReleaseNotes = async () =>{
+    const updateReleaseNotes = async () => {
         try {
             const data = await getDocument('informacion', 'releaseNotes');
             setReleaseNotes(data)
@@ -254,12 +277,12 @@ const { Provider } = DataContext;
     const addUser = async (data) => {
         await addObjectToDocument("users", "listaUsuarios", data);
     };
-    
+
     const context = {
-        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables, 
-        updateDesplegables, addFeriado, deleteFeriado, updateFeriados, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate, 
+        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
+        updateDesplegables, addFeriado, deleteFeriado, updateFeriados, addImportantDate, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio,
-        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
+        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
     };
     return <Provider value={context}>{children}</Provider>;
 };

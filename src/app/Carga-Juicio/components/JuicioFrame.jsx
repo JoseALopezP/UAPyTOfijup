@@ -5,7 +5,7 @@ import { BloqueList } from './BloqueList';
 import { useContext, useEffect, useState } from 'react';
 import { TestigoEditList } from './TestigoEditList';
 import { JuicioSelection } from './JuicioSelection';
-import EditExisting from './EditingExisting';
+import EditExisting from './EditExisting';
 import { getCurrentYear } from '@/utils/dateUtils';
 import { DataContext } from '@/context New/DataContext';
 import { ButtonSelection } from './ButtonSelection';
