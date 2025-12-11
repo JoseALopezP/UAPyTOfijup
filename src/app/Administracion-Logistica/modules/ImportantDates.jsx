@@ -2,15 +2,15 @@
 import { useEffect, useContext, useState } from 'react'
 import styles from '../administracionLogistica.module.css'
 import { DataContext } from '@/context New/DataContext'
+import customDigitSort from '@/utils/sortDates'
 
 export default function ImportantDates() {
-    const { importantDates, updateImportantDates } = useContext(DataContext)
+    const { importantDates, updateImportantDates, saveImportantDatesList } = useContext(DataContext)
     const [dates, setDates] = useState({})
     const [newEntryKey, setNewEntryKey] = useState('')
     const [newEntryValue, setNewEntryValue] = useState('')
-    const [filteredSuggestions, setFilteredSuggestions] = useState([])
     const handleUpdateList = () => {
-
+        saveImportantDatesList(dates)
     }
     const handleRenameCategory = (oldKey, newKey) => {
         if (!newKey || oldKey === newKey) return;
@@ -51,17 +51,10 @@ export default function ImportantDates() {
         setDates(newDates);
         setNewEntryKey('');
         setNewEntryValue('');
-        setFilteredSuggestions([]);
     }
     const handleKeyInputChange = (e) => {
         const val = e.target.value;
         setNewEntryKey(val);
-        if (val.trim()) {
-            const suggestions = Object.keys(dates).filter(key => key.toLowerCase().includes(val.toLowerCase()));
-            setFilteredSuggestions(suggestions);
-        } else {
-            setFilteredSuggestions([]);
-        }
     }
     useEffect(() => {
         setDates(importantDates)
@@ -80,19 +73,19 @@ export default function ImportantDates() {
                     <div className={`${styles.addDateBlock}`}>
                         <div className={`${styles.addDateInput}`}>
                             <input
-                                placeholder="Category Name (e.g. Feriados)"
+                                placeholder="DDMM"
                                 value={newEntryKey}
                                 onChange={handleKeyInputChange}
                                 style={{ width: '100%', padding: '8px' }}
                                 list="category-suggestions"
                             />
                             <datalist id="category-suggestions">
-                                {dates && Object.keys(dates).map(key => <option key={key} value={key} />)}
+                                {dates && customDigitSort(Object.keys(dates)).map(key => <option key={key} value={key} />)}
                             </datalist>
                         </div>
                         <div className={`${styles.addValueInput}`}>
                             <input
-                                placeholder="Value (e.g. 25 de Mayo)"
+                                placeholder="Nombre"
                                 value={newEntryValue}
                                 onChange={(e) => setNewEntryValue(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleUnifiedAdd()}
@@ -106,7 +99,7 @@ export default function ImportantDates() {
                 </div>
 
                 <div className={`${styles.iDList}`}>
-                    {dates && Object.entries(dates).map(([key, value]) => (
+                    {dates && customDigitSort(Object.entries(dates)).map(([key, value]) => (
                         <div key={key} style={{ marginBottom: '1rem', border: '1px dashed #ccc', padding: '10px', borderRadius: '5px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
                                 <input

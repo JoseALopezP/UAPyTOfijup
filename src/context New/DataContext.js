@@ -15,6 +15,7 @@ import { updateDocumentField } from "@/firebase new/firestore/updateDocumentFiel
 import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
 import { yearFunction } from "@/utils/dateUtils";
 import { updateInternalFieldJuicio } from "@/firebase new/firestore/updateInternalFieldJuicio";
+import replaceDocument from "@/firebase new/firestore/replaceDocument";
 
 export const DataContext = createContext({});
 
@@ -201,13 +202,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     };
-    const addImportantDate = async (type, data) => {
-        try {
-            await addStringToArray("informacion", "importantDates", type, data);
-        } catch (error) {
-            setErrorMessage(`${error.message}`)
-        }
-    };
     const deleteImportantDate = async (type, data) => {
         await removeStringFromArray("informacion", "importantDates", type, data);
     };
@@ -219,6 +213,14 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             } else {
                 setImportantDates([]);
             }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+    const saveImportantDatesList = async (data) => {
+        try {
+            await replaceDocument("informacion", "importantDates", data);
+            setImportantDates(data);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
@@ -280,8 +282,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
 
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
-        updateDesplegables, addFeriado, deleteFeriado, updateFeriados, addImportantDate, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
-        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio,
+        updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
+        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList
     };
     return <Provider value={context}>{children}</Provider>;

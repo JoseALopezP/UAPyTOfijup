@@ -70,7 +70,12 @@
     width: 100%;
     text-align: center;
     color: #CCCCCC;
+    height: 8vh;
+}
 
+.iDList {
+    height: 88vh;
+    overflow-y: scroll;
 }
 
 .titleSaveSpan {
@@ -97,7 +102,7 @@
 }
 
 .addDateInput {
-    width: 40%;
+    width: 30%;
 }
 
 .addValueInput {
