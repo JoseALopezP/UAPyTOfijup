@@ -1,12 +1,82 @@
 .menuContainer {
-    margin-left: 2.5vw;
-    width: 90vw;
-    height: 98vh;
-    background-color: aqua;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-left: 2.4vw;
+    width: 95vw;
+    border-radius: 4px;
+    height: calc(100vh - 10px);
+}
+
+
+.selectorBody {
+    background-color: #ffffff;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    border-radius: 5px;
+    display: inline-flex;
+    flex-direction: column;
+    color: #375166;
+    margin-top: 50px;
+    padding: 20px;
 }
 
 .importantDatesSection {
-    width: 20vw;
-    height: 100vh;
-    background-color: aqua;
+    background-color: #ffffff;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    border-radius: 5px;
+    display: inline-flex;
+    flex-direction: column;
+    color: #375166;
+    margin-top: 50px;
+    padding: 20px;
+}
+
+.importantDatesSection h3 {
+    text-align: center;
+}
+
+.linkRedirection {
+    background-color: #375166;
+    height: 40px;
+    margin: 5px;
+    border-radius: 5px;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+}
+
+.inputDate {
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #17a2b8;
+    height: 20px;
+    margin-bottom: 0;
+}
+
+.inputDate input::-webkit-inner-spin-button {
+    border-radius: 5px;
+    border: none;
+    -webkit-appearance: none;
+}
+
+.linkRedirectionCarga {
+    background-color: #17a2b8;
+}
+
+.linkRedirection:hover {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+
+.inputDate:hover {
+    transform: scale(1);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }

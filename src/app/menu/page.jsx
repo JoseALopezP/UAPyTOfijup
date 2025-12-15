@@ -5,15 +5,16 @@ import { DataContextProvider } from "@/context New/DataContext";
 import MenuImportantDates from './components/MenuImportantDates'
 import styles from './Menu.module.css'
 
-export default function menu() {
+export default function Menu() {
+  console.log(styles);
   return (
     <>
       <AuthContextProvider>
         <DataContextProvider>
-          <container className={`${styles.menuContainer}`}>
+          <div className={`${styles.menuContainer}`}>
             <MenuSelector />
             <MenuImportantDates />
-          </container>
+          </div>
         </DataContextProvider>
       </AuthContextProvider>
     </>
