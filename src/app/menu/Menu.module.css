@@ -1,7 +1,7 @@
 .menuContainer {
     display: inline-flex;
     flex-direction: row;
-    justify-content: center;
+    justify-items: center;
     margin-left: 2.4vw;
     width: 95vw;
     border-radius: 4px;
@@ -9,7 +9,7 @@
 }
 
 
-.selectorBody {
+.menuSelector {
     background-color: #ffffff;
     width: fit-content;
     height: fit-content;
@@ -22,9 +22,20 @@
     padding: 20px;
 }
 
+.selectorBody {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.importantDatesTitle {
+    text-align: center;
+    font-size: 32px;
+    margin: 10px 0;
+}
+
 .importantDatesSection {
     background-color: #ffffff;
-    width: fit-content;
+    width: 20vw;
     height: fit-content;
     margin: auto;
     border-radius: 5px;
@@ -37,6 +48,18 @@
 
 .importantDatesSection h3 {
     text-align: center;
+}
+
+.importantDatesToday {
+    text-align: center;
+    font-size: 18px;
+    width: 100%;
+}
+
+.importantDatesSecondary {
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
 }
 
 .linkRedirection {
@@ -59,6 +82,11 @@
     background-color: #17a2b8;
     height: 20px;
     margin-bottom: 0;
+}
+
+.importantDatesSecondary span {
+    margin: 5px;
+    width: 50%;
 }
 
 .inputDate input::-webkit-inner-spin-button {

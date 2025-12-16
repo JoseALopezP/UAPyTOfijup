@@ -36,7 +36,7 @@ export default function MenuImportantDates() {
             if (events.length > 0) {
                 datesToRender.push(
                     <div key={key}>
-                        <strong>{key}:</strong>
+                        <strong>{key.slice(0, 2)} / {key.slice(2, 4)}:</strong>
                         {events.map((el, index) => <p key={index}>{el}</p>)}
                     </div>
                 );
@@ -48,16 +48,17 @@ export default function MenuImportantDates() {
     const { events: todayEvents } = getEventsForDate(todayDate);
     return (
         <div className={`${styles.importantDatesSection}`}>
-            <h2>FECHAS IMPORTANTES</h2>
+            <h2 className={`${styles.importantDatesTitle}`}>FECHAS IMPORTANTES</h2>
             <div className={`${styles.importantDatesBody}`}>
                 <h3>Hoy es:</h3>
                 {todayEvents.length > 0 ? todayEvents.map((el, i) =>
-                    <p key={i}>{el}</p>
-                ) : <p>-</p>}
-                <h3>Últimos días:</h3>
-                {renderDates(-7, -1)}
-                <h3>Próximos días:</h3>
-                {renderDates(1, 6)}
+                    <p key={i} className={`${styles.importantDatesToday}`}>{el}</p>
+                ) : <p className={`${styles.importantDatesToday}`}>-</p>}
+                <div className={`${styles.importantDatesSecondary}`}>
+                    <span><h3>Últimos días:</h3>
+                        {renderDates(-7, -1)}</span>
+                    <span><h3>Próximos días:</h3>
+                        {renderDates(1, 6)}</span></div>
             </div>
         </div>
     )
