@@ -16,8 +16,54 @@ export default function JuicioFrame() {
   const [newState, setNewState] = useState(true)
   const [changesToSave, setChangesToSave] = useState(false)
   const [year, setYear] = useState(getCurrentYear())
-  const [bloquesArray, setBloquesArray] = useState(null)
-  const [testigos, setTestigos] = useState(null)
+  const [bloquesArray, setBloquesArray] = useState([
+    {
+      id: 1,
+      audId: 101,
+      fecha: '17122025',
+      hora: '09:00',
+      sala: '1',
+      estadoBloque: 'PROGRAMADO'
+    },
+    {
+      id: 2,
+      audId: 102,
+      fecha: '18122025',
+      hora: '10:00',
+      sala: '2',
+      estadoBloque: 'FINALIZADO'
+    }
+  ])
+  const [testigos, setTestigos] = useState([
+    {
+      id: 1,
+      nombre: 'Juan Perez',
+      dni: '12345678',
+      fecha: [
+        {
+          audid: 101,
+          hora: '09:30',
+          fecha: '17122025 09:00',
+          asistencia: 'presente',
+          complete: false
+        }
+      ]
+    },
+    {
+      id: 2,
+      nombre: 'Maria Garcia',
+      dni: '87654321',
+      fecha: [
+        {
+          audid: 102,
+          hora: '10:30',
+          fecha: '18122025 10:00',
+          asistencia: 'ausente',
+          complete: true
+        }
+      ]
+    }
+  ])
   useEffect(() => {
     updateDesplegables()
   }, [])
@@ -26,23 +72,35 @@ export default function JuicioFrame() {
     setTestigos(previousVersion.testigos)
   }
   useEffect(() => {
-    if (bloquesArray !== null) {
-      if (confirm("¿Editar otra audiencia?")) {
+    if (previousVersion.bloques && previousVersion.testigos) {
+      if (bloquesArray !== null) {
+        if (confirm("¿Editar otra audiencia?")) {
+          setBloquesArray(previousVersion.bloques)
+          setTestigos(previousVersion.testigos)
+        }
+      } else {
         setBloquesArray(previousVersion.bloques)
         setTestigos(previousVersion.testigos)
       }
-    } else {
-      setBloquesArray(previousVersion.bloques)
-      setTestigos(previousVersion.testigos)
     }
   }, [previousVersion])
+
+  useEffect(() => {
+    if (!newState && previousVersion.bloques && previousVersion.testigos && bloquesArray && testigos) {
+      const hasChanges = JSON.stringify(bloquesArray) !== JSON.stringify(previousVersion.bloques) ||
+        JSON.stringify(testigos) !== JSON.stringify(previousVersion.testigos)
+      setChangesToSave(hasChanges)
+    } else {
+      setChangesToSave(false)
+    }
+  }, [bloquesArray, testigos, previousVersion, newState])
   return (
     <div className={`${styles.globalBlock}`}><section className={`${styles.viewBlock}`}>
       {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState} setTestigos={setTestigos} /> :
         <>{previousVersion.bloques ? <EditExisting newState={newState} setNewState={setNewState} previousVersion={previousVersion} setPreviousVersion={setPreviousVersion} /> :
           <><section className={`${styles.addJuicioSection}`}><ButtonSelection newState={newState} setNewState={setNewState} />No hay juicio seleccionado</section></>}</>}
       <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray} testigos={testigos} />
-      <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloques={bloquesArray} />
+      <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloquesArray={bloquesArray} />
       <JuicioSelection year={year} setYear={setYear} setPreviousVersion={setPreviousVersion} />
     </section>
       <div className={`${styles.saveResetBar}`}>
