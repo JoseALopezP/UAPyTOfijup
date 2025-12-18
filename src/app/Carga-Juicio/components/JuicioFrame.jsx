@@ -64,6 +64,37 @@ export default function JuicioFrame() {
       ]
     }
   ])
+  const handleSave = (test = false) => {
+    previousVersion.bloques.forEach((bloque, index) => {
+      if (bloque.fecha !== bloquesArray.find(el => bloque.audId === el.audId).fecha) {
+
+      }
+      if (bloque.hora !== bloquesArray.find(el => bloque.audId === el.audId).hora) {
+
+      }
+      if (bloque.estadoBloque !== bloquesArray.find(el => bloque.audId === el.audId).estadoBloque) {
+
+      }
+      if (bloque.tipo !== bloquesArray.find(el => bloque.audId === el.audId).tipo) {
+
+      }
+      if (bloque.sala !== bloquesArray.find(el => bloque.audId === el.audId).sala) {
+
+      }
+    })
+    if (previousVersion.bloques.length !== bloquesArray.length) {
+
+    }
+    previousVersion.testigos.forEach((testigo, index) => {
+      if (testigo.nombre !== testigos.nombre) {
+
+      }
+      if (testigo.dni !== testigos.dni) {
+
+      }
+    })
+
+  }
   useEffect(() => {
     updateDesplegables()
   }, [])
@@ -106,7 +137,7 @@ export default function JuicioFrame() {
       <div className={`${styles.saveResetBar}`}>
         <button className={changesToSave ? `${styles.reestablecerButton} ${styles.reestablecerButtonActive}` : `${styles.reestablecerButton}`}
           onClick={() => handleReset()}>REESTABLECER</button>
-        <button className={changesToSave ? `${styles.guardarButton} ${styles.guardarButtonActive}` : `${styles.guardarButton}`}>GUARDAR</button>
+        <button onClick={() => handleSave()} className={changesToSave ? `${styles.guardarButton} ${styles.guardarButtonActive}` : `${styles.guardarButton}`}>GUARDAR</button>
       </div></div>
   )
 }
