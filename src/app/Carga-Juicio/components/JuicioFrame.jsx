@@ -14,11 +14,10 @@ export default function JuicioFrame() {
   const { changeValueJuicio, desplegables, updateDesplegables } = useContext(DataContext)
   const [previousVersion, setPreviousVersion] = useState({})
   const [newState, setNewState] = useState(true)
-  const [changesToSave, setChangesToSave] = useState(false)
+  const [changesToSave, setChangesToSave] = useState(null)
   const [year, setYear] = useState(getCurrentYear())
   const [bloquesArray, setBloquesArray] = useState([
     {
-      id: 1,
       audId: 101,
       fecha: '17122025',
       hora: '09:00',
@@ -26,7 +25,6 @@ export default function JuicioFrame() {
       estadoBloque: 'PROGRAMADO'
     },
     {
-      id: 2,
       audId: 102,
       fecha: '18122025',
       hora: '10:00',
@@ -64,33 +62,39 @@ export default function JuicioFrame() {
       ]
     }
   ])
-  const handleSave = (test = false) => {
-    previousVersion.bloques.forEach((bloque, index) => {
+  const testFunctionAux = (value) => {
+    if (!changesToSave.includes(value)) {
+      setChangesToSave([...changesToSave, value])
+    }
+  }
+  const saveTesting = () => {
+    setChangesToSave([])
+    previousVersion.bloques.forEach((bloque) => {
       if (bloque.fecha !== bloquesArray.find(el => bloque.audId === el.audId).fecha) {
-
+        testFunctionAux('fecha-' + bloque.audId)
       }
       if (bloque.hora !== bloquesArray.find(el => bloque.audId === el.audId).hora) {
-
+        testFunctionAux('hora-' + bloque.audId)
       }
       if (bloque.estadoBloque !== bloquesArray.find(el => bloque.audId === el.audId).estadoBloque) {
-
+        testFunctionAux('estado-' + bloque.audId)
       }
       if (bloque.tipo !== bloquesArray.find(el => bloque.audId === el.audId).tipo) {
-
+        testFunctionAux('tipo-' + bloque.audId)
       }
       if (bloque.sala !== bloquesArray.find(el => bloque.audId === el.audId).sala) {
-
+        testFunctionAux('sala-' + bloque.audId)
       }
     })
     if (previousVersion.bloques.length !== bloquesArray.length) {
-
+      testFunctionAux('bloques')
     }
-    previousVersion.testigos.forEach((testigo, index) => {
-      if (testigo.nombre !== testigos.nombre) {
-
+    previousVersion.testigos.forEach((testigo) => {
+      if (testigo.nombre !== testigos.find(el => testigo.id === el.id).nombre) {
+        testFunctionAux('nombre-' + testigo.id)
       }
-      if (testigo.dni !== testigos.dni) {
-
+      if (testigo.dni !== testigos.find(el => testigo.id === el.id).dni) {
+        testFunctionAux('dni-' + testigo.id)
       }
     })
 
