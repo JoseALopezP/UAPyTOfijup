@@ -11,7 +11,7 @@ import { DataContext } from '@/context New/DataContext';
 import { ButtonSelection } from './ButtonSelection';
 
 export default function JuicioFrame() {
-  const { changeValueJuicio, desplegables, updateDesplegables } = useContext(DataContext)
+  const { changeValueJuicio, desplegables, updateDesplegables, updateData } = useContext(DataContext)
   const [previousVersion, setPreviousVersion] = useState({})
   const [newState, setNewState] = useState(true)
   const [changesToSave, setChangesToSave] = useState(null)
@@ -67,8 +67,90 @@ export default function JuicioFrame() {
       setChangesToSave([...changesToSave, value])
     }
   }
-  const saveTesting = () => {
+  const updateAud = (attribute) => {
+    bloquesArray.forEach(el => {
+      updateData(el.fecha, el.audId, attribute, el[attribute])
+    })
+  }
+  const saving = (aux) => {
+    changesToSave.forEach((value) => {
+      switch (value) {
+        case 'numeroLeg':
+          changeValueJuicio(year, aux.id, 'numeroLeg', aux.numeroLeg)
+          updateAud('numeroLeg')
+          break;
+        case 'auto':
+          changeValueJuicio(year, aux.id, 'auto', aux.auto)
+          break;
+        case 'inicio':
+          changeValueJuicio(year, aux.id, 'inicio', aux.inicio)
+          break;
+        case 'fiscal':
+          changeValueJuicio(year, aux.id, 'fiscal', aux.fiscal)
+          break;
+        case 'tipoDelito':
+          changeValueJuicio(year, aux.id, 'tipoDelito', aux.tipoDelito)
+          break;
+        case 'ufi':
+          changeValueJuicio(year, aux.id, 'ufi', aux.ufi)
+          updateAud('ufi')
+          break;
+        case 'defensa':
+          changeValueJuicio(year, aux.id, 'defensa', aux.defensa)
+          break;
+        case 'defensoria':
+          changeValueJuicio(year, aux.id, 'defensoria', aux.defensoria)
+          updateAud('defensoria')
+          break;
+        case 'querella':
+          changeValueJuicio(year, aux.id, 'querella', aux.querella)
+          break;
+        case 'jueces':
+          changeValueJuicio(year, aux.id, 'jueces', aux.jueces)
+          break;
+        case 'estadoJuicio':
+          changeValueJuicio(year, aux.id, 'estadoJuicio', aux.estadoJuicio)
+          break;
+        default:
+          break;
+      }
+    })
+  }
+  const saveTesting = (aux) => {
     setChangesToSave([])
+    if (previousVersion.numeroLeg !== aux.numeroLeg) {
+      setChangesToSave('numeroLeg')
+    }
+    if (previousVersion.auto !== aux.auto) {
+      setChangesToSave('auto')
+    }
+    if (previousVersion.inicio !== aux.inicio) {
+      setChangesToSave('inicio')
+    }
+    if (previousVersion.fiscal !== aux.fiscal) {
+      setChangesToSave('fiscal')
+    }
+    if (previousVersion.tipoDelito !== aux.tipoDelito) {
+      setChangesToSave('tipoDelito')
+    }
+    if (previousVersion.ufi !== aux.ufi) {
+      setChangesToSave('ufi')
+    }
+    if (previousVersion.defensa !== aux.defensa) {
+      setChangesToSave('defensa')
+    }
+    if (previousVersion.defensoria !== aux.defensoria) {
+      setChangesToSave('defensoria')
+    }
+    if (previousVersion.querella !== aux.querella) {
+      setChangesToSave('querella')
+    }
+    if (previousVersion.jueces !== aux.jueces) {
+      setChangesToSave('jueces')
+    }
+    if (previousVersion.estadoJuicio !== aux.estadoJuicio) {
+      setChangesToSave('estadoJuicio')
+    }
     previousVersion.bloques.forEach((bloque) => {
       if (bloque.fecha !== bloquesArray.find(el => bloque.audId === el.audId).fecha) {
         testFunctionAux('fecha-' + bloque.audId)
@@ -97,7 +179,6 @@ export default function JuicioFrame() {
         testFunctionAux('dni-' + testigo.id)
       }
     })
-
   }
   useEffect(() => {
     updateDesplegables()
