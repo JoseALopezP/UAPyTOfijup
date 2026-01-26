@@ -6,6 +6,7 @@ import DownloadXLSX from './modules/DownloadXLSX';
 import DownloadXLSXInforme from './modules/DownloadXLSXInforme';
 import renameDocument from '@/firebase new/firestore/renameDocument';
 import ImportantDates from './modules/ImportantDates';
+import DataScraper from './modules/DataScraper';
 
 export default function page() {
   return (
@@ -21,10 +22,12 @@ export default function page() {
           <div className={`${styles.container}`}>
             <ImportantDates />
           </div>
-          <div className={`${styles.container}`}>
+          {/*<div className={`${styles.container}`}>
             <button className={`${styles.button}`} onClick={() => renameDocument()}>POR FAVOR NO TOCAR</button>
+          </div>*/}
+          <div className={`${styles.container}`}>
+            <DataScraper />
           </div>
-
         </DataContextProvider>
       </AuthContextProvider>
     </>

@@ -108,3 +108,39 @@
 .addValueInput {
     width: 60%;
 }
+
+.SelectionBlockScrap {
+    display: inline-flex;
+    flex-direction: column;
+    width: 95%;
+}
+
+.subtitleScrap {
+    width: 100%;
+    text-align: center;
+    color: #CCCCCC;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.inputScrap {
+    margin: 2%;
+    height: 40px;
+    font-size: 20px;
+    font-weight: 700;
+    outline: none;
+    border-radius: 6px;
+    border: none;
+    text-align: center;
+}
+
+.buttonScrap {
+    margin: 2%;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    font-weight: 700;
+    outline: none;
+    border-radius: 6px;
+    border: none;
+}
