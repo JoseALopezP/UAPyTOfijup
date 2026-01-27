@@ -1,3 +1,4 @@
+'use server'
 import puppeteer from 'puppeteer';
 
 const width = 1280;
@@ -95,31 +96,26 @@ function filterAudiencias(arr) {
         }));
 }
 
-// Función vacía para que el usuario implemente la extracción de datos del detalle
-async function extractDetailData(page) {
-    // Aquí puedes usar page.$eval o page.evaluate para sacar info
-    // Ejemplo:
-    // const detalle = await page.evaluate(() => document.querySelector('.some-class')?.innerText);
-    // return { detalle };
-    return {};
-}
-export async function getInfoAudiencia() {
-    const diaABuscar = "26";
+async function login() {
     await page.goto('http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F')
     await page.type('#loginform-username', '20423341980');
-
     await page.type('#loginform-password', 'Marzo24');
-
     await page.click('button[name="login-button"]');
-
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true });
+}
 
+async function goToAgenda(diaABuscar) {
     await page.click('a[href="/audiencia/agenda"]');
     await page.waitForSelector('button ::-p-text(Día)', { visible: true });
     await page.click('button ::-p-text(Día)');
     const selector = `td.day ::-p-text(${diaABuscar})`;
     await page.waitForSelector(selector, { visible: true });
     await page.click(selector);
+}
+
+export async function getInfoAudiencia(diaABuscar = "26") {
+    await login();
+    await goToAgenda(diaABuscar);
     const selectorLinks = 'td a';
     await page.waitForSelector(selectorLinks, { visible: true });
     const links = await page.$$(selectorLinks);
@@ -128,7 +124,6 @@ export async function getInfoAudiencia() {
         document.body.style.overflowY = 'scroll';
     });
     const resultados = [];
-
     console.log(`Se encontraron ${links.length} elementos.`);
     for (let i = 0; i < links.length; i++) {
         try {
@@ -150,68 +145,75 @@ export async function getInfoAudiencia() {
             await page.mouse.move(0, 0);
         }
     }
-
-    // --- NUEVO LOOP DE NAVEGACIÓN A DETALLE ---
-    console.log('Iniciando extracción de detalles...');
-
-    // Recorremos los resultados que ya tenemos.
-    // Nota: Como resultados se llena incrementalmente, coincide en índice con los links de la lista original.
-    for (let i = 0; i < resultados.length; i++) {
-        const item = resultados[i];
-        if (!item || item.status === 'error' || item.status === 'timeout') continue;
-
+    //getInfoAudiencia
+    for (let i = 0; i < links.length; i++) {
         try {
-            // 1. Re-localizar los links porque al volver atrás pueden perderse las referencias
             const currentLinks = await page.$$(selectorLinks);
-            const link = currentLinks[item.index];
-
-            if (!link) {
-                console.warn(`No se encontró el link para el índice ${item.index}`);
-                continue;
+            const link = currentLinks[i];
+            if (!link) continue;
+            await link.scrollIntoView({ block: 'center', behavior: 'instant' });
+            await new Promise(r => setTimeout(r, 100));
+            await link.hover();
+            const dynamicSelector = 'div.qtip.qtip-default.qtip-focus';
+            try {
+                await page.waitForSelector(dynamicSelector, { visible: true, timeout: 2000 });
+            } catch (e) {
+                console.log(`Posible shift detectado en índice ${i}, re-intentando hover...`);
+                await link.scrollIntoView({ block: 'center', behavior: 'instant' });
+                await new Promise(r => setTimeout(r, 300));
+                await link.hover();
+                await page.waitForSelector(dynamicSelector, { visible: true, timeout: 0 });
             }
 
-            // 2. Navegar al detalle
-            console.log(`Navegando al detalle del item ${item.index}...`);
-            await link.scrollIntoView({ block: 'center', behavior: 'instant' });
-            await new Promise(r => setTimeout(r, 200));
-
-            // Navegamos y esperamos a que cargue algo significativo de la nueva página.
-            // Ajusta 'body' o un selector específico de la página de detalle si lo conoces.
+            // Click to navigate to detail page
+            console.log(`Navegando al detalle del item ${i}...`);
             await Promise.all([
                 page.waitForNavigation({ waitUntil: 'networkidle2' }),
                 link.click()
             ]);
+            await new Promise(r => setTimeout(r, 1000));
+            console.log('Página de detalle cargada. Extrayendo datos...');
 
-            // 3. Extraer datos con la función del usuario
-            const datosExtra = await extractDetailData(page);
-
-            // Fusionamos los datos nuevos con lo que ya teníamos
-            resultados[i] = { ...item, ...datosExtra };
-
-            // 4. Volver atrás
             console.log('Volviendo a la lista...');
             await page.goBack({ waitUntil: 'networkidle2' });
-
-            // 5. Esperar a que la tabla/lista esté visible de nuevo
+            await goToAgenda(diaABuscar);
             await page.waitForSelector(selectorLinks, { visible: true });
-
-            // Pequeña pausa de seguridad
             await new Promise(r => setTimeout(r, 500));
+        } catch (error) {
+            console.warn(`⚠️ Error crítico en índice ${i}: ${error.message}`);
+            resultados.push({ index: i, data: null, status: 'error' });
+        }
+        await page.mouse.move(0, 0);
+        await new Promise(r => setTimeout(r, 10));
+    }
+    for (let i = 0; i < links.length; i++) {
+        try {
+            const currentLinks = await page.$$(selectorLinks);
+            const link = currentLinks[i];
+            if (!link) continue;
+            await link.scrollIntoView({ block: 'center', behavior: 'instant' });
+            await new Promise(r => setTimeout(r, 100));
+            await link.hover();
+            try {
+                await page.waitForSelector(dynamicSelector, { visible: true, timeout: 2000 });
+            } catch (e) {
+                console.log(`Posible shift detectado en índice ${i}, re-intentando hover...`);
+                await link.scrollIntoView({ block: 'center', behavior: 'instant' });
+                await new Promise(r => setTimeout(r, 300));
+                await link.hover();
+                await page.waitForSelector(dynamicSelector, { visible: true, timeout: 0 });
+            }
 
         } catch (error) {
-            console.error(`Error procesando detalle del índice ${item.index}:`, error);
-            // Intentamos recuperar la navegación si algo falló
-            try {
-                const urlActual = page.url();
-                if (!urlActual.includes('agenda')) { // Si no estamos en la agenda, intentamos volver
-                    await page.goBack({ waitUntil: 'networkidle2' });
-                    await page.waitForSelector(selectorLinks, { visible: true });
-                }
-            } catch (recoveryError) {
-                console.error('Error recuperando navegación:', recoveryError);
-            }
+            console.warn(`⚠️ Error crítico en índice ${i}: ${error.message}`);
+            resultados.push({ index: i, data: null, status: 'error' });
         }
+        await page.mouse.move(0, 0);
+        await new Promise(r => setTimeout(r, 10));
     }
-    console.log(`Datos extraídos (${filterAudiencias(resultados).length}):`, filterAudiencias(resultados));
+    const datosFiltrados = filterAudiencias(resultados);
+    console.log(`Datos extraídos (${datosFiltrados.length}):`, datosFiltrados);
     await browser.close();
+
+    return datosFiltrados;
 }

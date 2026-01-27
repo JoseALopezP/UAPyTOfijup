@@ -4,7 +4,6 @@ import { AuthContextProvider } from "@/context New/AuthContext";
 import { DataContextProvider } from "@/context New/DataContext";
 import DownloadXLSX from './modules/DownloadXLSX';
 import DownloadXLSXInforme from './modules/DownloadXLSXInforme';
-import renameDocument from '@/firebase new/firestore/renameDocument';
 import ImportantDates from './modules/ImportantDates';
 import DataScraper from './modules/DataScraper';
 
