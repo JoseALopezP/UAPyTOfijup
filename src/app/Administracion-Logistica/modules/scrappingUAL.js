@@ -14,6 +14,10 @@ const browser = await puppeteer.launch({
 });
 let [page] = await browser.pages();
 
+function instanceOfScraping() {
+
+}
+
 function limpiarYFormatear(textoBruto) {
     if (!textoBruto) return {};
     const lineas = textoBruto
@@ -54,6 +58,7 @@ function limpiarYFormatear(textoBruto) {
     }
     return resultado;
 }
+
 function filterAudiencias(arr) {
     return arr
         .filter(audiencia => !audiencia.titulo.includes('LICENCIA'))
@@ -104,18 +109,142 @@ async function login() {
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true });
 }
 
-async function goToAgenda(diaABuscar) {
-    await page.click('a[href="/audiencia/agenda"]');
-    await page.waitForSelector('button ::-p-text(Día)', { visible: true });
-    await page.click('button ::-p-text(Día)');
+async function goToAgenda(diaABuscar, pageInstance) {
+    await pageInstance.click('a[href="/audiencia/agenda"]');
+    await pageInstance.waitForSelector('button ::-p-text(Día)', { visible: true });
+    await pageInstance.click('button ::-p-text(Día)');
     const selector = `td.day ::-p-text(${diaABuscar})`;
-    await page.waitForSelector(selector, { visible: true });
-    await page.click(selector);
+    await pageInstance.waitForSelector(selector, { visible: true });
+    await pageInstance.click(selector);
 }
 
-export async function getInfoAudiencia(diaABuscar = "26") {
+// Función para procesar un chunk de audiencias con su propio navegador
+async function procesarChunkAudiencias(diaABuscar, startIndex, endIndex, totalLinks, onProgressChunk) {
+    // Crear navegador independiente para este chunk
+    const browserInstance = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
+
+    let pageInstance = (await browserInstance.pages())[0];
+    const resultadosChunk = [];
+
+    try {
+        // Login
+        await pageInstance.goto('http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F');
+        await pageInstance.type('#loginform-username', '20423341980');
+        await pageInstance.type('#loginform-password', 'Marzo24');
+        await pageInstance.click('button[name="login-button"]');
+        await pageInstance.waitForSelector('a[href="/audiencia/agenda"]', { visible: true });
+
+        // Ir a agenda
+        await goToAgenda(diaABuscar, pageInstance);
+
+        const selectorLinks = 'td a';
+        await pageInstance.waitForSelector(selectorLinks, { visible: true });
+
+        // Procesar solo el rango asignado
+        for (let i = startIndex; i < endIndex; i++) {
+            try {
+                const currentLinks = await pageInstance.$$(selectorLinks);
+                const link = currentLinks[i];
+                if (!link) continue;
+
+                await link.scrollIntoView({ block: 'center', behavior: 'instant' });
+                await new Promise(r => setTimeout(r, 100));
+                await link.hover();
+                const dynamicSelector = 'div.qtip.qtip-default.qtip-focus';
+
+                try {
+                    await pageInstance.waitForSelector(dynamicSelector, { visible: true, timeout: 2000 });
+                } catch (e) {
+                    console.log(`[Chunk ${startIndex}-${endIndex}] Posible shift detectado en índice ${i}, re-intentando hover...`);
+                    await link.scrollIntoView({ block: 'center', behavior: 'instant' });
+                    await new Promise(r => setTimeout(r, 300));
+                    await link.hover();
+                    await pageInstance.waitForSelector(dynamicSelector, { visible: true, timeout: 0 });
+                }
+
+                console.log(`[Chunk ${startIndex}-${endIndex}] Navegando al detalle del item ${i}...`);
+                await Promise.all([
+                    pageInstance.waitForNavigation({ waitUntil: 'networkidle2' }),
+                    link.click()
+                ]);
+                console.log(`[Chunk ${startIndex}-${endIndex}] Página de detalle cargada. Extrayendo datos...`);
+                const datosAudiencia = await pageInstance.evaluate(() => {
+                    const datos = {};
+                    const linkLegajo = document.querySelector('a[title="Ver Legajo"]');
+                    datos.numeroLeg = linkLegajo ? linkLegajo.textContent.trim() : '';
+
+                    const linkSolicitud = document.querySelector('a[title="Ver Solicitud"]');
+                    datos.dyhsolicitud = linkSolicitud ? linkSolicitud.textContent.trim() : '';
+
+                    const labels1 = Array.from(document.querySelectorAll('label'));
+                    const labelCreada = labels1.find(label => label.textContent.includes('Creada'));
+                    if (labelCreada) {
+                        const divSiguiente = labelCreada.nextElementSibling;
+                        const pOrganismo = divSiguiente ? divSiguiente.querySelector('p') : null;
+                        let ufiTexto = pOrganismo ? pOrganismo.textContent.trim() : '';
+                        datos.dyhagendamiento = ufiTexto;
+                    } else {
+                        datos.dyhagendamiento = '';
+                    }
+
+                    const labels2 = Array.from(document.querySelectorAll('label'));
+                    const labelOrganismo = labels2.find(label => label.textContent.includes('Organismo Interviniente'));
+                    if (labelOrganismo) {
+                        const divSiguiente = labelOrganismo.nextElementSibling;
+                        const pOrganismo = divSiguiente ? divSiguiente.querySelector('p') : null;
+                        let ufiTexto = pOrganismo ? pOrganismo.textContent.trim() : '';
+                        if (ufiTexto.startsWith('UFI ')) {
+                            ufiTexto = ufiTexto.substring(4);
+                        }
+                        datos.ufi = ufiTexto;
+                    } else {
+                        datos.ufi = '';
+                    }
+
+                    return datos;
+                });
+
+                // Guardar los datos extraídos
+                resultadosChunk.push({
+                    index: i,
+                    ...datosAudiencia
+                });
+
+                console.log(`[Chunk ${startIndex}-${endIndex}] Datos extraídos:`, datosAudiencia);
+
+                console.log(`[Chunk ${startIndex}-${endIndex}] Volviendo a la lista...`);
+                await pageInstance.goBack({ waitUntil: 'networkidle2' });
+                await goToAgenda(diaABuscar, pageInstance);
+                await pageInstance.waitForSelector(selectorLinks, { visible: true });
+
+                await new Promise(r => setTimeout(r, 500));
+
+                // Reportar progreso de este chunk
+                if (onProgressChunk) {
+                    onProgressChunk(i);
+                }
+            } catch (error) {
+                console.warn(`[Chunk ${startIndex}-${endIndex}] ⚠️ Error crítico en índice ${i}: ${error.message}`);
+                resultadosChunk.push({ index: i, data: null, status: 'error' });
+            }
+            await pageInstance.mouse.move(0, 0);
+            await new Promise(r => setTimeout(r, 10));
+        }
+    } catch (error) {
+        console.error(`[Chunk ${startIndex}-${endIndex}] Error general:`, error);
+    } finally {
+        await browserInstance.close();
+    }
+
+    return resultadosChunk;
+}
+
+export async function getInfoAudiencia(diaABuscar = "26", onProgress) {
     await login();
-    await goToAgenda(diaABuscar);
+    await goToAgenda(diaABuscar, page);
     const selectorLinks = 'td a';
     await page.waitForSelector(selectorLinks, { visible: true });
     const links = await page.$$(selectorLinks);
@@ -124,7 +253,15 @@ export async function getInfoAudiencia(diaABuscar = "26") {
         document.body.style.overflowY = 'scroll';
     });
     const resultados = [];
-    console.log(`Se encontraron ${links.length} elementos.`);
+    const totalLinks = links.length;
+    console.log(`Se encontraron ${totalLinks} elementos.`);
+
+    // Reportar inicio
+    if (onProgress) {
+        onProgress(0, 0, totalLinks);
+    }
+
+    // Primer bucle - preparación (sin reporte de progreso)
     for (let i = 0; i < links.length; i++) {
         try {
             const currentLinks = await page.$$(selectorLinks);
@@ -145,7 +282,8 @@ export async function getInfoAudiencia(diaABuscar = "26") {
             await page.mouse.move(0, 0);
         }
     }
-    //getInfoAudiencia
+
+    // Segundo bucle - preparación (sin reporte de progreso)
     for (let i = 0; i < links.length; i++) {
         try {
             const currentLinks = await page.$$(selectorLinks);
@@ -164,21 +302,6 @@ export async function getInfoAudiencia(diaABuscar = "26") {
                 await link.hover();
                 await page.waitForSelector(dynamicSelector, { visible: true, timeout: 0 });
             }
-
-            // Click to navigate to detail page
-            console.log(`Navegando al detalle del item ${i}...`);
-            await Promise.all([
-                page.waitForNavigation({ waitUntil: 'networkidle2' }),
-                link.click()
-            ]);
-            await new Promise(r => setTimeout(r, 1000));
-            console.log('Página de detalle cargada. Extrayendo datos...');
-
-            console.log('Volviendo a la lista...');
-            await page.goBack({ waitUntil: 'networkidle2' });
-            await goToAgenda(diaABuscar);
-            await page.waitForSelector(selectorLinks, { visible: true });
-            await new Promise(r => setTimeout(r, 500));
         } catch (error) {
             console.warn(`⚠️ Error crítico en índice ${i}: ${error.message}`);
             resultados.push({ index: i, data: null, status: 'error' });
@@ -186,31 +309,53 @@ export async function getInfoAudiencia(diaABuscar = "26") {
         await page.mouse.move(0, 0);
         await new Promise(r => setTimeout(r, 10));
     }
-    for (let i = 0; i < links.length; i++) {
-        try {
-            const currentLinks = await page.$$(selectorLinks);
-            const link = currentLinks[i];
-            if (!link) continue;
-            await link.scrollIntoView({ block: 'center', behavior: 'instant' });
-            await new Promise(r => setTimeout(r, 100));
-            await link.hover();
-            try {
-                await page.waitForSelector(dynamicSelector, { visible: true, timeout: 2000 });
-            } catch (e) {
-                console.log(`Posible shift detectado en índice ${i}, re-intentando hover...`);
-                await link.scrollIntoView({ block: 'center', behavior: 'instant' });
-                await new Promise(r => setTimeout(r, 300));
-                await link.hover();
-                await page.waitForSelector(dynamicSelector, { visible: true, timeout: 0 });
-            }
 
-        } catch (error) {
-            console.warn(`⚠️ Error crítico en índice ${i}: ${error.message}`);
-            resultados.push({ index: i, data: null, status: 'error' });
+    const NUM_BROWSERS = 4;
+    const chunkSize = Math.ceil(totalLinks / NUM_BROWSERS);
+    const chunks = [];
+
+    // Dividir las audiencias en chunks
+    for (let i = 0; i < NUM_BROWSERS; i++) {
+        const startIndex = i * chunkSize;
+        const endIndex = Math.min(startIndex + chunkSize, totalLinks);
+        if (startIndex < totalLinks) {
+            chunks.push({ startIndex, endIndex });
         }
-        await page.mouse.move(0, 0);
-        await new Promise(r => setTimeout(r, 10));
     }
+
+    console.log(`Dividiendo ${totalLinks} audiencias en ${chunks.length} chunks para procesamiento paralelo`);
+    chunks.forEach((chunk, idx) => {
+        console.log(`Chunk ${idx + 1}: índices ${chunk.startIndex}-${chunk.endIndex - 1}`);
+    });
+
+    // Contador compartido de progreso
+    let completadas = 0;
+
+    // Ejecutar todos los chunks en paralelo
+    const resultadosChunks = await Promise.all(
+        chunks.map((chunk, idx) => {
+            return procesarChunkAudiencias(
+                diaABuscar,
+                chunk.startIndex,
+                chunk.endIndex,
+                totalLinks,
+                (indexCompletado) => {
+                    // Callback de progreso - se ejecuta cada vez que un chunk completa una audiencia
+                    completadas++;
+                    if (onProgress) {
+                        const progress = Math.round((completadas / totalLinks) * 100);
+                        onProgress(progress, completadas, totalLinks);
+                    }
+                }
+            );
+        })
+    );
+
+    // Combinar resultados de todos los chunks
+    resultadosChunks.forEach(chunkResultados => {
+        resultados.push(...chunkResultados);
+    });
+
     const datosFiltrados = filterAudiencias(resultados);
     console.log(`Datos extraídos (${datosFiltrados.length}):`, datosFiltrados);
     await browser.close();

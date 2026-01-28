@@ -6,33 +6,52 @@ export default function DataScraper() {
     const [fechaScrap, setFechaScrap] = useState('26')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+    const [progress, setProgress] = useState(0)
 
     const handleScrap = async () => {
         if (!fechaScrap) return;
 
         setLoading(true);
         setError(null);
+        setProgress(0);
 
         try {
-            const response = await fetch('/api/scrape-audiencias', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dia: fechaScrap })
-            });
+            // Usar EventSource para Server-Sent Events
+            const eventSource = new EventSource(`/api/scrape-audiencias?dia=${fechaScrap}`);
 
-            const result = await response.json();
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
 
-            if (!response.ok) {
-                throw new Error(result.error || 'Error en scraping');
-            }
+                if (data.type === 'progress') {
+                    // Actualizar progreso
+                    setProgress(data.progress);
+                    console.log(data.message);
+                } else if (data.type === 'complete') {
+                    // Scraping completado
+                    eventSource.close();
+                    setLoading(false);
+                    setProgress(100);
+                    console.log('Datos scrapeados:', data.data);
+                    alert('Scraping completado! Ver consola para resultados.');
+                } else if (data.type === 'error') {
+                    // Error en el scraping
+                    eventSource.close();
+                    setLoading(false);
+                    setError(data.error);
+                    alert('Error: ' + data.error);
+                }
+            };
 
-            console.log('Datos scrapeados:', result.data);
-            alert('Scraping completado! Ver consola para resultados.');
+            eventSource.onerror = (error) => {
+                console.error('Error en EventSource:', error);
+                eventSource.close();
+                setLoading(false);
+                setError('Error de conexión con el servidor');
+            };
+
         } catch (err) {
             console.error('Error:', err);
             setError(err.message);
-            alert('Error: ' + err.message);
-        } finally {
             setLoading(false);
         }
     }
@@ -53,7 +72,7 @@ export default function DataScraper() {
                         onClick={handleScrap}
                         disabled={loading}
                     >
-                        {loading ? 'Scrapeando...' : 'Scrap Datos'}
+                        {loading ? `Scrapeando... ${progress}%` : 'Scrap Datos'}
                     </button>
                     {error && <p style={{ color: 'red' }}>{error}</p>}
                 </div>
