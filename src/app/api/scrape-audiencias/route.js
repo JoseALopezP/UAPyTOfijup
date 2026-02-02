@@ -1,4 +1,4 @@
-import { getInfoAudiencia } from '@/app/Administracion-Logistica/modules/scrappingUAL';
+import { getInfoAudiencia } from '@/app/Pumba/components/scrappingUAL';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);

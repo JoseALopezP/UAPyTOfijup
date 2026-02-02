@@ -1,11 +1,95 @@
 'use client'
 import styles from '../Pumba.module.css'
 import Image from 'next/image'
+import { useState } from 'react'
 
 export default function HeaderPumba() {
+    const [fechaScrap, setFechaScrap] = useState('');
+
+    const [fechaFill, setFechaFill] = useState('');
+
+    const [loading, setLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [error, setError] = useState(null);
+
+    const handleFill = async () => {
+
+    }
+
+    const handleScrap = async () => {
+        if (!fechaScrap) return;
+
+        setLoading(true);
+        setError(null);
+        setProgress(0);
+
+        try {
+            const eventSource = new EventSource(`/api/scrape-audiencias?dia=${fechaScrap}`);
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'progress') {
+                    setProgress(data.progress);
+                    console.log(data.message);
+                } else if (data.type === 'complete') {
+                    eventSource.close();
+                    setLoading(false);
+                    setProgress(100);
+                    console.log('Datos scrapeados:', data.data);
+                    alert('Scraping completado! Ver consola para resultados.');
+                } else if (data.type === 'error') {
+                    eventSource.close();
+
+                    setLoading(false);
+                    setError(data.error);
+                    alert('Error: ' + data.error);
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error('Error en EventSource:', error);
+                eventSource.close();
+                setLoading(false);
+                setError('Error de conexión con el servidor');
+            };
+
+        } catch (err) {
+            console.error('Error:', err);
+            setError(err.message);
+            setLoading(false);
+        }
+    }
     return (
         <><div className={styles.headerContainer}>
-            <Image src="pumbaLogo.png" alt="Logo" color='white' width={100} height={100} />
+            <Image className={styles.pumbaLogo} src="pumbaLogo.png" alt="Logo" color='white' width={81} height={38} />
+            <h2 className={`${styles.titleScrap}`}>Justificar el sueldo</h2>
+            <div className={styles.headerTitleContainer}>
+                <input
+                    value={fechaFill}
+                    className={`${styles.inputScrap}`}
+                    onChange={e => { setFechaFill(e.target.value) }}
+                    disabled={loading2}
+                />
+                <button
+                    className={`${styles.buttonScrap}`}
+                    onClick={handleFill}
+                    disabled={loading2}
+                >Cargar Día</button>
+                {error2 && <p style={{ color: 'red' }}>{error2}</p>}
+            </div>
+            <div className={styles.headerTitleContainer}>
+                <input
+                    value={fechaScrap}
+                    className={`${styles.inputScrap}`}
+                    onChange={e => { setFechaScrap(e.target.value) }}
+                    disabled={loading}
+                />
+                <button
+                    className={`${styles.buttonScrap}`}
+                    onClick={handleScrap}
+                    disabled={loading}
+                >{loading ? `Scrapeando... ${progress}%` : 'Scrap Datos'}</button>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+            </div>
         </div></>
     )
 }

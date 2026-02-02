@@ -5,7 +5,6 @@ import { DataContextProvider } from "@/context New/DataContext";
 import DownloadXLSX from './modules/DownloadXLSX';
 import DownloadXLSXInforme from './modules/DownloadXLSXInforme';
 import ImportantDates from './modules/ImportantDates';
-import DataScraper from './modules/DataScraper';
 
 export default function page() {
   return (
@@ -24,9 +23,6 @@ export default function page() {
           {/*<div className={`${styles.container}`}>
             <button className={`${styles.button}`} onClick={() => renameDocument()}>POR FAVOR NO TOCAR</button>
           </div>*/}
-          <div className={`${styles.container}`}>
-            <DataScraper />
-          </div>
         </DataContextProvider>
       </AuthContextProvider>
     </>
