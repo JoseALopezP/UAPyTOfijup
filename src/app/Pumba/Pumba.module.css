@@ -1,0 +1,26 @@
+.container {
+    display: inline-flex;
+    flex-direction: column;
+    height: 100vh;
+    margin-left: 2.2vw;
+}
+
+.headerContainer {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    background-color: transparent;
+    border: solid 1px white;
+}
+
+.bodyContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px;
+}

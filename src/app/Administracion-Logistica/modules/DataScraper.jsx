@@ -31,6 +31,7 @@ export default function DataScraper() {
                     alert('Scraping completado! Ver consola para resultados.');
                 } else if (data.type === 'error') {
                     eventSource.close();
+
                     setLoading(false);
                     setError(data.error);
                     alert('Error: ' + data.error);
