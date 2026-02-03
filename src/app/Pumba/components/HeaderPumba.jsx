@@ -1,18 +1,34 @@
 'use client'
 import styles from '../Pumba.module.css'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { DataContext } from '@/context New/DataContext'
 
 export default function HeaderPumba() {
+    const { pumaData, updatePumaData, addPumaData } = useContext(DataContext);
+
     const [fechaScrap, setFechaScrap] = useState('');
-
     const [fechaFill, setFechaFill] = useState('');
-
     const [loading, setLoading] = useState(false);
+    const [loading2, setLoading2] = useState(false);
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState(null);
+    const [error2, setError2] = useState(null);
 
     const handleFill = async () => {
+        if (fechaFill !== '') {
+            setLoading2(true);
+            setError2(null);
+            setProgress(0);
+            try {
+                await updatePumaData(fechaFill);
+                setLoading2(false);
+                setProgress(100);
+            } catch (error) {
+                setError2(`${error}`);
+                setLoading2(false);
+            }
+        }
 
     }
 
@@ -34,11 +50,10 @@ export default function HeaderPumba() {
                     eventSource.close();
                     setLoading(false);
                     setProgress(100);
-                    console.log('Datos scrapeados:', data.data);
-                    alert('Scraping completado! Ver consola para resultados.');
+                    console.log('Datos scrapeados:', data.length);
+                    addPumaData(fechaScrap, data);
                 } else if (data.type === 'error') {
                     eventSource.close();
-
                     setLoading(false);
                     setError(data.error);
                     alert('Error: ' + data.error);
