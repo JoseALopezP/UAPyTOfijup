@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState, useContext } from 'react'
 import { DataContext } from '@/context New/DataContext'
 
-export default function HeaderPumba() {
+export default function HeaderPumba({ setDateToUse }) {
     const { pumaData, updatePumaData, addPumaData } = useContext(DataContext);
 
     const [fechaScrap, setFechaScrap] = useState('');
@@ -23,6 +23,7 @@ export default function HeaderPumba() {
             try {
                 await updatePumaData(fechaFill);
                 setLoading2(false);
+                setDateToUse(fechaFill);
                 setProgress(100);
             } catch (error) {
                 setError2(`${error}`);
