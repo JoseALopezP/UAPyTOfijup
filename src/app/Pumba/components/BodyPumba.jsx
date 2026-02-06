@@ -28,8 +28,8 @@ export default function BodyPumba({ pumaData, dateToUse }) {
                         <th className={styles.tableHeaderTh}>Notificación (Puma)</th>
                         <th className={styles.tableHeaderTh}>DÍA Y HORA DE NOTIFICACIÓN AUDIENCIA</th>
                         <th className={styles.tableHeaderTh}>Programada (tablero)</th>
-                        <th className={styles.tableHeaderTh}>DÍA Y HORA PROGRAMADA DE AUDIENCIA</th>
                         <th className={styles.tableHeaderTh}>Programada (Puma)</th>
+                        <th className={styles.tableHeaderTh}>DÍA Y HORA PROGRAMADA DE AUDIENCIA</th>
                         <th className={styles.tableHeaderTh}>Inicio (Puma)</th>
                         <th className={styles.tableHeaderTh}>Inicio (tablero)</th>
                         <th className={styles.tableHeaderTh}>DÍA Y HORA INICIO REAL DE AUDIENCIA</th>
@@ -89,7 +89,7 @@ export default function BodyPumba({ pumaData, dateToUse }) {
                 </thead>
                 <tbody>
                     {pumaData && pumaData.map((item, index) => (
-                        <TableRow key={index} audData={item} />
+                        <TableRow key={index} audData={item} dateToUse={dateToUse} />
                     ))}
                 </tbody>
             </table>
