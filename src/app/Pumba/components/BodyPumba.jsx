@@ -2,13 +2,20 @@
 import styles from '../Pumba.module.css'
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context New/DataContext'
+import TableRow from './TableRow';
 
-export default function BodyPumba({ pumaData, dateToUse }) {
-    const { updateByDate } = useContext(DataContext);
+export default function BodyPumba({ dateToUse }) {
+    const { updateByDate, updateDesplegables, pumaData } = useContext(DataContext);
 
     useEffect(() => {
         updateByDate(dateToUse);
     }, [dateToUse]);
+    useEffect(() => {
+        console.log(pumaData);
+    }, [pumaData]);
+    useEffect(() => {
+        updateDesplegables()
+    }, [])
     return (
         <><div className={styles.bodyContainer}>
             <table className={styles.pumbaTable}>
@@ -27,8 +34,8 @@ export default function BodyPumba({ pumaData, dateToUse }) {
                         <th className={styles.tableHeaderTh}>DÍA Y HORA AGENDAMIENTO DE AUDIENCIA</th>
                         <th className={styles.tableHeaderTh}>Notificación (Puma)</th>
                         <th className={styles.tableHeaderTh}>DÍA Y HORA DE NOTIFICACIÓN AUDIENCIA</th>
-                        <th className={styles.tableHeaderTh}>Programada (tablero)</th>
                         <th className={styles.tableHeaderTh}>Programada (Puma)</th>
+                        <th className={styles.tableHeaderTh}>Programada (tablero)</th>
                         <th className={styles.tableHeaderTh}>DÍA Y HORA PROGRAMADA DE AUDIENCIA</th>
                         <th className={styles.tableHeaderTh}>Inicio (Puma)</th>
                         <th className={styles.tableHeaderTh}>Inicio (tablero)</th>
@@ -89,7 +96,7 @@ export default function BodyPumba({ pumaData, dateToUse }) {
                 </thead>
                 <tbody>
                     {pumaData && pumaData.map((item, index) => (
-                        <TableRow key={index} audData={item} dateToUse={dateToUse} />
+                        <TableRow key={index} audData={item} dateToUse={dateToUse} index={index} />
                     ))}
                 </tbody>
             </table>

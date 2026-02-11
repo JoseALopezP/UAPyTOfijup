@@ -277,14 +277,18 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const updatePumaData = async (date) => {
         try {
             const data = await getDocument('informeUAL', date);
-            setPumaData(data)
+            if (data) {
+                setPumaData(data.audiencias || [])
+            } else {
+                setPumaData([])
+            }
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
     }
     const addPumaData = async (date, pumaData) => {
         try {
-            await addOrUpdateObject('informeUAL', date, pumaData);
+            await addOrUpdateObject('informeUAL', date, 'audiencias', pumaData);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }

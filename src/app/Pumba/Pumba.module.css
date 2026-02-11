@@ -80,3 +80,26 @@
     min-width: 120px;
     border: solid 1px #3b3b3b;
 }
+
+.autofillButton {
+    width: 60px;
+    border-radius: 4px;
+    margin-top: 8px;
+    height: 32px;
+    outline: none;
+    border: none;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    background-color: aliceblue;
+}
+
+.inputCell {
+    width: 100%;
+}
+
+.cellBodyFixed {
+    color: #fff;
+    text-align: center;
+
+}

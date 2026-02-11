@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState, useContext } from 'react'
 import { DataContext } from '@/context New/DataContext'
 
-export default function HeaderPumba({ setDateToUse }) {
+export default function HeaderPumba({ setDateToUse, autofillB, setAutofillB }) {
     const { pumaData, updatePumaData, addPumaData } = useContext(DataContext);
 
     const [fechaScrap, setFechaScrap] = useState('');
@@ -51,8 +51,8 @@ export default function HeaderPumba({ setDateToUse }) {
                     eventSource.close();
                     setLoading(false);
                     setProgress(100);
-                    console.log('Datos scrapeados:', data.length);
-                    addPumaData(fechaScrap, data);
+                    console.log('Datos scrapeados:', data.data.length);
+                    addPumaData(fechaScrap, data.data);
                 } else if (data.type === 'error') {
                     eventSource.close();
                     setLoading(false);
@@ -77,6 +77,7 @@ export default function HeaderPumba({ setDateToUse }) {
     return (
         <><div className={styles.headerContainer}>
             <Image className={styles.pumbaLogo} src="pumbaLogo.png" alt="Logo" color='white' width={81} height={38} />
+            <button className={`${styles.autofillButton}`} onClick={() => setAutofillB(!autofillB)}>Autofill</button>
             <h2 className={`${styles.titleScrap}`}>Justificar el sueldo</h2>
             <div className={styles.headerTitleContainer}>
                 <input

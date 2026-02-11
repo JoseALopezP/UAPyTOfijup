@@ -94,6 +94,10 @@ function filterAudiencias(arr) {
             numeroLeg: audiencia.numeroLeg || '',
             horaProgramada: horaProgramada,
             hora: audiencia.inicioProgramada || '',
+            inicioProgramada: audiencia.inicioProgramada || '',
+            finProgramada: audiencia.finProgramada || '',
+            inicioReal: audiencia.inicioReal || '',
+            finReal: audiencia.finReal || '',
             juez: juezString,
             tipo: tipos[0] || '',
             tipo2: tipos[1] || '',
@@ -103,8 +107,15 @@ function filterAudiencias(arr) {
             caratula: audiencia.caratula || '',
             linkAudiencia: audiencia.linkAudiencia || '',
             linkVideo: audiencia.linkVideo || '',
+            linkMinuta: audiencia.linkMinuta || '',
             fechaNotificacion: audiencia.fechaNotificacion || '',
-            operador: audiencia.operador || ''
+            operador: audiencia.operador || '',
+            motivoDemora: audiencia.motivoDemora || '',
+            ufi: audiencia.ufi || '',
+            dyhsolicitud: audiencia.dyhsolicitud || '',
+            dyhagendamiento: audiencia.dyhagendamiento || '',
+            intervinientes: audiencia.intervinientes ?
+                Object.entries(audiencia.intervinientes).flatMap(([k, v]) => v.map(n => `${k}: ${n}`)) : []
         };
     }).filter(a => a !== null);
 }

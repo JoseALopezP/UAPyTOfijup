@@ -8,13 +8,14 @@ import { useState } from 'react'
 
 export default function Pumba() {
     const [dateToUse, setDateToUse] = useState('');
+    const [autofillB, setAutofillB] = useState(false);
     return (
         <>
             <AuthContextProvider>
                 <DataContextProvider>
                     <div className={styles.container}>
-                        <HeaderPumba setDateToUse={setDateToUse} />
-                        <BodyPumba dateToUse={dateToUse} />
+                        <HeaderPumba setDateToUse={setDateToUse} autofillB={autofillB} setAutofillB={setAutofillB} />
+                        <BodyPumba dateToUse={dateToUse} autofillB={autofillB} />
                     </div>
                 </DataContextProvider>
             </AuthContextProvider>
