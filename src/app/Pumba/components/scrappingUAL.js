@@ -356,11 +356,16 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                 try {
                     await pageInstance.click('a[href="#bloques"]');
                     await pageInstance.waitForSelector('#view-grid-bloques-container table tbody tr', { timeout: 5000 });
-                    const rawBloques = await pageInstance.evaluate(() => {
+                    const rawBloques = await pageInstance.evaluate((targetDate) => {
+                        const targetFormatted = targetDate.slice(0, 2) + '/' + targetDate.slice(2, 4) + '/' + targetDate.slice(4, 8);
                         const rows = Array.from(document.querySelectorAll('#view-grid-bloques-container table tbody tr'));
                         return rows.map(row => {
                             const cells = Array.from(row.querySelectorAll('td'));
                             if (cells.length < 7) return null;
+
+                            const fechaProg = cells[0].textContent.trim();
+                            if (fechaProg !== targetFormatted) return null;
+
                             const salaText = cells[5].textContent.trim();
                             const salaMatch = salaText.match(/SALA\s+(\d+)/i);
                             const actionsCell = cells[7];
@@ -369,7 +374,7 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                             const baseUrl = window.location.origin;
                             const getFullUrl = (href) => (!href ? '' : (href.startsWith('http') ? href : baseUrl + href));
                             return {
-                                fechaProgramada: cells[0].textContent.trim(),
+                                fechaProgramada: fechaProg,
                                 inicioProgramada: cells[1].textContent.trim(),
                                 finProgramada: cells[2].textContent.trim(),
                                 inicioReal: cells[3].textContent.trim(),
@@ -380,7 +385,7 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                                 linkVideo: getFullUrl(linkVideoEl?.getAttribute('href'))
                             };
                         }).filter(b => b !== null);
-                    });
+                    }, fechaStr);
                     bloquesArray = JSON.parse(JSON.stringify(rawBloques || []));
                 } catch (e) {
                     bloquesArray = [];

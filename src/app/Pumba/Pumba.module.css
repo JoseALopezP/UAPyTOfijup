@@ -64,14 +64,17 @@
     font-weight: 700;
     text-align: center;
     position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .pumbaTable {
     table-layout: fixed;
-    width: 97.5vw;
-    border-collapse: collapse;
+    width: max-content;
+    border-collapse: separate;
+    /* Required for sticky borders in some browsers */
+    border-spacing: 0;
     border: solid 1px #2B2B2B;
-
 }
 
 .tableHeaderTh {
@@ -79,6 +82,22 @@
     width: 120px;
     min-width: 120px;
     border: solid 1px #3b3b3b;
+    height: 40px;
+    background-color: #2B2B2B;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Sticky first column (Header) */
+.tableHeaderTh:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 15;
+    /* Above other headers */
+    background-color: #2B2B2B;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .autofillButton {
@@ -94,14 +113,66 @@
     background-color: aliceblue;
 }
 
-.inputCell {
-    width: 100%;
+.tableRow {
+    height: 50px;
 }
 
 .cellBodyFixed {
     color: #fff;
     text-align: center;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow: hidden;
+    border: solid 1px #3b3b3b;
+    height: 50px;
+    padding: 0;
+    box-sizing: border-box;
+    display: table-cell;
+    vertical-align: middle;
+    background-color: transparent;
+}
 
+/* Sticky first column (Body) */
+.tableRow td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background-color: #2b2b2b;
+    /* Solid background for first column */
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.inputCell {
+    width: 100%;
+    height: 100%;
+    padding: 8px 5px;
+    background-color: #1f1f1f;
+    border: none;
+    outline: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+    display: block;
+    resize: none;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.inputCell:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure textarea also has solid background when sticky */
+.tableRow td:first-child .inputCell {
+    background-color: #1f1f1f;
+}
+
+/* Specific styling for datalist inputs vs textareas */
+textarea.inputCell {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.tableHLegajo {
+    width: 130px;
+    min-width: 130px;
 }
