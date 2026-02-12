@@ -65,11 +65,10 @@ export default function BodyPumba({ dateToUse }) {
                         <th className={styles.tableHeaderTh}>Resuelvo (tablero)</th>
                         <th className={styles.tableHeaderTh}>HORARIO ENTREGA RESUELVO</th>
                         <th className={styles.tableHeaderTh}>Minuta (Puma)</th>
-                        <th className={styles.tableHeaderTh}>Minuta (tablero)</th>
                         <th className={styles.tableHeaderTh}>HORARIO ENTREGA DE MINUTA</th>
                         <th className={styles.tableHeaderTh}>Cant. imputados (tablero)</th>
                         <th className={styles.tableHeaderTh}>Cant. imputados (Puma)</th>
-                        <th className={styles.tableHeaderTh}>CANTIDAD DE IMPORTADOS</th>
+                        <th className={styles.tableHeaderTh}>CANTIDAD DE IMPUTADOS</th>
                         <th className={styles.tableHeaderTh}>TIPO DE VÍCTIMA</th>
                         <th className={styles.tableHeaderTh}>SALA (Puma)</th>
                         <th className={styles.tableHeaderTh}>SALA (tablero)</th>

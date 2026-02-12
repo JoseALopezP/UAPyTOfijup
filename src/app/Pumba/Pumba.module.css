@@ -101,5 +101,7 @@
 .cellBodyFixed {
     color: #fff;
     text-align: center;
+    overflow-y: scroll;
+    overflow-x: hidden;
 
 }

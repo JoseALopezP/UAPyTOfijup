@@ -40,7 +40,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
 
     const autoFill = () => {
         legajo === '' && audData.numeroLeg && setLegajo(audData.numeroLeg)
-        audTipo === '' && audData.tipo && setAudTipo(audData.tipo + ' + ' + audData.tipo2 + ' + ' + audData.tipo3)
+        audTipo === '' && audData.tipo && setAudTipo(audData.tipo + (audData.tipo2 ? ' + ' + audData.tipo2 : '') + (audData.tipo3 ? ' + ' + audData.tipo3 : ''))
         ufi === '' && audData.ufi && setUfi(audData.ufi)
         dyhsolicitud === '' && audData.dyhsolicitud && setDyhsolicitud(audData.dyhsolicitud)
         dyhagendamiento === '' && audData.dyhagendamiento && setDyhagendamiento(audData.dyhagendamiento)
@@ -51,7 +51,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
         motivDemora === '' && audData.motivoDemora && setMotivDemora(audData.motivoDemora)
         observDemora === '' && setObservDemora('')
         durReal === '' && audData.finReal && audData.inicioReal && setDurReal(parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])))
-        cuartoPedido === '' && tabItem.hitos && setCuartoPedido(tabItem.hitos.filter(el => el.filter(el2 => el2.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2]))))
+        cuartoPedido === '' && tabItem.hitos && setCuartoPedido(tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0))
         cuartoReal === '' && tabItem.hitos && setCuartoReal(calculateCuartos(tabItem.hitos))
         cuartoRealOtros === '' && tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos))
         dyhfinalizacion === '' && audData.finReal && setDyhfinalizacion(audData.finReal)
@@ -83,9 +83,9 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 <input className={`${styles.inputCell}`} type='text' value={legajo} onChange={(e) => setLegajo(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
-                {audData.tipo + ' + ' + audData.tipo2 + ' + ' + audData.tipo3}</td>
+                {audData.tipo + (audData.tipo2 ? ' + ' + audData.tipo2 : '') + (audData.tipo3 ? ' + ' + audData.tipo3 : '')}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.tipo + ' + ' + tabItem.tipo2 + ' + ' + tabItem.tipo3}</td>
+                {tabItem.tipo + (tabItem.tipo2 ? ' + ' + tabItem.tipo2 : '') + (tabItem.tipo3 ? ' + ' + tabItem.tipo3 : '')}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={audTipo} onChange={(e) => setAudTipo(e.target.value)} />
             </td>
@@ -107,19 +107,19 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 <input className={`${styles.inputCell}`} type='text' value={dyhnotificacion} onChange={(e) => setDyhnotificacion(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.inicioProgramada}</td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + tabItem.hora}</td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + (tabItem.hora || '')}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={dyhprogramada} onChange={(e) => setDyhprogramada(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.inicioReal}</td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{tabItem.hitos && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + tabItem.hitos[0].split(' | ')[0])}</td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{tabItem.hitos && tabItem.hitos.length > 0 && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + tabItem.hitos[0].split(' | ')[0])}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={dyhreal} onChange={(e) => setDyhreal(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.inicioReal && audData.inicioProgramada && (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1]) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.hitos && (parseInt((tabItem.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(tabItem.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(tabItem.hora.split(':')[0]) * 60 + parseInt(tabItem.hora.split(':')[1])))}</td>
+                {tabItem.hitos && tabItem.hitos.length > 0 && tabItem.hora && (parseInt((tabItem.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(tabItem.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(tabItem.hora.split(':')[0]) * 60 + parseInt(tabItem.hora.split(':')[1])))}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={demora} onChange={(e) => setDemora(e.target.value)} />
             </td>
@@ -143,17 +143,17 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.finReal && audData.inicioReal && (parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.hitos && (parseInt((tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0].split(':')[0])) * 60 + parseInt(tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0].split(':')[0])) - (parseInt(tabItem.hitos[0].split(':')[0])) * 60 + parseInt(tabItem.hitos[0].split(':')[1])}</td>
+                {tabItem.hitos && tabItem.hitos.some(el => el.includes('FINALIZADA')) && tabItem.hitos.length > 0 && (parseInt((tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0].split(':')[0])) * 60 + parseInt(tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0].split(':')[1])) - ((parseInt(tabItem.hitos[0].split(':')[0])) * 60 + parseInt(tabItem.hitos[0].split(':')[1]))}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={durReal} onChange={(e) => setDurReal(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.hitos && tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2]))}</td>
+                {tabItem.hitos && tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0)}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={cuartoPedido} onChange={(e) => setCuartoPedido(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.hitos && tabItem.hitos.filter(el => el.includes('FINALIZADA')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2]))}</td>
+                {tabItem.hitos && tabItem.hitos.filter(el => el.includes('FINALIZADA')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0)}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={cuartoPedido} onChange={(e) => setCuartoPedido(e.target.value)} />
             </td>
@@ -170,7 +170,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.finReal && audData.finReal}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.hitos && tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0]}</td>
+                {tabItem.hitos && tabItem.hitos.some(el => el.includes('FINALIZADA')) && tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0]}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={dyhfinalizacion} onChange={(e) => setDyhfinalizacion(e.target.value)} />
             </td>
