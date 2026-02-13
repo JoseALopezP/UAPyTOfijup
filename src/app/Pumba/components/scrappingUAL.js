@@ -109,6 +109,7 @@ function filterAudiencias(arr) {
             linkVideo: audiencia.linkVideo || '',
             linkMinuta: audiencia.linkMinuta || '',
             fechaNotificacion: audiencia.fechaNotificacion || '',
+            finalizadaMinuta: audiencia.finalizadaMinuta || '',
             operador: audiencia.operador || '',
             motivoDemora: audiencia.motivoDemora || '',
             ufi: audiencia.ufi || '',
@@ -352,6 +353,24 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                     datosAudiencia.fechaNotificacion = '';
                 }
 
+                try {
+                    await pageInstance.click('a[href="#historialEstado"]');
+                    await pageInstance.waitForSelector('#view-grid-historial-estados-container table tbody tr', { timeout: 5000 });
+                    const fechaFin = await pageInstance.evaluate(() => {
+                        const rows = Array.from(document.querySelectorAll('#view-grid-historial-estados-container table tbody tr'));
+                        const finalizadaRow = rows.find(row => {
+                            const stateCell = row.querySelector('td[data-col-seq="1"]');
+                            return stateCell && stateCell.textContent.trim().toUpperCase() === 'FINALIZADA';
+                        });
+                        if (!finalizadaRow) return '';
+                        const dateCell = finalizadaRow.querySelector('td[data-col-seq="0"]');
+                        return dateCell ? dateCell.textContent.trim() : '';
+                    });
+                    datosAudiencia.finalizadaMinuta = fechaFin;
+                } catch (e) {
+                    datosAudiencia.finalizadaMinuta = '';
+                }
+
                 let bloquesArray = [];
                 try {
                     await pageInstance.click('a[href="#bloques"]');
@@ -390,11 +409,10 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                 } catch (e) {
                     bloquesArray = [];
                 }
-
                 const emptyFields = {
                     fechaProgramada: '', inicioProgramada: '', finProgramada: '',
                     inicioReal: '', finReal: '', salaBlock: '', operador: '',
-                    linkMinuta: '', linkVideo: ''
+                    linkMinuta: '', linkVideo: '', finalizadaMinuta: ''
                 };
 
                 if (bloquesArray.length > 0) {

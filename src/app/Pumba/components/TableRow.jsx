@@ -3,12 +3,14 @@ import styles from '../Pumba.module.css'
 import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context New/DataContext';
 import { calculateCuartos, calculateCuartosOtros } from '@/utils/calculators';
+import ShowTextOver from './ShowTextOver';
+import { removeHtmlTags } from '@/utils/removeHtmlTags';
 
 export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const { bydate, desplegables, pumaData } = useContext(DataContext);
     const [tabItem, setTabItem] = useState({})
 
-    const [tiposT, setTiposT] = useState(true)
+
     const [legajo, setLegajo] = useState(audData.legajo || '')
     const [audTipo, setAudTipo] = useState(audData.audTipo || '')
     const [ufi, setUfi] = useState(audData.ufi || '')
@@ -20,12 +22,14 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [demora, setDemora] = useState(audData.demora || '')
     const [motivDemora, setMotivDemora] = useState(audData.motivDemora || '')
     const [observDemora, setObservDemora] = useState(audData.observDemora || '')
+    const [duracionProgramada, setDuracionProgramada] = useState(audData.duracionProgramada || '')
     const [durReal, setDurReal] = useState(audData.durReal || '')
     const [cuartoPedido, setCuartoPedido] = useState(audData.cuartoPedido || '')
     const [cuartoReal, setCuartoReal] = useState(audData.cuartoReal || '')
     const [cuartoRealOtros, setCuartoRealOtros] = useState(audData.cuartoRealOtros || '')
     const [dyhfinalizacion, setDyhfinalizacion] = useState(audData.dyhfinalizacion && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.dyhfinalizacion) || '')
     const [entregaResuelvo, setEntregaResuelvo] = useState(audData.entregaResuelvo || '')
+    const [finalizadaMinuta, setFinalizadaMinuta] = useState(audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0] || '')
     const [cantImputados, setCantImputados] = useState(audData.cantImputados || '')
     const [tipoVictima, setTipoVictima] = useState(audData.tipoVictima || '')
     const [sala, setSala] = useState(audData.sala || '')
@@ -38,10 +42,43 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [resultadoControl, setResultadoControl] = useState(audData.resultadoControl || '')
     const [indicadorUga, setIndicadorUga] = useState(audData.indicadorUga || '')
     const [comentario, setComentario] = useState(audData.comentario || '')
+    const [expandValue, setExpandValue] = useState(false)
+
+    const [legajoT, setLegajoT] = useState(true)
+    const [tiposT, setTiposT] = useState(true)
+    const [ufiT, setUfiT] = useState(true)
+    const [dyhsolicitudT, setDyhsolicitudT] = useState(true)
+    const [dyhagendamientoT, setDyhagendamientoT] = useState(true)
+    const [dyhnotificacionT, setDyhnotificacionT] = useState(true)
+    const [dyhprogramadaT, setDyhprogramadaT] = useState(true)
+    const [dyhrealT, setDyhrealT] = useState(true)
+    const [demoraT, setDemoraT] = useState(true)
+    const [motivDemoraT, setMotivDemoraT] = useState(true)
+    const [observDemoraT, setObservDemoraT] = useState(true)
+    const [duracionProgramadaT, setDuracionProgramadaT] = useState(true)
+    const [durRealT, setDurRealT] = useState(true)
+    const [cuartoPedidoT, setCuartoPedidoT] = useState(true)
+    const [cuartoRealT, setCuartoRealT] = useState(true)
+    const [cuartoRealOtrosT, setCuartoRealOtrosT] = useState(true)
+    const [dyhfinalizacionT, setDyhfinalizacionT] = useState(true)
+    const [entregaResuelvoT, setEntregaResuelvoT] = useState(true)
+    const [finalizadaMinutaT, setFinalizadaMinutaT] = useState(true)
+    const [cantImputadosT, setCantImputadosT] = useState(true)
+    const [tipoVictimaT, setTipoVictimaT] = useState(true)
+    const [salaT, setSalaT] = useState(true)
+    const [operadorT, setOperadorT] = useState(true)
+    const [fiscalT, setFiscalT] = useState(true)
+    const [defensaT, setDefensaT] = useState(true)
+    const [juezT, setJuezT] = useState(true)
+    const [finAudienciaT, setFinAudienciaT] = useState(true)
+    const [resolucionT, setResolucionT] = useState(true)
+    const [resultadoControlT, setResultadoControlT] = useState(true)
+    const [indicadorUgaT, setIndicadorUgaT] = useState(true)
+    const [comentarioT, setComentarioT] = useState(true)
 
     const autoFill = () => {
         legajo === '' && audData.numeroLeg && setLegajo(audData.numeroLeg)
-        audTipo === '' && audData.tipo && setAudTipo(audData.tipo + (audData.tipo2 ? ' + ' + audData.tipo2 : '') + (audData.tipo3 ? ' + ' + audData.tipo3 : ''))
+        audTipo === '' && audData.tipo && setAudTipo(audData.tipo + (audData.tipo2 ? ' ' + audData.tipo2 : '') + (audData.tipo3 ? ' ' + audData.tipo3 : ''))
         ufi === '' && audData.ufi && setUfi(audData.ufi)
         dyhsolicitud === '' && audData.dyhsolicitud && setDyhsolicitud(audData.dyhsolicitud)
         dyhagendamiento === '' && audData.dyhagendamiento && setDyhagendamiento(audData.dyhagendamiento)
@@ -50,19 +87,84 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
         dyhreal === '' && audData.inicioReal && setDyhreal(dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.inicioReal)
         demora === '' && audData.inicioReal && audData.inicioProgramada && setDemora((parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))
         motivDemora === '' && audData.motivoDemora && setMotivDemora(audData.motivoDemora)
+        observDemora === '' && audData.observDemora && setObservDemora(audData.observDemora)
+        duracionProgramada === '' && audData.inicioProgramada && audData.finProgramada && setDuracionProgramada((parseInt(audData.finProgramada.split(':')[0]) * 60 + parseInt(audData.finProgramada.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))
         durReal === '' && audData.finReal && audData.inicioReal && setDurReal(parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])))
         cuartoPedido === '' && tabItem.hitos && setCuartoPedido(tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0))
         cuartoReal === '' && tabItem.hitos && setCuartoReal(calculateCuartos(tabItem.hitos))
         cuartoRealOtros === '' && tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos))
         dyhfinalizacion === '' && audData.finReal && setDyhfinalizacion(audData.finReal)
         entregaResuelvo === '' && tabItem.horaResuelvo && setEntregaResuelvo(tabItem.horaResuelvo)
+        finalizadaMinuta === '' && audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[0])
         cantImputados === '' && audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length)
         sala === '' && tabItem.sala && setSala(tabItem.sala)
         operador === '' && tabItem.operador && setOperador(tabItem.operador)
         fiscal === '' && tabItem.mpf && setFiscal(tabItem.mpf[0].nombre)
         defensa === '' && tabItem.defensa && setDefensa(tabItem.defensa[0].nombre)
         juez === '' && tabItem.juez && setJuez(tabItem.juez)
-        finAudiencia === '' && audData.finReal && setFinAudiencia(audData.finReal)
+        finAudiencia === '' && audData.finAudiencia && setFinAudiencia(audData.finAudiencia)
+    }
+    const checkForDiff = () => {
+        if (legajo !== tabItem.numeroLeg || legajo === '') setLegajoT(false)
+        else setLegajoT(true)
+        if (audTipo !== tabItem.tipo + (tabItem.tipo2 ? ' ' + tabItem.tipo2 : '') + (tabItem.tipo3 ? ' ' + tabItem.tipo3 : '') || audTipo === '') setAudTipoT(false)
+        else setAudTipoT(true)
+        if (ufi !== tabItem.ufi || ufi === '') setUfiT(false)
+        else setUfiT(true)
+        if (dyhsolicitud !== tabItem.dyhsolicitud || dyhsolicitud === '') setDyhsolicitudT(false)
+        else setDyhsolicitudT(true)
+        if (dyhagendamiento !== tabItem.dyhagendamiento || dyhagendamiento === '') setDyhagendamientoT(false)
+        else setDyhagendamientoT(true)
+        if (dyhnotificacion !== tabItem.dyhnotificacion || dyhnotificacion === '') setDyhnotificacionT(false)
+        else setDyhnotificacionT(true)
+        if (dyhprogramada !== tabItem.dyhprogramada || dyhprogramada === '') setDyhprogramadaT(false)
+        else setDyhprogramadaT(true)
+        if (dyhreal !== tabItem.dyhreal || dyhreal === '') setDyhrealT(false)
+        else setDyhrealT(true)
+        if (demora !== tabItem.demora || demora === '') setDemoraT(false)
+        else setDemoraT(true)
+        if (motivDemora !== tabItem.motivDemora || motivDemora === '') setMotivDemoraT(false)
+        else setMotivDemoraT(true)
+        if (observDemora !== tabItem.observDemora || observDemora === '') setObservDemoraT(false)
+        else setObservDemoraT(true)
+        if (duracionProgramada !== tabItem.duracionProgramada || duracionProgramada === '') setDuracionProgramadaT(false)
+        else setDuracionProgramadaT(true)
+        if (durReal !== tabItem.durReal || durReal === '') setDurRealT(false)
+        else setDurRealT(true)
+        if (cuartoPedido !== tabItem.cuartoPedido || cuartoPedido === '') setCuartoPedidoT(false)
+        else setCuartoPedidoT(true)
+        if (cuartoReal !== tabItem.cuartoReal || cuartoReal === '') setCuartoRealT(false)
+        else setCuartoRealT(true)
+        if (cuartoRealOtros !== tabItem.cuartoRealOtros || cuartoRealOtros === '') setCuartoRealOtrosT(false)
+        else setCuartoRealOtrosT(true)
+        if (dyhfinalizacion !== tabItem.dyhfinalizacion || dyhfinalizacion === '') setDyhfinalizacionT(false)
+        else setDyhfinalizacionT(true)
+        if (entregaResuelvo !== tabItem.entregaResuelvo || entregaResuelvo === '') setEntregaResuelvoT(false)
+        else setEntregaResuelvoT(true)
+        if (cantImputados !== tabItem.cantImputados || cantImputados === '') setCantImputadosT(false)
+        else setCantImputadosT(true)
+        if (tipoVictima !== tabItem.tipoVictima || tipoVictima === '') setTipoVictimaT(false)
+        else setTipoVictimaT(true)
+        if (sala !== tabItem.sala || sala === '') setSalaT(false)
+        else setSalaT(true)
+        if (operador !== tabItem.operador || operador === '') setOperadorT(false)
+        else setOperadorT(true)
+        if (fiscal !== tabItem.fiscal || fiscal === '') setFiscalT(false)
+        else setFiscalT(true)
+        if (defensa !== tabItem.defensa || defensa === '') setDefensaT(false)
+        else setDefensaT(true)
+        if (juez !== tabItem.juez || juez === '') setJuezT(false)
+        else setJuezT(true)
+        if (finAudiencia !== tabItem.finAudiencia || finAudiencia === '') setFinAudienciaT(false)
+        else setFinAudienciaT(true)
+        if (resolucion !== tabItem.resolucion || resolucion === '') setResolucionT(false)
+        else setResolucionT(true)
+        if (resultadoControl !== tabItem.resultadoControl || resultadoControl === '') setResultadoControlT(false)
+        else setResultadoControlT(true)
+        if (indicadorUga !== tabItem.indicadorUga || indicadorUga === '') setIndicadorUgaT(false)
+        else setIndicadorUgaT(true)
+        if (comentario !== tabItem.comentario || comentario === '') setComentarioT(false)
+        else setComentarioT(true)
     }
     useEffect(() => {
         autoFill()
@@ -75,114 +177,114 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     }, [bydate, audData])
     return (
         <><tr className={`${styles.tableRow}`} key={index}>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
+            <td className={legajoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={legajo} onChange={(e) => setLegajo(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
-                {audData.tipo + (audData.tipo2 ? ' + ' + audData.tipo2 : '') + (audData.tipo3 ? ' + ' + audData.tipo3 : '')}</td>
+                {audData.tipo + (audData.tipo2 ? ' ' + audData.tipo2 : '') + (audData.tipo3 ? ' ' + audData.tipo3 : '')}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.tipo + (tabItem.tipo2 ? ' + ' + tabItem.tipo2 : '') + (tabItem.tipo3 ? ' + ' + tabItem.tipo3 : '')}</td>
+                {tabItem.tipo + (tabItem.tipo2 ? ' ' + tabItem.tipo2 : '') + (tabItem.tipo3 ? ' ' + tabItem.tipo3 : '')}</td>
             <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={audTipo} onChange={(e) => setAudTipo(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.ufi}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{tabItem.ufi}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={ufiT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={ufi} onChange={(e) => setUfi(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{audData.dyhsolicitud}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={dyhsolicitudT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhsolicitud} onChange={(e) => setDyhsolicitud(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{audData.dyhagendamiento}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={dyhagendamientoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhagendamiento} onChange={(e) => setDyhagendamiento(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{audData.fechaNotificacion}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={dyhnotificacionT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhnotificacion} onChange={(e) => setDyhnotificacion(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.inicioProgramada}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + (tabItem.hora || '')}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={dyhprogramadaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhprogramada} onChange={(e) => setDyhprogramada(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.inicioReal}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{tabItem.hitos && tabItem.hitos.length > 0 && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + tabItem.hitos[0].split(' | ')[0])}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={dyhrealT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhreal} onChange={(e) => setDyhreal(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.inicioReal && audData.inicioProgramada && (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1]) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.hitos && tabItem.hitos.length > 0 && tabItem.hora && (parseInt((tabItem.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(tabItem.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(tabItem.hora.split(':')[0]) * 60 + parseInt(tabItem.hora.split(':')[1])))}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={demoraT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={demora} onChange={(e) => setDemora(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.motivoDemora}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.razonDemora}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={motivDemoraT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={motivDemora} onChange={(e) => setMotivDemora(e.target.value)} />
             </td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={observDemoraT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={observDemora} onChange={(e) => setObservDemora(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.finProgramada && audData.inicioProgramada && (parseInt(audData.finProgramada.split(':')[0]) * 60 + parseInt(audData.finProgramada.split(':')[1]) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.horaProgramada}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
-                <textarea className={`${styles.inputCell}`} value={motivDemora} onChange={(e) => setMotivDemora(e.target.value)} />
+            <td className={duracionProgramadaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+                <textarea className={`${styles.inputCell}`} value={duracionProgramada} onChange={(e) => setDuracionProgramada(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.finReal && audData.inicioReal && (parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.hitos && tabItem.hitos.some(el => el.includes('FINALIZADA')) && tabItem.hitos.length > 0 && (parseInt((tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0].split(':')[0])) * 60 + parseInt(tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0].split(':')[1])) - ((parseInt(tabItem.hitos[0].split(':')[0])) * 60 + parseInt(tabItem.hitos[0].split(':')[1]))}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={durRealT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={durReal} onChange={(e) => setDurReal(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.hitos && tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0)}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
-                <textarea className={`${styles.inputCell}`} value={cuartoPedido} onChange={(e) => setCuartoPedido(e.target.value)} />
-            </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.hitos && tabItem.hitos.filter(el => el.includes('FINALIZADA')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0)}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={cuartoPedidoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={cuartoPedido} onChange={(e) => setCuartoPedido(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.hitos && calculateCuartos(tabItem.hitos)}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={cuartoRealT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={cuartoReal} onChange={(e) => setCuartoReal(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.hitos && calculateCuartosOtros(tabItem.hitos)}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={cuartoRealOtrosT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={cuartoRealOtros} onChange={(e) => setCuartoRealOtros(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.finReal && audData.finReal}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.hitos && tabItem.hitos.some(el => el.includes('FINALIZADA')) && tabItem.hitos.find(el => el.includes('FINALIZADA')).split(' | ')[0]}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={dyhfinalizacionT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhfinalizacion} onChange={(e) => setDyhfinalizacion(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.horaResuelvo && tabItem.horaResuelvo}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={entregaResuelvoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={entregaResuelvo} onChange={(e) => setEntregaResuelvo(e.target.value)} />
+            </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
+                {audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0]}</td>
+            <td className={finalizadaMinutaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+                <textarea className={`${styles.inputCell}`} value={finalizadaMinuta} onChange={(e) => setFinalizadaMinuta(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.intervinientes && audData.intervinientes.filter(el => el.includes('IMPUTADO')).length}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.imputado && tabItem.imputado.length}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={cantImputadosT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={cantImputados} onChange={(e) => setCantImputados(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
+            <td className={tipoVictimaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} value={tipoVictima} onChange={(e) => setTipoVictima(e.target.value)} list='tipoVictima-list' />
                 <datalist id='tipoVictima-list'>
                     {desplegables && desplegables.tipoVictima.map(key => <option key={key} value={key} />)}
@@ -191,38 +293,40 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 {audData.sala && audData.sala}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.sala && tabItem.sala}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={salaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={sala} onChange={(e) => setSala(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.operador && audData.operador}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.operador && tabItem.operador}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={operadorT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={operador} onChange={(e) => setOperador(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
-                {audData.intervinientes && audData.intervinientes.find(el => el.includes('FISCAL'))}</td>
+                {audData.intervinientes && audData.intervinientes.find(el => el.includes('FISCAL')) && audData.intervinientes.find(el => el.includes('FISCAL')).split(': ')[1]}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.mpf && tabItem.mpf[0].nombre}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={fiscalT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={fiscal} onChange={(e) => setFiscal(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.intervinientes && audData.intervinientes.find(el => el.includes('DEFENSA'))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.defensa && tabItem.defensa[0].nombre}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={defensaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={defensa} onChange={(e) => setDefensa(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.juez && audData.juez}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.juez && tabItem.juez}</td>
-            <td className={tiposT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={juezT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={juez} onChange={(e) => setJuez(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
+            <td className={finAudienciaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+                {expandValue && <ShowTextOver text={('MINUTA:\n' + removeHtmlTags(tabItem.minuta) + '\nRESUELVO:\n' + removeHtmlTags(tabItem.resuelvoText))} setExpandValue={setExpandValue} />}
+                <button className={`${styles.buttonExpand}`} onClick={() => setExpandValue(true)}>+</button>
                 <input className={`${styles.inputCell}`} type='text' value={finAudiencia}
                     onChange={(e) => setFinAudiencia(e.target.value)}
                     list='finAudiencia-list' />
@@ -230,15 +334,15 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                     {desplegables && desplegables.finAudiencia.map(key => <option key={key} value={key} />)}
                 </datalist>
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
-                <input className={`${styles.inputCell}`} type='text' value={resolucion}
+            <td className={resolucionT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+                <input className={`${styles.inputCell}`} value={resolucion}
                     onChange={(e) => setResolucion(e.target.value)}
                     list='resolucion-list' />
                 <datalist id='resolucion-list'>
                     {desplegables && desplegables.resolucion.map(key => <option key={key} value={key} />)}
                 </datalist>
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
+            <td className={resultadoControlT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={resultadoControl}
                     onChange={(e) => setResultadoControl(e.target.value)}
                     list='resultadoControl-list' />
@@ -246,7 +350,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                     {desplegables && desplegables.resultadoControl.map(key => <option key={key} value={key} />)}
                 </datalist>
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
+            <td className={indicadorUgaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <input className={`${styles.inputCell}`} type='text' value={indicadorUga}
                     onChange={(e) => setIndicadorUga(e.target.value)}
                     list='indicadorUga-list' />
@@ -254,7 +358,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                     {desplegables && desplegables.indicadorUga.map(key => <option key={key} value={key} />)}
                 </datalist>
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
+            <td className={comentarioT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={comentario} onChange={(e) => setComentario(e.target.value)} />
             </td>
         </tr></>
