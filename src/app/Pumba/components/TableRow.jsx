@@ -13,12 +13,12 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
 
     const [legajo, setLegajo] = useState(audData.legajo || '')
     const [audTipo, setAudTipo] = useState(audData.audTipo || '')
-    const [ufi, setUfi] = useState(audData.ufi || '')
+    const [ufi, setUfi] = useState(tabItem.ufi || '')
     const [dyhsolicitud, setDyhsolicitud] = useState(audData.dyhsolicitud || '')
     const [dyhagendamiento, setDyhagendamiento] = useState(audData.dyhagendamiento || '')
-    const [dyhnotificacion, setDyhnotificacion] = useState(audData.dyhnotificacion || '')
-    const [dyhprogramada, setDyhprogramada] = useState((audData.dyhprogramada && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.dyhprogramada)) || '')
-    const [dyhreal, setDyhreal] = useState(audData.dyhreal && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.dyhreal) || '')
+    const [dyhnotificacion, setDyhnotificacion] = useState(audData.fechaNotificacion || '')
+    const [dyhprogramada, setDyhprogramada] = useState((audData.dyhprogramada && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.dyhprogramada)) || '')
+    const [dyhreal, setDyhreal] = useState(audData.dyhreal && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.dyhreal) || '')
     const [demora, setDemora] = useState(audData.demora || '')
     const [motivDemora, setMotivDemora] = useState(audData.motivDemora || '')
     const [observDemora, setObservDemora] = useState(audData.observDemora || '')
@@ -27,8 +27,8 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [cuartoPedido, setCuartoPedido] = useState(audData.cuartoPedido || '')
     const [cuartoReal, setCuartoReal] = useState(audData.cuartoReal || '')
     const [cuartoRealOtros, setCuartoRealOtros] = useState(audData.cuartoRealOtros || '')
-    const [dyhfinalizacion, setDyhfinalizacion] = useState(audData.dyhfinalizacion && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.dyhfinalizacion) || '')
-    const [entregaResuelvo, setEntregaResuelvo] = useState(audData.entregaResuelvo || '')
+    const [dyhfinalizacion, setDyhfinalizacion] = useState(audData.dyhfinalizacion && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal) || '')
+    const [entregaResuelvo, setEntregaResuelvo] = useState(tabItem.resuelvo || '')
     const [finalizadaMinuta, setFinalizadaMinuta] = useState(audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0] || '')
     const [cantImputados, setCantImputados] = useState(audData.cantImputados || '')
     const [tipoVictima, setTipoVictima] = useState(audData.tipoVictima || '')
@@ -53,8 +53,6 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [dyhprogramadaT, setDyhprogramadaT] = useState(true)
     const [dyhrealT, setDyhrealT] = useState(true)
     const [demoraT, setDemoraT] = useState(true)
-    const [motivDemoraT, setMotivDemoraT] = useState(true)
-    const [observDemoraT, setObservDemoraT] = useState(true)
     const [duracionProgramadaT, setDuracionProgramadaT] = useState(true)
     const [durRealT, setDurRealT] = useState(true)
     const [cuartoPedidoT, setCuartoPedidoT] = useState(true)
@@ -79,22 +77,20 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const autoFill = () => {
         legajo === '' && audData.numeroLeg && setLegajo(audData.numeroLeg)
         audTipo === '' && audData.tipo && setAudTipo(audData.tipo + (audData.tipo2 ? ' ' + audData.tipo2 : '') + (audData.tipo3 ? ' ' + audData.tipo3 : ''))
-        ufi === '' && audData.ufi && setUfi(audData.ufi)
+        ufi === '' && tabItem.ufi && setUfi(tabItem.ufi)
         dyhsolicitud === '' && audData.dyhsolicitud && setDyhsolicitud(audData.dyhsolicitud)
         dyhagendamiento === '' && audData.dyhagendamiento && setDyhagendamiento(audData.dyhagendamiento)
         dyhnotificacion === '' && audData.fechaNotificacion && setDyhnotificacion(audData.fechaNotificacion)
-        dyhprogramada === '' && audData.inicioProgramada && setDyhprogramada(dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.inicioProgramada)
-        dyhreal === '' && audData.inicioReal && setDyhreal(dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.inicioReal)
+        dyhprogramada === '' && (audData.inicioProgramada) && setDyhprogramada(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioProgramada)
+        dyhreal === '' && audData.inicioReal && setDyhreal(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioReal)
         demora === '' && audData.inicioReal && audData.inicioProgramada && setDemora((parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))
-        motivDemora === '' && audData.motivoDemora && setMotivDemora(audData.motivoDemora)
-        observDemora === '' && audData.observDemora && setObservDemora(audData.observDemora)
         duracionProgramada === '' && audData.inicioProgramada && audData.finProgramada && setDuracionProgramada((parseInt(audData.finProgramada.split(':')[0]) * 60 + parseInt(audData.finProgramada.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))
         durReal === '' && audData.finReal && audData.inicioReal && setDurReal(parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])))
         cuartoPedido === '' && tabItem.hitos && setCuartoPedido(tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0))
         cuartoReal === '' && tabItem.hitos && setCuartoReal(calculateCuartos(tabItem.hitos))
         cuartoRealOtros === '' && tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos))
-        dyhfinalizacion === '' && audData.finReal && setDyhfinalizacion(audData.finReal)
-        entregaResuelvo === '' && tabItem.horaResuelvo && setEntregaResuelvo(tabItem.horaResuelvo)
+        dyhfinalizacion === '' && audData.finReal && setDyhfinalizacion((dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal))
+        entregaResuelvo === '' && tabItem.horaResuelvo && setEntregaResuelvo(tabItem.resuelvo)
         finalizadaMinuta === '' && audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[0])
         cantImputados === '' && audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length)
         sala === '' && tabItem.sala && setSala(tabItem.sala)
@@ -107,47 +103,43 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const checkForDiff = () => {
         if (legajo !== tabItem.numeroLeg || legajo === '') setLegajoT(false)
         else setLegajoT(true)
-        if (audTipo !== tabItem.tipo + (tabItem.tipo2 ? ' ' + tabItem.tipo2 : '') + (tabItem.tipo3 ? ' ' + tabItem.tipo3 : '') || audTipo === '') setAudTipoT(false)
-        else setAudTipoT(true)
+        if (audTipo !== tabItem.tipo + (tabItem.tipo2 ? ' ' + tabItem.tipo2 : '') + (tabItem.tipo3 ? ' ' + tabItem.tipo3 : '') || audTipo === '') setTiposT(false)
+        else setTiposT(true)
         if (ufi !== tabItem.ufi || ufi === '') setUfiT(false)
         else setUfiT(true)
-        if (dyhsolicitud !== tabItem.dyhsolicitud || dyhsolicitud === '') setDyhsolicitudT(false)
+        if (dyhsolicitud !== audData.dyhsolicitud || dyhsolicitud === '') setDyhsolicitudT(false)
         else setDyhsolicitudT(true)
-        if (dyhagendamiento !== tabItem.dyhagendamiento || dyhagendamiento === '') setDyhagendamientoT(false)
+        if (dyhagendamiento !== audData.dyhagendamiento || dyhagendamiento === '') setDyhagendamientoT(false)
         else setDyhagendamientoT(true)
-        if (dyhnotificacion !== tabItem.dyhnotificacion || dyhnotificacion === '') setDyhnotificacionT(false)
+        if (dyhnotificacion !== audData.fechaNotificacion || dyhnotificacion === '') setDyhnotificacionT(false)
         else setDyhnotificacionT(true)
-        if (dyhprogramada !== tabItem.dyhprogramada || dyhprogramada === '') setDyhprogramadaT(false)
+        if (dyhprogramada !== (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioProgramada) || dyhprogramada === '') setDyhprogramadaT(false)
         else setDyhprogramadaT(true)
-        if (dyhreal !== tabItem.dyhreal || dyhreal === '') setDyhrealT(false)
+        if (dyhreal !== (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioReal) || dyhreal === '') setDyhrealT(false)
         else setDyhrealT(true)
-        if (demora !== tabItem.demora || demora === '') setDemoraT(false)
+        if ((demora - tabItem.demora > 5) || (demora - tabItem.demora < -5) || demora === '') setDemoraT(false)
         else setDemoraT(true)
-        if (motivDemora !== tabItem.motivDemora || motivDemora === '') setMotivDemoraT(false)
-        else setMotivDemoraT(true)
-        if (observDemora !== tabItem.observDemora || observDemora === '') setObservDemoraT(false)
-        else setObservDemoraT(true)
-        if (duracionProgramada !== tabItem.duracionProgramada || duracionProgramada === '') setDuracionProgramadaT(false)
+        if ((duracionProgramada - tabItem.duracionProgramada > 5) || (duracionProgramada - tabItem.duracionProgramada < -5) || duracionProgramada === '') setDuracionProgramadaT(false)
         else setDuracionProgramadaT(true)
-        if (durReal !== tabItem.durReal || durReal === '') setDurRealT(false)
+        if ((durReal - tabItem.durReal > 5) || (durReal - tabItem.durReal < -5) || durReal === '') setDurRealT(false)
         else setDurRealT(true)
-        if (cuartoPedido !== tabItem.cuartoPedido || cuartoPedido === '') setCuartoPedidoT(false)
+        if (cuartoPedido !== (tabItem.hitos && tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0)) || cuartoPedido === '') setCuartoPedidoT(false)
         else setCuartoPedidoT(true)
-        if (cuartoReal !== tabItem.cuartoReal || cuartoReal === '') setCuartoRealT(false)
+        if (cuartoReal !== (tabItem.hitos && calculateCuartos(tabItem.hitos)) || cuartoReal === '') setCuartoRealT(false)
         else setCuartoRealT(true)
-        if (cuartoRealOtros !== tabItem.cuartoRealOtros || cuartoRealOtros === '') setCuartoRealOtrosT(false)
+        if (cuartoRealOtros !== (tabItem.hitos && calculateCuartosOtros(tabItem.hitos)) || cuartoRealOtros === '') setCuartoRealOtrosT(false)
         else setCuartoRealOtrosT(true)
-        if (dyhfinalizacion !== tabItem.dyhfinalizacion || dyhfinalizacion === '') setDyhfinalizacionT(false)
+        if (dyhfinalizacion !== (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal) || dyhfinalizacion === '') setDyhfinalizacionT(false)
         else setDyhfinalizacionT(true)
-        if (entregaResuelvo !== tabItem.entregaResuelvo || entregaResuelvo === '') setEntregaResuelvoT(false)
+        if (entregaResuelvo !== tabItem.resuelvo || entregaResuelvo === '') setEntregaResuelvoT(false)
         else setEntregaResuelvoT(true)
-        if (cantImputados !== tabItem.cantImputados || cantImputados === '') setCantImputadosT(false)
+        if (cantImputados !== (tabItem.imputado && tabItem.imputado.length) || cantImputados === '') setCantImputadosT(false)
         else setCantImputadosT(true)
         if (tipoVictima !== tabItem.tipoVictima || tipoVictima === '') setTipoVictimaT(false)
         else setTipoVictimaT(true)
         if (sala !== tabItem.sala || sala === '') setSalaT(false)
         else setSalaT(true)
-        if (operador !== tabItem.operador || operador === '') setOperadorT(false)
+        if (operador === '') setOperadorT(false)
         else setOperadorT(true)
         if (fiscal !== tabItem.fiscal || fiscal === '') setFiscalT(false)
         else setFiscalT(true)
@@ -175,6 +167,9 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             setTabItem(found || {})
         }
     }, [bydate, audData])
+    useEffect(() => {
+        tabItem && checkForDiff()
+    }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, tabItem])
     return (
         <><tr className={`${styles.tableRow}`} key={index}>
             <td className={legajoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
@@ -204,12 +199,12 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             <td className={dyhnotificacionT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhnotificacion} onChange={(e) => setDyhnotificacion(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.inicioProgramada}</td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.inicioProgramada}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + (tabItem.hora || '')}</td>
             <td className={dyhprogramadaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhprogramada} onChange={(e) => setDyhprogramada(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{audData.inicioReal}</td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>{dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + audData.inicioReal}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>{tabItem.hitos && tabItem.hitos.length > 0 && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(3, 5) + '/' + dateToUse.slice(6, 10) + ' ' + tabItem.hitos[0].split(' | ')[0])}</td>
             <td className={dyhrealT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhreal} onChange={(e) => setDyhreal(e.target.value)} />
@@ -225,10 +220,10 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 {audData.motivoDemora}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
                 {tabItem.razonDemora}</td>
-            <td className={motivDemoraT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={`${styles.inputCell}`} value={motivDemora} onChange={(e) => setMotivDemora(e.target.value)} />
             </td>
-            <td className={observDemoraT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={`${styles.inputCell}`} value={observDemora} onChange={(e) => setObservDemora(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
@@ -267,8 +262,8 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             <td className={dyhfinalizacionT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={dyhfinalizacion} onChange={(e) => setDyhfinalizacion(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.horaResuelvo && tabItem.horaResuelvo}</td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
+                {tabItem.resuelvo && tabItem.resuelvo}</td>
             <td className={entregaResuelvoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={entregaResuelvo} onChange={(e) => setEntregaResuelvo(e.target.value)} />
             </td>
@@ -285,6 +280,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 <textarea className={`${styles.inputCell}`} value={cantImputados} onChange={(e) => setCantImputados(e.target.value)} />
             </td>
             <td className={tipoVictimaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+                <button className={`${styles.buttonExpand}`} onClick={() => setExpandValue(true)}>+</button>
                 <input className={`${styles.inputCell}`} value={tipoVictima} onChange={(e) => setTipoVictima(e.target.value)} list='tipoVictima-list' />
                 <datalist id='tipoVictima-list'>
                     {desplegables && desplegables.tipoVictima.map(key => <option key={key} value={key} />)}
@@ -325,7 +321,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 <textarea className={`${styles.inputCell}`} value={juez} onChange={(e) => setJuez(e.target.value)} />
             </td>
             <td className={finAudienciaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
-                {expandValue && <ShowTextOver text={('MINUTA:\n' + removeHtmlTags(tabItem.minuta) + '\nRESUELVO:\n' + removeHtmlTags(tabItem.resuelvoText))} setExpandValue={setExpandValue} />}
+                {expandValue && <ShowTextOver text={(tabItem.caratula + '\n\n' + 'MINUTA:\n' + removeHtmlTags(tabItem.minuta) + '\nRESUELVO:\n' + removeHtmlTags(tabItem.resuelvoText))} setExpandValue={setExpandValue} />}
                 <button className={`${styles.buttonExpand}`} onClick={() => setExpandValue(true)}>+</button>
                 <input className={`${styles.inputCell}`} type='text' value={finAudiencia}
                     onChange={(e) => setFinAudiencia(e.target.value)}

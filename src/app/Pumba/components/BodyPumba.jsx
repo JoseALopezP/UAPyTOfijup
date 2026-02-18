@@ -97,7 +97,7 @@ export default function BodyPumba({ dateToUse }) {
                     {pumaData && pumaData.filter(item => item.estado !== "CANCELADA"
                         && item.tipo !== "ANIVI" && item.tipo !== "DEBATE DEL JUICIO ORAL"
                         && item.tipo !== "PRESENTACIÓN"
-                        && item.tipo !== "FINALIZACIÓN").sort((a, b) => a.hora - b.hora).map((item, index) => (
+                        && item.tipo !== "FINALIZACIÓN").sort((a, b) => parseInt(a.inicioProgramada.split(':')[0]) * 60 + parseInt(a.inicioProgramada.split(':')[1]) - (parseInt(b.inicioProgramada.split(':')[0]) * 60 + parseInt(b.inicioProgramada.split(':')[1]))).map((item, index) => (
                             <TableRow key={index} audData={item} dateToUse={dateToUse} index={index} />
                         ))}
                 </tbody>

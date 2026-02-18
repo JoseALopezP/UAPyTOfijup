@@ -132,7 +132,7 @@
 }
 
 .cellBodyError {
-    background-color: tomato;
+    border: 1px solid tomato;
 }
 
 /* Sticky first column (Body) */
