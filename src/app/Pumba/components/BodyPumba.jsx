@@ -1,6 +1,6 @@
 'use client'
 import styles from '../Pumba.module.css'
-import { useState, useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { DataContext } from '@/context New/DataContext'
 import TableRow from './TableRow';
 
@@ -90,7 +90,6 @@ export default function BodyPumba({ dateToUse }) {
                         <th className={`${styles.tableHeaderTh} ${styles.tableHResultadosDeAudienciaControlDeAcusacion}`}>RESULTADOS DE AUDIENCIA CONTROL DE ACUSACIÓN</th>
                         <th className={`${styles.tableHeaderTh} ${styles.tableHIndicadorUga}`}>INDICADOR UGA</th>
                         <th className={`${styles.tableHeaderTh} ${styles.tableHComentario}`}>COMENTARIO</th>
-
                     </tr>
                 </thead>
                 <tbody>

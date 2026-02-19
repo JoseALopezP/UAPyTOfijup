@@ -35,6 +35,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [juiciosList, setJuiciosList] = useState(defaultValue)
     const [sorteoList, setSorteoList] = useState(defaultValue);
     const [pumaData, setPumaData] = useState(defaultValue);
+    const [UALData, setUALData] = useState(defaultValue);
 
     const updateByDate = async (date) => {
         try {
@@ -293,6 +294,25 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
+    const updateUALData = async (date) => {
+        try {
+            const data = await getDocument('informeUALData', date);
+            if (data) {
+                setUALData(data.audiencias || [])
+            } else {
+                setUALData([])
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const addUALData = async (date, pumaData) => {
+        try {
+            await addOrUpdateObject('informeUALData', date, 'audiencias', pumaData);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const updateRealTime = async () => {
         setRealTime(await updateRealTimeFunction());
     };
@@ -303,8 +323,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
-        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData,
-        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData
+        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
+        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData
     };
     return <Provider value={context}>{children}</Provider>;
 };

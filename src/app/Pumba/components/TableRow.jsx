@@ -7,41 +7,46 @@ import ShowTextOver from './ShowTextOver';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 
 export default function TableRow({ audData, dateToUse, autofillB, index }) {
-    const { bydate, desplegables, pumaData } = useContext(DataContext);
+    const { bydate, desplegables, updateUALData, addUALData, UALData } = useContext(DataContext);
     const [tabItem, setTabItem] = useState({})
+    const [toSave, setToSave] = useState(false)
+    const [doSave, setDoSAve] = useState(false)
 
+    const savedData = UALData && Array.isArray(UALData)
+        ? (UALData.find(item => item.numeroLeg === audData.numeroLeg && item.inicioProgramada === audData.inicioProgramada) || {})
+        : {};
 
-    const [legajo, setLegajo] = useState(audData.legajo || '')
-    const [audTipo, setAudTipo] = useState(audData.audTipo || '')
-    const [ufi, setUfi] = useState(tabItem.ufi || '')
-    const [dyhsolicitud, setDyhsolicitud] = useState(audData.dyhsolicitud || '')
-    const [dyhagendamiento, setDyhagendamiento] = useState(audData.dyhagendamiento || '')
-    const [dyhnotificacion, setDyhnotificacion] = useState(audData.fechaNotificacion || '')
-    const [dyhprogramada, setDyhprogramada] = useState((audData.dyhprogramada && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.dyhprogramada)) || '')
-    const [dyhreal, setDyhreal] = useState(audData.dyhreal && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.dyhreal) || '')
-    const [demora, setDemora] = useState(audData.demora || '')
-    const [motivDemora, setMotivDemora] = useState(audData.motivDemora || '')
-    const [observDemora, setObservDemora] = useState(audData.observDemora || '')
-    const [duracionProgramada, setDuracionProgramada] = useState(audData.duracionProgramada || '')
-    const [durReal, setDurReal] = useState(audData.durReal || '')
-    const [cuartoPedido, setCuartoPedido] = useState(audData.cuartoPedido || '')
-    const [cuartoReal, setCuartoReal] = useState(audData.cuartoReal || '')
-    const [cuartoRealOtros, setCuartoRealOtros] = useState(audData.cuartoRealOtros || '')
-    const [dyhfinalizacion, setDyhfinalizacion] = useState(audData.dyhfinalizacion && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal) || '')
-    const [entregaResuelvo, setEntregaResuelvo] = useState(tabItem.resuelvo || '')
-    const [finalizadaMinuta, setFinalizadaMinuta] = useState(audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0] || '')
-    const [cantImputados, setCantImputados] = useState(audData.cantImputados || '')
-    const [tipoVictima, setTipoVictima] = useState(audData.tipoVictima || '')
-    const [sala, setSala] = useState(audData.sala || '')
-    const [operador, setOperador] = useState(audData.operador || '')
-    const [fiscal, setFiscal] = useState(audData.fiscal || '')
-    const [defensa, setDefensa] = useState(audData.defensa || '')
-    const [juez, setJuez] = useState(audData.juez || '')
-    const [finAudiencia, setFinAudiencia] = useState(audData.finAudiencia || '')
-    const [resolucion, setResolucion] = useState(audData.resolucion || '')
-    const [resultadoControl, setResultadoControl] = useState(audData.resultadoControl || '')
-    const [indicadorUga, setIndicadorUga] = useState(audData.indicadorUga || '')
-    const [comentario, setComentario] = useState(audData.comentario || '')
+    const [legajo, setLegajo] = useState(savedData.legajo || audData.legajo || '')
+    const [audTipo, setAudTipo] = useState(savedData.audTipo || audData.audTipo || '')
+    const [ufi, setUfi] = useState(savedData.ufi || '')
+    const [dyhsolicitud, setDyhsolicitud] = useState(savedData.dyhsolicitud || audData.dyhsolicitud || '')
+    const [dyhagendamiento, setDyhagendamiento] = useState(savedData.dyhagendamiento || audData.dyhagendamiento || '')
+    const [dyhnotificacion, setDyhnotificacion] = useState(savedData.dyhnotificacion || audData.fechaNotificacion || '')
+    const [dyhprogramada, setDyhprogramada] = useState(savedData.dyhprogramada || (audData.dyhprogramada && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.dyhprogramada)) || '')
+    const [dyhreal, setDyhreal] = useState(savedData.dyhreal || (audData.dyhreal && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.dyhreal)) || '')
+    const [demora, setDemora] = useState(savedData.demora !== undefined && savedData.demora !== '' ? savedData.demora : (audData.demora || ''))
+    const [motivDemora, setMotivDemora] = useState(savedData.motivDemora || audData.motivDemora || '')
+    const [observDemora, setObservDemora] = useState(savedData.observDemora || audData.observDemora || '')
+    const [duracionProgramada, setDuracionProgramada] = useState(savedData.duracionProgramada !== undefined && savedData.duracionProgramada !== '' ? savedData.duracionProgramada : (audData.duracionProgramada || ''))
+    const [durReal, setDurReal] = useState(savedData.durReal !== undefined && savedData.durReal !== '' ? savedData.durReal : (audData.durReal || ''))
+    const [cuartoPedido, setCuartoPedido] = useState(savedData.cuartoPedido !== undefined && savedData.cuartoPedido !== '' ? savedData.cuartoPedido : (audData.cuartoPedido || ''))
+    const [cuartoReal, setCuartoReal] = useState(savedData.cuartoReal !== undefined && savedData.cuartoReal !== '' ? savedData.cuartoReal : (audData.cuartoReal || ''))
+    const [cuartoRealOtros, setCuartoRealOtros] = useState(savedData.cuartoRealOtros !== undefined && savedData.cuartoRealOtros !== '' ? savedData.cuartoRealOtros : (audData.cuartoRealOtros || ''))
+    const [dyhfinalizacion, setDyhfinalizacion] = useState(savedData.dyhfinalizacion || (audData.dyhfinalizacion && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal)) || '')
+    const [entregaResuelvo, setEntregaResuelvo] = useState(savedData.entregaResuelvo || '')
+    const [finalizadaMinuta, setFinalizadaMinuta] = useState(savedData.finalizadaMinuta || (audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0]) || '')
+    const [cantImputados, setCantImputados] = useState(savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? savedData.cantImputados : (audData.cantImputados || ''))
+    const [tipoVictima, setTipoVictima] = useState(savedData.tipoVictima || audData.tipoVictima || '')
+    const [sala, setSala] = useState(savedData.sala || audData.sala || '')
+    const [operador, setOperador] = useState(savedData.operador || audData.operador || '')
+    const [fiscal, setFiscal] = useState(savedData.fiscal || audData.fiscal || '')
+    const [defensa, setDefensa] = useState(savedData.defensa || audData.defensa || '')
+    const [juez, setJuez] = useState(savedData.juez || audData.juez || '')
+    const [finAudiencia, setFinAudiencia] = useState(savedData.finAudiencia || audData.finAudiencia || '')
+    const [resolucion, setResolucion] = useState(savedData.resolucion || audData.resolucion || '')
+    const [resultadoControl, setResultadoControl] = useState(savedData.resultadoControl || audData.resultadoControl || '')
+    const [indicadorUga, setIndicadorUga] = useState(savedData.indicadorUga || audData.indicadorUga || '')
+    const [comentario, setComentario] = useState(savedData.comentario || audData.comentario || '')
     const [expandValue, setExpandValue] = useState(false)
 
     const [legajoT, setLegajoT] = useState(true)
@@ -71,34 +76,32 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [finAudienciaT, setFinAudienciaT] = useState(true)
     const [resolucionT, setResolucionT] = useState(true)
     const [resultadoControlT, setResultadoControlT] = useState(true)
-    const [indicadorUgaT, setIndicadorUgaT] = useState(true)
-    const [comentarioT, setComentarioT] = useState(true)
 
     const autoFill = () => {
-        legajo === '' && audData.numeroLeg && setLegajo(audData.numeroLeg)
-        audTipo === '' && audData.tipo && setAudTipo(audData.tipo + (audData.tipo2 ? ' ' + audData.tipo2 : '') + (audData.tipo3 ? ' ' + audData.tipo3 : ''))
-        ufi === '' && tabItem.ufi && setUfi(tabItem.ufi)
-        dyhsolicitud === '' && audData.dyhsolicitud && setDyhsolicitud(audData.dyhsolicitud)
-        dyhagendamiento === '' && audData.dyhagendamiento && setDyhagendamiento(audData.dyhagendamiento)
-        dyhnotificacion === '' && audData.fechaNotificacion && setDyhnotificacion(audData.fechaNotificacion)
-        dyhprogramada === '' && (audData.inicioProgramada) && setDyhprogramada(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioProgramada)
-        dyhreal === '' && audData.inicioReal && setDyhreal(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioReal)
-        demora === '' && audData.inicioReal && audData.inicioProgramada && setDemora((parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))
-        duracionProgramada === '' && audData.inicioProgramada && audData.finProgramada && setDuracionProgramada((parseInt(audData.finProgramada.split(':')[0]) * 60 + parseInt(audData.finProgramada.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1])))
-        durReal === '' && audData.finReal && audData.inicioReal && setDurReal(parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])))
-        cuartoPedido === '' && tabItem.hitos && setCuartoPedido(tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0))
-        cuartoReal === '' && tabItem.hitos && setCuartoReal(calculateCuartos(tabItem.hitos))
-        cuartoRealOtros === '' && tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos))
-        dyhfinalizacion === '' && audData.finReal && setDyhfinalizacion((dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal))
-        entregaResuelvo === '' && tabItem.horaResuelvo && setEntregaResuelvo(tabItem.resuelvo)
-        finalizadaMinuta === '' && audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[0])
-        cantImputados === '' && audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length)
-        sala === '' && tabItem.sala && setSala(tabItem.sala)
-        operador === '' && tabItem.operador && setOperador(tabItem.operador)
-        fiscal === '' && tabItem.mpf && setFiscal(tabItem.mpf[0].nombre)
-        defensa === '' && tabItem.defensa && setDefensa(tabItem.defensa[0].nombre)
-        juez === '' && tabItem.juez && setJuez(tabItem.juez)
-        finAudiencia === '' && audData.finAudiencia && setFinAudiencia(audData.finAudiencia)
+        legajo === '' && (savedData.legajo ? setLegajo(savedData.legajo) : audData.numeroLeg && setLegajo(audData.numeroLeg))
+        audTipo === '' && (savedData.audTipo ? setAudTipo(savedData.audTipo) : audData.tipo && setAudTipo(audData.tipo + (audData.tipo2 ? ' ' + audData.tipo2 : '') + (audData.tipo3 ? ' ' + audData.tipo3 : '')))
+        ufi === '' && (savedData.ufi ? setUfi(savedData.ufi) : tabItem.ufi && setUfi(tabItem.ufi))
+        dyhsolicitud === '' && (savedData.dyhsolicitud ? setDyhsolicitud(savedData.dyhsolicitud) : audData.dyhsolicitud && setDyhsolicitud(audData.dyhsolicitud))
+        dyhagendamiento === '' && (savedData.dyhagendamiento ? setDyhagendamiento(savedData.dyhagendamiento) : audData.dyhagendamiento && setDyhagendamiento(audData.dyhagendamiento))
+        dyhnotificacion === '' && (savedData.dyhnotificacion ? setDyhnotificacion(savedData.dyhnotificacion) : audData.fechaNotificacion && setDyhnotificacion(audData.fechaNotificacion))
+        dyhprogramada === '' && (savedData.dyhprogramada ? setDyhprogramada(savedData.dyhprogramada) : audData.inicioProgramada && setDyhprogramada(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioProgramada))
+        dyhreal === '' && (savedData.dyhreal ? setDyhreal(savedData.dyhreal) : audData.inicioReal && setDyhreal(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioReal))
+        demora === '' && (savedData.demora !== undefined && savedData.demora !== '' ? setDemora(savedData.demora) : audData.inicioReal && audData.inicioProgramada && setDemora((parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1]))))
+        duracionProgramada === '' && (savedData.duracionProgramada !== undefined && savedData.duracionProgramada !== '' ? setDuracionProgramada(savedData.duracionProgramada) : audData.inicioProgramada && audData.finProgramada && setDuracionProgramada((parseInt(audData.finProgramada.split(':')[0]) * 60 + parseInt(audData.finProgramada.split(':')[1])) - (parseInt(audData.inicioProgramada.split(':')[0]) * 60 + parseInt(audData.inicioProgramada.split(':')[1]))))
+        durReal === '' && (savedData.durReal !== undefined && savedData.durReal !== '' ? setDurReal(savedData.durReal) : audData.finReal && audData.inicioReal && setDurReal(parseInt(audData.finReal.split(':')[0]) * 60 + parseInt(audData.finReal.split(':')[1]) - (parseInt(audData.inicioReal.split(':')[0]) * 60 + parseInt(audData.inicioReal.split(':')[1]))))
+        cuartoPedido === '' && (savedData.cuartoPedido !== undefined && savedData.cuartoPedido !== '' ? setCuartoPedido(savedData.cuartoPedido) : tabItem.hitos && setCuartoPedido(tabItem.hitos.filter(el => el.includes('CUARTO_INTERMEDIO')).reduce((acc, el) => acc + parseInt(el.split(' | ')[2] || 0), 0)))
+        cuartoReal === '' && (savedData.cuartoReal !== undefined && savedData.cuartoReal !== '' ? setCuartoReal(savedData.cuartoReal) : tabItem.hitos && setCuartoReal(calculateCuartos(tabItem.hitos)))
+        cuartoRealOtros === '' && (savedData.cuartoRealOtros !== undefined && savedData.cuartoRealOtros !== '' ? setCuartoRealOtros(savedData.cuartoRealOtros) : tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos)))
+        dyhfinalizacion === '' && (savedData.dyhfinalizacion ? setDyhfinalizacion(savedData.dyhfinalizacion) : audData.finReal && setDyhfinalizacion(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal))
+        entregaResuelvo === '' && (savedData.entregaResuelvo ? setEntregaResuelvo(savedData.entregaResuelvo) : tabItem.horaResuelvo && setEntregaResuelvo(tabItem.resuelvo))
+        finalizadaMinuta === '' && (savedData.finalizadaMinuta ? setFinalizadaMinuta(savedData.finalizadaMinuta) : audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[0]))
+        cantImputados === '' && (savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? setCantImputados(savedData.cantImputados) : audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length))
+        sala === '' && (savedData.sala ? setSala(savedData.sala) : tabItem.sala && setSala(tabItem.sala))
+        operador === '' && (savedData.operador ? setOperador(savedData.operador) : tabItem.operador && setOperador(tabItem.operador))
+        fiscal === '' && (savedData.fiscal ? setFiscal(savedData.fiscal) : tabItem.mpf && setFiscal(tabItem.mpf[0].nombre))
+        defensa === '' && (savedData.defensa ? setDefensa(savedData.defensa) : tabItem.defensa && setDefensa(tabItem.defensa[0].nombre))
+        juez === '' && (savedData.juez ? setJuez(savedData.juez) : tabItem.juez && setJuez(tabItem.juez))
+        finAudiencia === '' && (savedData.finAudiencia ? setFinAudiencia(savedData.finAudiencia) : audData.finAudiencia && setFinAudiencia(audData.finAudiencia))
     }
     const checkForDiff = () => {
         if (legajo !== tabItem.numeroLeg || legajo === '') setLegajoT(false)
@@ -141,11 +144,11 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
         else setSalaT(true)
         if (operador === '') setOperadorT(false)
         else setOperadorT(true)
-        if (fiscal !== tabItem.fiscal || fiscal === '') setFiscalT(false)
+        if (fiscal === '') setFiscalT(false)
         else setFiscalT(true)
-        if (defensa !== tabItem.defensa || defensa === '') setDefensaT(false)
+        if (defensa === '') setDefensaT(false)
         else setDefensaT(true)
-        if (juez !== tabItem.juez || juez === '') setJuezT(false)
+        if (juez === '') setJuezT(false)
         else setJuezT(true)
         if (finAudiencia !== tabItem.finAudiencia || finAudiencia === '') setFinAudienciaT(false)
         else setFinAudienciaT(true)
@@ -153,14 +156,46 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
         else setResolucionT(true)
         if (resultadoControl !== tabItem.resultadoControl || resultadoControl === '') setResultadoControlT(false)
         else setResultadoControlT(true)
-        if (indicadorUga !== tabItem.indicadorUga || indicadorUga === '') setIndicadorUgaT(false)
-        else setIndicadorUgaT(true)
-        if (comentario !== tabItem.comentario || comentario === '') setComentarioT(false)
-        else setComentarioT(true)
+    }
+    const checkChanges = () => {
+        const hasChanges = (
+            legajo !== (savedData.legajo || '') ||
+            audTipo !== (savedData.audTipo || '') ||
+            ufi !== (savedData.ufi || '') ||
+            dyhsolicitud !== (savedData.dyhsolicitud || '') ||
+            dyhagendamiento !== (savedData.dyhagendamiento || '') ||
+            dyhnotificacion !== (savedData.dyhnotificacion || '') ||
+            dyhprogramada !== (savedData.dyhprogramada || '') ||
+            dyhreal !== (savedData.dyhreal || '') ||
+            String(demora) !== String(savedData.demora ?? '') ||
+            motivDemora !== (savedData.motivDemora || '') ||
+            observDemora !== (savedData.observDemora || '') ||
+            String(duracionProgramada) !== String(savedData.duracionProgramada ?? '') ||
+            String(durReal) !== String(savedData.durReal ?? '') ||
+            String(cuartoPedido) !== String(savedData.cuartoPedido ?? '') ||
+            String(cuartoReal) !== String(savedData.cuartoReal ?? '') ||
+            String(cuartoRealOtros) !== String(savedData.cuartoRealOtros ?? '') ||
+            dyhfinalizacion !== (savedData.dyhfinalizacion || '') ||
+            entregaResuelvo !== (savedData.entregaResuelvo || '') ||
+            finalizadaMinuta !== (savedData.finalizadaMinuta || '') ||
+            String(cantImputados) !== String(savedData.cantImputados ?? '') ||
+            tipoVictima !== (savedData.tipoVictima || '') ||
+            sala !== (savedData.sala || '') ||
+            operador !== (savedData.operador || '') ||
+            fiscal !== (savedData.fiscal || '') ||
+            defensa !== (savedData.defensa || '') ||
+            juez !== (savedData.juez || '') ||
+            finAudiencia !== (savedData.finAudiencia || '') ||
+            resolucion !== (savedData.resolucion || '') ||
+            resultadoControl !== (savedData.resultadoControl || '') ||
+            indicadorUga !== (savedData.indicadorUga || '') ||
+            comentario !== (savedData.comentario || '')
+        )
+        setToSave(hasChanges)
     }
     useEffect(() => {
         autoFill()
-    }, [autofillB, tabItem])
+    }, [autofillB, tabItem, UALData])
     useEffect(() => {
         if (bydate && Array.isArray(bydate)) {
             const found = bydate.find((item) => (item.numeroLeg === audData.numeroLeg && item.hora === audData.inicioProgramada));
@@ -170,6 +205,27 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     useEffect(() => {
         tabItem && checkForDiff()
     }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, tabItem])
+    useEffect(() => {
+        checkChanges()
+    }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, motivDemora, observDemora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, finalizadaMinuta, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, savedData])
+    useEffect(() => {
+        if (doSave) {
+            const key = `${audData.numeroLeg}_${audData.inicioProgramada}`
+            const dataToSave = {
+                numeroLeg: audData.numeroLeg,
+                inicioProgramada: audData.inicioProgramada,
+                legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion,
+                dyhprogramada, dyhreal, demora, motivDemora, observDemora,
+                duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros,
+                dyhfinalizacion, entregaResuelvo, finalizadaMinuta, cantImputados,
+                tipoVictima, sala, operador, fiscal, defensa, juez,
+                finAudiencia, resolucion, resultadoControl, indicadorUga, comentario
+            }
+            addUALData(dateToUse, { [key]: dataToSave })
+            setDoSAve(false)
+            setToSave(false)
+        }
+    }, [doSave])
     return (
         <><tr className={`${styles.tableRow}`} key={index}>
             <td className={legajoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
@@ -346,7 +402,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                     {desplegables && desplegables.resultadoControl.map(key => <option key={key} value={key} />)}
                 </datalist>
             </td>
-            <td className={indicadorUgaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <input className={`${styles.inputCell}`} type='text' value={indicadorUga}
                     onChange={(e) => setIndicadorUga(e.target.value)}
                     list='indicadorUga-list' />
@@ -354,7 +410,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                     {desplegables && desplegables.indicadorUga.map(key => <option key={key} value={key} />)}
                 </datalist>
             </td>
-            <td className={comentarioT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={`${styles.inputCell}`} value={comentario} onChange={(e) => setComentario(e.target.value)} />
             </td>
         </tr></>
