@@ -195,7 +195,7 @@ textarea.inputCell {
     font-family: inherit;
     cursor: pointer;
     background-color: aliceblue;
-    z-index: 9;
+    z-index: 4;
 }
 
 .expandBlock {
@@ -241,4 +241,22 @@ textarea.inputCell {
     justify-content: center;
     align-items: center;
 
+}
+
+.linksWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    height: 100%;
+    width: 100%;
+}
+
+.linkTag {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
 }

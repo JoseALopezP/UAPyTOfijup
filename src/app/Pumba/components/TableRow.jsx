@@ -93,7 +93,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
         cuartoReal === '' && (savedData.cuartoReal !== undefined && savedData.cuartoReal !== '' ? setCuartoReal(savedData.cuartoReal) : tabItem.hitos && setCuartoReal(calculateCuartos(tabItem.hitos)))
         cuartoRealOtros === '' && (savedData.cuartoRealOtros !== undefined && savedData.cuartoRealOtros !== '' ? setCuartoRealOtros(savedData.cuartoRealOtros) : tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos)))
         dyhfinalizacion === '' && (savedData.dyhfinalizacion ? setDyhfinalizacion(savedData.dyhfinalizacion) : audData.finReal && setDyhfinalizacion(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal))
-        entregaResuelvo === '' && (savedData.entregaResuelvo ? setEntregaResuelvo(savedData.entregaResuelvo) : tabItem.horaResuelvo && setEntregaResuelvo(tabItem.resuelvo))
+        entregaResuelvo === '' && (savedData.entregaResuelvo ? setEntregaResuelvo(savedData.entregaResuelvo) : tabItem.resuelvo && setEntregaResuelvo(tabItem.resuelvo))
         finalizadaMinuta === '' && (savedData.finalizadaMinuta ? setFinalizadaMinuta(savedData.finalizadaMinuta) : audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[0]))
         cantImputados === '' && (savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? setCantImputados(savedData.cantImputados) : audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length))
         sala === '' && (savedData.sala ? setSala(savedData.sala) : tabItem.sala && setSala(tabItem.sala))
@@ -412,6 +412,13 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={`${styles.inputCell}`} value={comentario} onChange={(e) => setComentario(e.target.value)} />
+            </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
+                <div className={styles.linksWrapper}>
+                    <a href={audData.linkAudiencia} className={`${styles.linkTag}`} target='_blank'>audiencia</a>
+                    <a href={audData.linkVideo} className={`${styles.linkTag}`} target='_blank'>video</a>
+                    <a href={audData.linkMinuta} className={`${styles.linkTag}`} target='_blank'>minuta</a>
+                </div>
             </td>
         </tr></>
     )

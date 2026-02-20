@@ -90,6 +90,7 @@ export default function BodyPumba({ dateToUse }) {
                         <th className={`${styles.tableHeaderTh} ${styles.tableHResultadosDeAudienciaControlDeAcusacion}`}>RESULTADOS DE AUDIENCIA CONTROL DE ACUSACIÓN</th>
                         <th className={`${styles.tableHeaderTh} ${styles.tableHIndicadorUga}`}>INDICADOR UGA</th>
                         <th className={`${styles.tableHeaderTh} ${styles.tableHComentario}`}>COMENTARIO</th>
+                        <th className={`${styles.tableHeaderTh} ${styles.tableHComentario}`}>LINKS</th>
                     </tr>
                 </thead>
                 <tbody>
