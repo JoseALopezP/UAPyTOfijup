@@ -75,7 +75,7 @@ export default function BodyPumba({ dateToUse }) {
                 saved.legajo || audData.numeroLeg || '',
                 '',
                 saved.audTipo || (audData.tipo + (audData.tipo2 ? ' ' + audData.tipo2 : '') + (audData.tipo3 ? ' ' + audData.tipo3 : '')) || '',
-                saved.ufi && saved || tabItem.ufi || '',
+                saved.ufi && saved.ufi || tabItem.ufi || '',
                 saved.dyhsolicitud || audData.dyhsolicitud || '',
                 saved.dyhagendamiento || audData.dyhagendamiento || '',
                 calculateDiffHHMMSS(saved.dyhsolicitud || audData.dyhsolicitud || '', saved.dyhagendamiento || audData.dyhagendamiento || ''),
