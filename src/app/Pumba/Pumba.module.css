@@ -260,3 +260,26 @@ textarea.inputCell {
     font-size: 16px;
     cursor: pointer;
 }
+
+.saveButtonContainer {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.saveButton {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.tableRowCompleted {
+    opacity: 0.3;
+}

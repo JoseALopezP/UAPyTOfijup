@@ -16,6 +16,7 @@ import addObjectToDocument from "@/firebase new/firestore/addObjectToDocument";
 import { yearFunction } from "@/utils/dateUtils";
 import { updateInternalFieldJuicio } from "@/firebase new/firestore/updateInternalFieldJuicio";
 import replaceDocument from "@/firebase new/firestore/replaceDocument";
+import { updateInternalUALData } from "@/firebase new/firestore/updateInternalUALData";
 
 export const DataContext = createContext({});
 
@@ -297,8 +298,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const updateUALData = async (date) => {
         try {
             const data = await getDocument('informeUALData', date);
-            if (data) {
-                setUALData(data.audiencias || [])
+            if (data && data.audiencias) {
+                setUALData(Object.values(data.audiencias))
             } else {
                 setUALData([])
             }
@@ -306,9 +307,22 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
-    const addUALData = async (date, pumaData) => {
+    const addUALData = async (date, rowKey, data) => {
         try {
-            await addOrUpdateObject('informeUALData', date, 'audiencias', pumaData);
+            await updateInternalUALData(date, rowKey, data);
+            setUALData(prev => {
+                const newData = [...prev];
+                const index = newData.findIndex(item =>
+                    item.numeroLeg === data.numeroLeg &&
+                    item.inicioProgramada === data.inicioProgramada
+                );
+                if (index !== -1) {
+                    newData[index] = data;
+                } else {
+                    newData.push(data);
+                }
+                return newData;
+            });
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }

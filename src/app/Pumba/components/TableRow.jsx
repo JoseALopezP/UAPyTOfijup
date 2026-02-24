@@ -1,16 +1,31 @@
 'use client'
 import styles from '../Pumba.module.css'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useRef } from 'react'
 import { DataContext } from '@/context New/DataContext';
 import { calculateCuartos, calculateCuartosOtros } from '@/utils/calculators';
 import ShowTextOver from './ShowTextOver';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 
-export default function TableRow({ audData, dateToUse, autofillB, index }) {
+export default function TableRow({ audData, dateToUse, autofillB, index, onStatusChange, forceSave }) {
     const { bydate, desplegables, updateUALData, addUALData, UALData } = useContext(DataContext);
     const [tabItem, setTabItem] = useState({})
     const [toSave, setToSave] = useState(false)
     const [doSave, setDoSAve] = useState(false)
+    const hasInitialSync = useRef(false)
+
+    const rowKey = `${audData.numeroLeg}_${audData.inicioProgramada}`;
+
+    useEffect(() => {
+        if (onStatusChange) {
+            onStatusChange(rowKey, toSave);
+        }
+    }, [toSave, rowKey]);
+
+    useEffect(() => {
+        if (forceSave && toSave) {
+            setDoSAve(true);
+        }
+    }, [forceSave, toSave]);
 
     const savedData = UALData && Array.isArray(UALData)
         ? (UALData.find(item => item.numeroLeg === audData.numeroLeg && item.inicioProgramada === audData.inicioProgramada) || {})
@@ -34,7 +49,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [cuartoRealOtros, setCuartoRealOtros] = useState(savedData.cuartoRealOtros !== undefined && savedData.cuartoRealOtros !== '' ? savedData.cuartoRealOtros : (audData.cuartoRealOtros || ''))
     const [dyhfinalizacion, setDyhfinalizacion] = useState(savedData.dyhfinalizacion || (audData.dyhfinalizacion && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal)) || '')
     const [entregaResuelvo, setEntregaResuelvo] = useState(savedData.entregaResuelvo || '')
-    const [finalizadaMinuta, setFinalizadaMinuta] = useState(savedData.finalizadaMinuta || (audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0]) || '')
+    const [finalizadaMinuta, setFinalizadaMinuta] = useState(savedData.finalizadaMinuta || (audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[1]) || '')
     const [cantImputados, setCantImputados] = useState(savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? savedData.cantImputados : (audData.cantImputados || ''))
     const [tipoVictima, setTipoVictima] = useState(savedData.tipoVictima || audData.tipoVictima || '')
     const [sala, setSala] = useState(savedData.sala || audData.sala || '')
@@ -47,6 +62,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     const [resultadoControl, setResultadoControl] = useState(savedData.resultadoControl || audData.resultadoControl || '')
     const [indicadorUga, setIndicadorUga] = useState(savedData.indicadorUga || audData.indicadorUga || '')
     const [comentario, setComentario] = useState(savedData.comentario || audData.comentario || '')
+    const [completado, setCompletado] = useState(savedData.completado || false)
     const [expandValue, setExpandValue] = useState(false)
 
     const [legajoT, setLegajoT] = useState(true)
@@ -94,7 +110,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
         cuartoRealOtros === '' && (savedData.cuartoRealOtros !== undefined && savedData.cuartoRealOtros !== '' ? setCuartoRealOtros(savedData.cuartoRealOtros) : tabItem.hitos && setCuartoRealOtros(calculateCuartosOtros(tabItem.hitos)))
         dyhfinalizacion === '' && (savedData.dyhfinalizacion ? setDyhfinalizacion(savedData.dyhfinalizacion) : audData.finReal && setDyhfinalizacion(dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal))
         entregaResuelvo === '' && (savedData.entregaResuelvo ? setEntregaResuelvo(savedData.entregaResuelvo) : tabItem.resuelvo && setEntregaResuelvo(tabItem.resuelvo))
-        finalizadaMinuta === '' && (savedData.finalizadaMinuta ? setFinalizadaMinuta(savedData.finalizadaMinuta) : audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[0]))
+        finalizadaMinuta === '' && (savedData.finalizadaMinuta ? setFinalizadaMinuta(savedData.finalizadaMinuta) : audData.finalizadaMinuta && setFinalizadaMinuta(audData.finalizadaMinuta.split(' ')[1]))
         cantImputados === '' && (savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? setCantImputados(savedData.cantImputados) : audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length))
         sala === '' && (savedData.sala ? setSala(savedData.sala) : tabItem.sala && setSala(tabItem.sala))
         operador === '' && (savedData.operador ? setOperador(savedData.operador) : tabItem.operador && setOperador(tabItem.operador))
@@ -189,9 +205,12 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             resolucion !== (savedData.resolucion || '') ||
             resultadoControl !== (savedData.resultadoControl || '') ||
             indicadorUga !== (savedData.indicadorUga || '') ||
-            comentario !== (savedData.comentario || '')
+            comentario !== (savedData.comentario || '') ||
+            completado !== (savedData.completado || false)
         )
-        setToSave(hasChanges)
+        if (hasInitialSync.current) {
+            setToSave(hasChanges)
+        }
     }
     useEffect(() => {
         autoFill()
@@ -204,30 +223,74 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
     }, [bydate, audData])
     useEffect(() => {
         tabItem && checkForDiff()
-    }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, tabItem])
+    }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, completado, tabItem])
+    useEffect(() => {
+        if (savedData && Object.keys(savedData).length > 0) {
+            setLegajo(savedData.legajo || '')
+            setAudTipo(savedData.audTipo || '')
+            setUfi(savedData.ufi || '')
+            setDyhsolicitud(savedData.dyhsolicitud || '')
+            setDyhagendamiento(savedData.dyhagendamiento || '')
+            setDyhnotificacion(savedData.dyhnotificacion || '')
+            setDyhprogramada(savedData.dyhprogramada || '')
+            setDyhreal(savedData.dyhreal || '')
+            setDemora(savedData.demora !== undefined && savedData.demora !== '' ? savedData.demora : '')
+            setMotivDemora(savedData.motivDemora || '')
+            setObservDemora(savedData.observDemora || '')
+            setDuracionProgramada(savedData.duracionProgramada !== undefined && savedData.duracionProgramada !== '' ? savedData.duracionProgramada : '')
+            setDurReal(savedData.durReal !== undefined && savedData.durReal !== '' ? savedData.durReal : '')
+            setCuartoPedido(savedData.cuartoPedido !== undefined && savedData.cuartoPedido !== '' ? savedData.cuartoPedido : '')
+            setCuartoReal(savedData.cuartoReal !== undefined && savedData.cuartoReal !== '' ? savedData.cuartoReal : '')
+            setCuartoRealOtros(savedData.cuartoRealOtros !== undefined && savedData.cuartoRealOtros !== '' ? savedData.cuartoRealOtros : '')
+            setDyhfinalizacion(savedData.dyhfinalizacion || '')
+            setEntregaResuelvo(savedData.entregaResuelvo || '')
+            setFinalizadaMinuta(savedData.finalizadaMinuta || '')
+            setCantImputados(savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? savedData.cantImputados : '')
+            setTipoVictima(savedData.tipoVictima || '')
+            setSala(savedData.sala || '')
+            setOperador(savedData.operador || '')
+            setFiscal(savedData.fiscal || '')
+            setDefensa(savedData.defensa || '')
+            setJuez(savedData.juez || '')
+            setFinAudiencia(savedData.finAudiencia || '')
+            setResolucion(savedData.resolucion || '')
+            setResultadoControl(savedData.resultadoControl || '')
+            setIndicadorUga(savedData.indicadorUga || '')
+            setComentario(savedData.comentario || '')
+            setCompletado(savedData.completado || false)
+
+            hasInitialSync.current = true;
+        } else if (UALData && Array.isArray(UALData)) {
+            // UALData is loaded but this row is not in it (empty day or new row)
+            hasInitialSync.current = true;
+        }
+    }, [savedData, UALData])
     useEffect(() => {
         checkChanges()
-    }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, motivDemora, observDemora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, finalizadaMinuta, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, savedData])
+    }, [legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion, dyhprogramada, dyhreal, demora, motivDemora, observDemora, duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros, dyhfinalizacion, entregaResuelvo, finalizadaMinuta, cantImputados, tipoVictima, sala, operador, fiscal, defensa, juez, finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, completado, savedData])
     useEffect(() => {
-        if (doSave) {
-            const key = `${audData.numeroLeg}_${audData.inicioProgramada}`
-            const dataToSave = {
-                numeroLeg: audData.numeroLeg,
-                inicioProgramada: audData.inicioProgramada,
-                legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion,
-                dyhprogramada, dyhreal, demora, motivDemora, observDemora,
-                duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros,
-                dyhfinalizacion, entregaResuelvo, finalizadaMinuta, cantImputados,
-                tipoVictima, sala, operador, fiscal, defensa, juez,
-                finAudiencia, resolucion, resultadoControl, indicadorUga, comentario
+        const saveRow = async () => {
+            if (doSave) {
+                const key = `${audData.numeroLeg}_${audData.inicioProgramada}`
+                const dataToSave = {
+                    numeroLeg: audData.numeroLeg,
+                    inicioProgramada: audData.inicioProgramada,
+                    legajo, audTipo, ufi, dyhsolicitud, dyhagendamiento, dyhnotificacion,
+                    dyhprogramada, dyhreal, demora, motivDemora, observDemora,
+                    duracionProgramada, durReal, cuartoPedido, cuartoReal, cuartoRealOtros,
+                    dyhfinalizacion, entregaResuelvo, finalizadaMinuta, cantImputados,
+                    tipoVictima, sala, operador, fiscal, defensa, juez,
+                    finAudiencia, resolucion, resultadoControl, indicadorUga, comentario, completado
+                }
+                await addUALData(dateToUse, rowKey, dataToSave)
+                setDoSAve(false)
+                setToSave(false)
             }
-            addUALData(dateToUse, { [key]: dataToSave })
-            setDoSAve(false)
-            setToSave(false)
         }
+        saveRow()
     }, [doSave])
     return (
-        <><tr className={`${styles.tableRow}`} key={index}>
+        <><tr className={completado ? `${styles.tableRow} ${styles.tableRowCompleted}` : `${styles.tableRow}`} key={index}>
             <td className={legajoT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={legajo} onChange={(e) => setLegajo(e.target.value)} />
             </td>
@@ -324,7 +387,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
                 <textarea className={`${styles.inputCell}`} value={entregaResuelvo} onChange={(e) => setEntregaResuelvo(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
-                {audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0]}</td>
+                {audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[1]}</td>
             <td className={finalizadaMinutaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={finalizadaMinuta} onChange={(e) => setFinalizadaMinuta(e.target.value)} />
             </td>
@@ -412,6 +475,14 @@ export default function TableRow({ audData, dateToUse, autofillB, index }) {
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={`${styles.inputCell}`} value={comentario} onChange={(e) => setComentario(e.target.value)} />
+            </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center' }}>
+                <input
+                    type="checkbox"
+                    checked={completado}
+                    onChange={(e) => setCompletado(e.target.checked)}
+                    style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+                />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <div className={styles.linksWrapper}>
