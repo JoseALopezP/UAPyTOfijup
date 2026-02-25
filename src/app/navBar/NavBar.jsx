@@ -13,6 +13,7 @@ export default function NavBar() {
                 <IconNavBar iconRoute={'Carga-Juicio'} />
                 <IconNavBar iconRoute={'Oficios'} />
                 <IconNavBar iconRoute={'audienciasUAC/control'} />
+                <IconNavBar iconRoute={'Solicitudes-Audiencia'} />
                 <p></p>
                 <IconNavBar iconRoute={'Registro-Audiencia'} />
                 <IconNavBar iconRoute={'Minuta-Juicio'} />

@@ -28,7 +28,91 @@ export async function extraerDatosDeUrl(url) {
         console.log(`[extraccion] Navegando a: ${url}`);
         await page.goto(url, { waitUntil: "networkidle2" });
 
-        console.log("[extraccion] Página lista para futuras extracciones.");
+        console.log("[extraccion] Iniciando extracción de datos de la tabla...");
+        const data = await page.evaluate(() => {
+            const results = {
+                defensaOficial: [],
+                fiscal: [],
+                defensorParticular: [],
+                imputados: []
+            };
+
+            const rows = document.querySelectorAll('#w9-container table tbody tr');
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 2) return;
+
+                const nombreTd = cells[0];
+                const tipoTd = cells[1];
+
+                const nombreText = nombreTd.innerText.trim();
+                const tipoText = tipoTd.innerText.trim().toUpperCase();
+
+                if (tipoText.includes('DEFENSOR OFICIAL')) {
+                    results.defensaOficial.push(nombreText);
+                } else if (tipoText.includes('FISCAL')) {
+                    results.fiscal.push(nombreText);
+                } else if (tipoText.includes('DEFENSOR PARTICULAR')) {
+                    results.defensorParticular.push(nombreText);
+                } else if (tipoText.includes('IMPUTADO')) {
+                    const link = nombreTd.querySelector('a');
+                    results.imputados.push({
+                        nombre: nombreText,
+                        link: link ? link.getAttribute('href') : null
+                    });
+                }
+            });
+
+            return results;
+        });
+
+        console.log("[extraccion] Datos iniciales extraídos:", data);
+
+        // --- Extracción Secundaria de DNI para Imputados ---
+        if (data.imputados.length > 0) {
+            console.log(`[extraccion] Iniciando extracción de DNI para ${data.imputados.length} imputados...`);
+
+            // Determinamos la base URL a partir de la URL actual (ej. http://10.107.1.184:8094)
+            const urlObj = new URL(url);
+            const baseURL = `${urlObj.protocol}//${urlObj.host}`;
+
+            for (const imputado of data.imputados) {
+                if (!imputado.link) continue;
+
+                const profileURL = imputado.link.startsWith('http') ? imputado.link : `${baseURL}${imputado.link}`;
+                console.log(`[extraccion] Navegando al perfil de ${imputado.nombre}: ${profileURL}`);
+
+                try {
+                    await page.goto(profileURL, { waitUntil: "networkidle2" });
+
+                    const dni = await page.evaluate(() => {
+                        // Buscamos en la pestaña de documentos o en la tabla que contenga "DNI"
+                        const rows = document.querySelectorAll('#w3-container table tbody tr');
+                        for (const row of rows) {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length >= 2) {
+                                const tipo = cells[0].innerText.trim().toUpperCase();
+                                if (tipo === 'DNI') {
+                                    return cells[1].innerText.trim();
+                                }
+                            }
+                        }
+                        return null;
+                    });
+
+                    imputado.dni = dni;
+                    console.log(`[extraccion] DNI encontrado para ${imputado.nombre}: ${dni}`);
+
+                } catch (err) {
+                    console.error(`[extraccion] Error al extraer DNI de ${imputado.nombre}: ${err.message}`);
+                    imputado.dni = null;
+                }
+            }
+        }
+
+        console.log("[extraccion] Extracción completa:", data);
+        return data;
 
     } catch (error) {
         console.error(`[extraccion] Error: ${error.message}`);
