@@ -66,14 +66,8 @@ export async function extraerDatosDeUrl(url) {
 
             return results;
         });
-
-        console.log("[extraccion] Datos iniciales extraídos:", data);
-
-        // --- Extracción Secundaria de DNI para Imputados ---
         if (data.imputados.length > 0) {
             console.log(`[extraccion] Iniciando extracción de DNI para ${data.imputados.length} imputados...`);
-
-            // Determinamos la base URL a partir de la URL actual (ej. http://10.107.1.184:8094)
             const urlObj = new URL(url);
             const baseURL = `${urlObj.protocol}//${urlObj.host}`;
 
@@ -81,14 +75,27 @@ export async function extraerDatosDeUrl(url) {
                 if (!imputado.link) continue;
 
                 const profileURL = imputado.link.startsWith('http') ? imputado.link : `${baseURL}${imputado.link}`;
-                console.log(`[extraccion] Navegando al perfil de ${imputado.nombre}: ${profileURL}`);
-
+                console.log(`[extraccion] Navegando al perfil de ${imputado.nombre}...`);
                 try {
-                    await page.goto(profileURL, { waitUntil: "networkidle2" });
+                    await page.goto(profileURL, { waitUntil: "domcontentloaded", timeout: 10000 });
 
-                    const dni = await page.evaluate(() => {
-                        // Buscamos en la pestaña de documentos o en la tabla que contenga "DNI"
-                        const rows = document.querySelectorAll('#w3-container table tbody tr');
+                    // Esperar a que el contenido cargue (sea en la página principal o en un iframe)
+                    await new Promise(r => setTimeout(r, 1000));
+
+                    let targetContext = page;
+                    const iframeElement = await page.$('iframe');
+
+                    if (iframeElement) {
+                        console.log(`[extraccion] Iframe detectado para ${imputado.nombre}, cambiando contexto...`);
+                        targetContext = await iframeElement.contentFrame();
+                    }
+
+                    await targetContext.waitForSelector('#documentos table', { visible: true, timeout: 5000 });
+
+                    const dni = await targetContext.evaluate(() => {
+                        const table = document.querySelector('#documentos table');
+                        if (!table) return null;
+                        const rows = table.querySelectorAll('tbody tr');
                         for (const row of rows) {
                             const cells = row.querySelectorAll('td');
                             if (cells.length >= 2) {
@@ -102,16 +109,17 @@ export async function extraerDatosDeUrl(url) {
                     });
 
                     imputado.dni = dni;
-                    console.log(`[extraccion] DNI encontrado para ${imputado.nombre}: ${dni}`);
+                    console.log(`[extraccion] DNI extraído para ${imputado.nombre}: ${dni}`);
 
                 } catch (err) {
-                    console.error(`[extraccion] Error al extraer DNI de ${imputado.nombre}: ${err.message}`);
+                    console.error(`[extraccion] Error en perfil de ${imputado.nombre}: ${err.message}`);
                     imputado.dni = null;
                 }
             }
         }
 
-        console.log("[extraccion] Extracción completa:", data);
+        console.log("[extraccion] Extracción finalizada. Enviando resultados:", data);
+
         return data;
 
     } catch (error) {
