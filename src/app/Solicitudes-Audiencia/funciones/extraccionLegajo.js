@@ -31,12 +31,43 @@ export async function extraerDatosDeUrl(url) {
         console.log("[extraccion] Iniciando extracción de datos de la tabla...");
         const data = await page.evaluate(() => {
             const results = {
+                numeroLeg: null,
+                caratula: null,
+                ufi: null,
+                fyhcreacion: null,
+                jueces: [],
                 defensaOficial: [],
                 fiscal: [],
                 defensorParticular: [],
                 imputados: []
             };
 
+            // Extraer Número de Legajo
+            const panelTitle = document.querySelector('.panel-title');
+            if (panelTitle) {
+                results.numeroLeg = panelTitle.innerText.replace(/Número de legajo:\s*/i, '').trim();
+            }
+
+            // Extraer datos de la tabla de detalles (Carátula, Organismo, Fecha)
+            const detailRows = document.querySelectorAll('.detail-view tr');
+            detailRows.forEach(row => {
+                const head = row.querySelector('th');
+                const cell = row.querySelector('td');
+                if (!head || !cell) return;
+
+                const label = head.innerText.trim().toUpperCase();
+                const value = cell.innerText.trim();
+
+                if (label.includes('CARÁTULA')) {
+                    results.caratula = value;
+                } else if (label.includes('ORGANISMO')) {
+                    results.ufi = value;
+                } else if (label.includes('FECHA Y HORA CREACIÓN')) {
+                    results.fyhcreacion = value;
+                }
+            });
+
+            // Extraer datos de la tabla de participantes (Defensa, Fiscal, Imputados)
             const rows = document.querySelectorAll('#w9-container table tbody tr');
 
             rows.forEach(row => {
@@ -66,6 +97,29 @@ export async function extraerDatosDeUrl(url) {
 
             return results;
         });
+
+        // Extraer Jueces (requiere clickear pestaña)
+        console.log("[extraccion] Extrayendo jueces...");
+        try {
+            await page.click('a[href="#jueces"]');
+            // Esperar a que la tabla de jueces sea visible dentro del panel
+            await page.waitForSelector('#jueces table', { visible: true, timeout: 5000 });
+
+            const jueces = await page.evaluate(() => {
+                const rows = document.querySelectorAll('#jueces table tbody tr');
+                const list = [];
+                rows.forEach(row => {
+                    const cell = row.querySelector('td[data-col-seq="1"]');
+                    if (cell) list.push(cell.innerText.trim());
+                });
+                return list;
+            });
+            data.jueces = jueces;
+            console.log(`[extraccion] Jueces encontrados: ${jueces.length}`);
+        } catch (juecesErr) {
+            console.error("[extraccion] Error al extraer jueces:", juecesErr.message);
+        }
+
         if (data.imputados.length > 0) {
             console.log(`[extraccion] Iniciando extracción de DNI para ${data.imputados.length} imputados...`);
             const urlObj = new URL(url);

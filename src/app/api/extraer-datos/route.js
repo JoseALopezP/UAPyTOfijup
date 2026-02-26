@@ -1,4 +1,4 @@
-import { extraerDatosDeUrl } from '@/app/Solicitudes-Audiencia/funciones/extraccion';
+import { extraerDatosDeUrl } from '@/app/Solicitudes-Audiencia/funciones/extraccionLegajo';
 
 export async function POST(request) {
     try {
