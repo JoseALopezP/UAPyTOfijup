@@ -150,11 +150,11 @@ function juecesPart(jueces) {
     if (jueces.split('+').length > 1) {
         aux = 'el Tribunal Colegiado compuesto por ';
         jueces.split('+').forEach((juez, index) => {
-            aux += juez.split('.')[0] === 'DR' ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`;
+            aux += (juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr.') ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`;
             if (index < jueces.split('+').length - 1) aux += ', ';
         });
     } else {
-        aux = jueces.split('.')[0] === 'DR' ? `Sr. Juez ${capitalizeFirst(jueces.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(jueces.toLowerCase())}`;
+        aux = (juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr.') ? `Sr. Juez ${capitalizeFirst(jueces.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(jueces.toLowerCase())}`;
     }
     return aux;
 }
