@@ -5,7 +5,11 @@ import GeneradorOficioBlock from './GeneradorOficioBlock';
 import deepEqual from '@/utils/deepEqual';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
-import TextEditor from '@/app/Registro-Audiencia/components/TextEditor';
+import dynamic from "next/dynamic";
+const TextEditor = dynamic(
+  () => import("../../Registro-Audiencia/components/TextEditor"),
+  { ssr: false }
+)
 import { DataContext } from '@/context/DataContext';
 
 export default function OficioRightBlock({aud, date}) {

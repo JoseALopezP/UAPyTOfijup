@@ -1,0 +1,44 @@
+.ql-container {
+  border: #2B2B2B 1px solid !important;
+  border-left: none !important;
+  border-right: none !important;
+  outline: none;
+  height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+.ql-toolbar {
+  border: none !important;
+  outline: none;
+  z-index: 1;
+  position: relative;
+}
+
+.textEditorWrapper {
+  overflow-y: scroll;
+}
+
+.textEditorWrapper :global(.ql-editor) {
+  font-size: 18px !important;
+  font-family: "Arial", sans-serif;
+  position: relative;
+}
+
+.conversionButtonBlock {
+  position: fixed;
+  z-index: 2;
+  margin-left: 50%;
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.conversionButtonBlock button {
+  height: 40px;
+  border-radius: 4px;
+  width: 40px;
+  border: solid 1px #ffffff25;
+  background-color: transparent;
+  margin-top: 1px;
+  color: #fff;
+}

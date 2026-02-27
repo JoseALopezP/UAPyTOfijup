@@ -7,7 +7,11 @@ import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { generatePDF } from '@/utils/pdfUtils';
 import deepEqual from '@/utils/deepEqual';
 import { checkCompletion } from '@/utils/checkCompletion';
-import TextEditor from './TextEditor';
+import dynamic from "next/dynamic";
+const TextEditor = dynamic(
+  () => import("./TextEditor"),
+  { ssr: false }
+)
 import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';

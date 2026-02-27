@@ -1,34 +1,20 @@
 export default function deepEqual(a, b) {
   if (a === b) return true;
-
-  // Handle NaN
   if (typeof a === "number" && typeof b === "number" && isNaN(a) && isNaN(b)) {
     return true;
   }
-
-  // Different types
   if (typeof a !== typeof b) return false;
-
-  // Null check
   if (a === null || b === null) return false;
-
-  // Arrays
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
     return a.every((el, i) => deepEqual(el, b[i]));
   }
-
-  // Dates
   if (a instanceof Date && b instanceof Date) {
     return a.getTime() === b.getTime();
   }
-
-  // RegExp
   if (a instanceof RegExp && b instanceof RegExp) {
     return a.source === b.source && a.flags === b.flags;
   }
-
-  // Map
   if (a instanceof Map && b instanceof Map) {
     if (a.size !== b.size) return false;
     for (let [key, val] of a) {
@@ -36,12 +22,9 @@ export default function deepEqual(a, b) {
     }
     return true;
   }
-
-  // Set
   if (a instanceof Set && b instanceof Set) {
     if (a.size !== b.size) return false;
     for (let val of a) {
-      // We can’t just check b.has(val) because val could be an object
       let hasMatch = false;
       for (let other of b) {
         if (deepEqual(val, other)) {
@@ -53,8 +36,6 @@ export default function deepEqual(a, b) {
     }
     return true;
   }
-
-  // Objects
   if (typeof a === "object" && typeof b === "object") {
     if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) return false;
 
