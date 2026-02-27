@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState} from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styles from './ScheduleTable.module.css';
 import { DataContext } from '@/context New/DataContext';
 import { todayFunction } from '@/utils/dateUtils';
 
-export function ScheduleTable({filterValue}) {
-    const { updateByDate, bydate, realTime} = useContext(DataContext);
+export function ScheduleTable({ filterValue }) {
+    const { updateByDate, bydate, realTime } = useContext(DataContext);
     const [todayFiltered, setTodayFiltered] = useState(bydate)
-    const tick = () =>{
+    const tick = () => {
         updateByDate(todayFunction())
     }
     useEffect(() => {
@@ -16,7 +16,7 @@ export function ScheduleTable({filterValue}) {
             clearInterval(timerID);
         };
     }, []);
-    useEffect(()=>{
+    useEffect(() => {
         const filteredData = bydate?.filter((sentence) => {
             const searchableText = [
                 sentence.hora,
@@ -33,7 +33,7 @@ export function ScheduleTable({filterValue}) {
                 .every((word) => searchableText.includes(word));
         });
         setTodayFiltered(filteredData)
-    }, [filterValue, today])
+    }, [filterValue, bydate])
     return (
         <section className={`${styles.tableSection}`}>
             <table className={`${styles.table}`} cellSpacing="0" cellPadding="0">
@@ -50,19 +50,19 @@ export function ScheduleTable({filterValue}) {
                 <tbody className={`${styles.tableBody}`}>
                     {todayFiltered &&
                         todayFiltered
-                        .filter(sentence =>
-                            filterValue.toLowerCase().split(' ').every(word =>
-                                ((sentence.hora+' '+sentence.estado+' '+sentence.numeroLeg+' '+sentence.tipo+' '+sentence.tipo2+' '+sentence.tipo3).toLowerCase().includes(word))
+                            .filter(sentence =>
+                                filterValue.toLowerCase().split(' ').every(word =>
+                                    ((sentence.hora + ' ' + sentence.estado + ' ' + sentence.numeroLeg + ' ' + sentence.tipo + ' ' + sentence.tipo2 + ' ' + sentence.tipo3).toLowerCase().includes(word))
+                                )
                             )
-                        )
                             .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
-                            .map((el, i) => {
+                            .map((el) => {
                                 return (
-                                    <tr key={el.numeroLeg+el.hora} className={`${styles["fila" + el.estado]}`}>
+                                    <tr key={el.numeroLeg + el.hora} className={`${styles["fila" + el.estado]}`}>
                                         <td>{el.hora}</td>
                                         <td>SALA {el.sala}</td>
                                         <td>{el.numeroLeg}</td>
-                                        <td>{el.tipo.split('').slice(0,40).join('')}{el.tipo.split('').length>39 ? '...' : ''}</td>
+                                        <td>{el.tipo.split('').slice(0, 40).join('')}{el.tipo.split('').length > 39 ? '...' : ''}</td>
                                         <td>{el.juez ? el.juez.split('+').map(e => <span key={e}>{e}<br /></span>) : <span>NA</span>}</td>
                                         {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
                                             <td className={`${styles.DEMORADA}`}>DEMORADA</td>

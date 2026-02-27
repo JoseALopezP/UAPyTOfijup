@@ -120,7 +120,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     }
     const addSorteo = async (data, date) => {
         try {
-            await addOrUpdateObject("sorteo", date, time, data);
+            await addOrUpdateObject("sorteos", date, data.title, data);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
@@ -128,7 +128,11 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const getSorteoList = async (date) => {
         try {
             const data = await getDocument('sorteos', date);
-            setSorteoList(data)
+            if (data) {
+                setSorteoList(Object.values(data));
+            } else {
+                setSorteoList([]);
+            }
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
