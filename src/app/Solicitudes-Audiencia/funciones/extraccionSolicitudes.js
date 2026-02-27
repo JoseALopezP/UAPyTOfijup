@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { extraerDetalles } from './extraccionDetalles.js';
 
 const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
 const SOLICITUD_URL = "http://10.107.1.184:8094/solicitud";
@@ -13,7 +14,13 @@ async function login(page) {
     console.log("[extraccion-solicitudes] Login exitoso.");
 }
 
-export async function extraerSolicitudes(existingData = []) {
+export async function extraerSolicitudes(existingData = [], onProgress) {
+    // onProgress lo usamos internamente solo al final para no hacer ruido
+    // en la primera fase, que es rápida
+    const notify = (msg) => {
+        console.log(`[extraccion-solicitudes] ${msg}`);
+    };
+
     const browser = await puppeteer.launch({
         headless: false,
         args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox"],
@@ -23,91 +30,153 @@ export async function extraerSolicitudes(existingData = []) {
     const page = (await browser.pages())[0] || await browser.newPage();
 
     try {
+        notify("Iniciando login...");
         await login(page);
 
-        console.log(`[extraccion-solicitudes] Navegando a la página de solicitudes: ${SOLICITUD_URL}`);
+        notify(`Navegando a la página de solicitudes: ${SOLICITUD_URL}`);
         await page.goto(SOLICITUD_URL, { waitUntil: "networkidle2" });
 
-        console.log("[extraccion-solicitudes] Aplicando filtros...");
+        notify("Aplicando filtros...");
 
-        // Seleccionar PENDIENTE (value: a2ddb5a6-57bc-47b9-8235-e5b0012f3450)
-        await page.select("#solicitudsearch-id_estado", "a2ddb5a6-57bc-47b9-8235-e5b0012f3450");
+        // Helper: registra un listener pjax:complete y devuelve una función que espera su disparo
+        const waitForPjax = async (triggerFn, timeoutMs = 30000) => {
+            // Antes de disparar el cambio, armar el listener
+            await page.evaluate(() => { window._pjaxDone = false; });
+            await page.evaluate(() => {
+                $(document).one('pjax:complete', () => { window._pjaxDone = true; });
+            });
+            // Disparar el cambio
+            await triggerFn();
+            // Esperar que el PJAX termine
+            await page.waitForFunction(() => window._pjaxDone, { timeout: timeoutMs });
+        };
 
-        // Seleccionar SOLICITUD DE AUDIENCIA (value: 37261e4a-94b8-4275-8bb8-0ac5a918feed)
-        await page.select("#solicitudsearch-id_tipo_solicitud", "37261e4a-94b8-4275-8bb8-0ac5a918feed");
+        // ── Filtro 1: PENDIENTE ───────────────────────────────────────────────
+        await waitForPjax(() => page.evaluate(() => {
+            const el = document.querySelector('#solicitudsearch-id_estado');
+            el.value = 'a2ddb5a6-57bc-47b9-8235-e5b0012f3450';
+            $(el).trigger('change');
+        }));
+        notify("Filtro PENDIENTE aplicado.");
 
-        // Esperar a que el PJAX recargue la tabla
-        await new Promise(r => setTimeout(r, 2000));
-        await page.waitForSelector("#w0-container table tbody", { visible: true });
+        // ── Filtro 2: SOLICITUD DE AUDIENCIA ─────────────────────────────────
+        await waitForPjax(() => page.evaluate(() => {
+            const el = document.querySelector('#solicitudsearch-id_tipo_solicitud');
+            el.value = '37261e4a-94b8-4275-8bb8-0ac5a918feed';
+            $(el).trigger('change');
+        }));
+        notify("Filtro SOLICITUD DE AUDIENCIA aplicado.");
 
-        let allSolicitudes = [];
+        // Confirmar que hay filas visibles antes de empezar
+        await page.waitForSelector('#w0-container table tbody tr[data-key]', { visible: true, timeout: 15000 });
+
+        notify("Filtros aplicados. Iniciando extracción...");
+
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+
+        // Extrae todas las filas visibles de la tabla actual
+        const extractRows = () => page.evaluate(() => {
+            const origin = window.location.origin;
+            return Array.from(
+                document.querySelectorAll('#w0-container table tbody tr[data-key]')
+            ).map(row => {
+                const col3 = row.querySelector('td[data-col-seq="3"]');
+                const col4 = row.querySelector('td[data-col-seq="4"]');
+                const col5 = row.querySelector('td[data-col-seq="5"]');
+                if (!col3 || !col4 || !col5) return null;
+
+                const linkLegEl = col3.querySelector('a');
+                // El link "Ver" puede estar en col 13 o 15 según el filtro activo, así que lo buscamos en toda la fila
+                const linkSolEl = row.querySelector('a[aria-label="Ver"]');
+
+                return {
+                    numeroLeg: col3.innerText.trim(),
+                    linkLeg: linkLegEl ? new URL(linkLegEl.getAttribute('href'), origin).href : null,
+                    caratula: col4.innerText.trim(),
+                    fyhcreacion: col5.innerText.trim(),
+                    linkSol: linkSolEl ? new URL(linkSolEl.getAttribute('href'), origin).href : null,
+                };
+            }).filter(r => r !== null);
+        });
+
+        // Devuelve el data-page del li.active actual
+        const getActivePage = () => page.evaluate(() => {
+            const el = document.querySelector('.pagination li.active a');
+            return el ? parseInt(el.getAttribute('data-page'), 10) : -1;
+        });
+
+        // Espera hasta que li.active tenga data-page === targetPage, máximo maxMs
+        const waitForPageChange = async (targetPage, maxMs = 30000) => {
+            const start = Date.now();
+            while (Date.now() - start < maxMs) {
+                await new Promise(r => setTimeout(r, 500));
+                if (await getActivePage() === targetPage) return true;
+            }
+            return false;
+        };
+
+        // ── Loop principal ────────────────────────────────────────────────────
+
+        const allSolicitudes = [];
         let stopFound = false;
 
         while (!stopFound) {
-            console.log("[extraccion-solicitudes] Extrayendo datos de la página actual...");
+            // 1. Extraer filas de la página actual
+            const rows = await extractRows();
+            notify(`${rows.length} filas en página actual.`);
 
-            const pageData = await page.evaluate(() => {
-                const rows = Array.from(document.querySelectorAll('#w0-container table tbody tr:not(.empty)'));
-                return rows.map(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length < 14) return null;
-
-                    // numeroLeg: 4to td (index 3)
-                    const nroLegTd = cells[3];
-                    const linkLegObj = nroLegTd.querySelector('a');
-
-                    // caratula: 5to td (index 4)
-                    const caratula = cells[4].innerText.trim();
-
-                    // fyhcreacion: 6to td (index 5)
-                    const fyhcreacion = cells[5].innerText.trim();
-
-                    // linkSol: 14vo td (index 13)
-                    const accionesTd = cells[13];
-                    const linkSolObj = accionesTd.querySelector('a');
-
-                    return {
-                        numeroLeg: nroLegTd.innerText.trim(),
-                        linkLeg: linkLegObj ? linkLegObj.getAttribute('href') : null,
-                        caratula: caratula,
-                        fyhcreacion: fyhcreacion,
-                        linkSol: linkSolObj ? linkSolObj.getAttribute('href') : null
-                    };
-                }).filter(r => r !== null);
-            });
-
-            for (const sol of pageData) {
-                // Verificar stop-on-match de arriba hacia abajo
-                const isDuplicate = existingData.some(d =>
-                    d.numeroLeg === sol.numeroLeg &&
-                    d.fyhcreacion === sol.fyhcreacion
+            for (const row of rows) {
+                const alreadyExists = existingData.some(
+                    d => d.numeroLeg === row.numeroLeg && d.fyhcreacion === row.fyhcreacion
                 );
-
-                if (isDuplicate) {
-                    console.log(`[extraccion-solicitudes] Coincidencia encontrada para ${sol.numeroLeg}. Deteniendo.`);
+                if (alreadyExists) {
+                    notify(`Match encontrado: ${row.numeroLeg}. Deteniendo.`);
                     stopFound = true;
                     break;
                 }
+                allSolicitudes.push(row);
+            }
+            if (stopFound) break;
 
-                allSolicitudes.push(sol);
+            // 2. Buscar botón "Siguiente"
+            const nextBtn = await page.$('li.next:not(.disabled) a');
+            if (!nextBtn) {
+                notify("No hay más páginas.");
+                break;
             }
 
-            if (!stopFound) {
-                const nextButton = await page.$('li.next:not(.disabled) a');
-                if (nextButton) {
-                    console.log("[extraccion-solicitudes] Pasando a la siguiente página...");
-                    await nextButton.click();
-                    await new Promise(r => setTimeout(r, 2000));
-                    await page.waitForSelector("#w0-container table tbody", { visible: true });
-                } else {
-                    console.log("[extraccion-solicitudes] Fin de las páginas.");
-                    stopFound = true;
+            // 3. Anotar página actual y hacer clic
+            const currentPage = await getActivePage();
+            const targetPage = currentPage + 1;
+            notify(`Navegando a página ${targetPage + 1}...`);
+            await nextBtn.click();
+
+            // 4. Esperar cambio de página (hasta 30s); si no cambia, reintentar una vez
+            const ok = await waitForPageChange(targetPage, 30000);
+            if (!ok) {
+                notify("Timeout devuelto. Reintentando clic en Siguiente...");
+                const retryBtn = await page.$('li.next:not(.disabled) a');
+                if (retryBtn) await retryBtn.click();
+                const okRetry = await waitForPageChange(targetPage, 30000);
+                if (!okRetry) {
+                    notify("Página tildada tras reintento. Abortando paginación.");
+                    break;
                 }
             }
+            notify(`Página ${targetPage + 1} cargada.`);
         }
 
-        console.log(`[extraccion-solicitudes] Extracción finalizada. Total: ${allSolicitudes.length}`);
-        return allSolicitudes;
+        notify(`Total extraídos tabla base: ${allSolicitudes.length}`);
+
+        if (onProgress) onProgress("Preparando datos...");
+
+        // ── Extracción de detalles (4 navegadores en paralelo) ────────────────
+        notify(`Pasando a extracción detallada (${allSolicitudes.length} items)...`);
+
+        const allDetalles = await extraerDetalles(allSolicitudes, onProgress);
+        return allDetalles;
+
 
     } catch (error) {
         console.error(`[extraccion-solicitudes] Error: ${error.message}`);
