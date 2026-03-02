@@ -99,7 +99,7 @@ export default function BodyPumba({ dateToUse }) {
                 saved.sala || audData.sala || '',
                 saved.operador || audData.operador || '',
                 saved.fiscal || (tabItem.mpf ? tabItem.mpf[0].nombre : ''),
-                saved.defensa || (tabItem.defensa ? tabItem.defensa[0].nombre : ''),
+                saved.defensa || (tabItem.defensa && tabItem.defensa.length > 0 ? tabItem.defensa[0].nombre : ''),
                 saved.juez || audData.juez || '',
                 saved.finAudiencia || audData.finAudiencia || '',
                 saved.resolucion || audData.resolucion || '',

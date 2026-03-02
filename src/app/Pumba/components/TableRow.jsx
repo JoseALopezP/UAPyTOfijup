@@ -115,7 +115,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index, onStatu
         sala === '' && (savedData.sala ? setSala(savedData.sala) : tabItem.sala && setSala(tabItem.sala))
         operador === '' && (savedData.operador ? setOperador(savedData.operador) : tabItem.operador && setOperador(tabItem.operador))
         fiscal === '' && (savedData.fiscal ? setFiscal(savedData.fiscal) : tabItem.mpf && setFiscal(tabItem.mpf[0].nombre))
-        defensa === '' && (savedData.defensa ? setDefensa(savedData.defensa) : tabItem.defensa && setDefensa(tabItem.defensa[0].nombre))
+        defensa === '' && (savedData.defensa ? setDefensa(savedData.defensa) : tabItem.defensa && tabItem.defensa.length > 0 && setDefensa(tabItem.defensa[0].nombre))
         juez === '' && (savedData.juez ? setJuez(savedData.juez) : tabItem.juez && setJuez(tabItem.juez))
         finAudiencia === '' && (savedData.finAudiencia ? setFinAudiencia(savedData.finAudiencia) : audData.finAudiencia && setFinAudiencia(audData.finAudiencia))
     }
@@ -428,7 +428,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index, onStatu
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.intervinientes && audData.intervinientes.find(el => el.includes('DEFENSA'))}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.defensa && tabItem.defensa[0].nombre}</td>
+                {tabItem.defensa && tabItem.defensa.length > 0 && tabItem.defensa[0].nombre}</td>
             <td className={defensaT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={defensa} onChange={(e) => setDefensa(e.target.value)} />
             </td>

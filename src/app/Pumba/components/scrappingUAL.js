@@ -138,7 +138,7 @@ async function goToAgenda(fechaStr, pageInstance) {
 
     const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const nombreMes = meses[mesNum - 1];
-    const targetText = `${nombreMes} ${anio}`;
+    const targetText = `${nombreMes} ${anio}`.toLowerCase();
 
     // 1. Navegar a la URL de la agenda si no estamos ahí
     if (!pageInstance.url().includes('/audiencia/agenda')) {
@@ -148,7 +148,7 @@ async function goToAgenda(fechaStr, pageInstance) {
 
     // 2. Asegurar vista de "Día"
     try {
-        await pageInstance.waitForSelector('button ::-p-text(Día)', { visible: true, timeout: 5000 });
+        await pageInstance.waitForSelector('button ::-p-text(Día)', { visible: true, timeout: 30000 });
         const isDiaActive = await pageInstance.evaluate(() => {
             const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Día'));
             return btn?.classList.contains('active') || btn?.parentElement?.classList.contains('active');
@@ -156,41 +156,73 @@ async function goToAgenda(fechaStr, pageInstance) {
         if (!isDiaActive) {
             console.log(`[goToAgenda] Activando vista de Día...`);
             await pageInstance.click('button ::-p-text(Día)');
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 1000));
         }
     } catch (e) {
         console.log(`[goToAgenda] ⚠️ Error al verificar botón Día, intentando continuar...`);
     }
 
     // 3. Navegación de mes/año
-    await pageInstance.waitForSelector('.datepicker-switch', { visible: true });
-    let currentText = await pageInstance.$eval('.datepicker-switch', el => el.textContent.trim());
+    const containerSelector = '#bloquesearch-fecha-kvdate';
+    await pageInstance.waitForSelector(`${containerSelector} .datepicker-switch`, { visible: true });
+
+    let currentText = await pageInstance.$eval(`${containerSelector} .datepicker-switch`, el => el.textContent.trim().toLowerCase());
 
     while (currentText !== targetText) {
         console.log(`[goToAgenda] Mes actual: ${currentText}, Objetivo: ${targetText}`);
-        const [currMesStr, currAnioStr] = currentText.split(' ');
-        const currAnio = parseInt(currAnioStr);
-        const currMesIdx = meses.indexOf(currMesStr);
-
-        if (anio < currAnio || (anio === currAnio && (mesNum - 1) < currMesIdx)) {
-            await pageInstance.click('.datepicker-days thead th.prev');
-        } else {
-            await pageInstance.click('.datepicker-days thead th.next');
+        const parts = currentText.split(/\s+/);
+        if (parts.length < 2) {
+            console.error(`[goToAgenda] Texto de mes inválido: ${currentText}`);
+            break;
         }
-        await new Promise(r => setTimeout(r, 600)); // Un poco más de tiempo para que el DOM se asiente
-        currentText = await pageInstance.$eval('.datepicker-switch', el => el.textContent.trim());
+        const [currMesStr, currAnioStr] = parts;
+        const currAnio = parseInt(currAnioStr);
+        const currMesIdx = meses.findIndex(m => m.toLowerCase() === currMesStr);
+
+        if (currMesIdx === -1) {
+            console.error(`[goToAgenda] No se encontró el mes: ${currMesStr}`);
+            break;
+        }
+
+        const prevText = currentText;
+        if (anio < currAnio || (anio === currAnio && (mesNum - 1) < currMesIdx)) {
+            console.log(`[goToAgenda] Retrocediendo un mes...`);
+            await pageInstance.click(`${containerSelector} .datepicker-days thead th.prev`);
+        } else {
+            console.log(`[goToAgenda] Avanzando un mes...`);
+            await pageInstance.click(`${containerSelector} .datepicker-days thead th.next`);
+        }
+
+        // 1. Esperar a que el UI refleje el cambio de mes (texto)
+        try {
+            await pageInstance.waitForFunction(
+                (sel, old) => document.querySelector(sel)?.textContent.trim().toLowerCase() !== old,
+                { timeout: 4000 },
+                `${containerSelector} .datepicker-switch`,
+                prevText
+            );
+        } catch (e) {
+            console.warn(`[goToAgenda] El texto del mes no cambió en el tiempo esperado.`);
+        }
+
+        // 2. Esperar a que el sitio termine de cargar datos (red)
+        console.log(`[goToAgenda] Esperando carga de datos del mes (red)...`);
+        await pageInstance.waitForNetworkIdle({ idleTime: 600, timeout: 30000 }).catch(() => { });
+
+        await new Promise(r => setTimeout(r, 400));
+        currentText = await pageInstance.$eval(`${containerSelector} .datepicker-switch`, el => el.textContent.trim().toLowerCase());
     }
 
     // 4. Selección del día con verificación de clase 'active'
     console.log(`[goToAgenda] Buscando y seleccionando día ${dia}...`);
-    const daySelector = `.datepicker-days td.day:not(.old):not(.new)`;
+    const daySelector = `${containerSelector} .datepicker-days td.day:not(.old):not(.new)`;
 
     await pageInstance.evaluate(async (targetDay, sel) => {
         const findDay = () => Array.from(document.querySelectorAll(sel))
             .find(el => el.textContent.trim() === targetDay);
 
         let attempts = 0;
-        while (attempts < 10) {
+        while (attempts < 15) {
             const dayEl = findDay();
             if (dayEl) {
                 if (dayEl.classList.contains('active')) {
@@ -198,17 +230,23 @@ async function goToAgenda(fechaStr, pageInstance) {
                     return true;
                 }
                 dayEl.click();
+                // Breve espera para que el click se procese y la clase active se asigne
+                await new Promise(r => setTimeout(r, 400));
+                if (dayEl.classList.contains('active')) return true;
             }
             attempts++;
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 400));
         }
         throw new Error(`[Browser] No se pudo confirmar el estado active para el día ${targetDay}`);
     }, dia, daySelector);
 
-    // Esperar a que la tabla de audiencias cargue o se actualice
-    await new Promise(r => setTimeout(r, 1000));
+    // 5. Esperar a que todo el contenido (agenda) termine de cargar tras seleccionar el día
+    console.log(`[goToAgenda] Esperando que la página termine de cargar el contenido final (red)...`);
+    await pageInstance.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 }).catch(() => { });
+    await new Promise(r => setTimeout(r, 800));
     console.log(`[goToAgenda] ✅ Navegación completada con éxito.`);
 }
+
 
 
 async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLinks, onProgressChunk) {
