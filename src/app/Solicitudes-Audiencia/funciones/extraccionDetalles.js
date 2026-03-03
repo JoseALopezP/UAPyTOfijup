@@ -198,7 +198,8 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
 
                     // Enriquecemos el último resultado con todos los datos del legajo
                     const imputadosFinales = extraLeg.imputadosMatch || [];
-                    const finalIntervinientes = { ...sol.intervinientes };
+                    // Usamos los intervinientes ya extraídos del linkSol (que están en el último result)
+                    const finalIntervinientes = { ...results[results.length - 1].intervinientes };
                     if (imputadosFinales.length > 0) {
                         finalIntervinientes.imputado = imputadosFinales;
                     }

@@ -1,3 +1,23 @@
+.containerSol {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 97.6vw;
+    margin-left: 2.4vw;
+    overflow: hidden;
+}
+
+.tableSol {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableWrapper {
+    flex: 1;
+    overflow: auto;
+    width: 100%;
+}
+
 .solHeader {
     display: inline-flex;
     flex-direction: row;
@@ -8,7 +28,6 @@
     border-radius: 0 0 5px 5px;
     width: 97.6vw;
     height: 32px;
-    margin-left: 2.4vw;
 }
 
 .headerSection {
@@ -35,4 +54,64 @@
     outline: none;
     border: none;
     cursor: pointer;
+}
+
+.syncButton {
+    width: 110px;
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    height: 25px;
+    padding: 2px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.tableHeaderTh {
+    padding: 2px;
+    width: 120px;
+    min-width: 120px;
+    border: solid 1px #3b3b3b;
+    height: 40px;
+    background-color: #2B2B2B;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.cellBodyFixed {
+    color: #fff;
+    text-align: center;
+    overflow: hidden;
+    border: solid 1px #3b3b3b;
+    height: 50px;
+    padding: 0;
+    box-sizing: border-box;
+    display: table-cell;
+    vertical-align: middle;
+    background-color: transparent;
+    position: relative;
+}
+
+.cellBodyError {
+    border: 1px solid tomato;
+}
+
+.inputCell {
+    width: 100%;
+    height: 100%;
+    padding: 8px 5px;
+    background-color: #1f1f1f;
+    border: none;
+    outline: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+    display: block;
+    resize: none;
+    line-height: 1.2;
+    text-align: center;
 }

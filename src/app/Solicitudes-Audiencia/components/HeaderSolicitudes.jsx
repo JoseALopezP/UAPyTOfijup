@@ -3,23 +3,8 @@ import { useState } from 'react'
 import styles from '../SolicitudesAudiencia.module.css'
 
 export default function HeaderSolicitudes() {
-    const [url, setUrl] = useState('')
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
-    const scrapHandler = async () => {
-        if (!url) return;
-        try {
-            const response = await fetch('/api/extraer-datos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url }),
-            });
-            const data = await response.json();
-            console.log(response.ok ? "Extracción exitosa:" : "Error:", data);
-        } catch (error) {
-            console.error("Error de red:", error);
-        }
-    }
 
     const syncSolicitudesHandler = async () => {
         try {
@@ -45,7 +30,7 @@ export default function HeaderSolicitudes() {
 
                 buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split('\n');
-                buffer = lines.pop(); // Keep incomplete line in buffer
+                buffer = lines.pop();
 
                 for (const line of lines) {
                     if (!line.trim()) continue;
@@ -76,8 +61,6 @@ export default function HeaderSolicitudes() {
     return (
         <div className={`${styles.solHeader}`}>
             <span className={`${styles.headerSection}`}>
-                <input type="text" placeholder="url solicitud" className={`${styles.headerInput}`} value={url} onChange={(e) => setUrl(e.target.value)} />
-                <button className={`${styles.addButton}`} title="Extraer Legajo" onClick={scrapHandler}>+</button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button
                         className={`${styles.syncButton}`}
@@ -86,7 +69,7 @@ export default function HeaderSolicitudes() {
                         disabled={isSyncing}
                     >
                         <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-refresh'}`}></i>
-                        {isSyncing ? ' Sincronizando...' : ' Sincronizar'}
+                        {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
                     </button>
                     {syncStatus && (
                         <span style={{ fontSize: '0.9rem', color: '#555', fontStyle: 'italic', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

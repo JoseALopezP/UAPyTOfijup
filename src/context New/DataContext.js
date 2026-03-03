@@ -37,6 +37,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [sorteoList, setSorteoList] = useState(defaultValue);
     const [pumaData, setPumaData] = useState(defaultValue);
     const [UALData, setUALData] = useState(defaultValue);
+    const [solicitudesCompletadas, setSolicitudesCompletadas] = useState(defaultValue);
+    const [solicitudesData, setSolicitudesData] = useState(defaultValue);
 
     const updateByDate = async (date) => {
         try {
@@ -334,6 +336,35 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const updateRealTime = async () => {
         setRealTime(await updateRealTimeFunction());
     };
+    const updateSolicitudesCompletadas = async () => {
+        try {
+            const data = await getDocument('solicitudes', 'completadas');
+            if (data) {
+                setSolicitudesCompletadas(Object.values(data));
+            } else {
+                setSolicitudesCompletadas([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+    const addSolicitudData = async (rowKey, data) => {
+        try {
+            await addOrUpdateObject('solicitudesData', 'solicitudes', rowKey, data);
+            setSolicitudesData(prev => {
+                const newData = Array.isArray(prev) ? [...prev] : [];
+                const index = newData.findIndex(item => item.rowKey === rowKey);
+                if (index !== -1) {
+                    newData[index] = { ...data, rowKey };
+                } else {
+                    newData.push({ ...data, rowKey });
+                }
+                return newData;
+            });
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
     const addUser = async (data) => {
         await addObjectToDocument("users", "listaUsuarios", data);
     };
@@ -342,7 +373,9 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
-        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData
+        updateSolicitudesCompletadas, addSolicitudData,
+        bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
+        solicitudesCompletadas, solicitudesData
     };
     return <Provider value={context}>{children}</Provider>;
 };

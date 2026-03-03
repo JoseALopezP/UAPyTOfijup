@@ -7,7 +7,7 @@ import ShowTextOver from './ShowTextOver';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 
 export default function TableRow({ audData, dateToUse, autofillB, index, onStatusChange, forceSave }) {
-    const { bydate, desplegables, updateUALData, addUALData, UALData } = useContext(DataContext);
+    const { bydate, desplegables, addUALData, UALData } = useContext(DataContext);
     const [tabItem, setTabItem] = useState({})
     const [toSave, setToSave] = useState(false)
     const [doSave, setDoSAve] = useState(false)
