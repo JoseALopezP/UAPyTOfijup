@@ -13,7 +13,7 @@ export function AudienciaAddList() {
         const interval = setInterval(() => {
             updateByDate(dateToUse);
         }, 30000);
-        return () => clearInterval(interval); 
+        return () => clearInterval(interval);
     }, [dateToUse]);
     return (
         <section className={styles.audienciaListSection}>
