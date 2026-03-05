@@ -1,96 +1,122 @@
-.audienciaListSection{
+.audienciaListSection {
     margin-left: 2vw;
     width: calc(100vw - (100vw - 100%));
 }
-.audienciaListTable{
+
+.audienciaListTable {
     width: calc(100vw - (100vw - 100%));
     display: table;
     table-layout: fixed;
 }
-.audienciaListTableHead{
+
+.audienciaListTableHead {
     width: calc(100vw - (100vw - 100%));
     text-align: center;
+    position: sticky;
+    background-color: #212121;
+    top: 0;
 }
-.inputLegajoBlock{
+
+.inputLegajoBlock {
     display: inline-flex;
     flex-direction: row;
     width: fit-content;
 }
-.addAudienciaRow{
+
+.addAudienciaRow {
     height: 50px;
     vertical-align: middle;
     width: calc(100vw - (100vw - 100%));
     display: table-row;
 }
-.true{
+
+.true {
     color: #dcc635;
 }
-.tableRow{
+
+.tableRow {
     display: table-row;
 }
-.tableCell{
+
+.tableCell {
     display: table-cell;
     padding: 0 8px;
     overflow: hidden;
     vertical-align: middle;
 }
-.tableCellAdmin{
+
+.tableCellAdmin {
     width: 65px;
 }
-.tableCellAdmin input{
+
+.tableCellAdmin input {
     width: 90%;
     height: 25px;
 }
-.tableCellHora{
+
+.tableCellHora {
     align-items: center;
     text-align: center;
     width: 100px;
 }
-.tableCellHora input{
+
+.tableCellHora input {
     width: 90%;
 }
-.tableCellSala{
+
+.tableCellSala {
     width: 90px;
 }
-.tableCellLegajo{
+
+.tableCellLegajo {
     width: 250px;
 }
-.tableCellAction{
-    display:table-cell;
+
+.tableCellAction {
+    display: table-cell;
     overflow: hidden;
     width: 150px;
 }
-.juecesButtonBlock{
+
+.juecesButtonBlock {
     display: inline-flex;
     flex-direction: row;
     width: 100%;
     max-width: 300px;
 }
-.colegiadoButton{
+
+.colegiadoButton {
     background-color: #dcc635;
     width: 60px;
     padding: 10px;
     font-weight: 700;
 }
-.uniSelect{
+
+.uniSelect {
     width: calc(100% - 60px);
 }
-.juecesSelect{
+
+.juecesSelect {
     width: 100%;
     max-width: 300px;
     margin-top: 10px;
 }
-.tableCellJuez{
+
+.tableCellJuez {
     width: 300px;
     max-width: 300px;
     flex-direction: column;
 }
-.tableCellJuezList{
+
+.tableCellJuezList {
     font-size: 14px;
     text-align: center;
-    
+
 }
-.addAudienciaRow select, .addAudienciaRow input, .addAudienciaRow button{
+
+.addAudienciaRow select,
+.addAudienciaRow input,
+.addAudienciaRow button {
     height: 40px;
     font-size: 16px;
     border-radius: 5px;
@@ -98,32 +124,39 @@
     border: none;
     padding: 0;
 }
-.addAudienciaRow input:focus-visible{
+
+.addAudienciaRow input:focus-visible {
     outline: 2px #dcc635 solid;
 }
-.inputLegajoBlock{
+
+.inputLegajoBlock {
     min-width: 260px;
     width: fit-content;
 }
 
-.inputItemBlock{
+.inputItemBlock {
     padding: 20px 5px;
     display: table-cell;
 }
-.inputTipoBlock{
+
+.inputTipoBlock {
     width: 80px;
 }
-.inputLegajoBlock input{
+
+.inputLegajoBlock input {
     width: 48px;
     padding: 0 6px;
 }
-.inputLegajoBlock select{
+
+.inputLegajoBlock select {
     padding: 0 6px;
 }
-.inputSubmitBlock{
+
+.inputSubmitBlock {
     padding: 0 10px 0 8px;
 }
-.submitButton{
+
+.submitButton {
     width: 100%;
     font-weight: 700;
     font-size: 32px;
@@ -133,26 +166,32 @@
     color: white;
 }
 
-.submitButton:focus-visible{
+.submitButton:focus-visible {
     outline: 2px #dcc635 solid;
 }
-.inputError select, .inputError input, .inputAreaError{
+
+.inputError select,
+.inputError input,
+.inputAreaError {
     outline: 4px #dc3545 solid;
 }
-.audienciaListTable{
+
+.audienciaListTable {
     color: white;
     font-weight: 700;
     font-size: 20px;
 }
-.audienciaListTable .audienciaList:nth-child(odd){
+
+.audienciaListTable .audienciaList:nth-child(odd) {
     background-color: #475f74;
 }
-.audienciaListTable .audienciaList:nth-child(even){
+
+.audienciaListTable .audienciaList:nth-child(even) {
     background-color: #375166;
 }
 
-.errorMessage{
-    position:fixed;
+.errorMessage {
+    position: fixed;
     width: 100%;
     text-align: center;
     display: inline-flex;
@@ -166,7 +205,7 @@
     -webkit-animation-fill-mode: both;
 }
 
-.deleteButton{
+.deleteButton {
     width: 100%;
     height: 30px;
     border-radius: 5px;
@@ -177,7 +216,8 @@
     font-size: 20px;
     background-color: #dc3545;
 }
-.editButton{
+
+.editButton {
     width: 100%;
     height: 30px;
     border-radius: 5px;
@@ -189,27 +229,32 @@
     background-color: #17a2b8;
     margin-top: 2px;
 }
-.editButtonNot{
+
+.editButtonNot {
     opacity: .3;
 }
-.inputSituacion{
+
+.inputSituacion {
     padding: 0 5px;
     width: 95%;
     border-radius: 5px;
     border: none;
     height: 50px;
 }
-.tableCellSituacion{
+
+.tableCellSituacion {
     width: 180px;
     max-width: 180px;
     padding: 0 10px;
 }
-.tableCellSituacionIndiv{
+
+.tableCellSituacionIndiv {
     flex-direction: column;
     text-align: center;
     vertical-align: middle;
 }
-.inputSituacionEdit{
+
+.inputSituacionEdit {
     width: 95%;
     padding: 5px;
     border-radius: 5px;
@@ -220,11 +265,13 @@
     max-height: 50px;
     font-size: 16px;
 }
-.inputSituacionEdit::placeholder{
+
+.inputSituacionEdit::placeholder {
     color: #fff;
     font-size: 16px;
 }
-.inputResultadoEdit{
+
+.inputResultadoEdit {
     border-radius: 5px;
     border: none;
     font-size: 16px;
@@ -234,24 +281,28 @@
     font-size: 20px;
     background-color: transparent;
 }
-.inputResultadoEdit::placeholder{
+
+.inputResultadoEdit::placeholder {
     color: #fff;
     font-size: 20px;
 }
-.tableCellResultado{
+
+.tableCellResultado {
     width: 150px;
     display: table-cell;
     flex-direction: column;
     justify-content: center;
 }
-.tableCellResultadoIndiv{
+
+.tableCellResultadoIndiv {
     padding: 5px;
     height: 100%;
     flex-direction: column;
     text-align: center;
     vertical-align: middle;
 }
-.selectSalaEdit{
+
+.selectSalaEdit {
     appearance: none;
     width: 80px;
     font-size: 20px;
@@ -261,13 +312,16 @@
     background-color: transparent;
     color: #fff;
 }
-.selectSalaEdit option{
+
+.selectSalaEdit option {
     color: black;
 }
-.tableCellJuezN{
+
+.tableCellJuezN {
     width: 60px;
 }
-.tableCellJuezN select{
+
+.tableCellJuezN select {
     width: 60px;
     appearance: none;
     font-size: 22px;
@@ -278,16 +332,19 @@
     color: #fff;
     padding: 5px;
 }
-.tableCellJuezN option{
+
+.tableCellJuezN option {
     color: #000;
 }
-.colegiadoButton{
+
+.colegiadoButton {
     background-color: #dcc635;
     width: 60px;
     padding: 10px;
     font-weight: 700;
 }
-.cancelarButton{
+
+.cancelarButton {
     background-color: #fd7e14;
     border-radius: 5px;
     border: none;
@@ -296,13 +353,15 @@
     font-weight: 700;
     width: 100%;
 }
-.cancelarButtonClicked{
-    transform: scale(0.98); 
+
+.cancelarButtonClicked {
+    transform: scale(0.98);
     color: #fd7e14;
     background-color: #000;
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.reprogramarButton{
+
+.reprogramarButton {
     background-color: #6c757d;
     border-radius: 5px;
     border: none;
@@ -311,22 +370,26 @@
     font-size: 10px;
     width: 100%;
 }
-.reprogramarButtonClicked{
+
+.reprogramarButtonClicked {
     color: #6c757d;
     background-color: #000;
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.deleteButtonClicked{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+
+.deleteButtonClicked {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.deleteButtonBlock{
+
+.deleteButtonBlock {
     padding: 4px;
     height: 100%;
     width: 80px
 }
-.inputHora{
+
+.inputHora {
     background-color: #fff;
     border-radius: 5px;
     border: none;
@@ -338,59 +401,72 @@
     justify-content: center;
     font-size: 14px;
     font-weight: 700;
-    font-family:inherit;
+    font-family: inherit;
 }
-.inputHora::-webkit-datetime-edit-hour-field{
+
+.inputHora::-webkit-datetime-edit-hour-field {
     background-color: #fff;
     border-radius: 5px;
     border: none;
     outline: none;
 }
-.inputHora::-webkit-datetime-edit-text{
+
+.inputHora::-webkit-datetime-edit-text {
     background-color: #fff;
     border-radius: 5px;
     border: none;
     outline: none;
 }
-.inputHora::-webkit-calendar-picker-indicator{
+
+.inputHora::-webkit-calendar-picker-indicator {
     display: none;
 }
-.toDelete{
+
+.toDelete {
     color: #dc3545;
 }
-.toDelete span .inputResultadoEdit::placeholder, .toDelete span .inputSituacionEdit::placeholder{
+
+.toDelete span .inputResultadoEdit::placeholder,
+.toDelete span .inputSituacionEdit::placeholder {
     color: #dc3545;
 }
-.inputAdmin{
+
+.inputAdmin {
     border: solid white 1px;
     font-size: 14px;
     padding: 0 2px;
     width: 65px;
 }
-.inputAdminChanges{
+
+.inputAdminChanges {
     border: solid #dcc635 1px;
     color: #dcc635;
     font-size: 14px;
     padding: 0 2px;
     width: 65px;
 }
-.inputAdminChanges::placeholder{
+
+.inputAdminChanges::placeholder {
     color: #dcc635;
 }
-.inputAdminCorrect{
+
+.inputAdminCorrect {
     border: solid #28a745 1px;
     color: #28a745;
     font-size: 14px;
     padding: 0 2px;
     width: 65px;
 }
-.inputAdminCorrect::placeholder{
+
+.inputAdminCorrect::placeholder {
     color: #28a745;
 }
-.inputAdmin::placeholder{
+
+.inputAdmin::placeholder {
     font-size: 14px;
 }
-.controlButton{
+
+.controlButton {
     width: 95%;
     font-weight: 700;
     background-color: #FFF;
@@ -400,36 +476,46 @@
     font-size: 14px;
     cursor: pointer;
 }
-.controlButtonClicked{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+
+.controlButtonClicked {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.audienciaCancelada{
+
+.audienciaCancelada {
     font-size: 14px;
     text-align: center;
 }
-.DEMORADA{
+
+.DEMORADA {
     color: #fd7e14;
 }
-.PROGRAMADA{
+
+.PROGRAMADA {
     color: #007bff;
 }
-.EN_CURSO{
+
+.EN_CURSO {
     color: #17a2b8;
 }
-.CANCELADA{
-    color: #dc3545; 
+
+.CANCELADA {
+    color: #dc3545;
 }
-.CUARTO_INTERMEDIO{
+
+.CUARTO_INTERMEDIO {
     color: #ffc107;
 }
+
 .FINALIZADA {
     color: #28a745;
 }
+
 .REPROGRAMADA {
     background-color: #6c757d;
 }
-.inputComentarioEdit{
+
+.inputComentarioEdit {
     margin: 0;
     width: 95%;
     background-color: transparent;
@@ -437,27 +523,35 @@
     border-radius: 5px;
     padding: 5px 0 5px 5px;
 }
-.inputComentarioEditCell{
+
+.inputComentarioEditCell {
     padding: 0;
 }
-.tableCellWhiteLeft, .tableCellWhiteMiddle, .tableCellWhiteRight{
+
+.tableCellWhiteLeft,
+.tableCellWhiteMiddle,
+.tableCellWhiteRight {
     background-color: #fff;
     opacity: 1;
     vertical-align: middle;
     padding: 0;
     text-align: center;
 }
-.tableCellWhiteLeft{
+
+.tableCellWhiteLeft {
     border-radius: 10px 0 0 10px;
 }
-.tableCellWhiteMiddle{
+
+.tableCellWhiteMiddle {
     border-radius: 0;
 
 }
-.tableCellWhiteRight{
+
+.tableCellWhiteRight {
     border-radius: 0 10px 10px 0;
 }
-.buttonCorrect{
+
+.buttonCorrect {
     background-color: #28a745;
     font-weight: 700;
     color: #fff;
@@ -466,11 +560,13 @@
     padding: 8px 5px;
     border-radius: 5px;
 }
-.buttonCorrectClicked{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+
+.buttonCorrectClicked {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.buttonToChange{
+
+.buttonToChange {
     color: #fff;
     background-color: #fd7e14;
     font-weight: 700;
@@ -479,11 +575,13 @@
     border: none;
     border-radius: 5px;
 }
-.buttonToChangeClicked{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+
+.buttonToChangeClicked {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.inputTimeBlock{
+
+.inputTimeBlock {
     display: inline-flex;
     flex-direction: row;
     background-color: #fff;
@@ -493,37 +591,44 @@
     padding: 3px 0;
     max-width: 80px;
 }
-.inputTimeBlock input{
+
+.inputTimeBlock input {
     margin: 0;
     padding: 2px;
     height: 30px;
     text-align: center;
 }
-.inputTimeBlock input:focus-visible{
+
+.inputTimeBlock input:focus-visible {
     border: none;
     outline: none;
 }
+
 .inputTimeBlock input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
-  }
-.controlButtonOficio{
+}
+
+.controlButtonOficio {
     background-color: #007bff;
     color: #fff;
     border: #fff 2px solid;
 }
-.controlButtonOficioClicked{
-    transform: scale(0.98); 
-    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24); 
+
+.controlButtonOficioClicked {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
-.buttonRefresh{
+
+.buttonRefresh {
     width: 24px;
     height: 20px;
     background-color: white;
     border-radius: 2px;
     cursor: pointer;
 }
-.oficioBlock{
+
+.oficioBlock {
     display: inline-flex;
     flex-direction: row;
     width: 90%;
@@ -538,7 +643,8 @@
     justify-content: space-between;
     border-radius: 5px;
 }
-.resuelvoBlock{
+
+.resuelvoBlock {
     width: calc(100% - 40px);
     color: #000;
     font-weight: 300;
@@ -546,51 +652,61 @@
     padding: 20px;
     line-height: 22px;
 }
-.oficiadosBlock{
+
+.oficiadosBlock {
     width: calc(100% - 40px);
     padding: 20px;
 }
-.oficioInput{
+
+.oficioInput {
     border: solid 2px #375166;
     outline: none;
     width: 100%;
     border-radius: 5px;
     padding: 4px;
 }
-.controlButtonQuitar{
+
+.controlButtonQuitar {
     width: 20%;
     padding: 4px;
     background-color: #dc3545;
     color: #fff;
 }
-.textAreaTraslado{
+
+.textAreaTraslado {
     width: 95%;
     border: none;
     border-radius: 5px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
 }
-.controlButtonAgregar{
+
+.controlButtonAgregar {
     border: #375166 2px solid;
     padding: 6px;
 }
-.controlButtonDescargar{
+
+.controlButtonDescargar {
     background-color: #375166;
     color: #fff;
     border: #fff 2px solid;
     padding: 6px;
 }
-.inputHoraProgramada{
+
+.inputHoraProgramada {
     text-align: center;
     width: 40px;
     padding: 10px;
     margin: 0;
 }
-.inputHoraProgramada::-webkit-outer-spin-button,.inputHoraProgramada::-webkit-inner-spin-button {
+
+.inputHoraProgramada::-webkit-outer-spin-button,
+.inputHoraProgramada::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-.controlButtonCerrar{
+
+.controlButtonCerrar {
     position: fixed;
     z-index: 65;
     background-color: #dc3545;
@@ -601,58 +717,73 @@
     left: calc(100% /2 - 100px);
     top: calc(100vh - 200px);
 }
+
 @keyframes errorMessage {
     0% {
         display: none;
     }
-    1%{
+
+    1% {
         display: inline-flex;
     }
-    50%{
-      opacity: 100%;
+
+    50% {
+        opacity: 100%;
     }
-    99%{
-      opacity: 0%;
+
+    99% {
+        opacity: 0%;
     }
-    100%{
+
+    100% {
         display: none;
     }
 }
+
 @media (max-width: 1550px) {
-    .tableCellJuez{
+    .tableCellJuez {
         width: 200px;
         max-width: 200px;
         flex-direction: column;
     }
-    .tableCellSituacion{
+
+    .tableCellSituacion {
         width: 120px;
     }
-    .tableCellSituacion input{
+
+    .tableCellSituacion input {
         width: 120px;
     }
-    .tableCellLegajo{
+
+    .tableCellLegajo {
         width: 150px;
     }
-    .tableCellTipoIndiv{
+
+    .tableCellTipoIndiv {
         font-size: 16px;
     }
-    .tableCellResultado{
+
+    .tableCellResultado {
         width: 90px;
     }
-    .tableCellLegajoIndiv{
+
+    .tableCellLegajoIndiv {
         font-size: 18px;
     }
 }
+
 @media (max-width: 1400px) {
-    .audienciaListTableHead{
+    .audienciaListTableHead {
         font-size: 20px;
     }
-    .tableCellJuez{
+
+    .tableCellJuez {
         width: 160px;
         max-width: 160px;
         flex-direction: column;
     }
-    .tableCellResultado{
+
+    .tableCellResultado {
         width: 80px;
     }
 }
