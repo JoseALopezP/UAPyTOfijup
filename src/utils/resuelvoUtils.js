@@ -147,15 +147,27 @@ export function generateResuelvoSection(item, date) {
 
 function juecesPart(jueces) {
     let aux = '';
-    if (jueces.split('+').length > 1) {
+    const lista = jueces.split('+');
+
+    if (lista.length > 1) {
         aux = 'el Tribunal Colegiado compuesto por ';
-        jueces.split('+').forEach((juez, index) => {
-            aux += (juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr.') ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`;
-            if (index < jueces.split('+').length - 1) aux += ', ';
+        lista.forEach((juez, index) => {
+            const esDr = juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr';
+            aux += esDr
+                ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}`
+                : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`;
+
+            if (index < lista.length - 1) aux += ', ';
         });
     } else {
-        aux = (juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr.') ? `Sr. Juez ${capitalizeFirst(jueces.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(jueces.toLowerCase())}`;
+        const juez = lista[0];
+        const esDr = juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr';
+
+        aux = esDr
+            ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}`
+            : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`;
     }
+
     return aux;
 }
 

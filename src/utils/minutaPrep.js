@@ -76,10 +76,10 @@ function splitNormalBold(text) {
         return { text: removeHtmlTags(part.trim()), bold };
     }).filter(Boolean);
 }
-function resuelvoStructure(juez) {
-    if (juez.includes('+')) {
+function resuelvoStructure(juezAux) {
+    if (juezAux.includes('+')) {
         return "<strong><br/>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
-    } else if (juez.includes('DR.')) {
+    } else if (juezAux.includes('DR.') || juezAux.includes('Dr.')) {
         return "<strong><br/>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
     } else {
         return "<strong><br/>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
