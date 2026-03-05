@@ -81,14 +81,19 @@ export async function extraerSolicitudes(existingData = [], onProgress) {
             return Array.from(
                 document.querySelectorAll('#w0-container table tbody tr[data-key]')
             ).map(row => {
+                const col1 = row.querySelector('td[data-col-seq="1"]');
                 const col3 = row.querySelector('td[data-col-seq="3"]');
                 const col4 = row.querySelector('td[data-col-seq="4"]');
                 const col5 = row.querySelector('td[data-col-seq="5"]');
                 if (!col3 || !col4 || !col5) return null;
 
                 const linkLegEl = col3.querySelector('a');
-                // El link "Ver" puede estar en col 13 o 15 según el filtro activo, así que lo buscamos en toda la fila
                 const linkSolEl = row.querySelector('a[aria-label="Ver"]');
+
+                // Detectar si es urgente: buscar el icono fa-exclamation en col 1
+                const urgente = col1
+                    ? !!col1.querySelector('i.fa-exclamation, i[title="Urgente"]')
+                    : false;
 
                 return {
                     numeroLeg: col3.innerText.trim(),
@@ -96,6 +101,7 @@ export async function extraerSolicitudes(existingData = [], onProgress) {
                     caratula: col4.innerText.trim(),
                     fyhcreacion: col5.innerText.trim(),
                     linkSol: linkSolEl ? new URL(linkSolEl.getAttribute('href'), origin).href : null,
+                    urgente,
                 };
             }).filter(r => r !== null);
         });

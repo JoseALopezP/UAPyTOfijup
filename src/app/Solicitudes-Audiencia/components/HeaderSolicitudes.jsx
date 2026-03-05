@@ -4,7 +4,7 @@ import { DataContext } from '@/context New/DataContext'
 import styles from '../SolicitudesAudiencia.module.css'
 
 export default function HeaderSolicitudes() {
-    const { solicitudesCompletadas, addSolicitudCompletada } = useContext(DataContext);
+    const { solicitudesPendientes, addSolicitudData } = useContext(DataContext);
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
 
@@ -14,7 +14,7 @@ export default function HeaderSolicitudes() {
             setIsSyncing(true);
             setSyncStatus('Iniciando...');
 
-            const existingData = Array.isArray(solicitudesCompletadas) ? solicitudesCompletadas : [];
+            const existingData = Array.isArray(solicitudesPendientes) ? solicitudesPendientes : [];
 
             const response = await fetch('/api/extraer-solicitudes', {
                 method: 'POST',
@@ -50,7 +50,7 @@ export default function HeaderSolicitudes() {
                                 const rowKey = item.linkSol
                                     ? item.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
                                     : `${item.numeroLeg}_${item.fyhcreacion}`;
-                                await addSolicitudCompletada(rowKey, item);
+                                await addSolicitudData(rowKey, item);
                             }
 
                             setSyncStatus(`✓ ${newItems.length} solicitudes guardadas.`);

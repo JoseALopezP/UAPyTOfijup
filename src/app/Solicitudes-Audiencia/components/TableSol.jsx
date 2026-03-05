@@ -5,34 +5,106 @@ import styles from "../SolicitudesAudiencia.module.css"
 import RowSol from "./RowSol"
 import { compareFyH } from "@/utils/compareFecha"
 
+// Columnas: { label, sortKey, filterKey }
+// sortKey  → campo en el objeto solicitud para ordenar (null = no sorteable)
+// filterKey → campo(s) en el objeto para filtrar (string o array de strings)
+const COLUMNS = [
+    { label: 'LEGAJO', sortKey: 'numeroLeg', filterKey: 'numeroLeg' },
+    { label: 'FyH SOLICITUD', sortKey: 'fyhcreacion', filterKey: 'fyhcreacion' },
+    { label: 'SOLICITANTE', sortKey: 'solicitante', filterKey: 'solicitante' },
+    { label: 'TIPO', sortKey: 'tipo', filterKey: 'tipo' },
+    { label: 'IMPUTADOS', sortKey: null, filterKey: null },
+    { label: 'IMPUTADOS LIST', sortKey: null, filterKey: null },
+    { label: 'SIT. CORPORAL', sortKey: 'sitCorporal', filterKey: 'sitCorporal' },
+    { label: 'VENCIMIENTO', sortKey: 'vencimiento', filterKey: 'vencimiento' },
+    { label: 'QUERELLANTE', sortKey: 'querella', filterKey: 'querella' },
+    { label: 'DEFENSOR', sortKey: 'defensa', filterKey: 'defensa' },
+    { label: 'UFI', sortKey: 'ufi', filterKey: 'ufi' },
+    { label: 'FISCAL', sortKey: 'fiscal', filterKey: 'fiscal' },
+    { label: 'JUEZ', sortKey: 'juez', filterKey: 'juez' },
+    { label: 'MOTIVO', sortKey: 'motivo', filterKey: 'motivo' },
+    { label: 'FECHA AUDIENCIA', sortKey: 'fechaAudiencia', filterKey: 'fechaAudiencia' },
+    { label: 'HORA AUDIENCIA', sortKey: 'horaAudiencia', filterKey: 'horaAudiencia' },
+    { label: 'SALA', sortKey: 'sala', filterKey: 'sala' },
+    { label: 'JUEZ DE LA CAUSA', sortKey: 'juezCausa', filterKey: 'juezCausa' },
+    { label: 'COMENTARIO', sortKey: 'comentario', filterKey: 'comentario' },
+    { label: 'ACCIONES', sortKey: null, filterKey: null },
+    { label: 'DOCUMENTOS', sortKey: null, filterKey: null, narrow: true },
+]
+
+function getFieldValue(sol, key) {
+    if (!key) return ''
+    if (key in sol) return String(sol[key] ?? '')
+    return ''
+}
+
 export default function TableSol() {
-    const { solicitudesCompletadas, updateSolicitudesCompletadas, updateSolicitudesData } = useContext(DataContext)
+    const { solicitudesPendientes, updateSolicitudesPendientes } = useContext(DataContext)
     const [pendingRows, setPendingRows] = useState({})
     const [forceSave, setForceSave] = useState(false)
+    const [sortKey, setSortKey] = useState('fyhcreacion')
+    const [sortDir, setSortDir] = useState('asc')
+    const [filters, setFilters] = useState({})
 
     useEffect(() => {
-        updateSolicitudesCompletadas()
-        updateSolicitudesData()
+        updateSolicitudesPendientes()
     }, [])
 
-    // Cada RowSol llama esto cuando cambia su estado de "tiene cambios"
     const onStatusChange = useCallback((rowKey, hasChanges) => {
         setPendingRows(prev => {
             const updated = { ...prev }
-            if (hasChanges) {
-                updated[rowKey] = true
-            } else {
-                delete updated[rowKey]
-            }
+            if (hasChanges) updated[rowKey] = true
+            else delete updated[rowKey]
             return updated
         })
     }, [])
 
     const handleSaveAll = () => {
         setForceSave(true)
-        // Reseteamos forceSave en el siguiente tick para que pueda volver a dispararse
         setTimeout(() => setForceSave(false), 100)
     }
+
+    const handleSortClick = (col) => {
+        if (!col.sortKey) return
+        if (sortKey === col.sortKey) {
+            setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortKey(col.sortKey)
+            setSortDir('asc')
+        }
+    }
+
+    const handleFilter = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }))
+    }
+
+    // Filtrar y ordenar
+    const processed = (() => {
+        if (!solicitudesPendientes || !Array.isArray(solicitudesPendientes)) return []
+
+        // Filtrar
+        let rows = solicitudesPendientes.filter(sol => {
+            return Object.entries(filters).every(([key, val]) => {
+                if (!val) return true
+                const fieldVal = getFieldValue(sol, key).toLowerCase()
+                return fieldVal.includes(val.toLowerCase())
+            })
+        })
+
+        // Ordenar
+        rows = [...rows].sort((a, b) => {
+            if (sortKey === 'fyhcreacion') {
+                const cmp = compareFyH(a.fyhcreacion, b.fyhcreacion)
+                return sortDir === 'asc' ? cmp : -cmp
+            }
+            const aVal = getFieldValue(a, sortKey).toLowerCase()
+            const bVal = getFieldValue(b, sortKey).toLowerCase()
+            const cmp = aVal.localeCompare(bVal)
+            return sortDir === 'asc' ? cmp : -cmp
+        })
+
+        return rows
+    })()
 
     const pendingCount = Object.keys(pendingRows).length
 
@@ -50,33 +122,37 @@ export default function TableSol() {
             <table className={`${styles.tableSol}`}>
                 <thead>
                     <tr>
-                        <th className={`${styles.tableHeaderTh}`}>LEGAJO</th>
-                        <th className={`${styles.tableHeaderTh}`}>FyH SOLICITUD</th>
-                        <th className={`${styles.tableHeaderTh}`}>SOLICITANTE</th>
-                        <th className={`${styles.tableHeaderTh}`}>TIPO</th>
-                        <th className={`${styles.tableHeaderTh}`}>IMPUTADOS</th>
-                        <th className={`${styles.tableHeaderTh}`}>IMPUTADOS LIST</th>
-                        <th className={`${styles.tableHeaderTh}`}>SIT. CORPORAL</th>
-                        <th className={`${styles.tableHeaderTh}`}>VENCIMIENTO</th>
-                        <th className={`${styles.tableHeaderTh}`}>QUERELLANTE</th>
-                        <th className={`${styles.tableHeaderTh}`}>DEFENSOR</th>
-                        <th className={`${styles.tableHeaderTh}`}>UFI</th>
-                        <th className={`${styles.tableHeaderTh}`}>FISCAL</th>
-                        <th className={`${styles.tableHeaderTh}`}>JUEZ</th>
-                        <th className={`${styles.tableHeaderTh}`}>MOTIVO</th>
-                        <th className={`${styles.tableHeaderTh}`}>FECHA AUDIENCIA</th>
-                        <th className={`${styles.tableHeaderTh}`}>HORA AUDIENCIA</th>
-                        <th className={`${styles.tableHeaderTh}`}>SALA</th>
-                        <th className={`${styles.tableHeaderTh}`}>JUEZ DE LA CAUSA</th>
-                        <th className={`${styles.tableHeaderTh}`}>COMENTARIO</th>
-                        <th className={`${styles.tableHeaderTh}`}>ACCIONES</th>
-                        <th className={`${styles.tableHeaderTh} ${styles.headerThNarrow}`}>DOCUMENTOS</th>
+                        {COLUMNS.map((col, idx) => (
+                            <th
+                                key={idx}
+                                className={`${styles.tableHeaderTh}${col.narrow ? ` ${styles.headerThNarrow}` : ''}${col.sortKey ? ` ${styles.thSortable}` : ''}`}
+                                onClick={() => handleSortClick(col)}
+                            >
+                                <div className={styles.thContent}>
+                                    <span className={styles.thLabel}>
+                                        {col.label}
+                                        {col.sortKey && sortKey === col.sortKey && (
+                                            <span className={styles.sortArrow}>{sortDir === 'asc' ? ' ↑' : ' ↓'}</span>
+                                        )}
+                                    </span>
+                                    {col.filterKey && (
+                                        <input
+                                            className={styles.thFilterInput}
+                                            placeholder="filtrar..."
+                                            value={filters[col.filterKey] || ''}
+                                            onClick={e => e.stopPropagation()}
+                                            onChange={e => handleFilter(col.filterKey, e.target.value)}
+                                        />
+                                    )}
+                                </div>
+                            </th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {solicitudesCompletadas && solicitudesCompletadas.sort((a, b) => compareFyH(a.fyhcreacion, b.fyhcreacion)).map((solicitud, index) => (
-                        <RowSol d
-                            key={index}
+                    {processed.map((solicitud, index) => (
+                        <RowSol
+                            key={solicitud.rowKey || index}
                             data={solicitud}
                             onStatusChange={onStatusChange}
                             forceSave={forceSave}

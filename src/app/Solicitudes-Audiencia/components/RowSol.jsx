@@ -3,9 +3,10 @@ import { useContext, useState, useEffect, useRef } from "react"
 import { DataContext } from "@/context New/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
 import ExpandContent from "./ExpandContent"
+import SelectorDropdown from "./SelectorDropdown"
 
 export default function RowSol({ data, onStatusChange, forceSave }) {
-    const { solicitudesData, addSolicitudData } = useContext(DataContext)
+    const { solicitudesPendientes, addSolicitudData } = useContext(DataContext)
     const hasInitialSync = useRef(false)
     const [toSave, setToSave] = useState(false)
     const [doSave, setDoSave] = useState(false)
@@ -14,8 +15,8 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
         ? data.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
         : `${data.numeroLeg}_${data.fyhcreacion}`
 
-    const savedData = solicitudesData && Array.isArray(solicitudesData)
-        ? (solicitudesData.find(item => item.rowKey === rowKey) || {})
+    const savedData = solicitudesPendientes && Array.isArray(solicitudesPendientes)
+        ? (solicitudesPendientes.find(item => item.rowKey === rowKey) || {})
         : {}
 
     const [sitCorporal, setSitCorporal] = useState(savedData.sitCorporal || data.sitCorporal || '')
@@ -30,6 +31,10 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     const [sala, setSala] = useState(savedData.sala || (data.intervinientes?.sala?.join(', ') ?? ''))
     const [juezCausa, setJuezCausa] = useState(savedData.juezCausa || (data.intervinientes?.juez_causa?.join(', ') ?? ''))
     const [comentario, setComentario] = useState(savedData.comentario || (data.intervinientes?.comentario?.join(', ') ?? ''))
+    const [imputados, setImputados] = useState(savedData.imputados || data.intervinientes?.imputado || [])
+    const [newNombre, setNewNombre] = useState('')
+    const [newDni, setNewDni] = useState('')
+    const [agendar, setAgendar] = useState(savedData.agendar ?? false)
 
     const [sitCorporalT, setSitCorporalT] = useState(true)
     const [vencimientoT, setVencimientoT] = useState(true)
@@ -92,9 +97,9 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     }
 
     useEffect(() => {
-        if (solicitudesData && Array.isArray(solicitudesData)) {
+        if (solicitudesPendientes && Array.isArray(solicitudesPendientes)) {
             // Buscamos si hay datos guardados
-            const saved = solicitudesData.find(item => item.rowKey === rowKey) || {}
+            const saved = solicitudesPendientes.find(item => item.rowKey === rowKey) || {}
 
             const syncField = (savedVal, scraperVal) => {
                 return savedVal !== undefined ? savedVal : (scraperVal || '');
@@ -112,13 +117,14 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             setSala(syncField(saved.sala, data.intervinientes?.sala?.join(', ')))
             setJuezCausa(syncField(saved.juezCausa, data.intervinientes?.juez_causa?.join(', ')))
             setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
+            setImputados(saved.imputados || data.intervinientes?.imputado || [])
 
             // Retrasamos la sincronización inicial para permitir que los estados se asienten
             setTimeout(() => {
                 hasInitialSync.current = true
             }, 800)
         }
-    }, [solicitudesData, data])
+    }, [solicitudesPendientes, data])
 
     useEffect(() => {
         checkForDiff()
@@ -136,7 +142,8 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
                     numeroLeg: data.numeroLeg,
                     fyhcreacion: data.fyhcreacion,
                     sitCorporal, vencimiento, querella, defensa, fiscal,
-                    juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario
+                    juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario,
+                    imputados, agendar
                 })
                 setDoSave(false)
                 setToSave(false)
@@ -152,13 +159,56 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     return (
         <tr className={styles.tableRow}>
             <td className={`${styles.cellBodyFixed}`}>{data.numeroLeg}</td>
-            <td className={`${styles.cellBodyFixed}`}>{data.fyhcreacion}</td>
-            <td className={`${styles.cellBodyFixed}`}>{data.solicitante}</td>
-            <td className={`${styles.cellBodyFixed}`}>{data.tipo}</td>
+            <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.fyhcreacion}</div></td>
+            <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.solicitante}</div></td>
+            <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.tipo}</div></td>
             <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.length ?? 0}</td>
-            <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.map((imp, i) => (
-                <div key={i}>{imp.nombre}{imp.dni ? ` (${imp.dni})` : ''}</div>
-            ))}</td>
+            <td className={`${styles.cellBodyFixed}`}>
+                <div className={styles.scrollCell}>
+                    {imputados.map((imp, i) => (
+                        <div key={i} className={styles.imputadoPill}>
+                            <div className={styles.imputadoPillInfo}>
+                                <span className={styles.imputadoNombre}>{imp.nombre}</span>
+                                {imp.dni && <span className={styles.imputadoDni}>{imp.dni}</span>}
+                            </div>
+                            <button
+                                className={styles.imputadoDeleteBtn}
+                                onClick={() => {
+                                    const updated = imputados.filter((_, idx) => idx !== i)
+                                    setImputados(updated)
+                                    setToSave(true)
+                                }}
+                                title="Eliminar"
+                            >✕</button>
+                        </div>
+                    ))}
+                    {/* Agregar nuevo imputado */}
+                    <div className={styles.imputadoAddPill}>
+                        <input
+                            className={styles.imputadoAddInput}
+                            placeholder="Nombre"
+                            value={newNombre}
+                            onChange={e => setNewNombre(e.target.value)}
+                        />
+                        <input
+                            className={styles.imputadoAddInput}
+                            placeholder="DNI"
+                            value={newDni}
+                            onChange={e => setNewDni(e.target.value)}
+                        />
+                        <button
+                            className={styles.imputadoAddBtn}
+                            onClick={() => {
+                                if (!newNombre.trim()) return
+                                setImputados(prev => [...prev, { nombre: newNombre.trim(), dni: newDni.trim() || null }])
+                                setNewNombre('')
+                                setNewDni('')
+                                setToSave(true)
+                            }}
+                        >+</button>
+                    </div>
+                </div>
+            </td>
             <td className={cell(sitCorporalT)}>
                 <textarea className={styles.inputCell} value={sitCorporal} onChange={e => setSitCorporal(e.target.value)} />
             </td>
@@ -171,7 +221,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             <td className={cell(defensaT)}>
                 <textarea className={styles.inputCell} value={defensa} onChange={e => setDefensa(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed}`}>{data.ufi}</td>
+            <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.ufi}</div></td>
             <td className={cell(fiscalT)}>
                 <textarea className={styles.inputCell} value={fiscal} onChange={e => setFiscal(e.target.value)} />
             </td>
@@ -190,32 +240,64 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             <td className={cell(salaT)}>
                 <textarea className={styles.inputCell} value={sala} onChange={e => setSala(e.target.value)} />
             </td>
-            <td className={cell(juezCausaT)}>
+            <td className={`${cell(juezCausaT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
+                <SelectorDropdown
+                    title="Jueces"
+                    options={data.jueces || []}
+                    onSelect={(val) => setJuezCausa(val)}
+                />
                 <textarea className={styles.inputCell} value={juezCausa} onChange={e => setJuezCausa(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={styles.inputCell} value={comentario} onChange={e => setComentario(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center' }}>
-                <button
-                    onClick={() => setDoSave(true)}
-                    disabled={!toSave}
-                    style={{ cursor: toSave ? 'pointer' : 'default', opacity: toSave ? 1 : 0.4, padding: '4px 10px' }}
-                >
-                    💾
-                </button>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                <div className={styles.accionesCell}>
+                    <button
+                        onClick={() => setDoSave(true)}
+                        disabled={!toSave}
+                        style={{ cursor: toSave ? 'pointer' : 'default', opacity: toSave ? 1 : 0.4, padding: '4px 10px' }}
+                    >
+                        💾
+                    </button>
+                    <label className={`${styles.agendarLabel}${agendar ? ` ${styles.agendarActive}` : ''}`}>
+                        <input
+                            type="checkbox"
+                            className={styles.agendarCheckbox}
+                            checked={agendar}
+                            onChange={async (e) => {
+                                const val = e.target.checked
+                                setAgendar(val)
+                                await addSolicitudData(rowKey, {
+                                    rowKey,
+                                    numeroLeg: data.numeroLeg,
+                                    fyhcreacion: data.fyhcreacion,
+                                    sitCorporal, vencimiento, querella, defensa, fiscal,
+                                    juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario,
+                                    imputados, agendar: val
+                                })
+                            }}
+                        />
+                        Agendar
+                    </label>
+                </div>
             </td>
-            <td className={`${styles.cellBodyFixed} ${styles.cellBodyDocuments}`}>
-                <ExpandContent label="Docs">
-                    {data.documentos?.map((el, idx) => (
-                        <a key={idx} href={el.link} target="_blank" rel="noopener noreferrer">
-                            📄 {el.nombre}
-                        </a>
-                    ))}
-                    {(!data.documentos || data.documentos.length === 0) && (
-                        <span style={{ fontSize: '11px', color: '#999' }}>No hay docs</span>
-                    )}
-                </ExpandContent>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyDocuments} ${styles.cellBodyActions}`}>
+                <div className={styles.cellActionWrapper}>
+                    <ExpandContent label="Docs">
+                        {data.documentos?.map((el, idx) => (
+                            <a key={idx} href={el.link} target="_blank" rel="noopener noreferrer">
+                                📄 {el.nombre}
+                            </a>
+                        ))}
+                        {(!data.documentos || data.documentos.length === 0) && (
+                            <span style={{ fontSize: '11px', color: '#999' }}>No hay docs</span>
+                        )}
+                    </ExpandContent>
+                    <a className={`${styles.linkSolATag}`} href={data.linkSol} target="_blank" rel="noopener noreferrer">
+                        <p className={`${styles.linkSolATagText}`}>Link</p>
+                    </a>
+                </div>
             </td>
         </tr>
     )

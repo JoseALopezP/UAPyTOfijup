@@ -61,8 +61,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                         }
                     }
 
-                    // ── 2. Intervinientes ────────────────────────────────────
-                    // Buscamos el panel cuyo título sea "Intervinientes"
+                    // ── 2. Intervinientes (solo primera página, paginación se hace fuera) ──
                     const intervinientes = {};
                     const panels = document.querySelectorAll('.kv-flat-b');
                     for (const panel of panels) {
@@ -75,23 +74,25 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                             const td = row.querySelector('td .kv-attribute');
                             if (!th || !td) continue;
 
-                            // Clave: "DEFENSOR PARTICULAR" → "defensor_particular"
                             const key = th.innerText.trim().toLowerCase().replace(/\s+/g, '_');
-
-                            // Nombre: solo el primer nodo de texto (antes de <b>)
                             const firstText = Array.from(td.childNodes)
                                 .filter(n => n.nodeType === 3)
                                 .map(n => n.textContent.trim())
                                 .filter(Boolean)[0] || td.innerText.trim();
 
                             if (!intervinientes[key]) intervinientes[key] = [];
-                            intervinientes[key].push(firstText);
+
+                            // Si es IMPUTADO, guardamos como objeto {nombre, dni: null}
+                            if (key === 'imputado') {
+                                intervinientes[key].push({ nombre: firstText, dni: null });
+                            } else {
+                                intervinientes[key].push(firstText);
+                            }
                         }
                         break;
                     }
 
                     // ── 3. Documentos ────────────────────────────────────────
-                    // El tab activo "#solicitud" contiene la tabla de documentos
                     const docRows = document.querySelectorAll('#solicitud .kv-grid-container table tbody tr[data-key]');
                     const documentos = Array.from(docRows).map(row => {
                         const nombre = row.querySelector('td[data-col-seq="0"]')?.innerText.trim() || null;
@@ -110,24 +111,150 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                         }
                     }
 
-                    return { tipo, solicitante, intervinientes, documentos };
+                    // ── 5. Paginación de intervinientes: info del pager ───────
+                    const pagerEl = document.querySelector('.kv-panel-pager span.kv-panel-pager-info, .summary');
+                    let paginaActual = 1;
+                    let totalPaginas = 1;
+                    if (pagerEl) {
+                        const match = pagerEl.innerText.match(/(\d+)\s*[-–]\s*\d+\s*of\s*(\d+)/i);
+                        if (match) totalPaginas = Math.ceil(parseInt(match[2]) / 10);
+                    }
+
+                    return { tipo, solicitante, intervinientes, documentos, paginaActual, totalPaginas };
                 });
 
+                // ── Paginación de intervinientes ─────────────────────────────
+                // Si hay más de 1 página de intervinientes, las recorremos
+                if (extra.totalPaginas > 1) {
+                    log(`  -> Intervinientes paginados: ${extra.totalPaginas} páginas`);
+                    for (let pg = 2; pg <= extra.totalPaginas; pg++) {
+                        // La paginación suele ser PJAX, buscamos el link de siguiente página
+                        await page.evaluate((pgNum) => {
+                            const links = document.querySelectorAll('.kv-panel-pager a[data-pjax]');
+                            for (const link of links) {
+                                if (link.innerText.trim() === String(pgNum) || link.getAttribute('data-page') === String(pgNum)) {
+                                    link.click();
+                                    return;
+                                }
+                            }
+                            // fallback: botón "next"
+                            const next = document.querySelector('.kv-panel-pager .next a');
+                            if (next) next.click();
+                        }, pg);
+
+                        await new Promise(r => setTimeout(r, 1500));
+
+                        const moreRows = await page.evaluate(() => {
+                            const result = {};
+                            const panels = document.querySelectorAll('.kv-flat-b');
+                            for (const panel of panels) {
+                                const title = panel.querySelector('.panel-title');
+                                if (!title || title.innerText.trim() !== 'Intervinientes') continue;
+                                const ivRows = panel.querySelectorAll('.detail-view tbody tr');
+                                for (const row of ivRows) {
+                                    const th = row.querySelector('th');
+                                    const td = row.querySelector('td .kv-attribute');
+                                    if (!th || !td) continue;
+                                    const key = th.innerText.trim().toLowerCase().replace(/\s+/g, '_');
+                                    const firstText = Array.from(td.childNodes)
+                                        .filter(n => n.nodeType === 3)
+                                        .map(n => n.textContent.trim())
+                                        .filter(Boolean)[0] || td.innerText.trim();
+                                    if (!result[key]) result[key] = [];
+                                    if (key === 'imputado') {
+                                        result[key].push({ nombre: firstText, dni: null });
+                                    } else {
+                                        result[key].push(firstText);
+                                    }
+                                }
+                                break;
+                            }
+                            return result;
+                        });
+
+                        // Merge moreRows into extra.intervinientes
+                        for (const [key, vals] of Object.entries(moreRows)) {
+                            if (!extra.intervinientes[key]) extra.intervinientes[key] = [];
+                            extra.intervinientes[key].push(...vals);
+                        }
+                    }
+                }
+
                 results.push({ ...sol, ...extra });
+
+                // ── Filtro temprano: FLAGRANCIA en solicitante ────────────
+                if (extra.solicitante && /flagrancia/i.test(extra.solicitante)) {
+                    log(`  -> FLAGRANCIA en solicitante ("${extra.solicitante}"). Descartando.`);
+                    results.pop();
+                    continue;
+                }
 
                 // ── Navegar al legajo ─────────────────────────────────────
                 if (sol.linkLeg) {
                     log(`  -> Legajo: ${sol.linkLeg}`);
                     await page.goto(sol.linkLeg, { waitUntil: "networkidle2", timeout: 30000 });
 
-                    const extraLeg = await page.evaluate((solImputados) => {
-                        // Helper: busca el valor de una fila por texto del th
+                    // Helper: navega todas las páginas de un paginador y acumula datos
+                    // extractFn() -> debe devolver { data: any[], hasNext: bool }
+                    const paginarTabla = async (containerSelector, extractFn, mergeInto) => {
+                        while (true) {
+                            const { data, hasNext } = await extractFn();
+
+                            // Merge: array → push, objeto → por clave
+                            if (Array.isArray(mergeInto)) {
+                                mergeInto.push(...data);
+                            } else {
+                                for (const [k, vals] of Object.entries(data)) {
+                                    if (!mergeInto[k]) mergeInto[k] = [];
+                                    mergeInto[k].push(...(Array.isArray(vals) ? vals : [vals]));
+                                }
+                            }
+
+                            if (!hasNext) break;
+
+                            // Leer página activa ANTES de hacer click
+                            const beforePage = await page.evaluate((sel) => {
+                                const panel = document.querySelector(sel)?.closest('.panel') ||
+                                    document.querySelector(sel)?.closest('.tab-pane');
+                                const active = panel?.querySelector('.pagination li.active a');
+                                return active ? active.getAttribute('data-page') : null;
+                            }, containerSelector);
+
+                            // Click en "next"
+                            await page.evaluate((sel) => {
+                                const panel = document.querySelector(sel)?.closest('.panel') ||
+                                    document.querySelector(sel)?.closest('.tab-pane');
+                                const next = panel?.querySelector('li.next:not(.disabled) a');
+                                if (next) next.click();
+                            }, containerSelector);
+
+                            // Esperar que la página activa cambie (max 15s)
+                            const deadline = Date.now() + 15000;
+                            let changed = false;
+                            while (Date.now() < deadline) {
+                                await new Promise(r => setTimeout(r, 600));
+                                const currentPage = await page.evaluate((sel) => {
+                                    const panel = document.querySelector(sel)?.closest('.panel') ||
+                                        document.querySelector(sel)?.closest('.tab-pane');
+                                    const active = panel?.querySelector('.pagination li.active a');
+                                    return active ? active.getAttribute('data-page') : null;
+                                }, containerSelector);
+                                if (currentPage !== beforePage) { changed = true; break; }
+                            }
+                            if (!changed) {
+                                log(`  -> Timeout esperando página siguiente en ${containerSelector}, abortando paginación`);
+                                break;
+                            }
+                        }
+                    };
+
+                    // ── 1. Fiscal a Cargo y UFI (datos de cabecera, sin paginación) ────
+                    const { fiscalACargo, ufi } = await page.evaluate(() => {
                         const getField = (label) => {
                             const rows = document.querySelectorAll('.detail-view tbody tr');
                             for (const row of rows) {
                                 const th = row.querySelector('th');
                                 if (th && th.innerText.trim() === label) {
-                                    // Usamos .kv-editable-value si existe (campos editables inline)
                                     const editable = row.querySelector('.kv-editable-value');
                                     if (editable) return editable.innerText.trim() || null;
                                     return row.querySelector('td .kv-attribute')?.innerText.trim() || null;
@@ -135,116 +262,141 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                             }
                             return null;
                         };
+                        return { fiscalACargo: getField('Fiscal a Cargo'), ufi: getField('Organismo') };
+                    });
 
-                        // ── 1. Fiscal a Cargo ─────────────────────────────
-                        const fiscalACargo = getField('Fiscal a Cargo');
+                    // ── Filtro FLAGRANCIA ──────────────────────────────────
+                    if (ufi && /flagrancia/i.test(ufi)) {
+                        log(`  -> FLAGRANCIA detectada en UFI ("${ufi}"). Descartando solicitud.`);
+                        results.pop(); // Elimina el resultado ya pusheado
+                        continue;     // Pasa a la siguiente solicitud del chunk
+                    }
 
-                        // ── 2. UFI / Organismo ────────────────────────────
-                        const ufi = getField('Organismo');
+                    // ── 2. Partes del legajo (paginadas) ──────────────────────────────
+                    const partesLegajo = {};
+                    const imputadosMatch = [];
 
-                        // ── 3. Partes del legajo ──────────────────────────
-                        const partesLegajo = [];
-                        const imputadosMatch = [];
+                    await paginarTabla(
+                        '#w9-container',   // el paginador está en el panel que contiene este id
+                        async () => {
+                            return page.evaluate(() => {
+                                const data = {};
+                                const impMatches = [];
+                                const hasNext = !!document.querySelector(
+                                    // Paginador del panel partes, siguiente no desactivado
+                                    '#w9-container ~ .panel-footer li.next:not(.disabled) a,' +
+                                    '#w9-container + .panel-footer li.next:not(.disabled) a'
+                                ) || (() => {
+                                    // fallback: buscar el panel-footer más cercano a #w9-container
+                                    const el = document.querySelector('#w9-container');
+                                    const panel = el?.closest('.panel');
+                                    return !!panel?.querySelector('li.next:not(.disabled) a');
+                                })();
 
-                        Array.from(
-                            document.querySelectorAll('#w9-container table tbody tr[data-key]')
-                        ).forEach(row => {
-                            const tdNombre = row.querySelector('td[data-col-seq="0"]');
-                            const aEl = tdNombre ? tdNombre.querySelector('a') : null;
-                            const rolEl = row.querySelector('td[data-col-seq="1"]');
-                            if (!tdNombre || !rolEl) return;
+                                Array.from(
+                                    document.querySelectorAll('#w9-container table tbody tr[data-key]')
+                                ).forEach(row => {
+                                    const tdNombre = row.querySelector('td[data-col-seq="0"]');
+                                    const aEl = tdNombre?.querySelector('a');
+                                    const rolEl = row.querySelector('td[data-col-seq="1"]');
+                                    if (!tdNombre || !rolEl) return;
 
-                            const nombreRaw = (aEl ? aEl.innerText : tdNombre.innerText).trim();
-                            const nombreLimpio = nombreRaw.replace(/\(.*\)/g, '').trim();
+                                    const nombreRaw = (aEl ? aEl.innerText : tdNombre.innerText).trim();
+                                    const nombreLimpio = nombreRaw.replace(/\(.*\)/g, '').trim();
+                                    const key = rolEl.innerText.trim().toLowerCase().replace(/\s+/g, '_');
 
-                            const rol = rolEl.innerText.trim();
-                            const key = rol.toLowerCase().replace(/\s+/g, '_');
+                                    if (!data[key]) data[key] = [];
+                                    data[key].push(nombreLimpio);
 
-                            if (key === 'imputado') {
-                                const link = aEl ? aEl.getAttribute('href') : null;
-                                // Verificamos si este imputado existe en intervinientes.imputado
-                                // O si la lista original vino vacía, extraemos TODOS los imputados del legajo.
-                                const coincide = !solImputados || solImputados.length === 0 || solImputados.some(imp =>
-                                    nombreLimpio.includes(imp) || imp.includes(nombreLimpio)
-                                );
-                                if (coincide) {
-                                    imputadosMatch.push({ nombre: nombreLimpio, link });
-                                }
-                            }
+                                    if (key === 'imputado') {
+                                        impMatches.push({ nombre: nombreLimpio, link: aEl?.getAttribute('href') || null, dni: null });
+                                    }
+                                });
 
+                                return { data, imputados: impMatches, hasNext };
+                            }).then(res => {
+                                imputadosMatch.push(...res.imputados);
+                                return { data: res.data, hasNext: res.hasNext };
+                            });
+                        },
+                        partesLegajo
+                    );
 
-                            partesLegajo.push({ [key]: nombreLimpio });
-                        });
+                    log(`  -> Partes extraídas: ${Object.values(partesLegajo).flat().length} total`);
 
-                        return { fiscalACargo, ufi, partesLegajo, imputadosMatch };
-                    }, sol.intervinientes?.imputado || []);
-
-                    // ── Calificaciones (tab PJAX) ──────────────────────────
+                    // ── 3. Calificaciones/delitos (tab PJAX, puede paginar) ───────────
                     await page.click('a[href="#calificaciones"]');
-                    // Esperamos hasta 15s a que cargue el contenido del tab
                     await page.waitForSelector(
                         '#calificaciones .kv-grid-container table tbody tr',
                         { timeout: 15000 }
-                    ).catch(() => null); // Si no hay filas o no carga, seguimos igual
+                    ).catch(() => null);
 
-                    const delitos = await page.evaluate(() =>
-                        Array.from(
-                            document.querySelectorAll('#calificaciones .kv-grid-container table tbody tr[data-key]')
-                        ).map(row => {
-                            const tipoEl = row.querySelector('td[data-col-seq="0"]');
-                            return tipoEl ? tipoEl.innerText.trim() : null;
-                        }).filter(Boolean)
+                    const delitos = [];
+                    await paginarTabla(
+                        '#calificaciones',
+                        async () => {
+                            return page.evaluate(() => {
+                                const data = Array.from(
+                                    document.querySelectorAll('#calificaciones .kv-grid-container table tbody tr[data-key]')
+                                ).map(row => row.querySelector('td[data-col-seq="0"]')?.innerText.trim()).filter(Boolean);
+
+                                const panel = document.querySelector('#calificaciones')?.closest('.panel, .tab-pane');
+                                const hasNext = !!panel?.querySelector('li.next:not(.disabled) a');
+                                return { data, hasNext };
+                            });
+                        },
+                        delitos
                     );
 
-                    // Enriquecemos el último resultado con todos los datos del legajo
-                    const imputadosFinales = extraLeg.imputadosMatch || [];
-                    // Usamos los intervinientes ya extraídos del linkSol (que están en el último result)
+                    // Enriquecemos el último resultado
                     const finalIntervinientes = { ...results[results.length - 1].intervinientes };
-                    if (imputadosFinales.length > 0) {
-                        finalIntervinientes.imputado = imputadosFinales;
+                    if (imputadosMatch.length > 0) {
+                        finalIntervinientes.imputado = imputadosMatch;
                     }
-
-                    const finalExtraLeg = { ...extraLeg };
-                    delete finalExtraLeg.imputadosMatch; // Removemos datos temporales
 
                     results[results.length - 1] = {
                         ...results[results.length - 1],
-                        ...finalExtraLeg,
+                        fiscalACargo, ufi,
+                        partesLegajo,
                         intervinientes: finalIntervinientes,
                         delitos,
                     };
 
-
-                    // ── Jueces (tab PJAX) ──────────────────────────────────
+                    // ── 4. Jueces (tab PJAX, puede paginar) ───────────────────────────
                     await page.click('a[href="#jueces"]');
                     await page.waitForSelector(
                         '#jueces .kv-grid-container table tbody tr',
                         { timeout: 15000 }
                     ).catch(() => null);
 
-                    const jueces = await page.evaluate(() =>
-                        Array.from(
-                            document.querySelectorAll('#jueces .kv-grid-container table tbody tr[data-key]')
-                        ).map(row => {
-                            // El nombre está directamente en td[data-col-seq="1"] (texto plano, no link)
-                            const td = row.querySelector('td[data-col-seq="1"]');
-                            return td ? td.innerText.trim() : null;
-                        }).filter(Boolean)
+                    const jueces = [];
+                    await paginarTabla(
+                        '#jueces',
+                        async () => {
+                            return page.evaluate(() => {
+                                const data = Array.from(
+                                    document.querySelectorAll('#jueces .kv-grid-container table tbody tr[data-key]')
+                                ).map(row => row.querySelector('td[data-col-seq="1"]')?.innerText.trim()).filter(Boolean);
+
+                                const panel = document.querySelector('#jueces')?.closest('.panel, .tab-pane');
+                                const hasNext = !!panel?.querySelector('li.next:not(.disabled) a');
+                                return { data, hasNext };
+                            });
+                        },
+                        jueces
                     );
 
                     results[results.length - 1] = { ...results[results.length - 1], jueces };
+                    log(`  -> Jueces extraídos: ${jueces.length}`);
 
                     // ── Extracción DNI (Navegación perfiles - AL FINAL) ─────
-                    if (imputadosFinales.length > 0) {
-                        log(`  -> Extrayendo DNI de ${imputadosFinales.length} imputados...`);
+                    if (imputadosMatch.length > 0) {
+                        log(`  -> Extrayendo DNI de ${imputadosMatch.length} imputados...`);
                         const urlObj = new URL(sol.linkLeg);
                         const baseURL = `${urlObj.protocol}//${urlObj.host}`;
 
-                        for (const imp of imputadosFinales) {
-                            if (!imp.link) {
-                                imp.dni = null;
-                                continue;
-                            }
+                        for (const imp of imputadosMatch) {
+                            if (!imp.link) { imp.dni = null; continue; }
                             const profileURL = imp.link.startsWith('http') ? imp.link : `${baseURL}${imp.link}`;
                             try {
                                 await page.goto(profileURL, { waitUntil: "domcontentloaded", timeout: 15000 });
@@ -275,6 +427,9 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                                 imp.dni = null;
                             }
                         }
+
+                        // Guardamos imputados con DNI actualizado en el resultado final
+                        results[results.length - 1].intervinientes.imputado = imputadosMatch;
                     }
                 } // End if (sol.linkLeg)
 
