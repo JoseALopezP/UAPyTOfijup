@@ -2,6 +2,7 @@
 import { useContext, useState, useEffect, useRef } from "react"
 import { DataContext } from "@/context New/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
+import ExpandContent from "./ExpandContent"
 
 export default function RowSol({ data, onStatusChange, forceSave }) {
     const { solicitudesData, addSolicitudData } = useContext(DataContext)
@@ -9,13 +10,14 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     const [toSave, setToSave] = useState(false)
     const [doSave, setDoSave] = useState(false)
 
-    const rowKey = `${data.numeroLeg}_${data.fyhcreacion}`
+    const rowKey = data.linkSol
+        ? data.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
+        : `${data.numeroLeg}_${data.fyhcreacion}`
 
     const savedData = solicitudesData && Array.isArray(solicitudesData)
         ? (solicitudesData.find(item => item.rowKey === rowKey) || {})
         : {}
 
-    // ── Estados editables ────────────────────────────────────────────────────
     const [sitCorporal, setSitCorporal] = useState(savedData.sitCorporal || data.sitCorporal || '')
     const [vencimiento, setVencimiento] = useState(savedData.vencimiento || data.vencimiento || '')
     const [querella, setQuerella] = useState(savedData.querella || (data.intervinientes?.querella?.join(', ') ?? ''))
@@ -29,7 +31,6 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     const [juezCausa, setJuezCausa] = useState(savedData.juezCausa || (data.intervinientes?.juez_causa?.join(', ') ?? ''))
     const [comentario, setComentario] = useState(savedData.comentario || (data.intervinientes?.comentario?.join(', ') ?? ''))
 
-    // ── Estados de validación ────────────────────────────────────────────────
     const [sitCorporalT, setSitCorporalT] = useState(true)
     const [vencimientoT, setVencimientoT] = useState(true)
     const [querellaT, setQuerellaT] = useState(true)
@@ -42,7 +43,6 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     const [salaT, setSalaT] = useState(true)
     const [juezCausaT, setJuezCausaT] = useState(true)
 
-    // ── Notificar estado al padre ────────────────────────────────────────────
     useEffect(() => {
         if (onStatusChange) onStatusChange(rowKey, toSave)
     }, [toSave, rowKey])
@@ -51,7 +51,6 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
         if (forceSave && toSave) setDoSave(true)
     }, [forceSave, toSave])
 
-    // ── Validación ───────────────────────────────────────────────────────────
     const checkForDiff = () => {
         setSitCorporalT(sitCorporal !== '')
         setVencimientoT(vencimiento !== '')
@@ -67,43 +66,59 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     }
 
     const checkChanges = () => {
+        if (!hasInitialSync.current) return;
+
+        // Debemos comparar contra lo mismo que usamos para inicializar
+        const getBaseValue = (field, scraperValue) => {
+            if (savedData && savedData[field] !== undefined) return savedData[field];
+            return scraperValue || '';
+        };
+
         const hasChanges = (
-            sitCorporal !== (savedData.sitCorporal || '') ||
-            vencimiento !== (savedData.vencimiento || '') ||
-            querella !== (savedData.querella || '') ||
-            defensa !== (savedData.defensa || '') ||
-            fiscal !== (savedData.fiscal || '') ||
-            juez !== (savedData.juez || '') ||
-            motivo !== (savedData.motivo || '') ||
-            fechaAudiencia !== (savedData.fechaAudiencia || '') ||
-            horaAudiencia !== (savedData.horaAudiencia || '') ||
-            sala !== (savedData.sala || '') ||
-            juezCausa !== (savedData.juezCausa || '') ||
-            comentario !== (savedData.comentario || '')
+            (sitCorporal || '') !== getBaseValue('sitCorporal', data.sitCorporal) ||
+            (vencimiento || '') !== getBaseValue('vencimiento', data.vencimiento) ||
+            (querella || '') !== getBaseValue('querella', data.intervinientes?.querella?.join(', ')) ||
+            (defensa || '') !== getBaseValue('defensa', data.intervinientes?.defensor_oficial?.join(', ') || data.intervinientes?.defensor_particular?.join(', ')) ||
+            (fiscal || '') !== getBaseValue('fiscal', data.intervinientes?.fiscal?.join(', ')) ||
+            (juez || '') !== getBaseValue('juez', data.intervinientes?.juez?.join(', ')) ||
+            (motivo || '') !== getBaseValue('motivo', data.intervinientes?.motivo?.join(', ')) ||
+            (fechaAudiencia || '') !== getBaseValue('fechaAudiencia', data.intervinientes?.fecha_audiencia?.join(', ')) ||
+            (horaAudiencia || '') !== getBaseValue('horaAudiencia', data.intervinientes?.hora_audiencia?.join(', ')) ||
+            (sala || '') !== getBaseValue('sala', data.intervinientes?.sala?.join(', ')) ||
+            (juezCausa || '') !== getBaseValue('juezCausa', data.intervinientes?.juez_causa?.join(', ')) ||
+            (comentario || '') !== getBaseValue('comentario', data.intervinientes?.comentario?.join(', '))
         )
-        if (hasInitialSync.current) setToSave(hasChanges)
+        setToSave(hasChanges)
     }
 
-    // ── Sync inicial con savedData ───────────────────────────────────────────
     useEffect(() => {
-        if (savedData && Object.keys(savedData).length > 0) {
-            setSitCorporal(savedData.sitCorporal || '')
-            setVencimiento(savedData.vencimiento || '')
-            setQuerella(savedData.querella || '')
-            setDefensa(savedData.defensa || '')
-            setFiscal(savedData.fiscal || '')
-            setJuez(savedData.juez || '')
-            setMotivo(savedData.motivo || '')
-            setFechaAudiencia(savedData.fechaAudiencia || '')
-            setHoraAudiencia(savedData.horaAudiencia || '')
-            setSala(savedData.sala || '')
-            setJuezCausa(savedData.juezCausa || '')
-            setComentario(savedData.comentario || '')
-            hasInitialSync.current = true
-        } else if (solicitudesData && Array.isArray(solicitudesData)) {
-            hasInitialSync.current = true
+        if (solicitudesData && Array.isArray(solicitudesData)) {
+            // Buscamos si hay datos guardados
+            const saved = solicitudesData.find(item => item.rowKey === rowKey) || {}
+
+            const syncField = (savedVal, scraperVal) => {
+                return savedVal !== undefined ? savedVal : (scraperVal || '');
+            };
+
+            setSitCorporal(syncField(saved.sitCorporal, data.sitCorporal))
+            setVencimiento(syncField(saved.vencimiento, data.vencimiento))
+            setQuerella(syncField(saved.querella, data.intervinientes?.querella?.join(', ')))
+            setDefensa(syncField(saved.defensa, data.intervinientes?.defensor_oficial?.join(', ') || data.intervinientes?.defensor_particular?.join(', ')))
+            setFiscal(syncField(saved.fiscal, data.intervinientes?.fiscal?.join(', ')))
+            setJuez(syncField(saved.juez, data.intervinientes?.juez?.join(', ')))
+            setMotivo(syncField(saved.motivo, data.intervinientes?.motivo?.join(', ')))
+            setFechaAudiencia(syncField(saved.fechaAudiencia, data.intervinientes?.fecha_audiencia?.join(', ')))
+            setHoraAudiencia(syncField(saved.horaAudiencia, data.intervinientes?.hora_audiencia?.join(', ')))
+            setSala(syncField(saved.sala, data.intervinientes?.sala?.join(', ')))
+            setJuezCausa(syncField(saved.juezCausa, data.intervinientes?.juez_causa?.join(', ')))
+            setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
+
+            // Retrasamos la sincronización inicial para permitir que los estados se asienten
+            setTimeout(() => {
+                hasInitialSync.current = true
+            }, 800)
         }
-    }, [savedData, solicitudesData])
+    }, [solicitudesData, data])
 
     useEffect(() => {
         checkForDiff()
@@ -113,7 +128,6 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
         checkChanges()
     }, [sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, savedData])
 
-    // ── Guardado en Firestore ─────────────────────────────────────────────────
     useEffect(() => {
         const saveRow = async () => {
             if (doSave) {
@@ -136,18 +150,15 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
         : `${styles.cellBodyFixed} ${styles.cellBodyError}`
 
     return (
-        <tr>
-            {/* Solo lectura */}
-            <td>{data.numeroLeg}</td>
-            <td>{data.fyhcreacion}</td>
-            <td>{data.solicitante}</td>
-            <td>{data.tipo}</td>
-            <td>{data.intervinientes?.imputado?.length ?? 0}</td>
-            <td>{data.intervinientes?.imputado?.map((imp, i) => (
+        <tr className={styles.tableRow}>
+            <td className={`${styles.cellBodyFixed}`}>{data.numeroLeg}</td>
+            <td className={`${styles.cellBodyFixed}`}>{data.fyhcreacion}</td>
+            <td className={`${styles.cellBodyFixed}`}>{data.solicitante}</td>
+            <td className={`${styles.cellBodyFixed}`}>{data.tipo}</td>
+            <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.length ?? 0}</td>
+            <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.map((imp, i) => (
                 <div key={i}>{imp.nombre}{imp.dni ? ` (${imp.dni})` : ''}</div>
             ))}</td>
-
-            {/* Editables */}
             <td className={cell(sitCorporalT)}>
                 <textarea className={styles.inputCell} value={sitCorporal} onChange={e => setSitCorporal(e.target.value)} />
             </td>
@@ -160,7 +171,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             <td className={cell(defensaT)}>
                 <textarea className={styles.inputCell} value={defensa} onChange={e => setDefensa(e.target.value)} />
             </td>
-            <td>{data.ufi}</td>
+            <td className={`${styles.cellBodyFixed}`}>{data.ufi}</td>
             <td className={cell(fiscalT)}>
                 <textarea className={styles.inputCell} value={fiscal} onChange={e => setFiscal(e.target.value)} />
             </td>
@@ -185,8 +196,6 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={styles.inputCell} value={comentario} onChange={e => setComentario(e.target.value)} />
             </td>
-
-            {/* Guardar */}
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center' }}>
                 <button
                     onClick={() => setDoSave(true)}
@@ -195,6 +204,18 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
                 >
                     💾
                 </button>
+            </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyDocuments}`}>
+                <ExpandContent label="Docs">
+                    {data.documentos?.map((el, idx) => (
+                        <a key={idx} href={el.link} target="_blank" rel="noopener noreferrer">
+                            📄 {el.nombre}
+                        </a>
+                    ))}
+                    {(!data.documentos || data.documentos.length === 0) && (
+                        <span style={{ fontSize: '11px', color: '#999' }}>No hay docs</span>
+                    )}
+                </ExpandContent>
             </td>
         </tr>
     )

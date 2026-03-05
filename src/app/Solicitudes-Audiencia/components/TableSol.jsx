@@ -1,12 +1,52 @@
 'use client'
-import { useContext } from "react"
+import { useContext, useEffect, useState, useCallback } from "react"
 import { DataContext } from "@/context New/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
+import RowSol from "./RowSol"
+import { compareFyH } from "@/utils/compareFecha"
 
 export default function TableSol() {
-    const { solicitudesCompletadas } = useContext(DataContext)
+    const { solicitudesCompletadas, updateSolicitudesCompletadas, updateSolicitudesData } = useContext(DataContext)
+    const [pendingRows, setPendingRows] = useState({})
+    const [forceSave, setForceSave] = useState(false)
+
+    useEffect(() => {
+        updateSolicitudesCompletadas()
+        updateSolicitudesData()
+    }, [])
+
+    // Cada RowSol llama esto cuando cambia su estado de "tiene cambios"
+    const onStatusChange = useCallback((rowKey, hasChanges) => {
+        setPendingRows(prev => {
+            const updated = { ...prev }
+            if (hasChanges) {
+                updated[rowKey] = true
+            } else {
+                delete updated[rowKey]
+            }
+            return updated
+        })
+    }, [])
+
+    const handleSaveAll = () => {
+        setForceSave(true)
+        // Reseteamos forceSave en el siguiente tick para que pueda volver a dispararse
+        setTimeout(() => setForceSave(false), 100)
+    }
+
+    const pendingCount = Object.keys(pendingRows).length
+
     return (
         <div className={styles.tableWrapper}>
+            {pendingCount > 0 && (
+                <button
+                    className={styles.saveAllButton}
+                    onClick={handleSaveAll}
+                    title={`Guardar ${pendingCount} fila${pendingCount > 1 ? 's' : ''} con cambios`}
+                >
+                    💾 Guardar todo ({pendingCount})
+                </button>
+            )}
             <table className={`${styles.tableSol}`}>
                 <thead>
                     <tr>
@@ -30,11 +70,17 @@ export default function TableSol() {
                         <th className={`${styles.tableHeaderTh}`}>JUEZ DE LA CAUSA</th>
                         <th className={`${styles.tableHeaderTh}`}>COMENTARIO</th>
                         <th className={`${styles.tableHeaderTh}`}>ACCIONES</th>
+                        <th className={`${styles.tableHeaderTh} ${styles.headerThNarrow}`}>DOCUMENTOS</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {solicitudesCompletadas && solicitudesCompletadas.map((solicitud, index) => (
-                        <RowSol key={index} data={solicitud} />
+                    {solicitudesCompletadas && solicitudesCompletadas.sort((a, b) => compareFyH(a.fyhcreacion, b.fyhcreacion)).map((solicitud, index) => (
+                        <RowSol d
+                            key={index}
+                            data={solicitud}
+                            onStatusChange={onStatusChange}
+                            forceSave={forceSave}
+                        />
                     ))}
                 </tbody>
             </table>

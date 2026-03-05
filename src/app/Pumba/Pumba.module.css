@@ -283,3 +283,15 @@ textarea.inputCell {
 .tableRowCompleted {
     opacity: 0.3;
 }
+
+.cellBodyDocuments {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: scroll;
+}
+
+.cellBodyDocuments a {
+    text-decoration: none;
+    color: #fff;
+}

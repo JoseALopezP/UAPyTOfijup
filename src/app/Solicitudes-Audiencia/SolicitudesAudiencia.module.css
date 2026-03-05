@@ -86,6 +86,7 @@
     text-align: center;
     overflow: hidden;
     border: solid 1px #3b3b3b;
+    background-color: #1f1f1f;
     height: 50px;
     padding: 0;
     box-sizing: border-box;
@@ -114,4 +115,144 @@
     resize: none;
     line-height: 1.2;
     text-align: center;
+}
+
+.saveAllButton {
+    position: fixed;
+    bottom: 24px;
+    right: 28px;
+    z-index: 100;
+    padding: 10px 20px;
+    background-color: #2d6a4f;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.2s, transform 0.1s;
+    animation: fadeInUp 0.2s ease;
+}
+
+.saveAllButton:hover {
+    background-color: #40916c;
+    transform: translateY(-2px);
+}
+
+.saveAllButton:active {
+    transform: translateY(0);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tableRow td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background-color: #2b2b2b;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.cellBodyDocuments {
+    padding: 0;
+    width: 100px;
+    min-width: 100px;
+    vertical-align: top;
+}
+
+.documentLinksWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 5px;
+    height: 50px;
+    max-height: 50px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Scrollbar styling for a premium feel */
+.documentLinksWrapper::-webkit-scrollbar {
+    width: 4px;
+}
+
+.documentLinksWrapper::-webkit-scrollbar-track {
+    background: #1f1f1f;
+}
+
+.documentLinksWrapper::-webkit-scrollbar-thumb {
+    background: #3b3b3b;
+    border-radius: 10px;
+}
+
+.documentLinksWrapper::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.cellBodyDocuments a {
+    text-decoration: none !important;
+    color: #4da6ff;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    text-align: left;
+}
+
+.cellBodyDocuments a:hover {
+    color: #80bfff;
+    text-decoration: underline !important;
+}
+
+.expandContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.expandButton {
+    background-color: #3b3b3b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.expandButton:hover {
+    background-color: #555;
+}
+
+.expandDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.headerThNarrow {
+    width: 100px !important;
+    min-width: 100px !important;
 }

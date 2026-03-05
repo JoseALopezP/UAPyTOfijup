@@ -1,8 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { DataContext } from '@/context New/DataContext'
 import styles from '../SolicitudesAudiencia.module.css'
 
 export default function HeaderSolicitudes() {
+    const { solicitudesCompletadas, addSolicitudCompletada } = useContext(DataContext);
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
 
@@ -12,10 +14,12 @@ export default function HeaderSolicitudes() {
             setIsSyncing(true);
             setSyncStatus('Iniciando...');
 
+            const existingData = Array.isArray(solicitudesCompletadas) ? solicitudesCompletadas : [];
+
             const response = await fetch('/api/extraer-solicitudes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ existingData: [] }),
+                body: JSON.stringify({ existingData }),
             });
 
             if (!response.body) throw new Error("No readable stream");
@@ -39,8 +43,18 @@ export default function HeaderSolicitudes() {
                         if (parsed.type === 'progress') {
                             setSyncStatus(parsed.message);
                         } else if (parsed.type === 'done') {
-                            setSyncStatus('Sincronización completada.');
-                            console.log("Datos finales recibidos:", parsed.data);
+                            const newItems = parsed.data || [];
+                            console.log(`[ui] Guardando ${newItems.length} solicitudes nuevas en Firestore...`);
+                            setSyncStatus(`Guardando ${newItems.length} solicitudes...`);
+                            for (const item of newItems) {
+                                const rowKey = item.linkSol
+                                    ? item.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
+                                    : `${item.numeroLeg}_${item.fyhcreacion}`;
+                                await addSolicitudCompletada(rowKey, item);
+                            }
+
+                            setSyncStatus(`✓ ${newItems.length} solicitudes guardadas.`);
+                            console.log("[ui] Guardado completo.");
                         } else if (parsed.type === 'error') {
                             setSyncStatus(`Error: ${parsed.error}`);
                         }

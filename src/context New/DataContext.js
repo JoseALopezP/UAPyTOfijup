@@ -348,6 +348,18 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     };
+    const updateSolicitudesData = async () => {
+        try {
+            const data = await getDocument('solicitudesData', 'solicitudes');
+            if (data) {
+                setSolicitudesData(Object.values(data));
+            } else {
+                setSolicitudesData([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
     const addSolicitudData = async (rowKey, data) => {
         try {
             await addOrUpdateObject('solicitudesData', 'solicitudes', rowKey, data);
@@ -365,6 +377,23 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     };
+    const addSolicitudCompletada = async (rowKey, data) => {
+        try {
+            await addOrUpdateObject('solicitudes', 'completadas', rowKey, data);
+            setSolicitudesCompletadas(prev => {
+                const newData = Array.isArray(prev) ? [...prev] : [];
+                const index = newData.findIndex(item => item.numeroLeg === data.numeroLeg && item.linkSol === data.linkSol);
+                if (index !== -1) {
+                    newData[index] = data;
+                } else {
+                    newData.unshift(data);
+                }
+                return newData;
+            });
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
     const addUser = async (data) => {
         await addObjectToDocument("users", "listaUsuarios", data);
     };
@@ -373,7 +402,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
-        updateSolicitudesCompletadas, addSolicitudData,
+        updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData
     };
