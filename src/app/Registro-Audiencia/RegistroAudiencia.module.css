@@ -1,4 +1,33 @@
+/* ══════════════════════════════════════════════════════════════
+   REGISTRO AUDIENCIA — CSS Variables Dark/Light
+   Estrategia: variables en .container, override con
+   :global(body.reg-light) .container
+   Los colores de estado (PROGRAMADA, FINALIZADA, etc.) se mantienen
+   porque son semánticos y funcionan bien en ambos modos.
+══════════════════════════════════════════════════════════════ */
+
+/* ── Variables dark (default) ────────────────────────────────── */
 .container {
+    --bg: #111111;
+    --surface: #181818;
+    --surface2: #1f1f1f;
+    --surface3: #242424;
+    --border: #2b2b2b;
+    --border2: #3c3c3c;
+    --text: #eaeef3;
+    --text2: #b0bbc9;
+    --text3: #6e7d91;
+    --accent: #0078d4;
+    --tab-active: #0078d4;
+    --nav-bg: #141414;
+    --input-bg: #1f1f1f;
+    --input-border: #3c3c3c;
+    --input-text: #d4d4d4;
+    --btn-hover: #2d2e2e;
+    --guardar-bg: #28a745;
+    --sticky-col: #161616;
+
+    /* layout */
     display: inline-flex;
     flex-direction: row;
     margin: 0;
@@ -7,15 +36,55 @@
     padding: 0;
     border-radius: 4px;
     height: calc(100vh - 10px);
-    flex-direction: row;
-    color: #fff;
     overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
-.container input {
+.container input,
+.container select,
+.container textarea,
+.container button {
     font-family: inherit;
 }
 
+/* ── Variables light ─────────────────────────────────────────── */
+/* Jerarquía de capas: bg (más oscuro) → surface → surface2 → surface3 → input=blanco
+   Misma lógica que dark pero en rango claro. Inputs blancos son el único blanco. */
+:global(body.light-mode) .container {
+    --bg: #c4ccd6;
+    /* fondo base (capa más profunda) */
+    --surface: #d4dae3;
+    /* paneles principales */
+    --surface2: #dfe4ec;
+    /* sub-paneles */
+    --surface3: #e8ecf2;
+    /* capas interiores */
+    --border: #a8b4c2;
+    /* separador visible */
+    --border2: #8898aa;
+    /* borde fuerte */
+    --text: #0d1117;
+    /* negro casi puro */
+    --text2: #1c2b3a;
+    /* texto secundario */
+    --text3: #45607a;
+    /* labels, placeholders */
+    --accent: #1a56cc;
+    --tab-active: #1a56cc;
+    --nav-bg: #bec8d4;
+    /* navbar más oscura que bg */
+    --input-bg: #ffffff;
+    /* único blanco — claramente editable */
+    --input-border: #9aaaba;
+    --input-text: #0d1117;
+    --btn-hover: #cbd2dc;
+    --guardar-bg: #15803d;
+    --sticky-col: #c0c8d4;
+}
+
+/* ── Panel izquierdo — lista de audiencias ───────────────────── */
 .listaBlock {
     display: inline-flex;
     flex-direction: column;
@@ -23,8 +92,9 @@
     width: 2vw;
     margin: 0;
     opacity: 0;
-    border-right: solid 1px #2B2B2B;
+    border-right: solid 1px var(--border);
     z-index: 2;
+    background: var(--surface);
 }
 
 .listaBlock:hover {
@@ -49,6 +119,7 @@
     height: 50px;
     width: 95%;
     opacity: .7;
+    transition: opacity 0.15s;
 }
 
 .listadoAudiencias:hover {
@@ -59,6 +130,7 @@
     opacity: 1;
 }
 
+/* ── Blocks de contenido ─────────────────────────────────────── */
 .block1 {
     width: 75%;
 }
@@ -69,31 +141,37 @@
     border-radius: 3px;
     margin: auto;
     flex-direction: column;
-    border: 1px solid #fff;
+    border: 1px solid var(--border2);
 }
 
+/* ── Textos ──────────────────────────────────────────────────── */
 .text {
     text-align: center;
     margin: 0;
+    color: var(--text);
 }
 
 .textEstado {
     font-weight: 400;
+    color: var(--text2);
 }
 
 .textLegajo {
     font-weight: 600;
+    color: var(--text);
 }
 
 .textHora {
-    color: #ffffffd1;
+    color: var(--text2);
     font-weight: 600;
 }
 
 .textoperador {
     font-weight: 500;
+    color: var(--text2);
 }
 
+/* ── Botones de estado (colores semánticos, no cambian con tema) */
 .buttonEstado {
     border-radius: 2px;
     width: 33%;
@@ -101,6 +179,13 @@
     outline: none;
     border: none;
     opacity: .1;
+    cursor: pointer;
+    font-weight: 700;
+    transition: opacity 0.15s;
+}
+
+.buttonEstado:hover {
+    opacity: 0.8 !important;
 }
 
 .DEMORADA {
@@ -171,6 +256,7 @@
     background-color: #6c757de0;
 }
 
+/* ── Flags imputado/condenado ────────────────────────────────── */
 .condenadoInput {
     background-color: #ffc107a0;
 }
@@ -203,6 +289,7 @@
     font-size: 22px;
 }
 
+/* ── Control change state ────────────────────────────────────── */
 .controlChangeStateButtonBlock {
     display: inline-flex;
     flex-direction: row;
@@ -210,9 +297,10 @@
     justify-content: space-between;
 }
 
+/* ── Control block (panel principal) ────────────────────────── */
 .controlBlock {
     width: 95vw;
-    background-color: #1F1F1F;
+    background: var(--surface2);
     display: inline-flex;
     flex-direction: row;
 }
@@ -220,65 +308,72 @@
 .controlBlockLeft {
     width: 36%;
     height: 100%;
-    border-right: solid 1px #2B2B2B;
+    border-right: solid 1px var(--border);
     overflow-y: scroll;
     overflow-x: hidden;
-    background-color: #181818;
+    background: var(--surface);
 }
 
+/* ── Botones de acción ───────────────────────────────────────── */
 .buttonChange {
     border-radius: 2px;
     height: 40px;
     font-weight: 700;
     opacity: .1;
     cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
 }
 
+.buttonChange:not([disabled]):hover {
+    opacity: 0.9 !important;
+}
+
+/* Estados disponibles */
 .REINICIAR {
     background-color: #6c757d;
     opacity: 1;
 }
 
 .CONTINUAR {
-    opacity: 1;
     background-color: #17a2b8;
+    opacity: 1;
 }
 
 .FINALIZAR {
-    opacity: 1;
     background-color: #28a745;
+    opacity: 1;
 }
 
 .CUARTOINTERMEDIO {
-    opacity: 1;
     background-color: #ffc107;
+    opacity: 1;
 }
 
 .INICIAR {
-    opacity: 1;
     background-color: #17a2b8;
-}
-
-.CAbidetcaNCELAR {
-    opacity: bacha lavadero1;
-    background-color: #dc3545;
+    opacity: 1;
 }
 
 .REPROGRAMAR {
-    opacity: 1;
     background-color: #6c757d;
+    opacity: 1;
 }
 
 .RESUELVOSUB {
-    opacity: 1;
     background-color: #1F572B;
+    opacity: 1;
 }
 
 .audControlTitle {
     text-align: center;
     margin: 10px 0 0 0;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 15px;
 }
 
+/* ── Inputs — panel izquierdo ────────────────────────────────── */
 .inputLeftRow {
     width: calc(100% - 10px);
     display: inline-flex;
@@ -299,24 +394,21 @@
     font-size: 20px;
     font-weight: 700;
     text-align: center;
+    color: var(--text);
 }
 
 .inputLeftNameDColumn {
     width: 100%;
     text-align: center;
     font-size: 20px;
+    color: var(--text);
 }
 
 .inputLeftDRow {
     width: 50%;
     text-align: center;
     font-size: 16px;
-}
-
-.inputLeftColumn {
-    display: inline-flex;
-    flex-direction: column;
-    width: 100%;
+    color: var(--text2);
 }
 
 .inputLeft10 {
@@ -364,15 +456,14 @@
 }
 
 .inputLeft {
-    height: 30px;
+    height: 28px;
     font-size: 18px;
     border: none;
     outline: none;
-    height: 28px;
     padding: 0;
     margin: 0;
-    color: #D4D4D4;
-    background-color: #1F1F1F;
+    color: var(--input-text);
+    background: var(--input-bg);
     vertical-align: bottom;
 }
 
@@ -386,7 +477,7 @@
 }
 
 .inputLeft:hover {
-    border: solid 1px #3C3C3C;
+    border: solid 1px var(--border2);
 }
 
 .inputLeftDelete {
@@ -400,28 +491,41 @@
     height: 30px;
 }
 
+/* ── Inputs tipados (typed) ──────────────────────────────────── */
 .inputTyped100 {
-    border: solid 1px #3C3C3C;
+    border: solid 1px var(--input-border);
     width: calc(100% - 2px);
     height: 26px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    outline: none;
 }
 
 .inputTyped70 {
-    border: solid 1px #3C3C3C;
+    border: solid 1px var(--input-border);
     width: calc(70% - 3px);
     height: 25px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    outline: none;
 }
 
 .inputTyped35 {
-    border: solid 1px #3C3C3C;
+    border: solid 1px var(--input-border);
     width: calc(35% - 3px);
     height: 25px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    outline: none;
 }
 
 .inputTyped50 {
-    border: solid 1px #3C3C3C;
+    border: solid 1px var(--input-border);
     width: calc(50% - 2px);
     height: 26px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    outline: none;
 }
 
 .deleteSVG {
@@ -434,9 +538,11 @@
     margin-left: 2%;
 }
 
+/* ── Botón guardar / guardando ───────────────────────────────── */
 .guardarButton {
     font-size: 20px;
-    background-color: #28a745;
+    background: var(--guardar-bg);
+    color: #fff;
     cursor: pointer;
     position: fixed;
     align-self: flex-end;
@@ -444,10 +550,13 @@
     width: 23vw;
     font-weight: 700;
     opacity: .9;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
 }
 
-.dropDownSelect {
-    height: 28px;
+.guardarButton:hover {
+    opacity: 1;
+    transform: translateY(-1px);
 }
 
 .guardar {
@@ -476,22 +585,32 @@
     display: none;
 }
 
+.guardarButtonSaving {
+    background-color: #ffc107;
+}
+
+/* ── Panel derecho ───────────────────────────────────────────── */
 .controlBlockRight {
     display: inline-flex;
     flex-direction: column;
     width: 100%;
+    background: var(--surface2);
 }
 
 .textArea {
     font-size: 22px;
     font-family: inherit;
+    background: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--border);
 }
 
+/* ── Modal check descarga ────────────────────────────────────── */
 .checkDescargaFalta {
     position: fixed;
-    border: solid 1px #2B2B2B;
-    border-radius: 2px;
-    background-color: #1F1F1F;
+    border: solid 1px var(--border);
+    border-radius: 4px;
+    background: var(--surface2);
     top: 40%;
     left: 40%;
     width: 20%;
@@ -500,6 +619,7 @@
     display: inline-flex;
     flex-direction: column;
     padding: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
 .buttonDownload2 {
@@ -511,7 +631,10 @@
     font-family: inherit;
     font-weight: 700;
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 4px;
+    background: var(--surface3);
+    color: var(--text);
+    border: 1px solid var(--border2);
 }
 
 .controlBlock button {
@@ -520,12 +643,15 @@
     cursor: pointer;
 }
 
+/* ── Top block minuta ────────────────────────────────────────── */
 .topBlockMinuta {
     display: inline-flex;
     flex-direction: row;
     width: 100%;
     height: 3%;
     padding: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
 }
 
 .footerSpace {
@@ -538,7 +664,7 @@
     border: none;
     outline: none;
     padding: 0;
-    background-color: #181818;
+    background: var(--surface);
 }
 
 .buttonDownload {
@@ -552,8 +678,8 @@
     outline: none;
     height: 100%;
     margin: 0;
-    color: #C7C7C7;
-    background-color: #181818;
+    color: var(--text2);
+    background: var(--surface);
 }
 
 .inputModelo {
@@ -562,27 +688,29 @@
     font-size: 18px;
     padding: 0;
     border: none;
-    background-color: #2D2E2E;
-    margin: none;
-    color: #C7C7C7;
+    background: var(--surface3);
+    color: var(--text2);
 }
 
 .insertarButton {
     width: 20%;
     padding: 0;
     font-size: 16px;
-    background-color: transparent;
+    background: transparent;
     border-radius: 2px;
     margin: 0;
-    color: #C7C7C7;
+    color: var(--text2);
+    border: none;
+    cursor: pointer;
 }
 
 .insertarButton:hover,
 .buttonDownload:hover,
 .controlBlock button:hover {
-    background-color: #2D2E2E;
+    background: var(--btn-hover);
 }
 
+/* ── State block (barra de estado flotante) ──────────────────── */
 .stateBlock {
     position: fixed;
     left: 4.5vw;
@@ -597,6 +725,7 @@
     animation: growOnHover .2s both;
 }
 
+/* Crono */
 .cronoBlock {
     width: 100%;
     margin-left: .33%;
@@ -643,22 +772,29 @@
     font-size: 20px;
 }
 
+/* ── NavBar (tabs) ───────────────────────────────────────────── */
 .navBarBlock {
     width: 100%;
     height: 40px;
     display: inline-flex;
     flex-direction: row;
     justify-content: flex-start;
-    border-top: solid 1px #2B2B2B;
+    align-items: center;
+    border-top: solid 1px var(--border);
+    background: var(--nav-bg);
+    position: relative;
 }
 
 .tab {
     vertical-align: middle;
     border: none;
-    border-right: solid 1px #2B2B2B;
+    border-right: solid 1px var(--border);
     height: 26px;
     padding: 5px 15px;
-    color: #9D9D9D;
+    color: var(--text3);
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.15s;
 }
 
 .tab p {
@@ -666,37 +802,73 @@
     cursor: pointer;
     padding: 0;
     margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.tab:hover {
+    color: var(--text2);
 }
 
 .selectedTab {
-    border-top: solid 2px #0078D4;
-    color: #ffffff;
+    border-top: solid 2px var(--tab-active);
+    color: var(--text) !important;
+    font-weight: 600;
 }
 
+/* Botón de tema — dentro del navBar, empujado a la derecha */
+.themeToggleBtn {
+    margin-left: auto;
+    margin-right: 10px;
+    height: 26px;
+    padding: 0 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: border-color 0.15s;
+}
+
+.themeToggleBtn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+/* ── Text editor container ───────────────────────────────────── */
 .textEditorContainer {
     height: 100%;
-    border: solid 1px #2B2B2B;
+    border: solid 1px var(--border);
     border-left: none;
+    background: var(--surface2);
 }
 
+/* ── Expand block (panel deslizable) ─────────────────────────── */
 .expandBlock {
     position: fixed;
     font-size: 32px;
     height: 100vh;
     z-index: 1;
-    color: #6c757d;
+    color: var(--text3);
     left: 3.25vw;
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     width: 1.2vw;
-    border-right: solid 1px #2B2B2B;
+    border-right: solid 1px var(--border);
 }
 
 .expandBlockHovered {
     animation: disappear .3s both;
 }
 
+/* ── Edit hitos ──────────────────────────────────────────────── */
 .editHitosButtonBlock {
     left: 27vw;
     top: 10px;
@@ -705,7 +877,8 @@
     height: 40px;
     cursor: pointer;
     border-radius: 20px;
-    background-color: transparent;
+    background: transparent;
+    border: none;
 }
 
 .editHitosButtonBlockHovered {
@@ -714,7 +887,7 @@
 
 .editHitosButtonSVG {
     width: 100%;
-    color: #000;
+    color: var(--text3);
 }
 
 .editHitosBlock {
@@ -722,12 +895,12 @@
     top: 6vh;
     width: 25vw;
     height: 70vh;
-    background-color: #007bff;
-    border: solid #1F1F1F 1px;
-    background-color: #1F1F1F;
-    border-radius: 2px;
+    background: var(--surface2);
+    border: solid var(--border) 1px;
+    border-radius: 4px;
     display: inline-flex;
     flex-direction: column;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
 .editHitosBlockHovered {
@@ -739,8 +912,8 @@
     display: inline-flex;
     flex-direction: row;
     height: 30px;
-    background-color: #181818;
-    border: solid 1px #1f1f1f;
+    background: var(--surface);
+    border: solid 1px var(--border);
     margin: 0;
 }
 
@@ -749,14 +922,15 @@
 .addHitoButton,
 .deleteButton,
 .guardarHitosButton {
-    background-color: transparent;
+    background: transparent;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     outline: none;
-    color: #fff;
+    color: var(--text);
     border: none;
     text-align: center;
+    cursor: pointer;
 }
 
 .inputTime {
@@ -776,10 +950,6 @@
     margin-top: 20px;
 }
 
-.guardarButtonSaving {
-    background-color: #ffc107;
-}
-
 .inputCrono {
     border-radius: 4px;
     width: 90%;
@@ -787,6 +957,8 @@
     outline: none;
     border: none;
     height: 22px;
+    background: var(--input-bg);
+    color: var(--input-text);
 }
 
 .confirmarButton {
@@ -795,17 +967,30 @@
     border-radius: 4px;
     align-self: center;
     margin-right: 10px;
-    background-color: #000000aa;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    cursor: pointer;
 }
 
+.dropDownSelect {
+    height: 28px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--input-border);
+    outline: none;
+}
+
+/* ── Misc ────────────────────────────────────────────────────── */
 .backupList {
     font-family: inherit;
-    background-color: transparent;
-    color: #C7C7C7;
+    background: transparent;
+    color: var(--text2);
     border: none;
     outline: none;
 }
 
+/* ── Keyframes ───────────────────────────────────────────────── */
 @keyframes growOnHoverHitos {
     from {
         width: 25vw;
@@ -850,7 +1035,7 @@
     }
 
     100% {
-        visibility: none;
+        visibility: hidden;
     }
 }
 

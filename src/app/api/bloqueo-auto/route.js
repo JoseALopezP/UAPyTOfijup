@@ -1,4 +1,4 @@
-import { bloqueoMasivoAuto, generarPeriodos } from '@/firebase new/firestore/bloqueoAuto';
+import { bloqueoMasivoAuto, parsearBloques } from '@/firebase new/firestore/bloqueoAuto';
 
 // Configuración por defecto — se puede sobreescribir enviando body en el POST
 const FIXED_DEFAULT = {
@@ -8,24 +8,23 @@ const FIXED_DEFAULT = {
     observaciones: "Posgrado Parra",
 };
 
-// Por defecto: lunes y jueves de marzo a noviembre 2026, 16:00-20:00
-const PERIODOS_DEFAULT = generarPeriodos(2026, 4, 11, [1, 4], "16:00:00", "20:00:00");
+const PERIODOS_DEFAULT = parsearBloques(BLOQUES);
 
 export async function POST(request) {
     let fixed = FIXED_DEFAULT;
     let periodos = PERIODOS_DEFAULT;
 
     // Permitir sobreescribir config enviando JSON en el body
+    // También se acepta body.bloques (array de strings) además de body.periodos (array de objetos)
     try {
         const body = await request.json();
         if (body.fixed) fixed = { ...FIXED_DEFAULT, ...body.fixed };
-        if (body.periodos) periodos = body.periodos;
+        if (body.bloques) periodos = parsearBloques(body.bloques);
+        else if (body.periodos) periodos = body.periodos;
     } catch {
         // Sin body → usar defaults
     }
 
-    // Correr en background para no bloquear la respuesta HTTP
-    // (Puppeteer puede tardar mucho)
     bloqueoMasivoAuto(fixed, periodos).catch(err =>
         console.error("[bloqueo-auto] Error:", err)
     );

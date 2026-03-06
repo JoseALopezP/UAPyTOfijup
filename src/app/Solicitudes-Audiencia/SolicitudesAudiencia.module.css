@@ -1,103 +1,246 @@
+/* ══════════════════════════════════════════════════════════════
+   SOLICITUDES AUDIENCIA — CSS Variables (Dark default / Light override)
+   Sin scrollbars custom — se heredan del navegador.
+   Sin hover en todos los td — evita recálculo masivo de estilos.
+══════════════════════════════════════════════════════════════ */
+
+/* ── Variables dark (default) ────────────────────────────────── */
 .containerSol {
+    /* colores */
+    --bg: #111111;
+    --surface: #1a1a1a;
+    --surface2: #202020;
+    --border: #2a2a2a;
+    --border2: #333333;
+    --text: #eaeef3;
+    --text2: #b0bbc9;
+    --text3: #6e7d91;
+    --accent: #3b82f6;
+    --green: #22c55e;
+    --red: #ef4444;
+    --header-bg: #151515;
+    --th-bg: #181818;
+    --th-bg-hover: #202020;
+    --input-bg: #181818;
+    --input-focus: #1a1a2e;
+    --sticky-col: #161616;
+    --pill-imp: #1e1b2e;
+    --pill-imp-border: #818cf8;
+    --pill-tipo: #1b2e2b;
+    --pill-tipo-border: #2dd4bf;
+    --pill-add: #1a1a1a;
+    --sort-arrow: #60a5fa;
+    --filter-bg: #111;
+    --filter-text: #8899aa;
+
+    /* layout */
     display: flex;
     flex-direction: column;
     height: 100vh;
     width: 97.6vw;
     margin-left: 2.4vw;
     overflow: hidden;
+    background: var(--bg);
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
 }
 
+/* ── Variables light ─────────────────────────────────────────── */
+/* Misma jerarquía de capas que dark, en rango claro:
+   bg (más oscuro) → surface → surface2 → input=blanco puro
+   Los bordes tienen contraste real para que las separaciones sean visibles */
+:global(body.light-mode) .containerSol {
+    --bg: #c8cfd8;
+    /* fondo base: gris medio (cap. más baja) */
+    --surface: #d8dde5;
+    /* paneles sobre el fondo */
+    --surface2: #e4e8ee;
+    /* sub-paneles */
+    --border: #b0bac6;
+    /* borde separador, bien visible */
+    --border2: #90a0b0;
+    /* borde fuerte */
+    --text: #0d1117;
+    /* negro casi puro — máximo contraste */
+    --text2: #1e2d3e;
+    /* texto secundario oscuro */
+    --text3: #4a5e70;
+    /* labels, placeholders */
+    --accent: #1a56cc;
+    --green: #15803d;
+    --red: #b91c1c;
+    --header-bg: #bec6d0;
+    /* header más oscuro que bg para diferenciarse */
+    --th-bg: #ccd3dc;
+    /* header de tabla */
+    --th-bg-hover: #c0c8d2;
+    --input-bg: #ffffff;
+    /* inputs: blanco puro — único blanco, claramente editable */
+    --input-focus: #eef4ff;
+    --sticky-col: #c4ccd6;
+    --pill-imp: #eef2ff;
+    --pill-imp-border: #6366f1;
+    --pill-tipo: #f0fdfa;
+    --pill-tipo-border: #0d9488;
+    --pill-add: #f3f4f6;
+    --sort-arrow: #1a56cc;
+    --filter-bg: #dce1e8;
+    --filter-text: #1e2d3e;
+}
+
+
+/* ── Header bar ──────────────────────────────────────────────── */
+.solHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 14px;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    width: 97.6vw;
+    height: 40px;
+    flex-shrink: 0;
+    gap: 12px;
+    box-sizing: border-box;
+}
+
+.headerSection {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.headerInput {
+    width: 220px;
+    height: 26px;
+    border-radius: 5px;
+    padding: 0 10px;
+    outline: none;
+    border: 1px solid var(--border2);
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 13px;
+}
+
+.addButton {
+    height: 26px;
+    border-radius: 5px;
+    padding: 0 12px;
+    background: var(--accent);
+    color: #fff;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.addButton:hover {
+    opacity: 0.85;
+}
+
+.syncButton {
+    height: 28px;
+    padding: 0 14px;
+    border-radius: 6px;
+    outline: none;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text2);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: border-color 0.15s;
+}
+
+.syncButton:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.syncButton:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Botón de tema */
+.themeButton {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 6px;
+    outline: none;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: border-color 0.15s;
+    margin-left: auto;
+    font-weight: 500;
+}
+
+.themeButton:hover {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.themeLabel {
+    font-size: 12px;
+}
+
+/* ── Table Wrapper ───────────────────────────────────────────── */
+.tableWrapper {
+    flex: 1;
+    overflow: auto;
+    width: 100%;
+    background: var(--bg);
+}
+
+/* ── Table ───────────────────────────────────────────────────── */
 .tableSol {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
 }
 
-.tableWrapper {
-    flex: 1;
-    overflow: auto;
-    width: 100%;
-}
-
-.solHeader {
-    display: inline-flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    padding: 2px 0;
-    background-color: #282828;
-    border-radius: 0 0 5px 5px;
-    width: 97.6vw;
-    height: 32px;
-}
-
-.headerSection {
-    display: inline-flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.headerInput {
-    width: 250px;
-    margin-right: 4px;
-    border-radius: 2px;
-    padding: 2px;
-    outline: none;
-    border: none;
-    background-color: #EBF4FC;
-}
-
-.addButton {
-    border-radius: 2px;
-    padding: 2px 10px;
-    background-color: #EBF4FC;
-    outline: none;
-    border: none;
-    cursor: pointer;
-}
-
-.syncButton {
-    width: 110px;
-    border-radius: 2px;
-    outline: none;
-    border: none;
-    height: 25px;
-    padding: 2px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-}
-
+/* ── Header Th ───────────────────────────────────────────────── */
 .tableHeaderTh {
-    padding: 4px 4px 2px;
+    padding: 6px 6px 4px;
     width: 120px;
     min-width: 120px;
-    color: #fff;
-    border-right: solid 1px #3b3b3b;
-    border-bottom: solid 1px #3b3b3b;
-    border-top: solid 1px #3b3b3b;
+    color: var(--text3);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
     height: auto;
-    min-height: 52px;
-    background-color: #2B2B2B;
+    min-height: 50px;
+    background: var(--th-bg);
     position: sticky;
     top: 0;
     z-index: 20;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     vertical-align: top;
 }
 
-/* Header con sorting habilitado */
 .thSortable {
     cursor: pointer;
     user-select: none;
 }
 
 .thSortable:hover {
-    background-color: #353535;
+    background: var(--th-bg-hover);
+    color: var(--text2);
 }
 
-/* Contenedor interno del th */
 .thContent {
     display: flex;
     flex-direction: column;
@@ -106,66 +249,89 @@
 }
 
 .thLabel {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
+    text-transform: uppercase;
+    color: var(--text3);
+}
+
+.thSortable:hover .thLabel {
+    color: var(--text2);
 }
 
 .sortArrow {
-    color: #4a9eed;
+    color: var(--sort-arrow);
     font-weight: 900;
 }
 
-/* Input de filtro por columna */
 .thFilterInput {
     width: 100%;
     box-sizing: border-box;
-    background: #1a1a2e;
-    border: 1px solid #3b3b5b;
+    background: var(--filter-bg);
+    border: 1px solid var(--border);
     border-radius: 3px;
-    color: #a0b8d8;
+    color: var(--filter-text);
     font-size: 10px;
-    padding: 2px 4px;
+    padding: 2px 5px;
     outline: none;
-    transition: border-color 0.15s;
 }
 
 .thFilterInput:focus {
-    border-color: #4a7ebb;
-    background: #1e1e38;
+    border-color: var(--accent);
 }
 
 .thFilterInput::placeholder {
-    color: #444466;
+    color: var(--text3);
     font-size: 9px;
 }
 
 .tableHeaderTh:first-child {
     left: 0;
     z-index: 30;
-    /* Corner cell highest */
-    border-left: solid 1px #3b3b3b;
+    border-left: 1px solid var(--border);
 }
 
+.headerThNarrow {
+    width: 100px !important;
+    min-width: 100px !important;
+}
+
+.headerThWide {
+    width: 220px !important;
+    min-width: 220px !important;
+}
+
+/* ── Rows ────────────────────────────────────────────────────── */
+/* Sin selector .tableRow:hover td — evita recálculo masivo de estilos */
+.tableRow:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.012);
+}
+
+:global(body.light-mode) .tableRow:nth-child(even) td {
+    background: rgba(0, 0, 0, 0.025);
+}
+
+
+/* ── Cells ───────────────────────────────────────────────────── */
 .cellBodyFixed {
-    color: #fff;
+    color: var(--text);
     text-align: center;
     overflow: hidden;
-    /* Revert to hidden for global cells */
-    border-right: solid 1px #3b3b3b;
-    border-bottom: solid 1px #3b3b3b;
-    background-color: #1f1f1f;
-    height: 50px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    height: 54px;
     padding: 0;
     box-sizing: border-box;
     display: table-cell;
     vertical-align: middle;
-    background-color: transparent;
     position: relative;
+    font-size: 13px;
 }
 
 .cellBodyActions {
@@ -173,238 +339,397 @@
     vertical-align: middle !important;
 }
 
-/* Columna acciones: 💾 + agendar apilados */
-.accionesCell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 100%;
+/* Sticky first column */
+.tableRow td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    /* --sticky-col-override viene del rowStyle del <tr> según estado */
+    background: var(--sticky-col-override, var(--sticky-col)) !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    border-left: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text2);
+    /* Siempre visible aunque el <tr> tenga opacity:
+       NOTA: opacity en <tr> crea stacking context y los hijos no pueden superarlo.
+       Por eso nunca se aplica opacity al <tr>, solo background semitransparente. */
+    opacity: 1;
 }
 
-/* Label del checkbox agendar */
-.agendarLabel {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    color: #777;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 3px;
-    border: 1px solid #333;
-    transition: all 0.15s;
+/* ── Celdas de error ─────────────────────────────────────── */
+/* El inputCell llena la celda al 100% y tapa el box-shadow del padre.
+   Solución: definir --cell-error que el inputCell hereda y aplica sobre sí mismo. */
+.cellBodyError {
+    --cell-error: inset 0 0 0 1px rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.04) !important;
+}
+
+/* ── Indicador urgente ───────────────────────────────────── */
+/* Triángulo rojo en esquina siempre visible; label aparece en hover */
+.urgenteCell {
+    overflow: visible !important;
+    /* permite que el label salga de la celda */
+    position: relative;
+}
+
+/* Triángulo en esquina superior izquierda — siempre visible */
+.urgenteCell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 0 0;
+    border-color: rgb(199, 108, 24) transparent transparent transparent;
+    z-index: 10;
+}
+
+/* Label "⚠ Urgente" — aparece en hover */
+.urgenteLabel {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    background: rgb(199, 108, 24);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 6px 2px 4px;
+    border-radius: 0 0 4px 0;
     white-space: nowrap;
-    user-select: none;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    z-index: 20;
 }
 
-.agendarLabel:hover {
-    border-color: #4a7ebb;
-    color: #aac;
+/* Muestra el label al hacer hover en la celda */
+.urgenteCell:hover .urgenteLabel {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.agendarActive {
-    color: #4ade80;
-    border-color: #2d6a4f;
-    background-color: rgba(45, 106, 79, 0.15);
-}
-
-.agendarCheckbox {
-    accent-color: #4ade80;
-    cursor: pointer;
-    width: 13px;
-    height: 13px;
-}
-
-/* Contenedor scroll para celdas de solo lectura */
+/* ── Scroll cell (read-only) ─────────────────────────────────── */
 .scrollCell {
     height: 100%;
     overflow-y: auto;
-    padding: 4px 6px;
+    padding: 5px 8px;
     box-sizing: border-box;
     width: 100%;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text2);
 }
 
-.scrollCell::-webkit-scrollbar {
-    width: 4px;
+/* ── Input cell (textarea editable) ─────────────────────────── */
+/* background usa --row-input-tint heredado del <tr> (si hay estado activo),
+   con fallback a --input-bg. Sin transition — evita repintado en cada keystroke */
+.inputCell {
+    width: 100%;
+    height: 100%;
+    padding: 6px 8px;
+    background: var(--row-input-tint, var(--input-bg));
+    border: none;
+    outline: none;
+    /* Hereda --cell-error del padre cellBodyError si existe */
+    box-shadow: var(--cell-error, none);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+    display: block;
+    resize: none;
+    line-height: 1.45;
+    text-align: center;
 }
 
-.scrollCell::-webkit-scrollbar-track {
-    background: #1f1f1f;
+.inputCell:focus {
+    background: var(--input-focus);
+    /* Al enfocar, mantiene el borde de error si existe */
+    box-shadow: var(--cell-error, none), inset 0 0 0 1px var(--accent);
 }
 
-.scrollCell::-webkit-scrollbar-thumb {
-    background: #3b3b3b;
-    border-radius: 10px;
-}
-
-.scrollCell::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Pill para cada imputado */
-.imputadoPill {
-    display: flex;
+/* ── List Pills (Tipos, Imputados, genérico) ─────────────────── */
+.listPill {
+    display: inline-flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    background-color: #2a2a3a;
-    border-left: 3px solid #4a7ebb;
-    border-radius: 4px;
-    margin-bottom: 4px;
-    font-size: 12px;
-    line-height: 1.3;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 2px;
     overflow: hidden;
+    vertical-align: top;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.imputadoPill:last-child {
-    margin-bottom: 0;
+.listPill:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
 }
 
-.imputadoPillInfo {
+/* Modificadores por color/contexto */
+.pillImputado {
+    background: var(--pill-imp);
+    border: 1px solid var(--pill-imp-border);
+}
+
+.pillTipo {
+    background: var(--pill-tipo);
+    border: 1px solid var(--pill-tipo-border);
+}
+
+.listPillInfo {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    padding: 3px 6px;
+    padding: 4px 8px;
     min-width: 0;
 }
 
-.imputadoNombre {
-    color: #d0d8f0;
-    font-weight: 600;
-    font-size: 16px;
+.listNombre {
+    color: var(--text);
+    font-weight: 500;
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.02em;
 }
 
-.imputadoDni {
-    color: #7a9ed0;
-    font-size: 12px;
-    font-weight: 400;
+.listDni {
+    color: var(--text3);
+    font-size: 10px;
 }
 
-.imputadoDeleteBtn {
+.listDeleteBtn {
     flex-shrink: 0;
     background: none;
     border: none;
-    color: #c0392b;
+    color: var(--text3);
     cursor: pointer;
     font-size: 11px;
-    padding: 0 6px;
+    padding: 0 8px;
     height: 100%;
-    opacity: 0.5;
-    transition: opacity 0.15s;
     align-self: stretch;
     display: flex;
     align-items: center;
+    border-left: 1px solid rgba(128, 128, 128, 0.15);
+    transition: color 0.15s, background 0.15s;
 }
 
-.imputadoDeleteBtn:hover {
-    opacity: 1;
-    background-color: rgba(192, 57, 43, 0.15);
+.listDeleteBtn:hover {
+    color: var(--red);
+    background: rgba(239, 68, 68, 0.08);
+    /* red con opacidad */
 }
 
-/* Pill para agregar nuevo imputado */
-.imputadoAddPill {
+/* ── Container para agregar list pill ────────────────────────── */
+.listAddContainer {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 4px;
-    background-color: #1e2a1e;
-    border-left: 3px solid #2d6a4f;
-    border-radius: 4px;
-    padding: 3px 4px;
-    margin-bottom: 4px;
+    background: var(--pill-add);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 3px 6px;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
-.imputadoAddInput {
+.listAddInput {
     flex: 1;
     background: transparent;
     border: none;
-    border-bottom: 1px solid #3a5a3a;
-    color: #a8d5a8;
-    font-size: 13px;
+    color: var(--text);
+    font-size: 11px;
     outline: none;
-    padding: 1px 2px;
+    padding: 2px;
     min-width: 0;
 }
 
-.imputadoAddInput::placeholder {
-    color: #4a7a4a;
-    font-size: 13px;
+.listAddInput::placeholder {
+    color: var(--text3);
+    font-style: italic;
 }
 
-.imputadoAddBtn {
+.listAddBtn {
     flex-shrink: 0;
-    background: #2d6a4f;
-    border: none;
-    border-radius: 3px;
-    color: #fff;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
     cursor: pointer;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: normal;
     width: 20px;
     height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    transition: background-color 0.15s;
     line-height: 1;
+    transition: background-color 0.15s, color 0.15s;
 }
 
-.imputadoAddBtn:hover {
-    background-color: #40916c;
+.listAddBtn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
 }
 
-.cellBodyError {
-    border: 1px solid tomato;
+/* ── Acciones cell — grilla 2×2 ───────────────────────────────── */
+.accionesCell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    padding: 4px;
+    height: 100%;
+    box-sizing: border-box;
+    align-items: stretch;
+    justify-items: stretch;
 }
 
-.inputCell {
+/* Botón flag rectangular — base (inactivo) */
+.flagBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text3);
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: border-color 0.12s, color 0.12s;
+    padding: 2px 4px;
     width: 100%;
     height: 100%;
-    padding: 8px 5px;
-    background-color: #1f1f1f;
-    border: none;
-    outline: none;
-    color: inherit;
-    font-family: inherit;
-    font-size: 13px;
     box-sizing: border-box;
-    display: block;
-    resize: none;
-    line-height: 1.2;
-    text-align: center;
 }
 
+.flagBtn:hover {
+    border-color: var(--border2);
+    color: var(--text2);
+}
+
+.accionesCell button {
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 14px;
+    width: 30px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accionesCell button:not(:disabled):hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.agendarLabel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    cursor: pointer;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.agendarLabel:hover {
+    border-color: var(--border2);
+    color: var(--text2);
+}
+
+.agendarActive {
+    color: var(--green) !important;
+    border-color: #166534 !important;
+    background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.agendarCheckbox {
+    accent-color: var(--green);
+    cursor: pointer;
+    width: 11px;
+    height: 11px;
+}
+
+/* Estado: revisado — azul sutil */
+.revisadoActive {
+    color: #60a5fa !important;
+    border-color: #1d4ed8 !important;
+    background: rgba(59, 130, 246, 0.12) !important;
+}
+
+/* Estado: marcado para borrar */
+.borrarActive {
+    color: #f87171 !important;
+    border-color: #991b1b !important;
+    background: rgba(220, 38, 38, 0.15) !important;
+}
+
+/* Estado: agendado — violeta */
+.agendadoActive {
+    color: #c084fc !important;
+    border-color: #7e22ce !important;
+    background: rgba(168, 85, 247, 0.18) !important;
+}
+
+/* ── Save all floating button ────────────────────────────────── */
 .saveAllButton {
     position: fixed;
     bottom: 24px;
     right: 28px;
     z-index: 100;
-    padding: 10px 20px;
-    background-color: #2d6a4f;
+    padding: 0 20px;
+    height: 40px;
+    background: var(--green);
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     animation: fadeInUp 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .saveAllButton:hover {
-    background-color: #40916c;
-    transform: translateY(-2px);
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .saveAllButton:active {
-    transform: translateY(0);
+    transform: none;
 }
 
 @keyframes fadeInUp {
@@ -419,15 +744,7 @@
     }
 }
 
-.tableRow td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 5;
-    background-color: #2b2b2b;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4);
-    border-left: solid 1px #3b3b3b;
-}
-
+/* ── Documents cell ──────────────────────────────────────────── */
 .cellBodyDocuments {
     padding: 0;
     width: 100px;
@@ -438,36 +755,18 @@
 .documentLinksWrapper {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     padding: 5px;
-    height: 50px;
-    max-height: 50px;
+    height: 54px;
+    max-height: 54px;
     overflow-y: auto;
     box-sizing: border-box;
 }
 
-/* Scrollbar styling for a premium feel */
-.documentLinksWrapper::-webkit-scrollbar {
-    width: 4px;
-}
-
-.documentLinksWrapper::-webkit-scrollbar-track {
-    background: #1f1f1f;
-}
-
-.documentLinksWrapper::-webkit-scrollbar-thumb {
-    background: #3b3b3b;
-    border-radius: 10px;
-}
-
-.documentLinksWrapper::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
 .cellBodyDocuments a {
     text-decoration: none !important;
-    color: #4da6ff;
-    font-size: 13px;
+    color: var(--accent);
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -476,33 +775,38 @@
 }
 
 .cellBodyDocuments a:hover {
-    color: #80bfff;
-    text-decoration: underline !important;
+    opacity: 0.75;
 }
 
-.expandContainer {
-    position: relative;
-    display: inline-block;
+/* ── Action wrapper ──────────────────────────────────────────── */
+.cellActionWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 4px;
+    width: 100%;
 }
 
+/* ── Expand / Link buttons ───────────────────────────────────── */
 .expandButton,
 .linkSolATag {
     color: #fff !important;
     border: none;
-    border-radius: 6px;
-    padding: 8px 0;
-    font-size: 14px;
+    border-radius: 5px;
+    padding: 0;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    width: 90px;
+    width: 82px;
+    height: 24px;
     box-sizing: border-box;
     text-decoration: none !important;
+    letter-spacing: 0.03em;
 }
 
 .linkSolATagText {
@@ -512,67 +816,66 @@
     justify-content: center;
 }
 
-
 .expandButton {
-    background-color: #2b6cb0;
+    background: #1d4ed8;
 }
 
 .linkSolATag {
-    background-color: #28a745;
-}
-
-.expandButton:hover,
-.linkSolATag:hover {
-    transform: translateY(-1px) scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    color: #fff;
+    background: #166534;
 }
 
 .expandButton:hover {
-    background-color: #3182ce;
+    background: #2563eb;
+    color: #fff;
 }
 
 .linkSolATag:hover {
-    background-color: #218838;
+    background: #15803d;
+    color: #fff;
 }
 
 .expandButtonActive {
-    background-color: #2c5282;
-    transform: scale(1.05);
+    background: #1e3a8a;
 }
 
-.cellActionWrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 4px;
-    width: 100%;
+.expandButtonEmpty {
+    background: var(--border2);
+    cursor: default;
+    color: var(--text3) !important;
+}
+
+.expandButtonEmpty:hover {
+    background: var(--border2);
+    color: var(--text3);
+}
+
+.expandContainer {
+    position: relative;
+    display: inline-block;
 }
 
 .expandDropdown {
     position: absolute;
-    top: calc(100% + 5px);
+    top: calc(100% + 6px);
     right: 0;
     z-index: 2000;
-    background-color: #2d2d2d;
-    border: 1px solid #4a5568;
+    background: var(--surface);
+    border: 1px solid var(--border2);
     border-radius: 8px;
-    padding: 12px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-    min-width: 180px;
+    padding: 10px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    min-width: 190px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 14px;
-    animation: fadeInScale 0.2s ease-out;
-    backdrop-filter: blur(4px);
+    gap: 6px;
+    font-size: 12px;
+    animation: fadeInScale 0.15s ease-out;
 }
 
 @keyframes fadeInScale {
     from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(0.96);
     }
 
     to {
@@ -581,28 +884,34 @@
     }
 }
 
-.headerThNarrow {
-    width: 100px !important;
-    min-width: 100px !important;
-}
-
+/* ── Button expand (mini) ────────────────────────────────────── */
 .buttonExpand {
     position: absolute;
     top: 2px;
     right: 2px;
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
     outline: none;
-    border: none;
+    border: 1px solid var(--border2);
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
-    background-color: aliceblue;
+    background: var(--surface);
+    color: var(--text3);
+    font-size: 10px;
     z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/**dropdown selector styles */
+.buttonExpand:hover {
+    color: var(--text);
+    border-color: var(--accent);
+}
+
+/* ── Selector dropdown ───────────────────────────────────────── */
 .selectorWrapper {
     position: absolute;
     top: 2px;
@@ -614,42 +923,43 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-bottom: 4px;
-    border-bottom: 1px solid #444;
-    font-size: 11px;
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
     font-weight: 700;
-    color: #aaa;
+    color: var(--text3);
     text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 .dropdownList {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     max-height: 150px;
     overflow-y: auto;
 }
 
 .dropdownItem {
-    padding: 6px 10px;
-    background-color: #3b3b3b;
+    padding: 5px 10px;
+    background: var(--surface2);
     border-radius: 4px;
-    font-size: 13px;
-    color: #eee;
+    font-size: 12px;
+    color: var(--text);
     cursor: pointer;
-    transition: background-color 0.2s;
     text-align: left;
+    border: 1px solid transparent;
 }
 
 .dropdownItem:hover {
-    background-color: #4a5568;
-    color: #fff;
+    border-color: var(--accent);
+    color: var(--text);
 }
 
 .dropdownEmpty {
-    font-size: 12px;
-    color: #777;
+    font-size: 11px;
+    color: var(--text3);
     padding: 8px;
     text-align: center;
 }
@@ -657,8 +967,13 @@
 .closeBtn {
     background: none;
     border: none;
-    color: #fff;
+    color: var(--text3);
     cursor: pointer;
-    font-size: 16px;
-    padding: 0 4px;
+    font-size: 14px;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: var(--text);
 }

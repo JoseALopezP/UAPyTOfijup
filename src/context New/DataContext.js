@@ -390,6 +390,16 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     };
+    const removeSolicitudPendiente = async (rowKey) => {
+        try {
+            await removeObject('solicitudes', 'pendientes', rowKey);
+            setSolicitudesPendientes(prev =>
+                Array.isArray(prev) ? prev.filter(item => item.rowKey !== rowKey) : []
+            );
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
     const addSolicitudCompletada = async (rowKey, data) => {
         try {
             await addOrUpdateObject('solicitudes', 'completadas', rowKey, data);
@@ -416,7 +426,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
-        updateSolicitudesPendientes,
+        updateSolicitudesPendientes, removeSolicitudPendiente,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes
     };

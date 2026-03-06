@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import styles from '../SolicitudesAudiencia.module.css';
 
-export default function ExpandContent({ children, label = "Ver" }) {
+export default function ExpandContent({ children, label = "Ver", empty = false }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
@@ -14,7 +14,7 @@ export default function ExpandContent({ children, label = "Ver" }) {
             onMouseLeave={() => setIsOpen(false)}
         >
             <button
-                className={`${styles.expandButton} ${isOpen ? styles.expandButtonActive : ''}`}
+                className={`${styles.expandButton} ${isOpen ? styles.expandButtonActive : ''} ${empty ? styles.expandButtonEmpty : ''}`}
                 type="button"
             >
                 {label} {isOpen ? '▲' : '▼'}

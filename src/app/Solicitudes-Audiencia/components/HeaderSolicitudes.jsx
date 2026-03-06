@@ -1,12 +1,36 @@
 'use client'
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { DataContext } from '@/context New/DataContext'
 import styles from '../SolicitudesAudiencia.module.css'
+
+const STORAGE_KEY = 'app-theme'
 
 export default function HeaderSolicitudes() {
     const { solicitudesPendientes, addSolicitudData } = useContext(DataContext);
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
+    const [isLight, setIsLight] = useState(false);
+
+    // Cargar preferencia guardada al montar
+    useEffect(() => {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved === 'light') {
+            setIsLight(true)
+            document.body.classList.add('light-mode')
+        }
+    }, [])
+
+    const toggleTheme = () => {
+        const next = !isLight
+        setIsLight(next)
+        if (next) {
+            document.body.classList.add('light-mode')
+            localStorage.setItem(STORAGE_KEY, 'light')
+        } else {
+            document.body.classList.remove('light-mode')
+            localStorage.setItem(STORAGE_KEY, 'dark')
+        }
+    }
 
     const syncSolicitudesHandler = async () => {
         try {
@@ -52,7 +76,6 @@ export default function HeaderSolicitudes() {
                                     : `${item.numeroLeg}_${item.fyhcreacion}`;
                                 await addSolicitudData(rowKey, item);
                             }
-
                             setSyncStatus(`✓ ${newItems.length} solicitudes guardadas.`);
                             console.log("[ui] Guardado completo.");
                         } else if (parsed.type === 'error') {
@@ -71,28 +94,53 @@ export default function HeaderSolicitudes() {
         }
     }
 
+    const statusColor = syncStatus.startsWith('✓') ? '#4ade80'
+        : syncStatus.startsWith('Error') ? '#f87171'
+            : '#6b7280'
 
     return (
-        <div className={`${styles.solHeader}`}>
-            <span className={`${styles.headerSection}`}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <button
-                        className={`${styles.syncButton}`}
-                        title="Sincronizar Solicitudes"
-                        onClick={syncSolicitudesHandler}
-                        disabled={isSyncing}
-                    >
-                        <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-refresh'}`}></i>
-                        {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
-                    </button>
-                    {syncStatus && (
-                        <span style={{ fontSize: '0.9rem', color: '#555', fontStyle: 'italic', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {syncStatus}
-                        </span>
-                    )}
-                </div>
+        <div className={styles.solHeader}>
+            <span className={styles.headerSection}>
+                {/* Botón sincronizar */}
+                <button
+                    className={styles.syncButton}
+                    title="Sincronizar Solicitudes"
+                    onClick={syncSolicitudesHandler}
+                    disabled={isSyncing}
+                >
+                    <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-refresh'}`}></i>
+                    {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
+                </button>
+
+                {/* Status */}
+                {syncStatus && (
+                    <span style={{
+                        fontSize: '12px',
+                        color: statusColor,
+                        background: 'rgba(128,128,128,0.08)',
+                        border: '1px solid rgba(128,128,128,0.15)',
+                        borderRadius: '5px',
+                        padding: '2px 10px',
+                        maxWidth: '340px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        fontFamily: 'monospace',
+                    }}>
+                        {syncStatus}
+                    </span>
+                )}
             </span>
 
+            {/* Botón tema — empujado al extremo derecho */}
+            <button
+                className={styles.themeButton}
+                onClick={toggleTheme}
+                title={isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+            >
+                <span>{isLight ? '🌙' : '☀️'}</span>
+                <span className={styles.themeLabel}>{isLight ? 'Oscuro' : 'Claro'}</span>
+            </button>
         </div>
     )
 }

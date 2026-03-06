@@ -74,13 +74,40 @@ async function llenarYEnviar(page, fixed, periodo, index, total) {
     ]);
 
     const finalUrl = page.url();
+
+    // Si el form falló y volvió a /create, leer el help-block con el motivo
+    if (finalUrl.includes("/bloqueo-persona/create")) {
+        let motivo = "Error de validación del formulario";
+        try {
+            const helpTexts = await page.$$eval(".help-block", els =>
+                els.map(el => el.textContent.trim()).filter(t => t.length > 0)
+            );
+            if (helpTexts.length > 0) motivo = helpTexts.join(" | ");
+        } catch { /* ignorar */ }
+        throw new Error(motivo);
+    }
+
     if (!finalUrl.includes("/bloqueo-persona")) {
         throw new Error(`Redirect inesperado: ${finalUrl}`);
     }
     console.log(`   ✓ Creado. Redirigido a: ${finalUrl}`);
 }
 
-// ── Helper: genera períodos ───────────────────────────────────────────────────
+// ── Helper: genera períodos desde array de strings ────────────────────────────
+// Formato esperado: "DD/MM/AAAA | HH:MM - HH:MM"
+// Ejemplo:          "09/03/2026 | 15:00 - 18:00"
+export function parsearBloques(bloques) {
+    return bloques.map((bloque) => {
+        const [fechaPart, horaPart] = bloque.split("|").map((s) => s.trim());
+        const [horaDesde, horaHasta] = horaPart.split("-").map((s) => s.trim());
+        return {
+            desde: `${fechaPart} ${horaDesde}:00`,
+            hasta: `${fechaPart} ${horaHasta}:00`,
+        };
+    });
+}
+
+// ── Helper: genera períodos (por rango de meses) ──────────────────────────────
 export function generarPeriodos(anio, mesInicio, mesFin, diasSemana, horaDesde, horaHasta) {
     const pad = (n) => String(n).padStart(2, "0");
     const formatFecha = (d, hora) =>
@@ -111,7 +138,11 @@ export function generarPeriodos(anio, mesInicio, mesFin, diasSemana, horaDesde, 
  * @param {string} [fixed.observaciones]
  * @param {Array<{desde:string, hasta:string}>} periodos - Formato "dd/mm/yyyy HH:mm:ss"
  */
-export async function bloqueoMasivoAuto(fixed, periodos) {
+export async function bloqueoMasivoAuto(fixed, periodos, onEvent = null) {
+    const notify = (data) => { try { if (onEvent) onEvent(data); } catch { /* ignorar */ } };
+    const errores = [];
+    let exitosos = 0;
+
     const browser = await puppeteer.launch({
         headless: false,
         slowMo: 60,
@@ -124,22 +155,40 @@ export async function bloqueoMasivoAuto(fixed, periodos) {
         await login(page);
 
         for (let i = 0; i < periodos.length; i++) {
+            const bloqueLabel = `${periodos[i].desde} → ${periodos[i].hasta}`;
             let intentos = 0;
+            let exito = false;
+            let ultimoError = "";
+
             while (intentos < 3) {
                 try {
                     await llenarYEnviar(page, fixed, periodos[i], i, periodos.length);
+                    exito = true;
                     break;
                 } catch (err) {
                     intentos++;
+                    ultimoError = err.message;
                     console.warn(`   ⚠️  Intento ${intentos}/3: ${err.message}`);
                     if (intentos >= 3) console.error(`   ❌ Período saltado.`);
                     else await new Promise(r => setTimeout(r, 1500));
                 }
             }
+
+            if (exito) {
+                exitosos++;
+            } else {
+                errores.push({ bloque: bloqueLabel, motivo: ultimoError });
+                notify({ type: "block_error", bloque: bloqueLabel, motivo: ultimoError });
+            }
+
+            notify({ type: "progress", index: i + 1, total: periodos.length, exitosos, erroresCount: errores.length });
         }
 
         console.log("\n✅ Todos los períodos fueron procesados.");
+        notify({ type: "done", exitosos, errores });
     } finally {
         await browser.close();
     }
+
+    return { exitosos, errores };
 }

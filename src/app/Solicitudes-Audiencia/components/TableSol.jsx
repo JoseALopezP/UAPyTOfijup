@@ -4,17 +4,17 @@ import { DataContext } from "@/context New/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
 import RowSol from "./RowSol"
 import { compareFyH } from "@/utils/compareFecha"
+import { addOrUpdateObject } from "@/firebase new/firestore/addOrUpdateObject"
 
-// Columnas: { label, sortKey, filterKey }
 // sortKey  → campo en el objeto solicitud para ordenar (null = no sorteable)
 // filterKey → campo(s) en el objeto para filtrar (string o array de strings)
 const COLUMNS = [
     { label: 'LEGAJO', sortKey: 'numeroLeg', filterKey: 'numeroLeg' },
     { label: 'FyH SOLICITUD', sortKey: 'fyhcreacion', filterKey: 'fyhcreacion' },
     { label: 'SOLICITANTE', sortKey: 'solicitante', filterKey: 'solicitante' },
-    { label: 'TIPO', sortKey: 'tipo', filterKey: 'tipo' },
+    { label: 'TIPO', sortKey: 'tipo', filterKey: 'tipo', wide: true },
     { label: 'IMPUTADOS', sortKey: null, filterKey: null },
-    { label: 'IMPUTADOS LIST', sortKey: null, filterKey: null },
+    { label: 'IMPUTADOS LIST', sortKey: null, filterKey: null, wide: true },
     { label: 'SIT. CORPORAL', sortKey: 'sitCorporal', filterKey: 'sitCorporal' },
     { label: 'VENCIMIENTO', sortKey: 'vencimiento', filterKey: 'vencimiento' },
     { label: 'QUERELLANTE', sortKey: 'querella', filterKey: 'querella' },
@@ -34,21 +34,27 @@ const COLUMNS = [
 
 function getFieldValue(sol, key) {
     if (!key) return ''
+    if (key === 'tipo' || key === 'tipos') {
+        if (sol.tipos && Array.isArray(sol.tipos)) return sol.tipos.join(', ')
+        return String(sol.tipo ?? '')
+    }
     if (key in sol) return String(sol[key] ?? '')
     return ''
 }
-
 export default function TableSol() {
-    const { solicitudesPendientes, updateSolicitudesPendientes } = useContext(DataContext)
+    const { solicitudesPendientes, updateSolicitudesPendientes, desplegables, updateDesplegables } = useContext(DataContext)
     const [pendingRows, setPendingRows] = useState({})
     const [forceSave, setForceSave] = useState(false)
     const [sortKey, setSortKey] = useState('fyhcreacion')
     const [sortDir, setSortDir] = useState('asc')
     const [filters, setFilters] = useState({})
-
     useEffect(() => {
         updateSolicitudesPendientes()
+        // Cargamos los desplegables generales
+        updateDesplegables()
     }, [])
+
+
 
     const onStatusChange = useCallback((rowKey, hasChanges) => {
         setPendingRows(prev => {
@@ -91,8 +97,12 @@ export default function TableSol() {
             })
         })
 
-        // Ordenar
+        // Ordenar: reprogramar=true siempre primero (ya procesadas, con opacity 0.5), luego por sortKey
         rows = [...rows].sort((a, b) => {
+            const aRep = !!(a.reprogramar)
+            const bRep = !!(b.reprogramar)
+            if (aRep !== bRep) return aRep ? -1 : 1   // reprogramar primero
+
             if (sortKey === 'fyhcreacion') {
                 const cmp = compareFyH(a.fyhcreacion, b.fyhcreacion)
                 return sortDir === 'asc' ? cmp : -cmp
@@ -125,7 +135,7 @@ export default function TableSol() {
                         {COLUMNS.map((col, idx) => (
                             <th
                                 key={idx}
-                                className={`${styles.tableHeaderTh}${col.narrow ? ` ${styles.headerThNarrow}` : ''}${col.sortKey ? ` ${styles.thSortable}` : ''}`}
+                                className={`${styles.tableHeaderTh}${col.narrow ? ` ${styles.headerThNarrow}` : ''}${col.wide ? ` ${styles.headerThWide}` : ''}${col.sortKey ? ` ${styles.thSortable}` : ''}`}
                                 onClick={() => handleSortClick(col)}
                             >
                                 <div className={styles.thContent}>
