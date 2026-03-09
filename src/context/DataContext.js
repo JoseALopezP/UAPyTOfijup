@@ -108,9 +108,9 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     }
   };
 
-  const pushtToArray = async (date, searchValLeg, searchValHora, newValue) => {
-    await pushToHitos("audiencias", date, searchValHora, searchValLeg, newValue);
-    await pushToHitos("legajos", searchValLeg, date, searchValHora, newValue);
+  const pushtToArray = async (date, searchValLeg, searchValHora, newValue, aId) => {
+    await pushToHitos("audiencias", date, searchValHora, searchValLeg, newValue, aId);
+    await pushToHitos("legajos", searchValLeg, date, searchValHora, newValue, aId);
   };
 
   const updateData = async (date, searchValLeg, searchValHora, property, newValue, aId) => {

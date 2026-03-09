@@ -98,7 +98,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
 
         if (newState === 'RESUELVO') {
             await updateData(dateToUse, item.numeroLeg, item.hora, 'resuelvo', updateRealTimeFunction(), (item.aId || false));
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`);
+            await pushtToArray(dateToUse, item.numeroLeg, item.hora, `${updateRealTimeFunction()} | ${newState}`, (item.aId || false));
         } else {
             if (newState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
             if (estadoActual === 'EN_CURSO' && newState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
@@ -107,7 +107,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
                 ? `${updateRealTimeFunction()} | ${newState} | ${pedido || 0} | ${pidiente || "juez"}`
                 : `${updateRealTimeFunction()} | ${newState}`;
 
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry);
+            await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry, (item.aId || false));
             setCuartoShow(false);
         }
 
