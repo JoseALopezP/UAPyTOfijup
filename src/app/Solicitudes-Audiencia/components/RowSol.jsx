@@ -341,19 +341,8 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
                     ))}
                     {/* Agregar nueva parte */}
                     <div className={styles.listAddContainer}>
-                        <SelectorDropdown
-                            title="Motivo"
-                            options={[
-                                "ABOGADO QUERELLANTE - APODERADO", "ABOGADO QUERELLANTE - PATROCINANTE",
-                                "DAMNIFICADO", "DEFENSOR DE MENORES", "DEFENSOR GENERAL", "DEFENSOR OFICIAL",
-                                "DEFENSOR PARTICULAR", "DENUNCIANTE", "ENLACE DE LA DEFENSA", "EXHORTO ORGANISMO EXTERNO",
-                                "FISCAL", "FISCAL GENERAL", "IMPUTADO", "INSTRUCTOR DEL LEGAJO", "LETRADO",
-                                "ORGANISMO AUXILIAR", "PERITO", "PSICÓLOGO/A DE CÁMARA GESELL", "QUERELLA",
-                                "TESTIGO", "VICTIMA"
-                            ]}
-                            onSelect={(val) => setNewMotivoParte(val)}
-                        />
                         <input
+                            list="motivos-datalist"
                             className={styles.listAddInput}
                             placeholder="Motivo..."
                             value={newMotivoParte}
@@ -377,6 +366,19 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
                             }}
                         >+</button>
                     </div>
+                    <datalist id="motivos-datalist">
+                        {[
+                            "ABOGADO QUERELLANTE - APODERADO", "ABOGADO QUERELLANTE - PATROCINANTE",
+                            "DAMNIFICADO", "DEFENSOR DE MENORES", "DEFENSOR GENERAL", "DEFENSOR OFICIAL",
+                            "DEFENSOR PARTICULAR", "DENUNCIANTE", "ENLACE DE LA DEFENSA", "EXHORTO ORGANISMO EXTERNO",
+                            "FISCAL", "FISCAL GENERAL", "IMPUTADO", "INSTRUCTOR DEL LEGAJO", "LETRADO",
+                            "ORGANISMO AUXILIAR", "PERITO", "PSICÓLOGO/A DE CÁMARA GESELL", "QUERELLA",
+                            "TESTIGO", "VICTIMA"
+                        ].map(opt => <option key={opt} value={opt} />)}
+                    </datalist>
+                    <datalist id="enlaces-datalist">
+                        <option value="ENLACE DE LA DEFENSA" />
+                    </datalist>
                 </div>
             </td>
             <td className={cell(vencimientoT)}>
