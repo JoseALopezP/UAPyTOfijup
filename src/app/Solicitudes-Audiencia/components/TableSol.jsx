@@ -16,6 +16,7 @@ const COLUMNS = [
     { label: 'IMPUTADOS', sortKey: null, filterKey: null },
     { label: 'IMPUTADOS LIST', sortKey: null, filterKey: null, wide: true },
     { label: 'SIT. CORPORAL', sortKey: 'sitCorporal', filterKey: 'sitCorporal' },
+    { label: 'AGREGAR', sortKey: null, filterKey: null, wide: true },
     { label: 'VENCIMIENTO', sortKey: 'vencimiento', filterKey: 'vencimiento' },
     { label: 'QUERELLANTE', sortKey: 'querella', filterKey: 'querella' },
     { label: 'DEFENSOR', sortKey: 'defensa', filterKey: 'defensa' },

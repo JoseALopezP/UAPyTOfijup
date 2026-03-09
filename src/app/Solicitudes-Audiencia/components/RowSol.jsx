@@ -42,8 +42,12 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     const [juezCausa, setJuezCausa] = useState(savedData.juezCausa || (data.intervinientes?.juez_causa?.join(', ') ?? ''))
     const [comentario, setComentario] = useState(savedData.comentario || (data.intervinientes?.comentario?.join(', ') ?? ''))
     const [imputados, setImputados] = useState(savedData.imputados || data.intervinientes?.imputado || [])
+    const [partesAgregar, setPartesAgregar] = useState(savedData.partesAgregar || [])
     const [newNombre, setNewNombre] = useState('')
     const [newDni, setNewDni] = useState('')
+    const [newMotivoParte, setNewMotivoParte] = useState('')
+    const [newNombreParte, setNewNombreParte] = useState('')
+
     const [agendar, setAgendar] = useState(savedData.agendar ?? false)
     const [revisado, setRevisado] = useState(savedData.revisado ?? false)
     const [marcarBorrar, setMarcarBorrar] = useState(savedData.marcarBorrar ?? false)
@@ -115,6 +119,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             (sala || '') !== getBaseValue('sala', data.intervinientes?.sala?.join(', ')) ||
             (juezCausa || '') !== getBaseValue('juezCausa', data.intervinientes?.juez_causa?.join(', ')) ||
             (comentario || '') !== getBaseValue('comentario', data.intervinientes?.comentario?.join(', ')) ||
+            JSON.stringify(partesAgregar) !== JSON.stringify(getBaseValue('partesAgregar', [])) ||
             agendar !== (savedData.agendar ?? false) ||
             revisado !== (savedData.revisado ?? false) ||
             marcarBorrar !== (savedData.marcarBorrar ?? false) ||
@@ -146,6 +151,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             setJuezCausa(syncField(saved.juezCausa, data.intervinientes?.juez_causa?.join(', ')))
             setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
             setImputados(saved.imputados || data.intervinientes?.imputado || [])
+            setPartesAgregar(saved.partesAgregar || [])
 
             // Retrasamos la sincronización inicial para permitir que los estados se asienten
             setTimeout(() => {
@@ -160,7 +166,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, agendar, revisado, marcarBorrar, reprogramar, savedData])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, partesAgregar, agendar, revisado, marcarBorrar, reprogramar, savedData])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -174,7 +180,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
                         fyhcreacion: data.fyhcreacion,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario,
-                        imputados, agendar, revisado, marcarBorrar, reprogramar
+                        imputados, partesAgregar, agendar, revisado, marcarBorrar, reprogramar
                     })
                 }
                 setDoSave(false)
@@ -313,6 +319,65 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             </td>
             <td className={cell(sitCorporalT)}>
                 <textarea className={styles.inputCell} value={sitCorporal} onChange={e => setSitCorporal(e.target.value)} />
+            </td>
+            <td className={`${styles.cellBodyFixed}`}>
+                <div className={styles.scrollCell}>
+                    {partesAgregar.map((parte, i) => (
+                        <div key={i} className={`${styles.listPill} ${styles.pillMotivo}`}>
+                            <div className={styles.listPillInfo}>
+                                <span className={styles.listNombre}>{parte.nombre}</span>
+                                {parte.motivo && <span className={styles.listDni}>{parte.motivo}</span>}
+                            </div>
+                            <button
+                                className={styles.listDeleteBtn}
+                                onClick={() => {
+                                    const updated = partesAgregar.filter((_, idx) => idx !== i)
+                                    setPartesAgregar(updated)
+                                    setToSave(true)
+                                }}
+                                title="Eliminar"
+                            >✕</button>
+                        </div>
+                    ))}
+                    {/* Agregar nueva parte */}
+                    <div className={styles.listAddContainer}>
+                        <SelectorDropdown
+                            title="Motivo"
+                            options={[
+                                "ABOGADO QUERELLANTE - APODERADO", "ABOGADO QUERELLANTE - PATROCINANTE",
+                                "DAMNIFICADO", "DEFENSOR DE MENORES", "DEFENSOR GENERAL", "DEFENSOR OFICIAL",
+                                "DEFENSOR PARTICULAR", "DENUNCIANTE", "ENLACE DE LA DEFENSA", "EXHORTO ORGANISMO EXTERNO",
+                                "FISCAL", "FISCAL GENERAL", "IMPUTADO", "INSTRUCTOR DEL LEGAJO", "LETRADO",
+                                "ORGANISMO AUXILIAR", "PERITO", "PSICÓLOGO/A DE CÁMARA GESELL", "QUERELLA",
+                                "TESTIGO", "VICTIMA"
+                            ]}
+                            onSelect={(val) => setNewMotivoParte(val)}
+                        />
+                        <input
+                            className={styles.listAddInput}
+                            placeholder="Motivo..."
+                            value={newMotivoParte}
+                            onChange={e => setNewMotivoParte(e.target.value)}
+                        />
+                        <input
+                            list="enlaces-datalist"
+                            className={styles.listAddInput}
+                            placeholder="Nombre/DNI..."
+                            value={newNombreParte}
+                            onChange={e => setNewNombreParte(e.target.value)}
+                        />
+                        <button
+                            className={styles.listAddBtn}
+                            onClick={() => {
+                                if (!newNombreParte.trim() || !newMotivoParte.trim()) return
+                                setPartesAgregar(prev => [...prev, { nombre: newNombreParte.trim(), motivo: newMotivoParte.trim() }])
+                                setNewNombreParte('')
+                                setNewMotivoParte('')
+                                setToSave(true)
+                            }}
+                        >+</button>
+                    </div>
+                </div>
             </td>
             <td className={cell(vencimientoT)}>
                 <textarea className={styles.inputCell} value={vencimiento} onChange={e => setVencimiento(e.target.value)} />

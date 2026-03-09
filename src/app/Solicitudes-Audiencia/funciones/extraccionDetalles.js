@@ -51,12 +51,35 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                     const origin = window.location.origin;
 
                     // ── 1. Tipo Solicitud (primer panel) ─────────────────────
+                    // Helper: split por comas ignorando las que están dentro de paréntesis
+                    const splitTipos = (str) => {
+                        if (!str) return null;
+                        const parts = [];
+                        let depth = 0;
+                        let current = '';
+                        for (const ch of str) {
+                            if (ch === '(') { depth++; current += ch; }
+                            else if (ch === ')') { depth--; current += ch; }
+                            else if (ch === ',' && depth === 0) {
+                                const trimmed = current.trim();
+                                if (trimmed) parts.push(trimmed);
+                                current = '';
+                            } else {
+                                current += ch;
+                            }
+                        }
+                        const trimmed = current.trim();
+                        if (trimmed) parts.push(trimmed);
+                        return parts.length === 1 ? parts[0] : parts;
+                    };
+
                     let tipo = null;
                     const allRows = document.querySelectorAll('.kv-flat-b .detail-view tbody tr');
                     for (const row of allRows) {
                         const th = row.querySelector('th');
                         if (th && th.innerText.trim() === 'Tipo Solicitud') {
-                            tipo = row.querySelector('td .kv-attribute')?.innerText.trim() || null;
+                            const raw = row.querySelector('td .kv-attribute')?.innerText.trim() || null;
+                            tipo = splitTipos(raw);
                             break;
                         }
                     }

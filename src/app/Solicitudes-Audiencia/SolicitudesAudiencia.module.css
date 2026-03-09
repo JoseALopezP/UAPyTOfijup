@@ -1,12 +1,4 @@
-/* ══════════════════════════════════════════════════════════════
-   SOLICITUDES AUDIENCIA — CSS Variables (Dark default / Light override)
-   Sin scrollbars custom — se heredan del navegador.
-   Sin hover en todos los td — evita recálculo masivo de estilos.
-══════════════════════════════════════════════════════════════ */
-
-/* ── Variables dark (default) ────────────────────────────────── */
 .containerSol {
-    /* colores */
     --bg: #111111;
     --surface: #1a1a1a;
     --surface2: #202020;
@@ -32,8 +24,6 @@
     --sort-arrow: #60a5fa;
     --filter-bg: #111;
     --filter-text: #8899aa;
-
-    /* layout */
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -45,37 +35,22 @@
     color: var(--text);
 }
 
-/* ── Variables light ─────────────────────────────────────────── */
-/* Misma jerarquía de capas que dark, en rango claro:
-   bg (más oscuro) → surface → surface2 → input=blanco puro
-   Los bordes tienen contraste real para que las separaciones sean visibles */
 :global(body.light-mode) .containerSol {
     --bg: #c8cfd8;
-    /* fondo base: gris medio (cap. más baja) */
     --surface: #d8dde5;
-    /* paneles sobre el fondo */
     --surface2: #e4e8ee;
-    /* sub-paneles */
     --border: #b0bac6;
-    /* borde separador, bien visible */
     --border2: #90a0b0;
-    /* borde fuerte */
     --text: #0d1117;
-    /* negro casi puro — máximo contraste */
     --text2: #1e2d3e;
-    /* texto secundario oscuro */
     --text3: #4a5e70;
-    /* labels, placeholders */
     --accent: #1a56cc;
     --green: #15803d;
     --red: #b91c1c;
     --header-bg: #bec6d0;
-    /* header más oscuro que bg para diferenciarse */
     --th-bg: #ccd3dc;
-    /* header de tabla */
     --th-bg-hover: #c0c8d2;
     --input-bg: #ffffff;
-    /* inputs: blanco puro — único blanco, claramente editable */
     --input-focus: #eef4ff;
     --sticky-col: #c4ccd6;
     --pill-imp: #eef2ff;
@@ -88,8 +63,6 @@
     --filter-text: #1e2d3e;
 }
 
-
-/* ── Header bar ──────────────────────────────────────────────── */
 .solHeader {
     display: flex;
     flex-direction: row;
@@ -168,7 +141,6 @@
     cursor: not-allowed;
 }
 
-/* Botón de tema */
 .themeButton {
     height: 28px;
     padding: 0 10px;
@@ -197,7 +169,6 @@
     font-size: 12px;
 }
 
-/* ── Table Wrapper ───────────────────────────────────────────── */
 .tableWrapper {
     flex: 1;
     overflow: auto;
@@ -205,14 +176,12 @@
     background: var(--bg);
 }
 
-/* ── Table ───────────────────────────────────────────────────── */
 .tableSol {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
 }
 
-/* ── Header Th ───────────────────────────────────────────────── */
 .tableHeaderTh {
     padding: 6px 6px 4px;
     width: 120px;
@@ -306,8 +275,6 @@
     min-width: 220px !important;
 }
 
-/* ── Rows ────────────────────────────────────────────────────── */
-/* Sin selector .tableRow:hover td — evita recálculo masivo de estilos */
 .tableRow:nth-child(even) td {
     background: rgba(255, 255, 255, 0.012);
 }
@@ -316,8 +283,6 @@
     background: rgba(0, 0, 0, 0.025);
 }
 
-
-/* ── Cells ───────────────────────────────────────────────────── */
 .cellBodyFixed {
     color: var(--text);
     text-align: center;
@@ -339,41 +304,29 @@
     vertical-align: middle !important;
 }
 
-/* Sticky first column */
 .tableRow td:first-child {
     position: sticky;
     left: 0;
     z-index: 5;
-    /* --sticky-col-override viene del rowStyle del <tr> según estado */
     background: var(--sticky-col-override, var(--sticky-col)) !important;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
     border-left: 1px solid var(--border);
     font-weight: 600;
     font-size: 12px;
     color: var(--text2);
-    /* Siempre visible aunque el <tr> tenga opacity:
-       NOTA: opacity en <tr> crea stacking context y los hijos no pueden superarlo.
-       Por eso nunca se aplica opacity al <tr>, solo background semitransparente. */
     opacity: 1;
 }
 
-/* ── Celdas de error ─────────────────────────────────────── */
-/* El inputCell llena la celda al 100% y tapa el box-shadow del padre.
-   Solución: definir --cell-error que el inputCell hereda y aplica sobre sí mismo. */
 .cellBodyError {
     --cell-error: inset 0 0 0 1px rgba(239, 68, 68, 0.35);
     background: rgba(239, 68, 68, 0.04) !important;
 }
 
-/* ── Indicador urgente ───────────────────────────────────── */
-/* Triángulo rojo en esquina siempre visible; label aparece en hover */
 .urgenteCell {
     overflow: visible !important;
-    /* permite que el label salga de la celda */
     position: relative;
 }
 
-/* Triángulo en esquina superior izquierda — siempre visible */
 .urgenteCell::before {
     content: '';
     position: absolute;
@@ -387,7 +340,6 @@
     z-index: 10;
 }
 
-/* Label "⚠ Urgente" — aparece en hover */
 .urgenteLabel {
     position: absolute;
     top: -1px;
@@ -884,7 +836,6 @@
     }
 }
 
-/* ── Button expand (mini) ────────────────────────────────────── */
 .buttonExpand {
     position: absolute;
     top: 2px;
@@ -911,7 +862,6 @@
     border-color: var(--accent);
 }
 
-/* ── Selector dropdown ───────────────────────────────────────── */
 .selectorWrapper {
     position: absolute;
     top: 2px;
