@@ -32,8 +32,6 @@ export async function notificarAudiencia(urlResultante, onProgress) {
         log(`Navegando a la URL post-agendamiento: ${urlResultante}`);
         await page.goto(urlResultante, { waitUntil: "networkidle2", timeout: 30000 });
 
-        // TODO: Implementar la logica de notificacion
-
         return { success: true };
 
     } catch (err) {

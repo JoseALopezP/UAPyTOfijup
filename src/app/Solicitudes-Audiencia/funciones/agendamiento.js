@@ -277,27 +277,16 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
                 await select2Agregar(page, tiposInput, t);
             }
         }
-
-        // ════════════════════════════════════════════════════════════════════
-        // JUECES
-        // ════════════════════════════════════════════════════════════════════
         log(`Agregando ${(jueces || []).length} juez/ces...`);
         const juecesInput = '.group-audiencia-inputjueces .select2-search__field';
         await page.waitForSelector(juecesInput, { visible: true, timeout: 5000 });
 
         for (const juez of (jueces || [])) {
-            // Usar el primer apellido para que el autocomplete sea más preciso
             const primerApellido = juez.split(',')[0].trim();
             log(`  → "${juez}" (buscando por: "${primerApellido}")`);
             await select2Agregar(page, juecesInput, primerApellido);
         }
-
-        // ════════════════════════════════════════════════════════════════════
-        // INTERVINIENTES
-        // ════════════════════════════════════════════════════════════════════
         log("Verificando intervinientes...");
-
-        // Leer los ya seleccionados (tienen selected en el <select> oculto)
         const yaSeleccionados = await page.evaluate(() =>
             Array.from(
                 document.querySelectorAll('#audiencia-inputintervinientes option[selected]')
@@ -325,9 +314,6 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
             }
         }
 
-        // ════════════════════════════════════════════════════════════════════
-        // BLOQUE: fecha, hora inicio, hora fin, sala
-        // ════════════════════════════════════════════════════════════════════
         log(`Completando bloque — fecha: ${fechaStr} | inicio: ${horaInicioStr} | fin: ${horaFinStr} | sala: ${sala}`);
         await page.waitForSelector('#bloque-0-fecha', { timeout: 5000 });
 
@@ -340,7 +326,6 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
         await setTimepicker(page, 'bloque-0-hora_fin_programada', horaFinStr);
         log("  → Hora fin seteada.");
 
-        // Sala — select2 single: click en la selección para abrir, buscar y Enter
         log(`  → Seleccionando sala: "${sala}"`);
         await page.click('#bloque-0-id_sala + span .select2-selection--single');
         await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
