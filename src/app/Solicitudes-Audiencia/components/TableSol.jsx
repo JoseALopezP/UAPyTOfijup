@@ -29,6 +29,7 @@ const COLUMNS = [
     { label: 'SALA', sortKey: 'sala', filterKey: 'sala' },
     { label: 'JUEZ DE LA CAUSA', sortKey: 'juezCausa', filterKey: 'juezCausa' },
     { label: 'COMENTARIO', sortKey: 'comentario', filterKey: 'comentario' },
+    { label: 'NOTIFICAR', sortKey: null, filterKey: null },
     { label: 'ACCIONES', sortKey: null, filterKey: null },
     { label: 'DOCUMENTOS', sortKey: null, filterKey: null, narrow: true },
 ]
@@ -49,6 +50,7 @@ export default function TableSol() {
     const [sortKey, setSortKey] = useState('fyhcreacion')
     const [sortDir, setSortDir] = useState('asc')
     const [filters, setFilters] = useState({})
+    const [activeNotificarRow, setActiveNotificarRow] = useState(null)
     useEffect(() => {
         updateSolicitudesPendientes()
         // Cargamos los desplegables generales
@@ -161,14 +163,20 @@ export default function TableSol() {
                     </tr>
                 </thead>
                 <tbody>
-                    {processed.map((solicitud, index) => (
-                        <RowSol
-                            key={solicitud.rowKey || index}
-                            data={solicitud}
-                            onStatusChange={onStatusChange}
-                            forceSave={forceSave}
-                        />
-                    ))}
+                    {processed.map((solicitud, index) => {
+                        const rowKey = solicitud.rowKey || index;
+                        return (
+                            <RowSol
+                                key={rowKey}
+                                data={solicitud}
+                                onStatusChange={onStatusChange}
+                                forceSave={forceSave}
+                                showNotificar={activeNotificarRow === rowKey}
+                                onToggleNotificar={() => setActiveNotificarRow(prev => prev === rowKey ? null : rowKey)}
+                                onCloseNotificar={() => setActiveNotificarRow(null)}
+                            />
+                        )
+                    })}
                 </tbody>
             </table>
         </div>

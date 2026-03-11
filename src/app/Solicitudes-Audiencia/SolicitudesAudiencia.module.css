@@ -927,3 +927,158 @@
 .closeBtn:hover {
     color: var(--text);
 }
+
+/* ── Modal Notificar ─────────────────────────────────────────── */
+.modalNotificarOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    color: #fff;
+    backdrop-filter: blur(4px);
+}
+
+.modalNotificarContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modalTitle {
+    font-size: 20px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.modalSection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--surface);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.modalSectionTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+}
+
+.modalSelect, .modalInput {
+    width: 100%;
+    padding: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.modalSelect:focus, .modalInput:focus {
+    border-color: var(--accent);
+}
+
+.modalCheckboxList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.modalCheckboxLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    background: var(--surface2);
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.modalCheckboxLabel:hover {
+    background: var(--input-bg);
+    border-color: var(--border2);
+}
+
+.modalCheckboxLabel input[type="checkbox"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+}
+
+.modalBtn {
+    padding: 10px 18px;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    transition: filter 0.15s, transform 0.1s;
+    align-self: flex-start;
+}
+
+.modalBtn:hover {
+    filter: brightness(1.1);
+}
+
+.modalBtn:active {
+    transform: scale(0.98);
+}
+
+.modalBtnClose {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+}
+
+.modalBtnClose:hover {
+    background: var(--surface2);
+    color: var(--text);
+}
+
+.modalButtonGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border2);
+}
+
+.addPartRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}

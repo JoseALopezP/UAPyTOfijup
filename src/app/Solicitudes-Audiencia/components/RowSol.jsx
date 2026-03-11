@@ -4,8 +4,9 @@ import { DataContext } from "@/context New/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
 import ExpandContent from "./ExpandContent"
 import SelectorDropdown from "./SelectorDropdown"
+import { descargarPdfNotificacion } from "@/utils/notificacionesAgendamiento";
 
-export default function RowSol({ data, onStatusChange, forceSave }) {
+export default function RowSol({ data, onStatusChange, forceSave, showNotificar, onToggleNotificar, onCloseNotificar }) {
     const { solicitudesPendientes, addSolicitudData, removeSolicitudPendiente, desplegables } = useContext(DataContext)
     const hasInitialSync = useRef(false)
     const [toSave, setToSave] = useState(false)
@@ -47,6 +48,31 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
     const [newDni, setNewDni] = useState('')
     const [newMotivoParte, setNewMotivoParte] = useState('')
     const [newNombreParte, setNewNombreParte] = useState('')
+
+    const [notificaciones, setNotificaciones] = useState(savedData.notificaciones || [])
+    const [notifOption, setNotifOption] = useState('cancelarAudienciaImputadoEnLibertad')
+    const [selectedPartsToNotify, setSelectedPartsToNotify] = useState([])
+    const [notifNewName, setNotifNewName] = useState('')
+    const [notifNewRole, setNotifNewRole] = useState('')
+
+    const availablePartsList = useMemo(() => {
+        let list = []
+        if (data.partesLegajo) {
+            Object.keys(data.partesLegajo).forEach(roleKey => {
+                const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                const persons = data.partesLegajo[roleKey]
+                if (Array.isArray(persons)) {
+                    persons.forEach(person => list.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, isNew: false }))
+                }
+            })
+        }
+        partesAgregar.forEach(p => {
+            if (p.nombre && p.motivo) {
+                list.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, isNew: true })
+            }
+        })
+        return list
+    }, [data.partesLegajo, partesAgregar])
 
     const [agendar, setAgendar] = useState(savedData.agendar ?? false)
     const [revisado, setRevisado] = useState(savedData.revisado ?? false)
@@ -120,6 +146,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             (juezCausa || '') !== getBaseValue('juezCausa', data.intervinientes?.juez_causa?.join(', ')) ||
             (comentario || '') !== getBaseValue('comentario', data.intervinientes?.comentario?.join(', ')) ||
             JSON.stringify(partesAgregar) !== JSON.stringify(getBaseValue('partesAgregar', [])) ||
+            JSON.stringify(notificaciones) !== JSON.stringify(getBaseValue('notificaciones', [])) ||
             agendar !== (savedData.agendar ?? false) ||
             revisado !== (savedData.revisado ?? false) ||
             marcarBorrar !== (savedData.marcarBorrar ?? false) ||
@@ -152,6 +179,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
             setImputados(saved.imputados || data.intervinientes?.imputado || [])
             setPartesAgregar(saved.partesAgregar || [])
+            setNotificaciones(saved.notificaciones || [])
 
             // Retrasamos la sincronización inicial para permitir que los estados se asienten
             setTimeout(() => {
@@ -166,7 +194,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, partesAgregar, agendar, revisado, marcarBorrar, reprogramar, savedData])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, savedData])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -180,7 +208,7 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
                         fyhcreacion: data.fyhcreacion,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario,
-                        imputados, partesAgregar, agendar, revisado, marcarBorrar, reprogramar
+                        imputados, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar
                     })
                 }
                 setDoSave(false)
@@ -431,6 +459,221 @@ export default function RowSol({ data, onStatusChange, forceSave }) {
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={styles.inputCell} value={comentario} onChange={e => setComentario(e.target.value)} />
+            </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 4px', zIndex: showNotificar ? 4000 : 'auto' }}>
+                <button
+                    className={styles.flagBtn}
+                    style={{
+                        background: showNotificar ? 'var(--accent)' : 'var(--surface2)',
+                        color: showNotificar ? '#fff' : undefined,
+                        borderColor: showNotificar ? 'var(--accent)' : undefined,
+                        height: '70%', margin: '0 auto', fontSize: '10px', position: 'relative'
+                    }}
+                    onClick={onToggleNotificar}
+                >
+                    Notificar
+                    {notificaciones.length > 0 && (
+                        <span style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            background: 'var(--accent)',
+                            color: '#fff',
+                            borderRadius: '50%',
+                            width: '18px',
+                            height: '18px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '10px',
+                            fontWeight: 'bold',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                        }}>
+                            {notificaciones.length}
+                        </span>
+                    )}
+                </button>
+                {showNotificar && (
+                    <div className={styles.modalNotificarOverlay} onClick={onCloseNotificar}>
+                        <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
+                            <div className={styles.modalTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>Generar Notificaciones</span>
+                                <button
+                                    className={styles.modalBtnClose}
+                                    style={{ border: 'none', fontSize: '24px', lineHeight: '1', padding: '0 8px', borderRadius: '4px' }}
+                                    onClick={onCloseNotificar}
+                                    title="Cerrar"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div className={styles.modalSection}>
+                                <h4 className={styles.modalSectionTitle}>1. Crear Notificación</h4>
+                                <select
+                                    className={styles.modalSelect}
+                                    value={notifOption}
+                                    onChange={e => setNotifOption(e.target.value)}
+                                >
+                                    <option value="cancelarAudienciaImputadoEnLibertad">Cancelar Audiencia Imputado Libre</option>
+                                    <option value="citacionDenunciante">Citación Denunciante</option>
+                                    <option value="citacionImputadoLibertadVideoconferencia">Citación Imputado Video</option>
+                                    <option value="citacionPersonalPolicial">Citación Personal Policial</option>
+                                    <option value="citacionImputadoCedulaPenalEnLibertad">Citación Imputado Cédula</option>
+                                </select>
+
+                                <div style={{ marginTop: '12px' }}>
+                                    <span style={{ fontSize: '12px', color: 'var(--text2)', fontWeight: '600' }}>Agregadas a esta notificación:</span>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', minHeight: '38px', border: '1px dashed var(--border2)', borderRadius: '6px', padding: '8px' }}>
+                                        {selectedPartsToNotify.length === 0 && <span style={{ fontSize: '12px', color: 'var(--text3)', fontStyle: 'italic', display: 'flex', alignItems: 'center' }}>Vacío... Haga clic abajo para agregar.</span>}
+                                        {selectedPartsToNotify.map(partKey => {
+                                            const p = availablePartsList.find(x => x.key === partKey) || { nombre: partKey, rol: '' };
+                                            return (
+                                                <div key={partKey} className={styles.listPill} style={p.isNew ? { borderColor: 'rgba(239, 68, 68, 0.5)' } : {}}>
+                                                    <div className={styles.listPillInfo}>
+                                                        <span className={styles.listNombre} style={p.isNew ? { color: '#f87171' } : {}}>{p.nombre}</span>
+                                                        <span className={styles.listDni}>{p.rol}</span>
+                                                    </div>
+                                                    <button className={styles.listDeleteBtn} onClick={() => setSelectedPartsToNotify(prev => prev.filter(k => k !== partKey))}>✕</button>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+
+                                <div style={{ marginTop: '12px' }}>
+                                    <span style={{ fontSize: '12px', color: 'var(--text2)', fontWeight: '600' }}>Click para agregar (Disponibles):</span>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', maxHeight: '140px', overflowY: 'auto' }}>
+                                        {availablePartsList.filter(p => !selectedPartsToNotify.includes(p.key)).map(part => (
+                                            <div
+                                                key={part.key}
+                                                className={styles.listPill}
+                                                style={{ cursor: 'pointer', transition: 'transform 0.1s', ...(part.isNew ? { borderColor: 'rgba(239, 68, 68, 0.4)' } : {}) }}
+                                                onClick={() => setSelectedPartsToNotify(prev => [...prev, part.key])}
+                                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                            >
+                                                <div className={styles.listPillInfo}>
+                                                    <span className={styles.listNombre} style={part.isNew ? { color: '#f87171' } : {}}>{part.nombre}</span>
+                                                    <span className={styles.listDni}>{part.rol}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <button
+                                    className={styles.modalBtn}
+                                    style={{ marginTop: '14px', alignSelf: 'flex-start' }}
+                                    onClick={() => {
+                                        if (selectedPartsToNotify.length === 0) return alert("Seleccione al menos una parte para agregar.");
+                                        setNotificaciones(prev => [...prev, { id: Date.now(), option: notifOption, parts: selectedPartsToNotify }]);
+                                        setSelectedPartsToNotify([]);
+                                        setToSave(true);
+                                    }}
+                                >
+                                    Guardar Configuración
+                                </button>
+                            </div>
+
+                            {notificaciones.length > 0 && (
+                                <div className={styles.modalSection}>
+                                    <h4 className={styles.modalSectionTitle}>2. Notificaciones Listas ({notificaciones.length})</h4>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {notificaciones.map(n => (
+                                            <div key={n.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface2)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                                <div>
+                                                    <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{n.option}</strong>
+                                                    <span style={{ fontSize: '12px', color: 'var(--text2)', marginLeft: '8px' }}>└ {n.parts.length} partes asignadas</span>
+                                                </div>
+                                                <button style={{ background: 'transparent', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center' }} onClick={() => { setNotificaciones(prev => prev.filter(x => x.id !== n.id)); setToSave(true); }} title="Quitar">✕</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={styles.modalSection}>
+                                <h4 className={styles.modalSectionTitle}>Agregar Nueva Parte al Legajo</h4>
+                                <div className={styles.addPartRow}>
+                                    <input
+                                        className={styles.modalInput}
+                                        placeholder="Nombre / DNI..."
+                                        value={notifNewName}
+                                        onChange={e => setNotifNewName(e.target.value)}
+                                    />
+                                    <input
+                                        className={styles.modalInput}
+                                        placeholder="Motivo (Rol)..."
+                                        value={notifNewRole}
+                                        onChange={e => setNotifNewRole(e.target.value)}
+                                    />
+                                    <button
+                                        className={styles.modalBtn}
+                                        onClick={() => {
+                                            if (!notifNewName.trim() || !notifNewRole.trim()) return;
+                                            setPartesAgregar(prev => [...prev, { nombre: notifNewName.trim(), motivo: notifNewRole.trim() }]);
+                                            setNotifNewName('');
+                                            setNotifNewRole('');
+                                            setToSave(true);
+                                        }}
+                                    >
+                                        Agregar +
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className={styles.modalButtonGroup}>
+                                <button className={styles.modalBtn} style={{ background: 'var(--green)' }} onClick={async () => {
+                                    if (notificaciones.length === 0) return alert("No hay notificaciones configuradas.")
+
+                                    try {
+                                        for (const notif of notificaciones) {
+                                            // Preparamos los datos básicos
+                                            const destinatariosStr = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey)?.nombre || pKey).join(', ');
+
+                                            const datosList = {
+                                                destinatarioNombre: destinatariosStr,
+                                                destinatarioDomicilio: '[DOMICILIO A COMPLETAR]',
+                                                destinatarioLocalidad: '[LOCALIDAD A COMPLETAR]',
+                                                destinatarioTelefono: '[TELEFONO A COMPLETAR]',
+                                                legajoFiscal: data.numeroLeg || '[LEGAJO]',
+                                                caratula: data.caratula || '[CARATULA]',
+                                                tipoAudiencia: tipos.join(' - ') || '[TIPO]',
+                                                fechaAudiencia: fechaAudiencia || '[FECHA]',
+                                                horaAudiencia: horaAudiencia || '[HORA]',
+                                                juez: juez || '[JUEZ]',
+
+                                                // Solo para personal policial, lo acomodamos para que mande como lista
+                                                personasACitar: notif.parts.map(pKey => {
+                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '' };
+                                                    return {
+                                                        nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
+                                                        fecha: fechaAudiencia || '[FECHA]',
+                                                        hora: horaAudiencia || '[HORA]'
+                                                    }
+                                                })
+                                            };
+
+                                            // Llamamos a la herramienta del PDF
+                                            await descargarPdfNotificacion(notif.option, datosList);
+                                        }
+                                        alert(`Se generaron ${notificaciones.length} archivos PDF!`);
+                                        onCloseNotificar();
+                                    } catch (err) {
+                                        console.error('Error generando PDF de notificaciones:', err);
+                                        alert('Hubo un error al generar las notificaciones PDF.');
+                                    }
+                                }}>
+                                    Generar Seleccionadas
+                                </button>
+                                <button className={`${styles.modalBtn} ${styles.modalBtnClose}`} onClick={onCloseNotificar}>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                 <div className={styles.accionesCell}>
