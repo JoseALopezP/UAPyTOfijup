@@ -6,7 +6,7 @@ import ExpandContent from "./ExpandContent"
 import SelectorDropdown from "./SelectorDropdown"
 import { descargarPdfNotificacion } from "@/utils/notificacionesAgendamiento";
 
-export default function RowSol({ data, onStatusChange, forceSave, showNotificar, onToggleNotificar, onCloseNotificar }) {
+export default function RowSol({ data, onStatusChange, forceSave, showNotificar, onToggleNotificar, onCloseNotificar, showPartesLegajo, onTogglePartesLegajo, onClosePartesLegajo }) {
     const { solicitudesPendientes, addSolicitudData, removeSolicitudPendiente, desplegables } = useContext(DataContext)
     const hasInitialSync = useRef(false)
     const [toSave, setToSave] = useState(false)
@@ -48,6 +48,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [newDni, setNewDni] = useState('')
     const [newMotivoParte, setNewMotivoParte] = useState('')
     const [newNombreParte, setNewNombreParte] = useState('')
+    const [filterPartes, setFilterPartes] = useState('')
+    const [partesLegajo, setPartesLegajo] = useState([])
 
     const [notificaciones, setNotificaciones] = useState(savedData.notificaciones || [])
     const [notifOption, setNotifOption] = useState('cancelarAudienciaImputadoEnLibertad')
@@ -57,22 +59,36 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     const availablePartsList = useMemo(() => {
         let list = []
-        if (data.partesLegajo) {
+        // Manejar tanto array nuevo como objeto viejo
+        if (Array.isArray(partesLegajo) && partesLegajo.length > 0) {
+            partesLegajo.forEach(p => {
+                list.push({ 
+                    key: `${p.nombre}-${p.rol}`, 
+                    nombre: p.nombre, 
+                    rol: p.rol, 
+                    isNew: false, 
+                    direccion: p.direccion,
+                    localidad: p.localidad,
+                    telefono: p.telefono,
+                    alias: p.alias || ''
+                })
+            })
+        } else if (data.partesLegajo && typeof data.partesLegajo === 'object') {
             Object.keys(data.partesLegajo).forEach(roleKey => {
                 const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
                 const persons = data.partesLegajo[roleKey]
                 if (Array.isArray(persons)) {
-                    persons.forEach(person => list.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, isNew: false }))
+                    persons.forEach(person => list.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, isNew: false, alias: '' }))
                 }
             })
         }
         partesAgregar.forEach(p => {
             if (p.nombre && p.motivo) {
-                list.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, isNew: true })
+                list.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, isNew: true, alias: '' })
             }
         })
         return list
-    }, [data.partesLegajo, partesAgregar])
+    }, [partesLegajo, data.partesLegajo, partesAgregar])
 
     const [agendar, setAgendar] = useState(savedData.agendar ?? false)
     const [revisado, setRevisado] = useState(savedData.revisado ?? false)
@@ -145,6 +161,22 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             (sala || '') !== getBaseValue('sala', data.intervinientes?.sala?.join(', ')) ||
             (juezCausa || '') !== getBaseValue('juezCausa', data.intervinientes?.juez_causa?.join(', ')) ||
             (comentario || '') !== getBaseValue('comentario', data.intervinientes?.comentario?.join(', ')) ||
+            JSON.stringify(partesLegajo) !== JSON.stringify((() => {
+                if (savedData && savedData.partesLegajo) return savedData.partesLegajo;
+                if (Array.isArray(data.partesLegajo)) return data.partesLegajo;
+                if (data.partesLegajo && typeof data.partesLegajo === 'object') {
+                    const converted = [];
+                    Object.keys(data.partesLegajo).forEach(roleKey => {
+                        const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                        const persons = data.partesLegajo[roleKey]
+                        if (Array.isArray(persons)) {
+                            persons.forEach(person => converted.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '', alias: '' }))
+                        }
+                    })
+                    return converted;
+                }
+                return [];
+            })()) ||
             JSON.stringify(partesAgregar) !== JSON.stringify(getBaseValue('partesAgregar', [])) ||
             JSON.stringify(notificaciones) !== JSON.stringify(getBaseValue('notificaciones', [])) ||
             agendar !== (savedData.agendar ?? false) ||
@@ -178,6 +210,21 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             setJuezCausa(syncField(saved.juezCausa, data.intervinientes?.juez_causa?.join(', ')))
             setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
             setImputados(saved.imputados || data.intervinientes?.imputado || [])
+            
+            let initialPartes = []
+            if (saved.partesLegajo) initialPartes = saved.partesLegajo
+            else if (Array.isArray(data.partesLegajo)) initialPartes = data.partesLegajo
+            else if (data.partesLegajo && typeof data.partesLegajo === 'object') {
+                Object.keys(data.partesLegajo).forEach(roleKey => {
+                    const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                    const persons = data.partesLegajo[roleKey]
+                    if (Array.isArray(persons)) {
+                        persons.forEach(person => initialPartes.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '' }))
+                    }
+                })
+            }
+            setPartesLegajo(initialPartes)
+
             setPartesAgregar(saved.partesAgregar || [])
             setNotificaciones(saved.notificaciones || [])
 
@@ -194,7 +241,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, savedData])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, savedData])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -208,7 +255,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         fyhcreacion: data.fyhcreacion,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario,
-                        imputados, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar
+                        imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar
                     })
                 }
                 setDoSave(false)
@@ -344,6 +391,178 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         >+</button>
                     </div>
                 </div>
+            </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 4px', zIndex: showPartesLegajo ? 4000 : 'auto' }}>
+                <button
+                    className={styles.flagBtn}
+                    style={{
+                        background: showPartesLegajo ? 'var(--accent)' : 'var(--surface2)',
+                        color: showPartesLegajo ? '#fff' : undefined,
+                        borderColor: showPartesLegajo ? 'var(--accent)' : undefined,
+                        height: '70%', margin: '0 auto', fontSize: '10px', position: 'relative'
+                    }}
+                    onClick={onTogglePartesLegajo}
+                >
+                    Partes ({partesLegajo.length})
+                </button>
+                {showPartesLegajo && (
+                    <div className={styles.modalNotificarOverlay} onClick={onClosePartesLegajo}>
+                        <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
+                            <div className={styles.modalTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>Partes del Legajo</span>
+                                <button
+                                    className={styles.modalBtnClose}
+                                    style={{ border: 'none', fontSize: '24px', lineHeight: '1', padding: '0 8px', borderRadius: '4px' }}
+                                    onClick={onClosePartesLegajo}
+                                    title="Cerrar"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div className={styles.modalSection} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Lista de Partes</h4>
+                                    <input
+                                        className={styles.modalInput}
+                                        style={{ width: '200px', height: '30px', padding: '4px 10px', fontSize: '12px' }}
+                                        placeholder="Buscar por nombre o rol..."
+                                        value={filterPartes}
+                                        onChange={e => setFilterPartes(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '12px', overflowY: 'auto' }}>
+                                    {partesLegajo.length === 0 && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No hay partes extraídas.</p>}
+                                    {partesLegajo
+                                        .filter(p => {
+                                            const lower = filterPartes.toLowerCase();
+                                            return p.nombre.toLowerCase().includes(lower) || p.rol.toLowerCase().includes(lower);
+                                        })
+                                        .map((parte, idx) => {
+                                            // Encontrar el índice original para que el guardado funcione correctamente al filtrar
+                                            const originalIdx = partesLegajo.findIndex(orig => orig === parte);
+                                            return (
+                                                <div key={idx} style={{ background: 'var(--surface2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                        <strong style={{ color: 'var(--accent)' }}>{parte.nombre}</strong>
+                                                        <span style={{ fontSize: '11px', color: 'var(--text3)', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px' }}>{parte.rol}</span>
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Dirección / Domicilio:</label>
+                                                            <input
+                                                                className={styles.modalInput}
+                                                                value={parte.direccion || ''}
+                                                                onChange={e => {
+                                                                    const updated = [...partesLegajo]
+                                                                    updated[originalIdx] = { ...parte, direccion: e.target.value }
+                                                                    setPartesLegajo(updated)
+                                                                    setToSave(true)
+                                                                }}
+                                                                placeholder="Ingrese domicilio..."
+                                                            />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Localidad:</label>
+                                                            <input
+                                                                className={styles.modalInput}
+                                                                value={parte.localidad || ''}
+                                                                onChange={e => {
+                                                                    const updated = [...partesLegajo]
+                                                                    updated[originalIdx] = { ...parte, localidad: e.target.value }
+                                                                    setPartesLegajo(updated)
+                                                                    setToSave(true)
+                                                                }}
+                                                                placeholder="Ingrese localidad..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Teléfono:</label>
+                                                            <input
+                                                                className={styles.modalInput}
+                                                                value={parte.telefono || ''}
+                                                                onChange={e => {
+                                                                    const updated = [...partesLegajo]
+                                                                    updated[originalIdx] = { ...parte, telefono: e.target.value }
+                                                                    setPartesLegajo(updated)
+                                                                    setToSave(true)
+                                                                }}
+                                                                placeholder="Móvil/Fijo..."
+                                                            />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                            <label style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: '600' }}>Alias / Nombre notificación:</label>
+                                                            <input
+                                                                className={styles.modalInput}
+                                                                style={{ borderColor: 'var(--accent)' }}
+                                                                value={parte.alias || ''}
+                                                                onChange={e => {
+                                                                    const updated = [...partesLegajo]
+                                                                    updated[originalIdx] = { ...parte, alias: e.target.value }
+                                                                    setPartesLegajo(updated)
+                                                                    setToSave(true)
+                                                                }}
+                                                                placeholder="Ej: Sra. CORIA VEDIA..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                </div>
+                            </div>
+                            <div className={styles.modalSection}>
+                                <h4 className={styles.modalSectionTitle}>Agregar Nueva Parte al Legajo</h4>
+                                <div className={styles.addPartRow}>
+                                    <input
+                                        className={styles.modalInput}
+                                        placeholder="Nombre..."
+                                        value={notifNewName}
+                                        onChange={e => setNotifNewName(e.target.value)}
+                                    />
+                                    <input
+                                        list="motivos-datalist"
+                                        className={styles.modalInput}
+                                        placeholder="Rol (Motivo)..."
+                                        value={notifNewRole}
+                                        onChange={e => setNotifNewRole(e.target.value)}
+                                    />
+                                    <button
+                                        className={styles.modalBtn}
+                                        onClick={() => {
+                                            if (!notifNewName.trim() || !notifNewRole.trim()) return;
+                                            const newPart = { 
+                                                nombre: notifNewName.trim(), 
+                                                rol: notifNewRole.trim(), 
+                                                direccion: '', 
+                                                localidad: '', 
+                                                telefono: '',
+                                                alias: ''
+                                            };
+                                            setPartesLegajo(prev => [...prev, newPart]);
+                                            setNotifNewName('');
+                                            setNotifNewRole('');
+                                            setToSave(true);
+                                        }}
+                                    >
+                                        Agregar +
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className={styles.modalButtonGroup}>
+                                <button className={styles.modalBtn} onClick={onClosePartesLegajo}>
+                                    Aceptar
+                                </button>
+                                <button className={`${styles.modalBtn} ${styles.modalBtnClose}`} onClick={onClosePartesLegajo}>
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </td>
             <td className={cell(sitCorporalT)}>
                 <textarea className={styles.inputCell} value={sitCorporal} onChange={e => setSitCorporal(e.target.value)} />
@@ -586,42 +805,48 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                     <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{n.option}</strong>
                                                     <span style={{ fontSize: '12px', color: 'var(--text2)', marginLeft: '8px' }}>└ {n.parts.length} partes asignadas</span>
                                                 </div>
-                                                <button style={{ background: 'transparent', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center' }} onClick={() => { setNotificaciones(prev => prev.filter(x => x.id !== n.id)); setToSave(true); }} title="Quitar">✕</button>
+                                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                    <button 
+                                                        style={{ background: 'var(--accent)', border: 'none', color: '#fff', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            const selectedPartsWithInfo = n.parts.map(pKey => availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', direccion: '', localidad: '', telefono: '' });
+                                                            const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
+                                                            const datosList = {
+                                                                destinatarioNombre: selectedPartsWithInfo.map(p => p.nombre).join(', '),
+                                                                destinatarioDomicilio: firstPart.direccion || '[DOMICILIO A COMPLETAR]',
+                                                                destinatarioLocalidad: firstPart.localidad || '[LOCALIDAD A COMPLETAR]',
+                                                                destinatarioTelefono: firstPart.telefono || '[TELEFONO A COMPLETAR]',
+                                                                legajoFiscal: data.numeroLeg || '[LEGAJO]',
+                                                                caratula: data.caratula || '[CARATULA]',
+                                                                tipoAudiencia: tipos.join(' - ') || '[TIPO]',
+                                                                fechaAudiencia: fechaAudiencia || '[FECHA]',
+                                                                horaAudiencia: horaAudiencia || '[HORA]',
+                                                                juez: juez || '[JUEZ]',
+                                                                personasACitar: n.parts.map(pKey => {
+                                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '' };
+                                                                    return {
+                                                                        nombre: (pInfo.alias || pInfo.nombre) + (pInfo.rol ? ` (${pInfo.rol})` : ''),
+                                                                        fecha: fechaAudiencia || '[FECHA]',
+                                                                        hora: horaAudiencia || '[HORA]'
+                                                                    }
+                                                                })
+                                                            };
+                                                            descargarPdfNotificacion(n.option, datosList);
+                                                        }}
+                                                        title="Descargar esta notificación"
+                                                    >
+                                                        💾 PDF
+                                                    </button>
+                                                    <button style={{ background: 'transparent', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center' }} onClick={() => { setNotificaciones(prev => prev.filter(x => x.id !== n.id)); setToSave(true); }} title="Quitar">✕</button>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
 
-                            <div className={styles.modalSection}>
-                                <h4 className={styles.modalSectionTitle}>Agregar Nueva Parte al Legajo</h4>
-                                <div className={styles.addPartRow}>
-                                    <input
-                                        className={styles.modalInput}
-                                        placeholder="Nombre / DNI..."
-                                        value={notifNewName}
-                                        onChange={e => setNotifNewName(e.target.value)}
-                                    />
-                                    <input
-                                        className={styles.modalInput}
-                                        placeholder="Motivo (Rol)..."
-                                        value={notifNewRole}
-                                        onChange={e => setNotifNewRole(e.target.value)}
-                                    />
-                                    <button
-                                        className={styles.modalBtn}
-                                        onClick={() => {
-                                            if (!notifNewName.trim() || !notifNewRole.trim()) return;
-                                            setPartesAgregar(prev => [...prev, { nombre: notifNewName.trim(), motivo: notifNewRole.trim() }]);
-                                            setNotifNewName('');
-                                            setNotifNewRole('');
-                                            setToSave(true);
-                                        }}
-                                    >
-                                        Agregar +
-                                    </button>
-                                </div>
-                            </div>
+
 
                             <div className={styles.modalButtonGroup}>
                                 <button className={styles.modalBtn} style={{ background: 'var(--green)' }} onClick={async () => {
@@ -630,20 +855,24 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     try {
                                         for (const notif of notificaciones) {
                                             // Preparamos los datos básicos
-                                            const destinatariosStr = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey)?.nombre || pKey).join(', ');
+                                            const selectedPartsWithInfo = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', direccion: '', localidad: '', telefono: '', alias: '' });
+                                            const destinatariosStr = selectedPartsWithInfo.map(p => p.alias || p.nombre).join(', ');
+                                            const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
+                                            const firstDireccion = firstPart.direccion || '[DOMICILIO A COMPLETAR]';
+                                            const firstLocalidad = firstPart.localidad || '[LOCALIDAD A COMPLETAR]';
+                                            const firstTelefono = firstPart.telefono || '[TELEFONO A COMPLETAR]';
 
                                             const datosList = {
                                                 destinatarioNombre: destinatariosStr,
-                                                destinatarioDomicilio: '[DOMICILIO A COMPLETAR]',
-                                                destinatarioLocalidad: '[LOCALIDAD A COMPLETAR]',
-                                                destinatarioTelefono: '[TELEFONO A COMPLETAR]',
+                                                destinatarioDomicilio: firstDireccion,
+                                                destinatarioLocalidad: firstLocalidad,
+                                                destinatarioTelefono: firstTelefono,
                                                 legajoFiscal: data.numeroLeg || '[LEGAJO]',
                                                 caratula: data.caratula || '[CARATULA]',
                                                 tipoAudiencia: tipos.join(' - ') || '[TIPO]',
                                                 fechaAudiencia: fechaAudiencia || '[FECHA]',
                                                 horaAudiencia: horaAudiencia || '[HORA]',
                                                 juez: juez || '[JUEZ]',
-
                                                 // Solo para personal policial, lo acomodamos para que mande como lista
                                                 personasACitar: notif.parts.map(pKey => {
                                                     const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '' };

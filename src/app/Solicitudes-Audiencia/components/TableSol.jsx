@@ -15,6 +15,7 @@ const COLUMNS = [
     { label: 'TIPO', sortKey: 'tipo', filterKey: 'tipo', wide: true },
     { label: 'IMPUTADOS', sortKey: null, filterKey: null },
     { label: 'IMPUTADOS LIST', sortKey: null, filterKey: null, wide: true },
+    { label: 'PARTES LEGAJO', sortKey: null, filterKey: null },
     { label: 'SIT. CORPORAL', sortKey: 'sitCorporal', filterKey: 'sitCorporal' },
     { label: 'AGREGAR', sortKey: null, filterKey: null, wide: true },
     { label: 'VENCIMIENTO', sortKey: 'vencimiento', filterKey: 'vencimiento' },
@@ -51,6 +52,7 @@ export default function TableSol() {
     const [sortDir, setSortDir] = useState('asc')
     const [filters, setFilters] = useState({})
     const [activeNotificarRow, setActiveNotificarRow] = useState(null)
+    const [activePartesRow, setActivePartesRow] = useState(null)
     useEffect(() => {
         updateSolicitudesPendientes()
         // Cargamos los desplegables generales
@@ -174,6 +176,9 @@ export default function TableSol() {
                                 showNotificar={activeNotificarRow === rowKey}
                                 onToggleNotificar={() => setActiveNotificarRow(prev => prev === rowKey ? null : rowKey)}
                                 onCloseNotificar={() => setActiveNotificarRow(null)}
+                                showPartesLegajo={activePartesRow === rowKey}
+                                onTogglePartesLegajo={() => setActivePartesRow(prev => prev === rowKey ? null : rowKey)}
+                                onClosePartesLegajo={() => setActivePartesRow(null)}
                             />
                         )
                     })}

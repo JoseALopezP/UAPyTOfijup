@@ -1,150 +1,119 @@
-export function generarCuerpoNotificacion(opcion, datos) {
+const formatName = (str) => {
+    if (!str) return '';
+    return str.trim();
+};
+
+const formatLongDate = () => {
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const now = new Date();
+    return `San Juan, ${now.getDate()} de ${months[now.getMonth()]} del ${now.getFullYear()}`;
+};
+
+export async function descargarPdfNotificacion(opcion, datos) {
+    const { PDFGenerator } = await import('./pdfUtils.js');
+    
     const {
-        destinatarioNombre = '[NOMBRE DESTINATARIO]',
-        destinatarioDomicilio = '[DOMICILIO]',
-        destinatarioLocalidad = '[LOCALIDAD/DEPARTAMENTO]',
-        destinatarioTelefono = '[TELÉFONO]',
-        legajoFiscal = '[N° LEGAJO]',
-        caratula = '[CARÁTULA]',
-        tipoAudiencia = '[TIPO DE AUDIENCIA]',
-        fechaAudiencia = '[FECHA]',
-        horaAudiencia = '[HORA]',
-        juez = '[JUEZ ASIGNADO]',
+        destinatarioNombre = '',
+        destinatarioDomicilio = '',
+        destinatarioLocalidad = '',
+        destinatarioTelefono = '',
+        legajoFiscal = '',
+        caratula = '',
+        tipoAudiencia = '',
+        fechaAudiencia = '',
+        horaAudiencia = '',
+        juez = '',
         personasACitar = []
     } = datos || {};
 
-    let cuerpo = '';
+    const formattedName = formatName(destinatarioNombre);
+    const fullAddress = `${destinatarioDomicilio}, ${destinatarioLocalidad}`.toLowerCase();
 
-    switch (opcion) {
-        case 'cancelarAudienciaImputadoEnLibertad':
-            cuerpo = `Sr. Jefe de Policía
-Sra/Sr. ${destinatarioNombre} domiciliada/o en calle ${destinatarioDomicilio},
-${destinatarioLocalidad}
-Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a los fines de notificarle que fue CANCELADA
-la Audiencia de ${tipoAudiencia}
-del día ${fechaAudiencia} a las ${horaAudiencia} hs.`;
-            break;
+    const sections = [];
 
-        case 'citacionDenunciante':
-            cuerpo = `Sr. Jefe de Policía
-Sra/Sr. ${destinatarioNombre}
-Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que
-deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${horaAudiencia} hs ante la Oficina
-Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales
-(Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con
-documento nacional de identidad.
-(Cfr. LEY 1851 - O ARTÍCULO 206. - Acceso del público: Todas las personas tienen derecho a
-acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que
-pudieren afectar la seguridad, orden o higiene de la audiencia, ni los menores de dieciséis (16)
-años de Edad...)`;
-            break;
+    // 1. Fecha a la derecha
+    sections.push({ text: formatLongDate(), align: 'right', size: 10, spacing: 10 });
 
-        case 'citacionImputadoLibertadVideoconferencia':
-            cuerpo = `Sr. Jefe de Policía
-Sr/a. ${destinatarioNombre}
-Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de
-hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} mediante VIDEOCONFERENCIA el
-día ${fechaAudiencia} a las ${horaAudiencia} hs. A tal fin comunicarse al numero de teléfono 2646613638 para enviarle
-el link corresponidente link de conexión. Preséntese, con documento de identidad bajo
-apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del
-C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del
-C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y
-su derecho de defensa.
-(Cfr. LEY 1851 - O ARTÍCULO 206. - Acceso del público: Todas las personas tienen derecho a
-acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que
-pudieren afectar la seguridad, orden o higiene de la audiencia, ni los menores de dieciséis (16)
-años de Edad…)
-Se informa que la presente audiencia se asignó al Juez ${juez}.`;
-            break;
+    // 2. Título centrado (con rectángulo muy ajustado)
+    sections.push({ text: 'CÉDULA PENAL', align: 'center', size: 18, border: true, bold: true, spacing: 12 });
 
-        case 'citacionPersonalPolicial':
-            let listaPersonas = personasACitar.length > 0
-                ? personasACitar.map(p => `- ${p.nombre}, para que se presente el dia ${p.fecha} a las ${p.hora}hs,`).join('\n')
-                : `- [NOMBRE PERSONA], para que se presente el dia [FECHA] a las [HORA]hs,`;
+    // 3. Encabezado y Destinatario
+    if (opcion === 'citacionPersonalPolicial') {
+        sections.push({ text: `Dirección de Personal D - 1,`, bold: true, size: 12, spacing: 5 });
+        
+        const introOficio = `Me dirijo a Ud., en Legajo N° ${legajoFiscal} caratulado "${caratula}", con trámite ante la OFICINA JUDICIAL PENAL DE SAN JUAN, sito en calle Rivadavia 473 Este de esta ciudad, a los fines de hacerle saber que tiene que citar a:`;
+        sections.push({ text: introOficio, size: 11, bold: false, spacing: 5, align: 'justify' });
 
-            cuerpo = `Dirección de Personal D - 1,
+        const listaPersonas = personasACitar.length > 0
+            ? personasACitar.map(p => `- ${p.nombre.toUpperCase()}, para que se presente el día ${p.fecha} a las ${p.hora}hs,`).join('\n')
+            : `- [NOMBRE PERSONA], para que se presente el día [FECHA] a las [HORA]hs,`;
+        
+        sections.push({ text: listaPersonas, size: 11, bold: true, spacing: 5 });
 
-Me dirijo a Ud., en Legajo N° ${legajoFiscal} caratulado "${caratula}", con trámite ante la OFICINA JUDICIAL PENAL DE SAN JUAN, sito en calle Rivadavia 473 Este de esta ciudad, a los fines de hacerle saber que tiene que citar a:
+        const restOfOficio = `Deberán comparecer para audiencia de ${tipoAudiencia} ante la Oficina Judicial Penal por la Unidad de Atención al Público y Trámite (Planta Baja del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.`;
+        sections.push({ text: restOfOficio, size: 11, bold: true, spacing: 10, align: 'justify' });
 
-${listaPersonas}
+        const closureOficio = `Sirva la presente de comunicación y solicito, por este mismo medio, confirmación de recepción correcta de la misma.\n\nConforme Acuerdo de Superintendencia 05 / 2024 y 34 / 2024, se informa que la presente audiencia se asignó al Juez ${juez}.`;
+        sections.push({ text: closureOficio, size: 11, bold: true, spacing: 10, align: 'justify' });
 
-Deberán comparecer para audiencia de ${tipoAudiencia} ante la Oficina Judicial Penal por la Unidad de Atención al Público y Trámite (Planta Baja del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.
+    } else {
+        sections.push({ text: `Sr. Jefe de Policía`, bold: true, size: 13, spacing: 2 });
+        
+        const hasPrefix = /^(Sr|Sra)/i.test(formattedName);
+        const headerDestinatario = `${hasPrefix ? '' : 'Sra/Sr. '}${formattedName} domiciliada/o en calle ${fullAddress}`;
+        
+        sections.push({ 
+            text: headerDestinatario, 
+            bold: true, 
+            size: 12, 
+            spacing: 8,
+            align: 'justify'
+        });
 
-Sirva la presente de comunicación y solicito, por este mismo medio, confirmación de recepción correcta de la misma.
+        // CUERPO: Me dirijo a Ud...
+        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${horaAudiencia} ante la Oficina Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales (Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.`;
+        sections.push({ text: introText, size: 11, bold: false, spacing: 6, align: 'justify' });
 
-Conforme Acuerdo de Superintendencia 05 / 2024 y 34 / 2024, se informa que la presente audiencia se asignó al Juez ${juez}.`;
-            break;
-
-        case 'citacionImputadoCedulaPenalEnLibertad':
-            cuerpo = `Sr. Jefe de Policía
-Sr/a. ${destinatarioNombre}
-Teléfono: ${destinatarioTelefono}
-Domicilio: ${destinatarioDomicilio}
-Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${horaAudiencia} horas ante la Oficina Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales (Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.
-
-(Cfr. LEY 1851 - O ARTÍCULO 206. - Acceso del público: Todas las personas tienen derecho a acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que pudieren afectar la seguridad, orden o higiene de la audiencia, ni los menores de dieciséis (16) años de Edad…)
-
-Se informa que la presente audiencia se asignó al Juez Dr. ${juez}.`;
-            break;
-
-        default:
-            return '';
+        const restOfBody = `(Cfr. LEY 1851-O ARTÍCULO 206.- Acceso del público: Todas las personas tienen derecho a acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que pudieren afectar la seguridad, orden o higiene de la audiencia,ni los menores de dieciséis (16) años de Edad…)
+\nSe informa que la presente audiencia se asignó al Juez Dr. ${juez}.`;
+        sections.push({ text: restOfBody, size: 11, bold: true, spacing: 10, align: 'justify' });
     }
 
-    if (!cuerpo) return '';
+    // 5. Avisos finales
+    sections.push({ text: 'QUEDA UD. DEBIDAMENTE NOTIFICADO.', align: 'center', bold: true, underline: true, size: 11, spacing: 2 });
+    sections.push({ text: 'UNIDAD DE NOTIFICACIONES Y CITACIONES', align: 'center', bold: true, size: 11, spacing: 2 });
+    sections.push({ text: 'OFICINA JUDICIAL PENAL', align: 'center', bold: true, size: 11, spacing: 15 });
 
-    const fechaHoy = new Date().toLocaleDateString('es-AR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    // 6. Bloque de firmas y acta
+    const contactBlock = `Ante cualquier duda o consulta comunicarse al teléfono 2646 61-3638 o al correo electrónico notificacionofijup@jussanjuan.gov.ar`;
+    sections.push({ text: contactBlock, size: 10, bold: true, spacing: 8, minHeight: 60 });
 
-    const encabezado = `                                                                                                     San Juan, ${fechaHoy}
+    const notificationLine = `EN EL DÍA ………/……./……, siendo las ...…… HS, NOTIFIQUÉ AL/ LA CIUDADANO/A ……….…………………………………NUMERO DE TELÉFONO CELULAR: ……………………………………….`;
+    sections.push({ text: notificationLine, size: 10, bold: true, spacing: 5 });
 
-                                               CÉDULA PENAL
+    sections.push({ text: `En caso de no ser la persona citada:`, size: 10, bold: true, spacing: 2 });
+    sections.push({ text: `VÍNCULO CON EL CITADO…………. y DECLARA BAJO JURAMENTO QUE EN EL DOMICILIO QUE SE NOTIFICA RESIDE EL SR/A……………………..`, size: 10, bold: true, spacing: 2, align: 'justify' });
+    sections.push({ text: `(MARCAR ÚNICAMENTE LA OPCIÓN QUE CORRESPONDA)`, size: 9, bold: false, spacing: 5 });
+    
+    // Cuadros SI / NO (Grandes)
+    sections.push({ type: 'checkboxes', spacing: 12 });
 
-`;
+    // Líneas de firma
+    const midSpaces = " ".repeat(48);
+    const signatureLine1 = `---------------------------------------------------${midSpaces}-----------------------------------------------------`;
+    
+    const cargoLeft = "FIRMA, DNI, ACLARACIÓN";
+    const cargoRight = "FIRMA, ACLARACIÓN";
+    const signatureLine2 = `${cargoLeft}${" ".repeat(64)}${cargoRight}`;
+    
+    const ownerLeft = "PERSONA NOTIFICADA";
+    const ownerRight = "FUNCIONARIO";
+    const signatureLine3 = `${ownerLeft}${" ".repeat(68)}${ownerRight}`;
+    
+    sections.push({ text: signatureLine1 + "\n" + signatureLine2 + "\n" + signatureLine3, size: 10, bold: true, spacing: 15 });
 
-    const pieDePagina = `
+    const finalFooter = `SE REQUIERE QUE UNA VEZ NOTIFICADA LA PRESENTE, SE ENVÍE LA CONSTANCIA CORRESPONDIENTE AL\nCORREO ELECTRÓNICO notificacionofijup@jussanjuan.gov.ar`;
+    sections.push({ text: finalFooter, size: 10, bold: true, spacing: 5, align: 'justify' });
 
-
-Ante cualquier duda o consulta comunicarse al teléfono 2646 61-3638 o al correo electrónico notificacionofijup@jussanjuan.gov.ar 	
-QUEDA UD. DEBIDAMENTE NOTIFICADO.
-UNIDAD DE NOTIFICACIONES Y CITACIONES
-OFICINA JUDICIAL PENAL 
-
-
-EN EL DÍA ………/……./……, siendo las ...…… HS, NOTIFIQUÉ AL/ LA CIUDADANO/A ……….…………………………………NUMERO DE TELÉFONO CELULAR: ……………………………………….
-En caso de no ser la persona citada: VÍNCULO CON EL CITADO…………. y DECLARA BAJO JURAMENTO QUE EN EL DOMICILIO QUE SE NOTIFICA RESIDE EL SR/A……………………..
-
-
-
----------------------------------------------------                 -----------------------------------------------------
-     FIRMA, DNI, ACLARACIÓN                                          FIRMA, ACLARACIÓN
-       PERSONA NOTIFICADA                                                      FUNCIONARIO
-`;
-
-    return encabezado + cuerpo + pieDePagina;
-}
-
-/**
- * Llama al utilitario de PDFs para generar un archivo descargable.
- */
-export async function descargarPdfNotificacion(opcion, datos) {
-    // Si tenemos una lista de personas, generamos una única notificación con todas juntas.
-    // O si solo es una persona por notificación.
-    // Como el req parece ser 1 PDF por configuración
-    const { PDFGenerator } = await import('./pdfUtils.js');
-
-    // Generamos el texto completo uniendo todo
-    const cuerpoFinal = generarCuerpoNotificacion(opcion, datos);
-
-    if (!cuerpoFinal) return;
-
-    const sections = [
-        { text: cuerpoFinal }
-    ];
-
-    // minutaBool=true evita la sangría extra en cada párrafo
-    await PDFGenerator(sections, `Notificacion_${datos.legajoFiscal}_${Date.now()}`, true);
+    await PDFGenerator(sections, `Notificacion_${legajoFiscal}_${Date.now()}`, true);
 }

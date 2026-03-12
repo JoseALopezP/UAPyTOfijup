@@ -296,14 +296,14 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                     }
 
                     // ── 2. Partes del legajo (paginadas) ──────────────────────────────
-                    const partesLegajo = {};
+                    const partesLegajo = [];
                     const imputadosMatch = [];
 
                     await paginarTabla(
                         '#w9-container',   // el paginador está en el panel que contiene este id
                         async () => {
                             return page.evaluate(() => {
-                                const data = {};
+                                const data = [];
                                 const impMatches = [];
                                 const hasNext = !!document.querySelector(
                                     // Paginador del panel partes, siguiente no desactivado
@@ -326,10 +326,10 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
 
                                     const nombreRaw = (aEl ? aEl.innerText : tdNombre.innerText).trim();
                                     const nombreLimpio = nombreRaw.replace(/\(.*\)/g, '').trim();
-                                    const key = rolEl.innerText.trim().toLowerCase().replace(/\s+/g, '_');
+                                    const rolRaw = rolEl.innerText.trim();
+                                    const key = rolRaw.toLowerCase().replace(/\s+/g, '_');
 
-                                    if (!data[key]) data[key] = [];
-                                    data[key].push(nombreLimpio);
+                                    data.push({ nombre: nombreLimpio, rol: rolRaw, direccion: '', localidad: '', telefono: '', alias: '' });
 
                                     if (key === 'imputado') {
                                         impMatches.push({ nombre: nombreLimpio, link: aEl?.getAttribute('href') || null, dni: null });
@@ -345,7 +345,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                         partesLegajo
                     );
 
-                    log(`  -> Partes extraídas: ${Object.values(partesLegajo).flat().length} total`);
+                    log(`  -> Partes extraídas: ${partesLegajo.length} total`);
 
                     // ── 3. Calificaciones/delitos (tab PJAX, puede paginar) ───────────
                     await page.click('a[href="#calificaciones"]');
