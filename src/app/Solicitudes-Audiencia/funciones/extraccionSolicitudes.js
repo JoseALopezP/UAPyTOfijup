@@ -14,7 +14,7 @@ async function login(page) {
     console.log("[extraccion-solicitudes] Login exitoso.");
 }
 
-export async function extraerSolicitudes(existingData = [], onProgress) {
+export async function extraerSolicitudes(existingData = [], onProgress, tiposAudiencia = []) {
     // onProgress lo usamos internamente solo al final para no hacer ruido
     // en la primera fase, que es rápida
     const notify = (msg) => {
@@ -180,7 +180,7 @@ export async function extraerSolicitudes(existingData = [], onProgress) {
         // ── Extracción de detalles (4 navegadores en paralelo) ────────────────
         notify(`Pasando a extracción detallada (${allSolicitudes.length} items)...`);
 
-        const allDetalles = await extraerDetalles(allSolicitudes, onProgress);
+        const allDetalles = await extraerDetalles(allSolicitudes, onProgress, tiposAudiencia);
         return allDetalles;
 
 

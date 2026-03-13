@@ -43,7 +43,7 @@ export default function HeaderSolicitudes() {
             const response = await fetch('/api/extraer-solicitudes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ existingData }),
+                body: JSON.stringify({ existingData, tiposAudiencia: desplegables?.tiposPuma || [] }),
             });
 
             if (!response.body) throw new Error("No readable stream");

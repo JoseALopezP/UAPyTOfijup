@@ -13,6 +13,7 @@ const COLUMNS = [
     { label: 'FyH SOLICITUD', sortKey: 'fyhcreacion', filterKey: 'fyhcreacion' },
     { label: 'SOLICITANTE', sortKey: 'solicitante', filterKey: 'solicitante' },
     { label: 'TIPO', sortKey: 'tipo', filterKey: 'tipo', wide: true },
+    { label: 'CARÁTULA MOD', sortKey: 'caratulaMod', filterKey: 'caratulaMod', wide: true },
     { label: 'IMPUTADOS', sortKey: null, filterKey: null },
     { label: 'IMPUTADOS LIST', sortKey: null, filterKey: null, wide: true },
     { label: 'PARTES LEGAJO', sortKey: null, filterKey: null },

@@ -19,7 +19,7 @@ function chunkArray(arr, n) {
     }
     return chunks;
 }
-async function procesarChunk(workerId, chunk, onProgress, sharedState) {
+async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudiencia = []) {
     const log = (msg) => {
         console.log(`[worker-${workerId}] ${msg}`);
     };
@@ -302,7 +302,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                     await paginarTabla(
                         '#w9-container',   // el paginador está en el panel que contiene este id
                         async () => {
-                            return page.evaluate(() => {
+                            return page.evaluate((tipos) => {
                                 const data = [];
                                 const impMatches = [];
                                 const hasNext = !!document.querySelector(
@@ -329,7 +329,24 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                                     const rolRaw = rolEl.innerText.trim();
                                     const key = rolRaw.toLowerCase().replace(/\s+/g, '_');
 
-                                    data.push({ nombre: nombreLimpio, rol: rolRaw, direccion: '', localidad: '', telefono: '', alias: '' });
+                                    let aliasLimpio = '';
+                                    if (key === 'imputado') {
+                                        aliasLimpio = nombreLimpio;
+                                        if (tipos && tipos.length > 0) {
+                                            for (let t of tipos) {
+                                                const escapedTipo = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                                // Utilizamos límites de palabras o espacios para mayor seguridad aunque normalmente solo vienen sumados
+                                                const regex = new RegExp(`\\b${escapedTipo}\\b`, 'gi');
+                                                aliasLimpio = aliasLimpio.replace(regex, '').trim();
+                                            }
+                                        }
+                                        // Limpiamos los restos de guiones o espacios extra que puedan quedar al quitar el tipo
+                                        aliasLimpio = aliasLimpio.replace(/^[-\s]+|[-\s]+$/g, '').trim();
+                                        // También los guiones o "de" que queden solos o descolocados en el nombre
+                                        aliasLimpio = aliasLimpio.replace(/\s+-\s*$/g, '').trim();
+                                    }
+
+                                    data.push({ nombre: nombreLimpio, rol: rolRaw, direccion: '', localidad: '', telefono: '', alias: aliasLimpio });
 
                                     if (key === 'imputado') {
                                         impMatches.push({ nombre: nombreLimpio, link: aEl?.getAttribute('href') || null, dni: null });
@@ -337,7 +354,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
                                 });
 
                                 return { data, imputados: impMatches, hasNext };
-                            }).then(res => {
+                            }, tiposAudiencia).then(res => {
                                 imputadosMatch.push(...res.imputados);
                                 return { data: res.data, hasNext: res.hasNext };
                             });
@@ -487,7 +504,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState) {
  * @param {Function} onProgress - Opcional callback de progreso
  * @returns {Promise<Array>} - Array enriquecido con los datos de detalle
  */
-export async function extraerDetalles(solicitudes, onProgress) {
+export async function extraerDetalles(solicitudes, onProgress, tiposAudiencia = []) {
     if (!solicitudes || solicitudes.length === 0) {
         if (onProgress) onProgress("No hay solicitudes para procesar.");
 
@@ -506,7 +523,7 @@ export async function extraerDetalles(solicitudes, onProgress) {
 
     // Lanzamos todos los workers en paralelo
     const allResults = await Promise.all(
-        chunks.map((chunk, i) => procesarChunk(i, chunk, onProgress, sharedState))
+        chunks.map((chunk, i) => procesarChunk(i, chunk, onProgress, sharedState, tiposAudiencia))
     );
 
 

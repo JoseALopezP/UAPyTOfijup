@@ -42,7 +42,11 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [sala, setSala] = useState(savedData.sala || (data.intervinientes?.sala?.join(', ') ?? ''))
     const [juezCausa, setJuezCausa] = useState(savedData.juezCausa || (data.intervinientes?.juez_causa?.join(', ') ?? ''))
     const [comentario, setComentario] = useState(savedData.comentario || (data.intervinientes?.comentario?.join(', ') ?? ''))
-    const [imputados, setImputados] = useState(savedData.imputados || data.intervinientes?.imputado || [])
+    const [caratulaMod, setCaratulaMod] = useState(savedData.caratulaMod || data.caratula || '')
+    const [imputados, setImputados] = useState(() => {
+        const list = savedData.imputados || data.intervinientes?.imputado || [];
+        return list.map(item => typeof item === 'string' ? { nombre: item, dni: '' } : { nombre: item.nombre || '', dni: item.dni || '' });
+    })
     const [partesAgregar, setPartesAgregar] = useState(savedData.partesAgregar || [])
     const [newNombre, setNewNombre] = useState('')
     const [newDni, setNewDni] = useState('')
@@ -70,7 +74,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     direccion: p.direccion,
                     localidad: p.localidad,
                     telefono: p.telefono,
-                    alias: p.alias || ''
+                    alias: p.alias || '',
+                    dni: p.dni || ''
                 })
             })
         } else if (data.partesLegajo && typeof data.partesLegajo === 'object') {
@@ -78,13 +83,13 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
                 const persons = data.partesLegajo[roleKey]
                 if (Array.isArray(persons)) {
-                    persons.forEach(person => list.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, isNew: false, alias: '' }))
+                    persons.forEach(person => list.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, isNew: false, alias: '', dni: '' }))
                 }
             })
         }
         partesAgregar.forEach(p => {
             if (p.nombre && p.motivo) {
-                list.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, isNew: true, alias: '' })
+                list.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, isNew: true, alias: '', dni: '' })
             }
         })
         return list
@@ -161,18 +166,33 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             (sala || '') !== getBaseValue('sala', data.intervinientes?.sala?.join(', ')) ||
             (juezCausa || '') !== getBaseValue('juezCausa', data.intervinientes?.juez_causa?.join(', ')) ||
             (comentario || '') !== getBaseValue('comentario', data.intervinientes?.comentario?.join(', ')) ||
+            (caratulaMod || '') !== getBaseValue('caratulaMod', data.caratula) ||
+            JSON.stringify(imputados) !== JSON.stringify((() => {
+                const list = savedData.imputados || data.intervinientes?.imputado || [];
+                return list.map(item => typeof item === 'string' ? { nombre: item, dni: '' } : { nombre: item.nombre || '', dni: item.dni || '' });
+            })()) ||
             JSON.stringify(partesLegajo) !== JSON.stringify((() => {
-                if (savedData && savedData.partesLegajo) return savedData.partesLegajo;
-                if (Array.isArray(data.partesLegajo)) return data.partesLegajo;
-                if (data.partesLegajo && typeof data.partesLegajo === 'object') {
+                const sourcePartes = savedData?.partesLegajo || data.partesLegajo;
+                if (Array.isArray(sourcePartes)) {
+                    return sourcePartes.map(p => ({
+                        nombre: p.nombre || '',
+                        rol: p.rol || '',
+                        direccion: p.direccion || '',
+                        localidad: p.localidad || '',
+                        telefono: p.telefono || '',
+                        dni: p.dni || '',
+                        alias: p.alias || ''
+                    }));
+                }
+                if (sourcePartes && typeof sourcePartes === 'object') {
                     const converted = [];
-                    Object.keys(data.partesLegajo).forEach(roleKey => {
-                        const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                        const persons = data.partesLegajo[roleKey]
+                    Object.keys(sourcePartes).forEach(roleKey => {
+                        const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        const persons = sourcePartes[roleKey];
                         if (Array.isArray(persons)) {
-                            persons.forEach(person => converted.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '', alias: '' }))
+                            persons.forEach(person => converted.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '', dni: '', alias: '' }));
                         }
-                    })
+                    });
                     return converted;
                 }
                 return [];
@@ -209,17 +229,39 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             setSala(syncField(saved.sala, data.intervinientes?.sala?.join(', ')))
             setJuezCausa(syncField(saved.juezCausa, data.intervinientes?.juez_causa?.join(', ')))
             setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
-            setImputados(saved.imputados || data.intervinientes?.imputado || [])
+            setCaratulaMod(syncField(saved.caratulaMod, data.caratula))
+            setImputados((saved.imputados || data.intervinientes?.imputado || []).map(item => {
+                if (typeof item === 'string') return { nombre: item, dni: '' };
+                return { nombre: item.nombre || '', dni: item.dni || '' };
+            }))
             
             let initialPartes = []
-            if (saved.partesLegajo) initialPartes = saved.partesLegajo
-            else if (Array.isArray(data.partesLegajo)) initialPartes = data.partesLegajo
-            else if (data.partesLegajo && typeof data.partesLegajo === 'object') {
-                Object.keys(data.partesLegajo).forEach(roleKey => {
+            const sourcePartes = saved.partesLegajo || data.partesLegajo;
+
+            if (Array.isArray(sourcePartes)) {
+                initialPartes = sourcePartes.map(p => ({
+                    nombre: p.nombre || '',
+                    rol: p.rol || '',
+                    direccion: p.direccion || '',
+                    localidad: p.localidad || '',
+                    telefono: p.telefono || '',
+                    dni: p.dni || '',
+                    alias: p.alias || ''
+                }))
+            } else if (sourcePartes && typeof sourcePartes === 'object') {
+                Object.keys(sourcePartes).forEach(roleKey => {
                     const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                    const persons = data.partesLegajo[roleKey]
+                    const persons = sourcePartes[roleKey]
                     if (Array.isArray(persons)) {
-                        persons.forEach(person => initialPartes.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '' }))
+                        persons.forEach(person => initialPartes.push({ 
+                            nombre: person, 
+                            rol: roleName, 
+                            direccion: '', 
+                            localidad: '', 
+                            telefono: '', 
+                            dni: '', 
+                            alias: '' 
+                        }))
                     }
                 })
             }
@@ -241,7 +283,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, savedData])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, savedData])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -250,11 +292,12 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     await removeSolicitudPendiente(rowKey)
                 } else {
                     await addSolicitudData(rowKey, {
+                        ...data,
                         rowKey,
                         numeroLeg: data.numeroLeg,
                         fyhcreacion: data.fyhcreacion,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
-                        juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario,
+                        juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, caratulaMod,
                         imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar
                     })
                 }
@@ -345,6 +388,17 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     </datalist>
                 </div>
             </td>
+            <td className={`${styles.cellBodyFixed}`}>
+                <div className={styles.scrollCell}>
+                    {tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) ? (
+                        <textarea 
+                            className={styles.inputCell} 
+                            value={caratulaMod} 
+                            onChange={e => { setCaratulaMod(e.target.value); setToSave(true); }}
+                        />
+                    ) : '-'}
+                </div>
+            </td>
             <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.length ?? 0}</td>
             <td className={`${styles.cellBodyFixed}`}>
                 <div className={styles.scrollCell}>
@@ -432,8 +486,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     />
                                 </div>
                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '12px', overflowY: 'auto' }}>
-                                    {partesLegajo.length === 0 && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No hay partes extraídas.</p>}
-                                    {partesLegajo
+                                    {(!Array.isArray(partesLegajo) || partesLegajo.length === 0) && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No hay partes extraídas.</p>}
+                                    {(Array.isArray(partesLegajo) ? partesLegajo : [])
                                         .filter(p => {
                                             const lower = filterPartes.toLowerCase();
                                             return p.nombre.toLowerCase().includes(lower) || p.rol.toLowerCase().includes(lower);
@@ -507,6 +561,20 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                                 placeholder="Ej: Sra. CORIA VEDIA..."
                                                             />
                                                         </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>DNI:</label>
+                                                            <input
+                                                                className={styles.modalInput}
+                                                                value={parte.dni || ''}
+                                                                onChange={e => {
+                                                                    const updated = [...partesLegajo]
+                                                                    updated[originalIdx] = { ...parte, dni: e.target.value }
+                                                                    setPartesLegajo(updated)
+                                                                    setToSave(true)
+                                                                }}
+                                                                placeholder="Ingrese DNI..."
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )
@@ -539,6 +607,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 direccion: '', 
                                                 localidad: '', 
                                                 telefono: '',
+                                                dni: '',
                                                 alias: ''
                                             };
                                             setPartesLegajo(prev => [...prev, newPart]);
@@ -739,6 +808,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     <option value="citacionImputadoLibertadVideoconferencia">Citación Imputado Video</option>
                                     <option value="citacionPersonalPolicial">Citación Personal Policial</option>
                                     <option value="citacionImputadoCedulaPenalEnLibertad">Citación Imputado Cédula</option>
+                                    <option value="citacionConvenio">Citación por Convenio</option>
                                 </select>
 
                                 <div style={{ marginTop: '12px' }}>
@@ -816,17 +886,19 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                                 destinatarioNombre: selectedPartsWithInfo.map(p => p.nombre).join(', '),
                                                                 destinatarioDomicilio: firstPart.direccion || '[DOMICILIO A COMPLETAR]',
                                                                 destinatarioLocalidad: firstPart.localidad || '[LOCALIDAD A COMPLETAR]',
-                                                                destinatarioTelefono: firstPart.telefono || '[TELEFONO A COMPLETAR]',
+                                                                destinatarioTelefono: firstPart.telefono || '',
                                                                 legajoFiscal: data.numeroLeg || '[LEGAJO]',
-                                                                caratula: data.caratula || '[CARATULA]',
+                                                                caratula: (tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) && caratulaMod) ? caratulaMod : (data.caratula || '[CARATULA]'),
                                                                 tipoAudiencia: tipos.join(' - ') || '[TIPO]',
                                                                 fechaAudiencia: fechaAudiencia || '[FECHA]',
                                                                 horaAudiencia: horaAudiencia || '[HORA]',
                                                                 juez: juez || '[JUEZ]',
                                                                 personasACitar: n.parts.map(pKey => {
-                                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '' };
+                                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
                                                                     return {
                                                                         nombre: (pInfo.alias || pInfo.nombre) + (pInfo.rol ? ` (${pInfo.rol})` : ''),
+                                                                        dni: pInfo.dni || '',
+                                                                        telefono: pInfo.telefono || '',
                                                                         fecha: fechaAudiencia || '[FECHA]',
                                                                         hora: horaAudiencia || '[HORA]'
                                                                     }
@@ -860,7 +932,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                             const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
                                             const firstDireccion = firstPart.direccion || '[DOMICILIO A COMPLETAR]';
                                             const firstLocalidad = firstPart.localidad || '[LOCALIDAD A COMPLETAR]';
-                                            const firstTelefono = firstPart.telefono || '[TELEFONO A COMPLETAR]';
+                                            const firstTelefono = firstPart.telefono || '';
 
                                             const datosList = {
                                                 destinatarioNombre: destinatariosStr,
@@ -868,20 +940,22 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 destinatarioLocalidad: firstLocalidad,
                                                 destinatarioTelefono: firstTelefono,
                                                 legajoFiscal: data.numeroLeg || '[LEGAJO]',
-                                                caratula: data.caratula || '[CARATULA]',
+                                                caratula: (tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) && caratulaMod) ? caratulaMod : (data.caratula || '[CARATULA]'),
                                                 tipoAudiencia: tipos.join(' - ') || '[TIPO]',
                                                 fechaAudiencia: fechaAudiencia || '[FECHA]',
                                                 horaAudiencia: horaAudiencia || '[HORA]',
                                                 juez: juez || '[JUEZ]',
                                                 // Solo para personal policial, lo acomodamos para que mande como lista
                                                 personasACitar: notif.parts.map(pKey => {
-                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '' };
-                                                    return {
-                                                        nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
-                                                        fecha: fechaAudiencia || '[FECHA]',
-                                                        hora: horaAudiencia || '[HORA]'
-                                                    }
-                                                })
+                                                      const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
+                                                      return {
+                                                          nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
+                                                          dni: pInfo.dni || '',
+                                                          telefono: pInfo.telefono || '',
+                                                          fecha: fechaAudiencia || '[FECHA]',
+                                                          hora: horaAudiencia || '[HORA]'
+                                                      }
+                                                  })
                                             };
 
                                             // Llamamos a la herramienta del PDF

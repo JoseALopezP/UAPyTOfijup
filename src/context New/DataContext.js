@@ -365,7 +365,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         try {
             const data = await getDocument('solicitudes', 'pendientes');
             if (data) {
-                setSolicitudesPendientes(Object.values(data));
+                setSolicitudesPendientes(Object.entries(data).map(([key, val]) => ({ ...val, rowKey: key })));
             } else {
                 setSolicitudesPendientes([]);
             }

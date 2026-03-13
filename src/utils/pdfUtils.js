@@ -27,24 +27,47 @@ export const PDFGenerator = async (sections, numeroLeg, minutaBool = false) => {
     const footerImage = '/pdf/footer.jpg';
     const headerImageOficio = '/pdf/headerOficio.jpg';
     const footerImageOficio = '/pdf/footerOficio.jpg';
-    const topMargin = 40;
-    const bottomMargin = 40;
+    const isNotif = numeroLeg && String(numeroLeg).startsWith('Notificacion');
+    const topMargin = isNotif ? 33 : 40;
+    const bottomMargin = isNotif ? 15 : 40;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const contentWidth = pageWidth - 40; // 20 standard margin on each side
+    const contentWidth = pageWidth - 40;
     let currentY = topMargin;
-    const lineHeight = 7;
+    const lineHeight = isNotif ? 5.5 : 7;
     const sectionSpacingWithTitle = 0;
     const sectionSpacingWithoutTitle = 0;
+
+    // Obtener imágenes una sola vez
+    const isOficio = sections.some(s => s.right);
+    const headerImg = (isOficio || isNotif) ? headerImageOficio : headerImage;
+    const footerImg = (isOficio || isNotif) ? footerImageOficio : footerImage;
+
+    const drawBackground = async () => {
+        try {
+            await doc.addImage(headerImg, 'JPEG', 0, 0, pageWidth, 30);
+            const footerWidth = (pageWidth * 2) / 5;
+            const footerHeight = (footerWidth / 60) * 20;
+            const footerX = pageWidth - footerWidth;
+            const footerY = pageHeight - footerHeight;
+            await doc.addImage(footerImg, 'JPEG', footerX, footerY, footerWidth, footerHeight);
+        } catch (e) {
+            console.error("PDF Images error", e);
+        }
+    };
 
     const checkPageBreak = (neededHeight) => {
         if (currentY + neededHeight > (pageHeight - bottomMargin)) {
             doc.addPage();
+            drawBackground();
             currentY = topMargin;
             return true;
         }
         return false;
     };
+
+    // Dibujamos el fondo inicial
+    await drawBackground();
 
     // ----- ORIGINAL EXACT JUSTIFY ALGORITHM (Used by legacy and newly by notificaciones) -----
     function justifyText(doc, textArray, textWidth, startX, startY, lineHeight, indentFactor = 0.4, paragraphSpacing = lineHeight) {
@@ -156,6 +179,7 @@ export const PDFGenerator = async (sections, numeroLeg, minutaBool = false) => {
     // ----- TIPO 1: NOTIFICACIONES (Con rectángulos y checkboxes y justificado compatible) -----
     const processNotificacionSections = async (sections) => {
         for (const section of sections) {
+            if (section.yOffset) currentY += section.yOffset;
             const fontSize = section.size || 11;
             doc.setFontSize(fontSize);
             doc.setFont(section.bold ? "arialbd" : "arial", "normal");
@@ -176,13 +200,14 @@ export const PDFGenerator = async (sections, numeroLeg, minutaBool = false) => {
                 // Usa el justificado exacto que tenía Minutas/Oficios
                 doc.setFontSize(fontSize);
                 const textArray = [{ text: section.text, bold: section.bold }];
-                currentY = justifyText(doc, textArray, contentWidth, 20, currentY, fontSize * 0.6, 0, (section.spacing || 5));
+                // Reducimos el interlineado de 0.6 a 0.52 para notificaciones
+                currentY = justifyText(doc, textArray, contentWidth, 20, currentY, fontSize * 0.52, 0, (section.spacing || 5));
                 continue;
             }
 
             const text = section.text || "";
             const lines = doc.splitTextToSize(text, section.border ? contentWidth - 10 : contentWidth);
-            const lineHeightPoints = fontSize * 0.6;
+            const lineHeightPoints = fontSize * 0.52; // Reducido de 0.6 a 0.52
             const sectionHeight = lines.length * lineHeightPoints + (section.border ? 10 : 5);
 
             checkPageBreak(section.minHeight || sectionHeight);
@@ -305,25 +330,6 @@ export const PDFGenerator = async (sections, numeroLeg, minutaBool = false) => {
         await processNotificacionSections(sections);
     } else {
         processLegacySections(sections);
-    }
-
-    // Header and Footer
-    const isOficio = sections.some(s => s.right);
-    const headerImg = isOficio ? headerImageOficio : headerImage;
-    const footerImg = isOficio ? footerImageOficio : footerImage;
-
-    for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
-        doc.setPage(i);
-        try {
-            await doc.addImage(headerImg, 'JPEG', 0, 0, pageWidth, 30);
-            const footerWidth = (pageWidth * 2) / 5;
-            const footerHeight = (footerWidth / 60) * 20;
-            const footerX = pageWidth - footerWidth;
-            const footerY = pageHeight - footerHeight;
-            await doc.addImage(footerImg, 'JPEG', footerX, footerY, footerWidth, footerHeight);
-        } catch (e) {
-            console.error("PDF Images not found", e);
-        }
     }
 
     doc.save(numeroLeg + '.pdf');

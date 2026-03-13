@@ -3,7 +3,7 @@ import { extraerSolicitudes } from '@/app/Solicitudes-Audiencia/funciones/extrac
 export const maxDuration = 300; // Si usás Vercel hobby, máximo 60s, pro 300s. Solo por las dudas.
 
 export async function POST(request) {
-    const { existingData } = await request.json().catch(() => ({ existingData: [] }));
+    const { existingData, tiposAudiencia = [] } = await request.json().catch(() => ({ existingData: [], tiposAudiencia: [] }));
 
     const encoder = new TextEncoder();
 
@@ -22,7 +22,7 @@ export async function POST(request) {
                 onProgress("Iniciando proceso en el servidor...");
 
                 // Puppeteer
-                const data = await extraerSolicitudes(existingData, onProgress);
+                const data = await extraerSolicitudes(existingData, onProgress, tiposAudiencia);
 
                 // Resultado final
                 const finalData = JSON.stringify({ type: 'done', data }) + '\n';
