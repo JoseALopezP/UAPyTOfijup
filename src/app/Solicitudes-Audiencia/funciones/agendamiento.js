@@ -178,7 +178,82 @@ async function agregarPartesAlLegajo(page, linkLeg, partes, log) {
     log('Partes del legajo actualizadas.');
 }
 
-export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar = [] }, onProgress) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Subir documentos (Notificaciones)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Sube documentos al legajo
+ * @param {Page} page
+ * @param {string} linkLeg
+ * @param {Array<{path:string, descripcion:string}>} documentos
+ * @param {Function} log
+ */
+async function subirDocumentosLegajo(page, linkLeg, documentos, log) {
+    if (!documentos || documentos.length === 0) return;
+    log(`Subiendo ${documentos.length} documento(s) al legajo...`);
+
+    // Ensure we are in the legajo page
+    if (!page.url().includes(linkLeg)) {
+        log(`Navegando al legajo: ${linkLeg}`);
+        await page.goto(linkLeg, { waitUntil: 'networkidle2', timeout: 30000 });
+    }
+
+    log(`  → Abriendo pestaña Documentos`);
+    await page.click('a[href="#documentos"][data-toggle="tab"]');
+    await page.waitForSelector('.modalButtonAgregarDocumento', { visible: true, timeout: 15000 });
+
+    for (const doc of documentos) {
+        log(`  → Subiendo: ${doc.descripcion}`);
+        await page.click('.modalButtonAgregarDocumento');
+        
+        await page.waitForSelector('#documento-form-id', { visible: true, timeout: 15000 });
+        await new Promise(r => setTimeout(r, 600));
+
+        log(`     Cargando archivo en input...`);
+        // Nos aseguramos que el input de tipo file existe en el DOM y esperamos a que el elemento sea interactuable
+        await page.waitForSelector('input[type="file"][id="documento-documento"]', { timeout: 10000 });
+        const fileInput = await page.$('input[type="file"][id="documento-documento"]');
+        await fileInput.uploadFile(doc.path);
+        
+        // Esperar a que el nombre del archivo se muestre en el caption para asegurar que se cargó (el Krajee lo hace)
+        await page.waitForFunction(
+            () => {
+                const el = document.querySelector('.file-caption-name');
+                return el && el.value.length > 0;
+            },
+            { timeout: 10000 }
+        ).catch(() => null);
+
+        log(`     Archivo cargado en input...`);
+        
+        // state -> PROCESAL (using exact text search for Select2)
+        log(`     Seleccionando estado Procesal...`);
+        await page.click('#documento-estado + span .select2-selection--single');
+        await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
+        await page.type('.select2-dropdown .select2-search__field', 'Procesal', { delay: 40 });
+        await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+        await page.keyboard.press('Enter');
+        await new Promise(r => setTimeout(r, 300));
+
+        log(`     Ingresando descripción...`);
+        await page.type('#documento-descripcion', doc.descripcion, { delay: 20 });
+        await new Promise(r => setTimeout(r, 300));
+
+        log(`     Guardando documento...`);
+        await page.click('#documento-form-id [id="boton-submit"]');
+
+        await page.waitForFunction(
+            () => !document.querySelector('.modal.in #documento-form-id'),
+            { timeout: 30000 }
+        ).catch(() => null);
+        await new Promise(r => setTimeout(r, 600));
+        
+        log(`     ✅ Documento subido`);
+    }
+}
+
+export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar = [], documentos = [] }, onProgress) {
     const log = (msg) => {
         console.log(`[agendamiento] ${msg}`);
         if (onProgress) onProgress(msg);
@@ -208,6 +283,11 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
         // ── 2. Agregar partes faltantes al legajo (si las hay) ────────────
         if (linkLeg && agregar && agregar.length > 0) {
             await agregarPartesAlLegajo(page, linkLeg, agregar, log);
+        }
+
+        // ── 2b. Subir documentos (Notificaciones) al legajo ───────────────
+        if (linkLeg && documentos && documentos.length > 0) {
+            await subirDocumentosLegajo(page, linkLeg, documentos, log);
         }
 
         // ── 2. Navegar a la solicitud ─────────────────────────────────────
@@ -336,13 +416,180 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
         log("  → Sala seteada.");
         log("Enviando formulario...");
         await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
-        await Promise.all([
-            page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
-            page.click('button[type="submit"].btn-success'),
+        await page.click('button[type="submit"].btn-success');
+
+        log("  → Esperando a que el formulario procese...");
+        // Espera a navegar (éxito) o a que aparezca un mensaje de error sin navegar (falla)
+        const resultadoSubmit = await Promise.race([
+            page.waitForNavigation({ waitUntil: "networkidle2", timeout: 45000 }).then(() => ({ success: true })),
+            page.waitForSelector('.form-group.has-error .help-block', { visible: true, timeout: 45000 })
+                .then(async el => {
+                    const msgError = await page.evaluate(e => e.innerText, el);
+                    return { success: false, error: msgError };
+                })
         ]);
+
+        if (!resultadoSubmit.success) {
+            log(`❌ Conflicto o Error de agendamiento detectado: ${resultadoSubmit.error}`);
+            // Retorna que al menos los documentos se subieron, pero el agendamiento y notificaciones fallaron
+            return { success: false, error: resultadoSubmit.error, documentosSubidos: true };
+        }
 
         const urlResultante = page.url();
         log(`✅ Agendamiento guardado. URL: ${urlResultante}`);
+
+        // ── 5. Crear la Notificación posterior a la agenda ──────────────────
+        if (documentos && documentos.length > 0) {
+            log(`Navegando a Pestaña Notificaciones...`);
+            await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+            await page.click('a[href="#notificaciones"][data-toggle="tab"]');
+            await new Promise(r => setTimeout(r, 600));
+            
+            // Agregamos una por una las notificaciones
+            for (let i = 0; i < documentos.length; i++) {
+                const doc = documentos[i];
+                log(`Creando Notificación para: ${doc.descripcion}`);
+                
+                await page.waitForSelector('.btn-success[href^="/notificacion/create/"]', { visible: true, timeout: 15000 });
+                await Promise.all([
+                    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                    page.click('.btn-success[href^="/notificacion/create/"]'),
+                ]);
+
+                log(`  → Cargando Plantilla MODELO...`);
+                await page.waitForSelector('#notificacion-id_tipo_notificacion_template + span .select2-selection--single', { visible: true, timeout: 15000 });
+                await page.click('#notificacion-id_tipo_notificacion_template + span .select2-selection--single');
+                await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
+                await page.type('.select2-dropdown .select2-search__field', 'MODELO', { delay: 40 });
+                await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+                await page.keyboard.press('Enter');
+                await new Promise(r => setTimeout(r, 600));
+
+                log(`  → Vaciando destinatarios predefinidos...`);
+                await page.waitForSelector('#notificacion-personas + span .select2-selection--multiple', { visible: true, timeout: 10000 });
+                while (true) {
+                    const closeBtns = await page.$$('#notificacion-personas + span .select2-selection__choice__remove');
+                    if (closeBtns.length === 0) break;
+                    await closeBtns[0].click();
+                    await new Promise(r => setTimeout(r, 100)); // pausas entre acciones para no trabar PUMA
+                }
+
+                if (doc.personasAnotificar && Array.isArray(doc.personasAnotificar)) {
+                    for (const persona of doc.personasAnotificar) {
+                        log(`  → Agregando destinatario: ${persona}`);
+                        await page.click('#notificacion-personas + span .select2-search__field');
+                        await page.type('#notificacion-personas + span .select2-search__field', persona, { delay: 40 });
+                        await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 }).catch(() => null);
+                        await page.keyboard.press('Enter');
+                        await new Promise(r => setTimeout(r, 600));
+                    }
+                }
+
+                log(`  → Adjuntando doc: ${doc.descripcion}`);
+                await page.waitForSelector('#notificacion-documentos + span .select2-search__field', { visible: true, timeout: 10000 });
+                await page.click('#notificacion-documentos + span .select2-search__field');
+                await page.waitForSelector('.select2-results .select2-search__field', { visible: true, timeout: 5000 }).catch(() => null);
+                await page.type('#notificacion-documentos + span .select2-search__field', doc.descripcion, { delay: 40 });
+                await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 }).catch(() => null);
+                await page.keyboard.press('Enter');
+                await new Promise(r => setTimeout(r, 600));
+
+                const textoPlano = doc.textoPlano || '';
+                if (textoPlano.trim() !== '') {
+                    log(`  → Pegando texto en cuerpo...`);
+                    await page.waitForSelector('iframe#notificacion-texto_ifr', { visible: true, timeout: 10000 });
+                    const frameElement = await page.$('iframe#notificacion-texto_ifr');
+                    const frame = await frameElement.contentFrame();
+                    await frame.evaluate((html) => {
+                        const body = document.querySelector('body');
+                        if (body) body.innerHTML = html;
+                    }, textoPlano);
+                }
+
+                log(`  → Confirmando Creación...`);
+                await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
+                await Promise.all([
+                    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                    page.click('button[type="submit"].btn-success'),
+                ]);
+                log(`✅ Notificación Creada para doc: ${doc.descripcion}.`);
+                
+                // Si todavía quedan documentos por notificar, debemos reactivar la pestaña de Notificaciones
+                if (i < documentos.length - 1) {
+                    await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+                    await page.click('a[href="#notificaciones"][data-toggle="tab"]');
+                    await new Promise(r => setTimeout(r, 600));
+                }
+            }
+
+            // ── 6. Enviar a Notificar (Bulk send from table) ────────────────
+            log(`Revisando tabla para Enviar a Notificar...`);
+            await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+            await page.click('a[href="#notificaciones"][data-toggle="tab"]');
+            
+            let nextPagination = true;
+            let pageIndex = 1;
+
+            while (nextPagination) {
+                log(`  → Revisando página ${pageIndex}...`);
+                await page.waitForSelector('#view-grid-notificaciones-container table tbody', { visible: true, timeout: 20000 });
+                await new Promise(r => setTimeout(r, 1000)); // esperamos a que el pjax cargue bien si lo hubiera
+
+                const rows = await page.$$('#view-grid-notificaciones-container table tbody tr');
+                let foundOld = false;
+                let checkedCount = 0;
+
+                for (const row of rows) {
+                    try {
+                        const dateText = await row.$eval('td[data-col-seq="6"]', td => td.innerText.trim());
+                        if (!dateText || dateText === "(sin datos)") continue;
+
+                        const [datePart, timePart] = dateText.split(' ');
+                        const [d, m, y] = datePart.split('/');
+                        const [H, M, S] = timePart.split(':');
+                        const rowDate = new Date(y, m - 1, d, H, M, S);
+                        const diffMins = (Date.now() - rowDate.getTime()) / 60000;
+                        
+                        // Validar si fue creada en los últimos 35 minutos (le damos un ligero margen a 30)
+                        if (diffMins <= 35) { 
+                            const isDisabled = await row.$eval('input.kv-row-checkbox', el => el.disabled).catch(() => true);
+                            if (!isDisabled) {
+                                await row.evaluate(el => {
+                                    const cb = el.querySelector('input.kv-row-checkbox');
+                                    if (cb && !cb.checked) cb.click();
+                                });
+                                checkedCount++;
+                            }
+                        } else {
+                            foundOld = true;
+                        }
+                    } catch(e) {}
+                }
+
+                if (checkedCount > 0) {
+                    log(`  → Marcadas ${checkedCount} notificaciones recientes, clickeando 'Enviar a Notificar'...`);
+                    await page.click('#btn-notificar');
+                    // Esperar unos segundos a que la petición via web sea enviada y la grilla se recargue
+                    await new Promise(r => setTimeout(r, 4000));
+                    await page.waitForSelector('#view-grid-notificaciones-container table tbody', { visible: true, timeout: 20000 }).catch(() => null);
+                }
+
+                if (foundOld) {
+                    log(`  → Se encontró una notificación de hace > 30 mins. Fin del proceso.`);
+                    nextPagination = false;
+                } else {
+                    const nextBtn = await page.$('.pagination li.next:not(.disabled) a');
+                    if (nextBtn) {
+                        log(`  → Avanzando a la siguiente página...`);
+                        await nextBtn.click();
+                        await new Promise(r => setTimeout(r, 2000));
+                        pageIndex++;
+                    } else {
+                        nextPagination = false;
+                    }
+                }
+            }
+        }
 
         return { success: true, url: urlResultante };
 

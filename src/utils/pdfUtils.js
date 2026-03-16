@@ -332,5 +332,10 @@ export const PDFGenerator = async (sections, numeroLeg, minutaBool = false) => {
         processLegacySections(sections);
     }
 
-    doc.save(numeroLeg + '.pdf');
+    if (minutaBool === 'return_buffer') {
+        const arrayBuffer = doc.output('arraybuffer');
+        return Buffer.from(arrayBuffer);
+    } else {
+        doc.save(numeroLeg + '.pdf');
+    }
 };

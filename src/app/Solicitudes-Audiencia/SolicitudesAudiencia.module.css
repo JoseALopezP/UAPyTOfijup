@@ -270,6 +270,11 @@
     min-width: 100px !important;
 }
 
+.headerThNarrower {
+    width: 54px !important;
+    min-width: 54px !important;
+}
+
 .headerThWide {
     width: 220px !important;
     min-width: 220px !important;
@@ -632,11 +637,30 @@
     height: 11px;
 }
 
-/* Estado: revisado — azul sutil */
+/* Estado: revisado — corregimos nombre y agregamos checkbox color */
 .revisadoActive {
     color: #60a5fa !important;
     border-color: #1d4ed8 !important;
     background: rgba(59, 130, 246, 0.12) !important;
+}
+.revisadoCheckbox {
+    accent-color: #3b82f6;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+/* Estado: cancelar — naranja/rojo */
+.cancelarActive {
+    color: #fb923c !important;
+    border-color: #c2410c !important;
+    background: rgba(251, 146, 60, 0.12) !important;
+}
+.cancelarCheckbox {
+    accent-color: #f97316;
+    cursor: pointer;
+    width: 11px;
+    height: 11px;
 }
 
 /* Estado: marcado para borrar */
@@ -645,12 +669,24 @@
     border-color: #991b1b !important;
     background: rgba(220, 38, 38, 0.15) !important;
 }
+.borrarCheckbox {
+    accent-color: #ef4444;
+    cursor: pointer;
+    width: 11px;
+    height: 11px;
+}
 
 /* Estado: agendado — violeta */
 .agendadoActive {
     color: #c084fc !important;
     border-color: #7e22ce !important;
     background: rgba(168, 85, 247, 0.18) !important;
+}
+.reprogramarCheckbox {
+    accent-color: #a855f7;
+    cursor: pointer;
+    width: 11px;
+    height: 11px;
 }
 
 /* ── Save all floating button ────────────────────────────────── */

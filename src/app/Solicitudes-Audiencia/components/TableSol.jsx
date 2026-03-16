@@ -32,6 +32,7 @@ const COLUMNS = [
     { label: 'JUEZ DE LA CAUSA', sortKey: 'juezCausa', filterKey: 'juezCausa' },
     { label: 'COMENTARIO', sortKey: 'comentario', filterKey: 'comentario' },
     { label: 'NOTIFICAR', sortKey: null, filterKey: null },
+    { label: 'REVISADO', sortKey: 'revisado', filterKey: 'revisado', narrower: true },
     { label: 'ACCIONES', sortKey: null, filterKey: null },
     { label: 'DOCUMENTOS', sortKey: null, filterKey: null, narrow: true },
 ]
@@ -103,11 +104,11 @@ export default function TableSol() {
             })
         })
 
-        // Ordenar: reprogramar=true siempre primero (ya procesadas, con opacity 0.5), luego por sortKey
+        // Ordenar: reprogramar o cancelar = true siempre primero (ya procesadas), luego por sortKey
         rows = [...rows].sort((a, b) => {
-            const aRep = !!(a.reprogramar)
-            const bRep = !!(b.reprogramar)
-            if (aRep !== bRep) return aRep ? -1 : 1   // reprogramar primero
+            const aImp = !!(a.reprogramar || a.cancelar)
+            const bImp = !!(b.reprogramar || b.cancelar)
+            if (aImp !== bImp) return aImp ? -1 : 1   // reprogramar/cancelar primero
 
             if (sortKey === 'fyhcreacion') {
                 const cmp = compareFyH(a.fyhcreacion, b.fyhcreacion)
@@ -141,7 +142,7 @@ export default function TableSol() {
                         {COLUMNS.map((col, idx) => (
                             <th
                                 key={idx}
-                                className={`${styles.tableHeaderTh}${col.narrow ? ` ${styles.headerThNarrow}` : ''}${col.wide ? ` ${styles.headerThWide}` : ''}${col.sortKey ? ` ${styles.thSortable}` : ''}`}
+                                className={`${styles.tableHeaderTh}${col.narrow ? ` ${styles.headerThNarrow}` : ''}${col.narrower ? ` ${styles.headerThNarrower}` : ''}${col.wide ? ` ${styles.headerThWide}` : ''}${col.sortKey ? ` ${styles.thSortable}` : ''}`}
                                 onClick={() => handleSortClick(col)}
                             >
                                 <div className={styles.thContent}>

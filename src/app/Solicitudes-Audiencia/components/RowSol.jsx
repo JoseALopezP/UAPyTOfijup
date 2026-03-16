@@ -66,16 +66,18 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         // Manejar tanto array nuevo como objeto viejo
         if (Array.isArray(partesLegajo) && partesLegajo.length > 0) {
             partesLegajo.forEach(p => {
-                list.push({ 
-                    key: `${p.nombre}-${p.rol}`, 
-                    nombre: p.nombre, 
-                    rol: p.rol, 
-                    isNew: false, 
+                list.push({
+                    key: `${p.nombre}-${p.rol}`,
+                    nombre: p.nombre,
+                    rol: p.rol,
+                    isNew: false,
                     direccion: p.direccion,
                     localidad: p.localidad,
                     telefono: p.telefono,
                     alias: p.alias || '',
-                    dni: p.dni || ''
+                    dni: p.dni || '',
+                    situacionCorporal: p.situacionCorporal || '',
+                    situacionDetalle: p.situacionDetalle || ''
                 })
             })
         } else if (data.partesLegajo && typeof data.partesLegajo === 'object') {
@@ -99,6 +101,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [revisado, setRevisado] = useState(savedData.revisado ?? false)
     const [marcarBorrar, setMarcarBorrar] = useState(savedData.marcarBorrar ?? false)
     const [reprogramar, setReprogramar] = useState(savedData.reprogramar ?? false)
+    const [cancelar, setCancelar] = useState(savedData.cancelar ?? false)
 
     const [tipoT, setTipoT] = useState(true)
     const [sitCorporalT, setSitCorporalT] = useState(true)
@@ -181,7 +184,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         localidad: p.localidad || '',
                         telefono: p.telefono || '',
                         dni: p.dni || '',
-                        alias: p.alias || ''
+                        alias: p.alias || '',
+                        situacionCorporal: p.situacionCorporal || '',
+                        situacionDetalle: p.situacionDetalle || ''
                     }));
                 }
                 if (sourcePartes && typeof sourcePartes === 'object') {
@@ -190,7 +195,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                         const persons = sourcePartes[roleKey];
                         if (Array.isArray(persons)) {
-                            persons.forEach(person => converted.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '', dni: '', alias: '' }));
+                            persons.forEach(person => converted.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '', dni: '', alias: '', situacionCorporal: '', situacionDetalle: '' }));
                         }
                     });
                     return converted;
@@ -202,7 +207,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             agendar !== (savedData.agendar ?? false) ||
             revisado !== (savedData.revisado ?? false) ||
             marcarBorrar !== (savedData.marcarBorrar ?? false) ||
-            reprogramar !== (savedData.reprogramar ?? false)
+            reprogramar !== (savedData.reprogramar ?? false) ||
+            cancelar !== (savedData.cancelar ?? false)
         )
         setToSave(hasChanges)
     }
@@ -234,7 +240,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 if (typeof item === 'string') return { nombre: item, dni: '' };
                 return { nombre: item.nombre || '', dni: item.dni || '' };
             }))
-            
+
             let initialPartes = []
             const sourcePartes = saved.partesLegajo || data.partesLegajo;
 
@@ -246,21 +252,25 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     localidad: p.localidad || '',
                     telefono: p.telefono || '',
                     dni: p.dni || '',
-                    alias: p.alias || ''
+                    alias: p.alias || '',
+                    situacionCorporal: p.situacionCorporal || '',
+                    situacionDetalle: p.situacionDetalle || ''
                 }))
             } else if (sourcePartes && typeof sourcePartes === 'object') {
                 Object.keys(sourcePartes).forEach(roleKey => {
                     const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
                     const persons = sourcePartes[roleKey]
                     if (Array.isArray(persons)) {
-                        persons.forEach(person => initialPartes.push({ 
-                            nombre: person, 
-                            rol: roleName, 
-                            direccion: '', 
-                            localidad: '', 
-                            telefono: '', 
-                            dni: '', 
-                            alias: '' 
+                        persons.forEach(person => initialPartes.push({
+                            nombre: person,
+                            rol: roleName,
+                            direccion: '',
+                            localidad: '',
+                            telefono: '',
+                            dni: '',
+                            alias: '',
+                            situacionCorporal: '',
+                            situacionDetalle: ''
                         }))
                     }
                 })
@@ -283,7 +293,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, savedData])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -298,7 +308,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         fyhcreacion: data.fyhcreacion,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, caratulaMod,
-                        imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar
+                        imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar
                     })
                 }
                 setDoSave(false)
@@ -311,36 +321,52 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const cell = (ok) => ok
         ? `${styles.cellBodyFixed} ${styles.cellBodyOk}`
         : `${styles.cellBodyFixed} ${styles.cellBodyError}`
-
-    // Color de fila y sticky según estado — vars CSS heredadas por inputs y primera columna
-    // ⚠️ NUNCA usar opacity ni outline en rowStyle:
-    //    - opacity: se hereda a hijos y no se puede anular (stacking context)
-    //    - outline: en <tr> se pinta sobre todos los <td> incluida la col sticky
-    //    La primera columna no se tiñe: usa siempre var(--sticky-col) sin override.
     const rowStyle = (() => {
+        if (savedData.agendadaError) return {
+            '--row-input-tint': 'rgba(239, 68, 68, 0.1)',
+            '--sticky-col-override': 'rgba(239, 68, 68, 0.12)',
+            background: 'rgba(239, 68, 68, 0.12)',
+        }
+        if (savedData.agendada) return {
+            '--row-input-tint': 'rgba(16, 185, 129, 0.1)',
+            '--sticky-col-override': 'rgba(16, 185, 129, 0.15)',
+            background: 'rgba(16, 185, 129, 0.15)',
+            borderLeft: '4px solid #10b981'
+        }
+        if (cancelar) return {
+            '--row-input-tint': 'rgba(251, 146, 60, 0.08)',
+            '--sticky-col-override': 'rgba(251, 146, 60, 0.10)',
+            background: 'rgba(251, 146, 60, 0.10)',
+        }
         if (reprogramar) return {
             '--row-input-tint': 'rgba(168, 85, 247, 0.07)',
+            '--sticky-col-override': 'rgba(168, 85, 247, 0.08)',
             background: 'rgba(168, 85, 247, 0.08)',
         }
         if (marcarBorrar) return {
             '--row-input-tint': 'rgba(220, 38, 38, 0.10)',
+            '--sticky-col-override': 'rgba(220, 38, 38, 0.20)',
             background: 'rgba(220, 38, 38, 0.20)',
         }
         if (revisado) return {
             '--row-input-tint': 'rgba(59, 130, 246, 0.07)',
+            '--sticky-col-override': 'rgba(59, 130, 246, 0.08)',
             background: 'rgba(59, 130, 246, 0.08)',
         }
         if (agendar) return {
             '--row-input-tint': 'rgba(34, 197, 94, 0.08)',
+            '--sticky-col-override': 'rgba(34, 197, 94, 0.10)',
             background: 'rgba(34, 197, 94, 0.10)',
         }
         return {}
     })()
 
     return (
-        <tr className={styles.tableRow} style={rowStyle}>
+        <tr className={styles.tableRow} style={rowStyle} title={savedData.agendadaError ? `Error de agendamiento: ${savedData.agendadaError}` : (savedData.agendada ? '¡Audiencia Agendada con Éxito!' : '')}>
             <td className={`${styles.cellBodyFixed}${data.urgente ? ` ${styles.urgenteCell}` : ''}`}>
                 {data.urgente && <span className={styles.urgenteLabel}>⚠ Urgente</span>}
+                {savedData.agendada && <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', marginRight: '6px' }} title="Agendada en PUMA"></span>}
+                {savedData.agendadaError && <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', marginRight: '6px' }} title="Error en PUMA"></span>}
                 {data.numeroLeg}
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.fyhcreacion}</div></td>
@@ -391,9 +417,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             <td className={`${styles.cellBodyFixed}`}>
                 <div className={styles.scrollCell}>
                     {tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) ? (
-                        <textarea 
-                            className={styles.inputCell} 
-                            value={caratulaMod} 
+                        <textarea
+                            className={styles.inputCell}
+                            value={caratulaMod}
                             onChange={e => { setCaratulaMod(e.target.value); setToSave(true); }}
                         />
                     ) : '-'}
@@ -495,11 +521,24 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                         .map((parte, idx) => {
                                             // Encontrar el índice original para que el guardado funcione correctamente al filtrar
                                             const originalIdx = partesLegajo.findIndex(orig => orig === parte);
+
+                                            const getRoleStyle = (rol) => {
+                                                const r = (rol || '').toUpperCase();
+                                                if (r.includes('IMPUTADO')) return { bg: 'rgba(239, 68, 68, 0.1)', color: 'var(--red)', border: 'rgba(239, 68, 68, 0.3)' };
+                                                if (r.includes('VICTIMA') || r.includes('DAMNIFICADO')) return { bg: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', border: 'rgba(168, 85, 247, 0.3)' };
+                                                if (r.includes('DEFENSOR')) return { bg: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: 'rgba(34, 197, 94, 0.3)' };
+                                                if (r.includes('FISCAL')) return { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' };
+                                                if (r.includes('QUERELLA')) return { bg: 'rgba(249, 115, 22, 0.1)', color: '#f97316', border: 'rgba(249, 115, 22, 0.3)' };
+                                                if (r.includes('TESTIGO')) return { bg: 'rgba(234, 179, 8, 0.1)', color: '#eab308', border: 'rgba(234, 179, 8, 0.3)' };
+                                                return { bg: 'var(--surface)', color: 'var(--text3)', border: 'var(--border)' };
+                                            };
+                                            const roleStyle = getRoleStyle(parte.rol);
+
                                             return (
-                                                <div key={idx} style={{ background: 'var(--surface2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                                <div key={idx} style={{ background: 'var(--surface2)', padding: '12px', borderRadius: '8px', border: `1px solid ${roleStyle.border}` }}>
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                                         <strong style={{ color: 'var(--accent)' }}>{parte.nombre}</strong>
-                                                        <span style={{ fontSize: '11px', color: 'var(--text3)', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px' }}>{parte.rol}</span>
+                                                        <span style={{ fontSize: '11px', color: roleStyle.color, background: roleStyle.bg, padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold' }}>{parte.rol}</span>
                                                     </div>
                                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -576,6 +615,43 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                             />
                                                         </div>
                                                     </div>
+                                                    {parte.rol && parte.rol.toUpperCase().includes('IMPUTADO') && (
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px', background: 'rgba(239, 68, 68, 0.05)', padding: '8px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                                <label style={{ fontSize: '11px', color: 'var(--red)', fontWeight: '600' }}>Situación Corporal:</label>
+                                                                <select
+                                                                    className={styles.modalSelect}
+                                                                    style={{ borderColor: 'var(--red)', padding: '4px 8px', minHeight: '32px' }}
+                                                                    value={parte.situacionCorporal || ''}
+                                                                    onChange={e => {
+                                                                        const updated = [...partesLegajo]
+                                                                        updated[originalIdx] = { ...parte, situacionCorporal: e.target.value }
+                                                                        setPartesLegajo(updated)
+                                                                        setToSave(true)
+                                                                    }}
+                                                                >
+                                                                    <option value="">Seleccione...</option>
+                                                                    <option value="Libertad">Libertad</option>
+                                                                    <option value="Detenido">Detenido</option>
+                                                                </select>
+                                                            </div>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                                <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Detalle Situación:</label>
+                                                                <input
+                                                                    className={styles.modalInput}
+                                                                    style={{ borderColor: parte.situacionCorporal === 'Detenido' ? 'var(--red)' : '' }}
+                                                                    value={parte.situacionDetalle || ''}
+                                                                    onChange={e => {
+                                                                        const updated = [...partesLegajo]
+                                                                        updated[originalIdx] = { ...parte, situacionDetalle: e.target.value }
+                                                                        setPartesLegajo(updated)
+                                                                        setToSave(true)
+                                                                    }}
+                                                                    placeholder="Ej: SPP, Comisaría..."
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )
                                         })}
@@ -601,14 +677,16 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                         className={styles.modalBtn}
                                         onClick={() => {
                                             if (!notifNewName.trim() || !notifNewRole.trim()) return;
-                                            const newPart = { 
-                                                nombre: notifNewName.trim(), 
-                                                rol: notifNewRole.trim(), 
-                                                direccion: '', 
-                                                localidad: '', 
+                                            const newPart = {
+                                                nombre: notifNewName.trim(),
+                                                rol: notifNewRole.trim(),
+                                                direccion: '',
+                                                localidad: '',
                                                 telefono: '',
                                                 dni: '',
-                                                alias: ''
+                                                alias: '',
+                                                situacionCorporal: '',
+                                                situacionDetalle: ''
                                             };
                                             setPartesLegajo(prev => [...prev, newPart]);
                                             setNotifNewName('');
@@ -761,24 +839,42 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 >
                     Notificar
                     {notificaciones.length > 0 && (
-                        <span style={{
-                            position: 'absolute',
-                            top: '-6px',
-                            right: '-6px',
-                            background: 'var(--accent)',
-                            color: '#fff',
-                            borderRadius: '50%',
-                            width: '18px',
-                            height: '18px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '10px',
-                            fontWeight: 'bold',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                        }}>
-                            {notificaciones.length}
-                        </span>
+                        <div style={{ position: 'absolute', top: '-6px', right: '-4px', display: 'flex', gap: '2px', alignItems: 'center' }}>
+                            {notificaciones.filter(n => !n.notificada).length > 0 && (
+                                <span title="Notificaciones" style={{
+                                    background: 'var(--accent)',
+                                    color: '#fff',
+                                    borderRadius: '50%',
+                                    width: '18px',
+                                    height: '18px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                }}>
+                                    {notificaciones.filter(n => !n.notificada).length}
+                                </span>
+                            )}
+                            {notificaciones.filter(n => n.notificada).length > 0 && (
+                                <span title="Notificadas" style={{
+                                    background: '#888', // Gris
+                                    color: '#fff',
+                                    borderRadius: '50%',
+                                    width: '18px',
+                                    height: '18px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                }}>
+                                    {notificaciones.filter(n => n.notificada).length}
+                                </span>
+                            )}
+                        </div>
                     )}
                 </button>
                 {showNotificar && (
@@ -876,7 +972,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                     <span style={{ fontSize: '12px', color: 'var(--text2)', marginLeft: '8px' }}>└ {n.parts.length} partes asignadas</span>
                                                 </div>
                                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                                    <button 
+                                                    <button
                                                         style={{ background: 'var(--accent)', border: 'none', color: '#fff', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -947,15 +1043,15 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 juez: juez || '[JUEZ]',
                                                 // Solo para personal policial, lo acomodamos para que mande como lista
                                                 personasACitar: notif.parts.map(pKey => {
-                                                      const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
-                                                      return {
-                                                          nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
-                                                          dni: pInfo.dni || '',
-                                                          telefono: pInfo.telefono || '',
-                                                          fecha: fechaAudiencia || '[FECHA]',
-                                                          hora: horaAudiencia || '[HORA]'
-                                                      }
-                                                  })
+                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
+                                                    return {
+                                                        nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
+                                                        dni: pInfo.dni || '',
+                                                        telefono: pInfo.telefono || '',
+                                                        fecha: fechaAudiencia || '[FECHA]',
+                                                        hora: horaAudiencia || '[HORA]'
+                                                    }
+                                                })
                                             };
 
                                             // Llamamos a la herramienta del PDF
@@ -978,26 +1074,51 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     </div>
                 )}
             </td>
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 4px', width: '54px', minWidth: '54px' }}>
+                <label className={`${styles.flagBtn}${revisado ? ` ${styles.revisadoActive}` : ''}`} style={{ height: '32px', width: '32px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                    <input type="checkbox" className={styles.revisadoCheckbox} checked={revisado}
+                        onChange={(e) => { setRevisado(e.target.checked); setToSave(true) }} />
+                </label>
+            </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                 <div className={styles.accionesCell}>
 
                     {/* Agendar — verde */}
                     <label className={`${styles.flagBtn}${agendar ? ` ${styles.agendarActive}` : ''}`}>
                         <input type="checkbox" className={styles.agendarCheckbox} checked={agendar}
-                            onChange={(e) => { setAgendar(e.target.checked); setToSave(true) }} />
+                            onChange={(e) => {
+                                const val = e.target.checked;
+                                if (val) {
+                                    if (!fechaAudiencia) return alert("Falta ingresar la fecha de la audiencia para poder agendar.");
+                                    if (!sala) return alert("Falta ingresar la sala de la audiencia para poder agendar.");
+                                    if (!juez) return alert("Falta ingresar el juez de la audiencia para poder agendar.");
+
+                                    const partsImputados = availablePartsList.filter(p => (p.rol || '').toUpperCase().includes('IMPUTADO'));
+                                    const activeImputados = partsImputados.length > 0 ? partsImputados : imputados;
+
+                                    if (activeImputados.length > 0) {
+                                        const algunoConSituacion = activeImputados.some(imp => imp.situacionCorporal);
+                                        if (!algunoConSituacion) {
+                                            return alert("¡No podés agendar! Al menos un imputado debe tener cargada la situación corporal (Libertad/Detenido).");
+                                        }
+                                    }
+                                }
+                                setAgendar(val);
+                                setToSave(true);
+                            }} />
                         Agendar
                     </label>
 
-                    {/* Revisado — azul */}
-                    <label className={`${styles.flagBtn}${revisado ? ` ${styles.revisadoActive}` : ''}`}>
-                        <input type="checkbox" className={styles.agendarCheckbox} checked={revisado}
-                            onChange={(e) => { setRevisado(e.target.checked); setToSave(true) }} />
-                        Revisado
+                    {/* Cancelar — naranja */}
+                    <label className={`${styles.flagBtn}${cancelar ? ` ${styles.cancelarActive}` : ''}`}>
+                        <input type="checkbox" className={styles.cancelarCheckbox} checked={cancelar}
+                            onChange={(e) => { setCancelar(e.target.checked); setToSave(true) }} />
+                        Cancelar
                     </label>
 
                     {/* Borrar — rojo */}
                     <label className={`${styles.flagBtn}${marcarBorrar ? ` ${styles.borrarActive}` : ''}`}>
-                        <input type="checkbox" className={styles.agendarCheckbox} checked={marcarBorrar}
+                        <input type="checkbox" className={styles.borrarCheckbox} checked={marcarBorrar}
                             onChange={(e) => {
                                 const val = e.target.checked
                                 if (val) {
@@ -1012,10 +1133,17 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         Borrar
                     </label>
 
-                    {/* Reprogramar — violeta, mueve arriba con opacity 0.5 */}
+                    {/* Reprogramar — violeta */}
                     <label className={`${styles.flagBtn}${reprogramar ? ` ${styles.agendadoActive}` : ''}`}>
-                        <input type="checkbox" className={styles.agendarCheckbox} checked={reprogramar}
-                            onChange={(e) => { setReprogramar(e.target.checked); setToSave(true) }} />
+                        <input type="checkbox" className={styles.reprogramarCheckbox} checked={reprogramar}
+                            onChange={(e) => {
+                                const val = e.target.checked;
+                                if (val && !savedData.agendada) {
+                                    return alert("Audiencia sin agendar");
+                                }
+                                setReprogramar(val);
+                                setToSave(true);
+                            }} />
                         Reprogramar
                     </label>
 
@@ -1033,9 +1161,24 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                             <span style={{ fontSize: '11px', color: '#999' }}>No hay docs</span>
                         )}
                     </ExpandContent>
-                    <a className={`${styles.linkSolATag}`} href={data.linkSol} target="_blank" rel="noopener noreferrer">
-                        <p className={`${styles.linkSolATagText}`}>Link</p>
-                    </a>
+                    {data.linkSol && savedData.urlAgendamiento ? (
+                        <ExpandContent
+                            label="Links"
+                            empty={false}
+                            btnStyle={{ background: 'var(--blue)', color: 'white', border: '1px solid var(--blue)' }}
+                        >
+                            <a href={data.linkSol} target="_blank" rel="noopener noreferrer">
+                                🔗 Link Solicitud
+                            </a>
+                            <a href={savedData.urlAgendamiento} target="_blank" rel="noopener noreferrer">
+                                🔗 Link Audiencia
+                            </a>
+                        </ExpandContent>
+                    ) : (
+                        <a className={`${styles.linkSolATag}`} href={savedData.urlAgendamiento || data.linkSol} target="_blank" rel="noopener noreferrer">
+                            <p className={`${styles.linkSolATagText}`}>Link</p>
+                        </a>
+                    )}
                 </div>
             </td>
         </tr>

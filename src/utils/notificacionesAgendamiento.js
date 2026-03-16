@@ -9,7 +9,7 @@ const formatLongDate = () => {
     return `San Juan, ${now.getDate()} de ${months[now.getMonth()]} del ${now.getFullYear()}`;
 };
 
-export async function descargarPdfNotificacion(opcion, datos) {
+export async function descargarPdfNotificacion(opcion, datos, returnBuffer = false) {
     const { PDFGenerator } = await import('./pdfUtils.js');
 
     const {
@@ -145,5 +145,18 @@ export async function descargarPdfNotificacion(opcion, datos) {
     const finalFooter = `SE REQUIERE QUE UNA VEZ NOTIFICADA LA PRESENTE, SE ENVÍE LA CONSTANCIA CORRESPONDIENTE AL CORREO ELECTRÓNICO notificacionofijup@jussanjuan.gov.ar`;
     sections.push({ text: finalFooter, size: 9, bold: true, spacing: 2, align: 'justify' });
 
-    await PDFGenerator(sections, `Notificacion_${legajoFiscal}_${Date.now()}`, true);
+    const minutaArg = returnBuffer ? 'return_buffer' : true;
+    const result = await PDFGenerator(sections, `Notificacion_${legajoFiscal}_${Date.now()}`, minutaArg);
+
+    if (returnBuffer) {
+        // Build raw text using only sections with actual text, line breaks as <br>
+        const rawText = sections
+            .filter(s => s.text)
+            .map(s => s.text.replace(/\n/g, '<br>'))
+            .join('<br><br>');
+        
+        return { buffer: result, textoPlano: rawText };
+    }
+    
+    return result;
 }
