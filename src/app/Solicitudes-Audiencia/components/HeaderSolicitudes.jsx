@@ -100,51 +100,91 @@ export default function HeaderSolicitudes() {
             setIsSyncing(true);
             setSyncStatus('Iniciando Agendamiento...');
 
-            const aAgendar = (solicitudesPendientes || []).filter(s => s.agendar === true && !s.agendada);
-            if (aAgendar.length === 0) {
-                setSyncStatus('✓ No hay solicitudes para agendar.');
+            const aAgendar = (solicitudesPendientes || []).filter(s => (s.agendar === true || s.reprogramar === true || s.cancelar === true) && !s.agendada);
+            // Si es reprogramar o cancelar, permitimos que pase aunque ya esté agendada
+            const aProcesar = (solicitudesPendientes || []).filter(s => 
+                (s.agendar === true && !s.agendada) || 
+                (s.reprogramar === true) || 
+                (s.cancelar === true)
+            );
+
+            if (aProcesar.length === 0) {
+                setSyncStatus('✓ No hay solicitudes para procesar.');
                 setIsSyncing(false);
                 return;
             }
 
-            for (let i = 0; i < aAgendar.length; i++) {
-                const item = aAgendar[i];
-                setSyncStatus(`Agendando ${i+1}/${aAgendar.length}: ${item.numeroLeg}...`);
-                
-                // Reconstruir availablePartsList (lógica idéntica a RowSol.jsx)
-                let availablePartsList = [];
-                if (Array.isArray(item.partesLegajo) && item.partesLegajo.length > 0) {
-                    item.partesLegajo.forEach(p => {
-                        availablePartsList.push({ 
-                            key: `${p.nombre}-${p.rol}`, nombre: p.nombre, rol: p.rol, 
-                            direccion: p.direccion, localidad: p.localidad, telefono: p.telefono, alias: p.alias || '', dni: p.dni || ''
+            for (let i = 0; i < aProcesar.length; i++) {
+                const item = aProcesar[i];
+                try {
+                    const action = item.cancelar ? 'Cancelando' : (item.reprogramar ? 'Reprogramando' : 'Agendando');
+                    setSyncStatus(`${action} ${i+1}/${aProcesar.length}: ${item.numeroLeg}...`);
+                    
+                    // Reconstruir availablePartsList (lógica idéntica a RowSol.jsx)
+                    let availablePartsList = [];
+                    if (Array.isArray(item.partesLegajo) && item.partesLegajo.length > 0) {
+                        item.partesLegajo.forEach(p => {
+                            availablePartsList.push({ 
+                                key: `${p.nombre}-${p.rol}`, nombre: p.nombre, rol: p.rol, 
+                                direccion: p.direccion, localidad: p.localidad, telefono: p.telefono, alias: p.alias || '', dni: p.dni || ''
+                            });
                         });
-                    });
-                } else if (item.partesLegajo && typeof item.partesLegajo === 'object') {
-                    Object.keys(item.partesLegajo).forEach(roleKey => {
-                        const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                        const persons = item.partesLegajo[roleKey];
-                        if (Array.isArray(persons)) {
-                            persons.forEach(person => availablePartsList.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, alias: '', dni: '' }));
+                    } else if (item.partesLegajo && typeof item.partesLegajo === 'object') {
+                        Object.keys(item.partesLegajo).forEach(roleKey => {
+                            const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                            const persons = item.partesLegajo[roleKey];
+                            if (Array.isArray(persons)) {
+                                persons.forEach(person => availablePartsList.push({ key: `${person}-${roleName}`, nombre: person, rol: roleName, alias: '', dni: '' }));
+                            }
+                        });
+                    }
+                    (item.partesAgregar || []).forEach(p => {
+                        if (p.nombre && p.motivo) {
+                            availablePartsList.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, alias: '', dni: '' });
                         }
                     });
-                }
-                (item.partesAgregar || []).forEach(p => {
-                    if (p.nombre && p.motivo) {
-                        availablePartsList.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, alias: '', dni: '' });
-                    }
-                });
 
                 // Preparar PDFs de notificaciones si no se han subido ya
                 let documentosBase64 = [];
-                if (!item.documentosSubidos && item.notificaciones && item.notificaciones.length > 0) {
+                const TEMPLATES_NO_PDF = [
+                    "AUDIENCIA  CITACION FISCAL DEFENSA",
+                    "AUDIENCIA OFICIO POLICÍA TRASLADO DETENIDO",
+                    "AUDIENCIA OFICIO POLICÍA TRASLADO PRISION DOMICILIARIA",
+                    "CANCELACION AUDIENCIA FISCAL DEFENSA",
+                    "CITACION IMPUTADO DETENIDO PARA AUDIENCIA",
+                    "Citación IMPUTADO IMPUGNACIÓN CONEXIÓN",
+                    "CONEXIÓN DE ZOOM IMPUTADOS PARA ANIVI",
+                    "Ejecución CITACIÓN FISCAL DEFENSA",
+                    "Ejecución CITACIÓN IMPUTADO ZOOM",
+                    "MODELO",
+                    "NOTIFICACIÓN ASESORÍAS PARA VIDEOGRABADA ANIVI",
+                    "NOTIFICACION DE ANIVI PARA SAP"
+                ];
+
+                if (item.notificaciones && item.notificaciones.length > 0) {
                     const { descargarPdfNotificacion } = await import('@/utils/notificacionesAgendamiento');
                     
-                    for (const notif of item.notificaciones) {
+                    const pendientes = item.notificaciones.filter(n => !n.notificada);
+                    for (const notif of pendientes) {
                         const selectedPartsWithInfo = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', direccion: '', localidad: '', telefono: '', alias: '' });
-                        const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
                         const destinatariosStr = selectedPartsWithInfo.map(p => p.alias || p.nombre).join(', ');
                         
+                        if (TEMPLATES_NO_PDF.includes(notif.option)) {
+                            documentosBase64.push({
+                                isTemplateOnly: true,
+                                templateName: notif.option,
+                                personasAnotificar: selectedPartsWithInfo.map(p => p.alias || p.nombre),
+                                descripcion: notif.option,
+                                fechaAudiencia: item.fechaAudiencia,
+                                horaAudiencia: item.horaAudiencia,
+                                localKey: notif.parts.join('|') + notif.option
+                            });
+                            continue;
+                        }
+
+                        if (item.documentosSubidos) continue;
+
+                        const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
                         const tiposStr = (item.tipos || []).join(' - ') || '[TIPO]';
                         const caratulaModStr = ((item.tipos || []).some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) && item.caratulaMod) ? item.caratulaMod : (item.caratula || '[CARATULA]');
                         
@@ -158,6 +198,7 @@ export default function HeaderSolicitudes() {
                             tipoAudiencia: tiposStr,
                             fechaAudiencia: item.fechaAudiencia || '[FECHA]',
                             horaAudiencia: item.horaAudiencia || '[HORA]',
+                            horaFinAudiencia: item.horaFinAudiencia || '[HORA FIN]',
                             juez: item.juez || '[JUEZ]',
                             personasACitar: notif.parts.map(pKey => {
                                 const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
@@ -166,16 +207,15 @@ export default function HeaderSolicitudes() {
                                     dni: pInfo.dni || '',
                                     telefono: pInfo.telefono || '',
                                     fecha: item.fechaAudiencia || '[FECHA]',
-                                    hora: item.horaAudiencia || '[HORA]'
+                                    hora: item.horaAudiencia || '[HORA]',
+                                    horaFin: item.horaFinAudiencia || '[HORA FIN]'
                                 }
                             })
                         };
 
                         try {
-                            // descargarPdfNotificacion modificado ahora devuelve { buffer, textoPlano }
                             const { buffer, textoPlano } = await descargarPdfNotificacion(notif.option, datosList, true);
                             
-                            // Transformar ArrayBuffer a Base64
                             const bytes = new Uint8Array(buffer);
                             let binary = '';
                             for (let j = 0; j < bytes.byteLength; j++) {
@@ -188,10 +228,11 @@ export default function HeaderSolicitudes() {
                                 base64: base64Str,
                                 descripcion: `${item.numeroLeg} NOTIFICACION ${notif.option}`.toUpperCase(),
                                 personasAnotificar: selectedPartsWithInfo.map(p => p.alias || p.nombre),
-                                textoPlano: textoPlano || ""
+                                textoPlano: textoPlano,
+                                localKey: notif.parts.join('|') + notif.option
                             });
-                        } catch (e) {
-                            console.error(`Error generando PDF para ${item.numeroLeg}`, e);
+                        } catch (err) {
+                            console.error("Error generando PDF para notificación:", err);
                         }
                     }
                 }
@@ -204,7 +245,8 @@ export default function HeaderSolicitudes() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             solicitud: item,
-                            documentosBase64: documentosBase64
+                            documentosBase64: documentosBase64,
+                            action: item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : 'agendar')
                         })
                     });
 
@@ -238,8 +280,28 @@ export default function HeaderSolicitudes() {
                                         }
                                         throw new Error(parsed.error);
                                     } else if (parsed.type === 'done') {
-                                        setSyncStatus(`Ag. ${i+1}/${aAgendar.length}: Finalizado con éxito.`);
-                                        await addSolicitudData(item.rowKey, { ...item, agendada: true, agendar: false, documentosSubidos: true, agendadaError: null, urlAgendamiento: parsed.data?.url });
+                                        const actionDone = item.cancelar ? 'Cancelado' : (item.reprogramar ? 'Reprogramado' : 'Agendado');
+                                        setSyncStatus(`${actionDone} ${i+1}/${aProcesar.length}: Finalizado con éxito.`);
+                                        
+                                        const nuevasNotifs = (item.notificaciones || []).map(n => {
+                                            const key = n.parts.join('|') + n.option;
+                                            if (documentosBase64.some(d => d.localKey === key)) {
+                                                return { ...n, notificada: true };
+                                            }
+                                            return n;
+                                        });
+
+                                        await addSolicitudData(item.rowKey, { 
+                                            ...item, 
+                                            agendada: item.cancelar ? false : true, 
+                                            agendar: false, 
+                                            reprogramar: false, 
+                                            cancelar: false,
+                                            documentosSubidos: true, 
+                                            agendadaError: null, 
+                                            urlAgendamiento: parsed.data?.url,
+                                            notificaciones: nuevasNotifs 
+                                        });
                                         
                                         // AGREGAR LA AUDIENCIA A FIRESTORE
                                         if (addAudiencia) {
@@ -330,6 +392,9 @@ export default function HeaderSolicitudes() {
                                 }
                             }
                         }
+                        }
+                    } catch (e) {
+                        console.error("Error en el stream de agendamiento:", e);
                     }
                 } catch (e) {
                     console.error("Fallo al procesar agendamiento", e);

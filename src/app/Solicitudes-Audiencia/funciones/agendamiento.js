@@ -253,7 +253,10 @@ async function subirDocumentosLegajo(page, linkLeg, documentos, log) {
     }
 }
 
-export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar = [], documentos = [] }, onProgress) {
+export async function agendarAudiencia({ 
+    linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, 
+    agregar = [], documentos = [], action = 'agendar', solicitud = {} 
+}, onProgress) {
     const log = (msg) => {
         console.log(`[agendamiento] ${msg}`);
         if (onProgress) onProgress(msg);
@@ -290,153 +293,228 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
             await subirDocumentosLegajo(page, linkLeg, documentos, log);
         }
 
-        // ── 2. Navegar a la solicitud ─────────────────────────────────────
-        log(`Navegando a la solicitud: ${linkSol}`);
-        await page.goto(linkSol, { waitUntil: "networkidle2", timeout: 30000 });
-        log("Solicitud cargada.");
+        if (action === 'notificar-solo') {
+            const urlNotif = solicitud.urlAgendamiento || linkSol;
+            if (!urlNotif) throw new Error("No se proporcionó URL de la audiencia para notificar.");
+            log(`Navegando directamente para NOTIFICAR: ${urlNotif}`);
+            await page.goto(urlNotif, { waitUntil: "networkidle2", timeout: 30000 });
+        } 
+        else if (action === 'cancelar') {
+            const urlCancel = solicitud.urlAgendamiento || linkSol;
+            log(`Navegando para CANCELAR: ${urlCancel}`);
+            await page.goto(urlCancel, { waitUntil: "networkidle2", timeout: 30000 });
 
-        // ── 3. Click en "Agendar" ─────────────────────────────────────────
-        log("Buscando botón Agendar...");
-        await page.waitForSelector('a[title="Agendar"]', { visible: true, timeout: 15000 });
-        await Promise.all([
-            page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
-            page.click('a[title="Agendar"]'),
-        ]);
-        log("Calendario cargado.");
+            log("Buscando botón Cancelar (fa-times)...");
+            await page.waitForSelector('a[title="Cancelar"]', { visible: true, timeout: 15000 });
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.click('a[title="Cancelar"]'),
+            ]);
 
-        // ── 4. Click en el primer día del calendario ──────────────────────
-        log("Clickeando en el primer día del calendario...");
-        await page.waitForSelector('thead tr td.fc-day-top', { visible: true, timeout: 15000 });
-        await Promise.all([
-            page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
-            page.click('thead tr td.fc-day-top'),
-        ]);
-        log("Formulario de agendamiento cargado.");
+            log("Formulario de cancelación cargado.");
+            await page.waitForSelector('#historialestadoaudiencia-id_motivo_cambio_estado', { timeout: 15000 });
 
-        await page.waitForSelector('#dynamic-form', { visible: true, timeout: 15000 });
+            log(`Seleccionando motivo: ${solicitud.motivCancel}`);
+            await page.click('#select2-historialestadoaudiencia-id_motivo_cambio_estado-container');
+            await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+            await page.type('.select2-search__field', solicitud.motivCancel, { delay: 40 });
+            await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 });
+            await page.keyboard.press('Enter');
 
-        log("Verificando tipos de audiencia...");
+            log(`Ingresando observaciones: ${solicitud.obsCancel}`);
+            await page.type('#historialestadoaudiencia-observaciones', solicitud.obsCancel || 'Cancelación vía UAPyTO', { delay: 20 });
 
-        // Leer los "Originales" que muestra la página
-        const originalesEnPagina = await page.evaluate(() =>
-            Array.from(
-                document.querySelectorAll('.field-audiencia-tiposaudienciaoriginales .form-control-static span')
-            ).map(s => s.innerText.trim().toUpperCase().replace(/\s+/g, ' '))
-        );
+            log("Enviando cancelación...");
+            await page.click('button[type="submit"].btn-success');
+            await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 });
+            log("✅ Cancelación completada.");
+            return { success: true };
+        } 
+        else if (action === 'reprogramar') {
+            const urlRepro = solicitud.urlAgendamiento || linkSol;
+            log(`Navegando para REPROGRAMAR: ${urlRepro}`);
+            await page.goto(urlRepro, { waitUntil: "networkidle2", timeout: 30000 });
+            
+            log("Buscando botón Reprogramar (glyphicon-time)...");
+            await page.waitForSelector('a[title="Reprogramar"]', { visible: true, timeout: 15000 });
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.click('a[title="Reprogramar"]'),
+            ]);
 
-        log(`  Originales en página: [${originalesEnPagina.join(', ')}]`);
-        log(`  Tipos en params:      [${tipos.join(', ')}]`);
+            log("Formulario de reprogramación cargado.");
+            await page.waitForSelector('#dynamic-form', { visible: true, timeout: 15000 });
 
-        // Tipos de página que NO coinciden con ninguno de los params → discrepancia
-        const discrepancias = originalesEnPagina.filter(o => !tipos.includes(o));
+            log(`Cambiando tiempos — inicio: ${horaInicioStr} | fin: ${horaFinStr}`);
+            await setTimepicker(page, 'bloque-0-hora_inicio_programada', horaInicioStr);
+            await setTimepicker(page, 'bloque-0-hora_fin_programada', horaFinStr);
 
-        if (discrepancias.length > 0) {
-            log(`⚠️  Tipos que no coinciden: [${discrepancias.join(', ')}]`);
-            const continuar = await confirmarConUsuario(page,
-                `⚠️ <b>Discrepancia en Tipos de Audiencia</b><br><br>
-                 <b>Originales en el sistema:</b><br>${originalesEnPagina.join('<br>')}<br><br>
-                 <b>Tipos recibidos por parámetro:</b><br>${tipos.join('<br>')}<br><br>
-                 ¿Desea continuar de todas formas?`
+            log(`Seleccionando motivo: ${solicitud.motivRepro}`);
+            await page.click('#select2-historialestadoaudiencia-id_motivo_cambio_estado-container');
+            await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+            await page.type('.select2-search__field', solicitud.motivRepro, { delay: 40 });
+            await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 });
+            await page.keyboard.press('Enter');
+
+            log(`Ingresando observaciones: ${solicitud.obsRepro}`);
+            await page.type('#historialestadoaudiencia-observaciones', solicitud.obsRepro || 'Reprogramación vía UAPyTO', { delay: 20 });
+            // proceed to form filling section below
+        } 
+        else {
+            // AGENDAR FLOW
+            log(`Navegando a la solicitud: ${linkSol}`);
+            await page.goto(linkSol, { waitUntil: "networkidle2", timeout: 30000 });
+            log("Solicitud cargada.");
+
+            log("Buscando botón Agendar...");
+            await page.waitForSelector('a[title="Agendar"]', { visible: true, timeout: 15000 });
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.click('a[title="Agendar"]'),
+            ]);
+            log("Calendario cargado.");
+
+            log("Clickeando en el primer día del calendario...");
+            await page.waitForSelector('thead tr td.fc-day-top', { visible: true, timeout: 15000 });
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.click('thead tr td.fc-day-top'),
+            ]);
+            log("Formulario de agendamiento cargado.");
+            await page.waitForSelector('#dynamic-form', { visible: true, timeout: 15000 });
+        }
+
+        // Section 3: Shared Form Filling for Agendar/Reprogramar
+        if (action === 'agendar' || action === 'reprogramar') {
+            log("Iniciando llenado de formulario...");
+
+            log("Verificando tipos de audiencia...");
+
+            // Leer los "Originales" que muestra la página
+            const originalesEnPagina = await page.evaluate(() =>
+                Array.from(
+                    document.querySelectorAll('.field-audiencia-tiposaudienciaoriginales .form-control-static span')
+                ).map(s => s.innerText.trim().toUpperCase().replace(/\s+/g, ' '))
             );
-            if (!continuar) {
-                log("Agendamiento cancelado por el usuario.");
-                return { success: false, cancelado: true };
-            }
-            log("El usuario eligió continuar pese a la discrepancia.");
-        }
 
-        // Tipos en params que NO están como originales → agregar a "Agregadas"
-        const tiposParaAgregar = tipos.filter(t => !originalesEnPagina.includes(t));
+            log(`  Originales en página: [${originalesEnPagina.join(', ')}]`);
+            log(`  Tipos en params:      [${tipos.join(', ')}]`);
 
-        if (tiposParaAgregar.length > 0) {
-            log(`Agregando ${tiposParaAgregar.length} tipo/s a "Agregadas"...`);
-            const tiposInput = '#audiencia-inputtiposaudiencia + span .select2-search__field';
-            await page.waitForSelector(tiposInput, { visible: true, timeout: 5000 });
-            for (const t of tiposParaAgregar) {
-                log(`  → "${t}"`);
-                await select2Agregar(page, tiposInput, t);
-            }
-        }
-        log(`Agregando ${(jueces || []).length} juez/ces...`);
-        const juecesInput = '.group-audiencia-inputjueces .select2-search__field';
-        await page.waitForSelector(juecesInput, { visible: true, timeout: 5000 });
+            // Tipos de página que NO coinciden con ninguno de los params → discrepancia
+            const discrepancias = originalesEnPagina.filter(o => !tipos.includes(o));
 
-        for (const juez of (jueces || [])) {
-            const primerApellido = juez.split(',')[0].trim();
-            log(`  → "${juez}" (buscando por: "${primerApellido}")`);
-            await select2Agregar(page, juecesInput, primerApellido);
-        }
-        log("Verificando intervinientes...");
-        const yaSeleccionados = await page.evaluate(() =>
-            Array.from(
-                document.querySelectorAll('#audiencia-inputintervinientes option[selected]')
-            ).map(o => o.innerText.trim().toUpperCase())
-        );
-
-        const intervsInput = '#audiencia-inputintervinientes + span .select2-search__field';
-        await page.waitForSelector(intervsInput, { visible: true, timeout: 5000 });
-
-        for (const [, personas] of Object.entries(intervinientes || {})) {
-            const lista = Array.isArray(personas) ? personas : [personas];
-            for (const persona of lista) {
-                const nombre = norm(typeof persona === 'object' ? persona.nombre : persona);
-                if (!nombre) continue;
-
-                const yaEsta = yaSeleccionados.some(s => s.includes(nombre));
-                if (yaEsta) {
-                    log(`  → Ya presente: "${nombre}"`);
-                    continue;
+            if (discrepancias.length > 0) {
+                log(`⚠️  Tipos que no coinciden: [${discrepancias.join(', ')}]`);
+                const continuar = await confirmarConUsuario(page,
+                    `⚠️ <b>Discrepancia en Tipos de Audiencia</b><br><br>
+                     <b>Originales en el sistema:</b><br>${originalesEnPagina.join('<br>')}<br><br>
+                     <b>Tipos recibidos por parámetro:</b><br>${tipos.join('<br>')}<br><br>
+                     ¿Desea continuar de todas formas?`
+                );
+                if (!continuar) {
+                    log("Agendamiento cancelado por el usuario.");
+                    return { success: false, cancelado: true };
                 }
-
-                const primerApellido = nombre.split(',')[0].trim();
-                log(`  → Agregando: "${nombre}" (buscando por: "${primerApellido}")`);
-                await select2Agregar(page, intervsInput, primerApellido);
+                log("El usuario eligió continuar pese a la discrepancia.");
             }
-        }
 
-        log(`Completando bloque — fecha: ${fechaStr} | inicio: ${horaInicioStr} | fin: ${horaFinStr} | sala: ${sala}`);
-        await page.waitForSelector('#bloque-0-fecha', { timeout: 5000 });
+            // Tipos en params que NO están como originales → agregar a "Agregadas"
+            const tiposParaAgregar = tipos.filter(t => !originalesEnPagina.includes(t));
 
-        await setDatepicker(page, 'bloque-0-fecha', fechaStr);
-        log("  → Fecha seteada.");
+            if (tiposParaAgregar.length > 0) {
+                log(`Agregando ${tiposParaAgregar.length} tipo/s a "Agregadas"...`);
+                const tiposInput = '#audiencia-inputtiposaudiencia + span .select2-search__field';
+                await page.waitForSelector(tiposInput, { visible: true, timeout: 5000 });
+                for (const t of tiposParaAgregar) {
+                    log(`  → "${t}"`);
+                    await select2Agregar(page, tiposInput, t);
+                }
+            }
+            log(`Agregando ${(jueces || []).length} juez/ces...`);
+            const juecesInput = '.group-audiencia-inputjueces .select2-search__field';
+            await page.waitForSelector(juecesInput, { visible: true, timeout: 5000 });
 
-        await setTimepicker(page, 'bloque-0-hora_inicio_programada', horaInicioStr);
-        log("  → Hora inicio seteada.");
+            for (const juez of (jueces || [])) {
+                const primerApellido = juez.split(',')[0].trim();
+                log(`  → "${juez}" (buscando por: "${primerApellido}")`);
+                await select2Agregar(page, juecesInput, primerApellido);
+            }
+            log("Verificando intervinientes...");
+            const yaSeleccionados = await page.evaluate(() =>
+                Array.from(
+                    document.querySelectorAll('#audiencia-inputintervinientes option[selected]')
+                ).map(o => o.innerText.trim().toUpperCase())
+            );
 
-        await setTimepicker(page, 'bloque-0-hora_fin_programada', horaFinStr);
-        log("  → Hora fin seteada.");
+            const intervsInput = '#audiencia-inputintervinientes + span .select2-search__field';
+            await page.waitForSelector(intervsInput, { visible: true, timeout: 5000 });
 
-        log(`  → Seleccionando sala: "${sala}"`);
-        await page.click('#bloque-0-id_sala + span .select2-selection--single');
-        await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
-        await page.type('.select2-dropdown .select2-search__field', sala, { delay: 40 });
-        await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
-        await page.keyboard.press('Enter');
-        await new Promise(r => setTimeout(r, 400));
-        log("  → Sala seteada.");
-        log("Enviando formulario...");
-        await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
-        await page.click('button[type="submit"].btn-success');
+            for (const [, personas] of Object.entries(intervinientes || {})) {
+                const lista = Array.isArray(personas) ? personas : [personas];
+                for (const persona of lista) {
+                    const nombre = norm(typeof persona === 'object' ? persona.nombre : persona);
+                    if (!nombre) continue;
 
-        log("  → Esperando a que el formulario procese...");
-        // Espera a navegar (éxito) o a que aparezca un mensaje de error sin navegar (falla)
-        const resultadoSubmit = await Promise.race([
-            page.waitForNavigation({ waitUntil: "networkidle2", timeout: 45000 }).then(() => ({ success: true })),
-            page.waitForSelector('.form-group.has-error .help-block', { visible: true, timeout: 45000 })
-                .then(async el => {
-                    const msgError = await page.evaluate(e => e.innerText, el);
-                    return { success: false, error: msgError };
-                })
-        ]);
+                    const yaEsta = yaSeleccionados.some(s => s.includes(nombre));
+                    if (yaEsta) {
+                        log(`  → Ya presente: "${nombre}"`);
+                        continue;
+                    }
 
-        if (!resultadoSubmit.success) {
-            log(`❌ Conflicto o Error de agendamiento detectado: ${resultadoSubmit.error}`);
-            // Retorna que al menos los documentos se subieron, pero el agendamiento y notificaciones fallaron
-            return { success: false, error: resultadoSubmit.error, documentosSubidos: true };
+                    const primerApellido = nombre.split(',')[0].trim();
+                    log(`  → Agregando: "${nombre}" (buscando por: "${primerApellido}")`);
+                    await select2Agregar(page, intervsInput, primerApellido);
+                }
+            }
+
+            log(`Completando bloque — fecha: ${fechaStr} | inicio: ${horaInicioStr} | fin: ${horaFinStr} | sala: ${sala}`);
+            await page.waitForSelector('#bloque-0-fecha', { timeout: 5000 });
+
+            await setDatepicker(page, 'bloque-0-fecha', fechaStr);
+            log("  → Fecha seteada.");
+
+            await setTimepicker(page, 'bloque-0-hora_inicio_programada', horaInicioStr);
+            log("  → Hora inicio seteada.");
+
+            await setTimepicker(page, 'bloque-0-hora_fin_programada', horaFinStr);
+            log("  → Hora fin seteada.");
+
+            log(`  → Seleccionando sala: "${sala}"`);
+            await page.click('#bloque-0-id_sala + span .select2-selection--single');
+            await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
+            await page.type('.select2-dropdown .select2-search__field', sala, { delay: 40 });
+            await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+            await page.keyboard.press('Enter');
+            await new Promise(r => setTimeout(r, 400));
+            log("  → Sala seteada.");
+            log("Enviando formulario...");
+            await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
+            await page.click('button[type="submit"].btn-success');
+
+            log("  → Esperando a que el formulario procese...");
+            // Espera a navegar (éxito) o a que aparezca un mensaje de error sin navegar (falla)
+            const resultadoSubmit = await Promise.race([
+                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 45000 }).then(() => ({ success: true })),
+                page.waitForSelector('.form-group.has-error .help-block', { visible: true, timeout: 45000 })
+                    .then(async el => {
+                        const msgError = await page.evaluate(e => e.innerText, el);
+                        return { success: false, error: msgError };
+                    })
+            ]);
+
+            if (!resultadoSubmit.success) {
+                log(`❌ Conflicto o Error de agendamiento detectado: ${resultadoSubmit.error}`);
+                if (resultadoSubmit && !resultadoSubmit.success) {
+                    // Retorna que al menos los documentos se subieron, pero el agendamiento y notificaciones fallaron
+                    return { success: false, error: resultadoSubmit.error, documentosSubidos: true };
+                }
+            }
         }
 
         const urlResultante = page.url();
-        log(`✅ Agendamiento guardado. URL: ${urlResultante}`);
+        if (action !== 'notificar-solo') {
+            log(`✅ Agendamiento guardado. URL: ${urlResultante}`);
+        }
 
         // ── 5. Crear la Notificación posterior a la agenda ──────────────────
         if (documentos && documentos.length > 0) {
@@ -456,22 +534,57 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
                     page.click('.btn-success[href^="/notificacion/create/"]'),
                 ]);
 
-                log(`  → Cargando Plantilla MODELO...`);
+                const isTemplateOnly = doc.isTemplateOnly || false;
+                const templateName = isTemplateOnly ? doc.templateName : 'MODELO';
+
+                log(`  → Cargando Plantilla ${templateName}...`);
                 await page.waitForSelector('#notificacion-id_tipo_notificacion_template + span .select2-selection--single', { visible: true, timeout: 15000 });
                 await page.click('#notificacion-id_tipo_notificacion_template + span .select2-selection--single');
                 await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
-                await page.type('.select2-dropdown .select2-search__field', 'MODELO', { delay: 40 });
-                await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+                await page.type('.select2-dropdown .select2-search__field', templateName, { delay: 40 });
+                await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 }).catch(() => null);
                 await page.keyboard.press('Enter');
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 800));
+
+                if (isTemplateOnly) {
+                    log(`  → Seleccionando Bloque (Fecha: ${doc.fechaAudiencia} ${doc.horaAudiencia})...`);
+                    try {
+                        await page.waitForSelector('#notificacion-id_bloque + span .select2-selection--single', { visible: true, timeout: 5000 });
+                        await page.click('#notificacion-id_bloque + span .select2-selection--single');
+                        await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+                        
+                        // Buscamos la opción que coincida con la fecha y hora
+                        const targetTextMatch = `${doc.fechaAudiencia.trim()} ${doc.horaAudiencia.trim()}`.replace(/[\/\s:]/g, '');
+                        const found = await page.evaluate((matchStr) => {
+                            const results = Array.from(document.querySelectorAll('.select2-results__option'));
+                            const target = results.find(el => el.textContent.replace(/[\/\s:]/g, '').includes(matchStr));
+                            if (target) {
+                                target.click();
+                                return true;
+                            }
+                            return false;
+                        }, targetTextMatch);
+
+                        if (!found) {
+                            log(`⚠️ No se encontró un bloque que coincida con ${doc.fechaAudiencia} ${doc.horaAudiencia}. Intentando seleccionar el primero disponible...`);
+                            await page.keyboard.press('ArrowDown');
+                            await page.keyboard.press('Enter');
+                        }
+                    } catch (err) {
+                        log(`⚠️ Error al seleccionar bloque: ${err.message}`);
+                    }
+                    await new Promise(r => setTimeout(r, 600));
+                }
 
                 log(`  → Vaciando destinatarios predefinidos...`);
                 await page.waitForSelector('#notificacion-personas + span .select2-selection--multiple', { visible: true, timeout: 10000 });
                 while (true) {
                     const closeBtns = await page.$$('#notificacion-personas + span .select2-selection__choice__remove');
                     if (closeBtns.length === 0) break;
-                    await closeBtns[0].click();
-                    await new Promise(r => setTimeout(r, 100)); // pausas entre acciones para no trabar PUMA
+                    try {
+                        await closeBtns[0].click();
+                        await new Promise(r => setTimeout(r, 150));
+                    } catch (err) { break; }
                 }
 
                 if (doc.personasAnotificar && Array.isArray(doc.personasAnotificar)) {
@@ -485,34 +598,104 @@ export async function agendarAudiencia({ linkSol, tipo, jueces, intervinientes, 
                     }
                 }
 
-                log(`  → Adjuntando doc: ${doc.descripcion}`);
-                await page.waitForSelector('#notificacion-documentos + span .select2-search__field', { visible: true, timeout: 10000 });
-                await page.click('#notificacion-documentos + span .select2-search__field');
-                await page.waitForSelector('.select2-results .select2-search__field', { visible: true, timeout: 5000 }).catch(() => null);
-                await page.type('#notificacion-documentos + span .select2-search__field', doc.descripcion, { delay: 40 });
-                await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 }).catch(() => null);
-                await page.keyboard.press('Enter');
-                await new Promise(r => setTimeout(r, 600));
+                if (!isTemplateOnly) {
+                    log(`  → Adjuntando doc: ${doc.descripcion}`);
+                    await page.waitForSelector('#notificacion-documentos + span .select2-search__field', { visible: true, timeout: 10000 });
+                    await page.click('#notificacion-documentos + span .select2-search__field');
+                    await page.waitForSelector('.select2-results .select2-search__field', { visible: true, timeout: 5000 }).catch(() => null);
+                    await page.type('#notificacion-documentos + span .select2-search__field', doc.descripcion, { delay: 40 });
+                    await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 }).catch(() => null);
+                    await page.keyboard.press('Enter');
+                    await new Promise(r => setTimeout(r, 800));
 
-                const textoPlano = doc.textoPlano || '';
-                if (textoPlano.trim() !== '') {
-                    log(`  → Pegando texto en cuerpo...`);
-                    await page.waitForSelector('iframe#notificacion-texto_ifr', { visible: true, timeout: 10000 });
-                    const frameElement = await page.$('iframe#notificacion-texto_ifr');
-                    const frame = await frameElement.contentFrame();
-                    await frame.evaluate((html) => {
-                        const body = document.querySelector('body');
-                        if (body) body.innerHTML = html;
-                    }, textoPlano);
+                    const textoPlano = doc.textoPlano || '';
+                    if (textoPlano.trim() !== '') {
+                        log(`  → Pegando texto en cuerpo...`);
+                        await page.waitForSelector('iframe#notificacion-texto_ifr', { visible: true, timeout: 10000 });
+                        const frameElement = await page.$('iframe#notificacion-texto_ifr');
+                        const frame = await frameElement.contentFrame();
+                        await frame.evaluate((html) => {
+                            const body = document.querySelector('body');
+                            if (body) body.innerHTML = html;
+                        }, textoPlano);
+                    }
+                } else {
+                    // Flujo Generar Texto para Plantillas
+                    log(`  → Iniciando flujo 'Generar Texto'...`);
+                    try {
+                        await page.waitForSelector('button[title="Generar Texto del Modelo"]', { visible: true, timeout: 10000 });
+                        await page.click('button[title="Generar Texto del Modelo"]');
+                        
+                        log(`  → Esperando diálogo de generación...`);
+                        await page.waitForSelector('.tox-dialog iframe', { visible: true, timeout: 15000 });
+                        const dialogIframeHandle = await page.$('.tox-dialog iframe');
+                        const dialogFrame = await dialogIframeHandle.contentFrame();
+
+                        log(`  → Seleccionando Bloque en diálogo...`);
+                        await dialogFrame.waitForSelector('#templatedynamicmodel-input_bloque', { visible: true, timeout: 10000 });
+                        
+                        const targetTextMatch = `${doc.fechaAudiencia.trim()} ${doc.horaAudiencia.trim()}`.replace(/[\/\s:]/g, '');
+                        await dialogFrame.evaluate((matchStr) => {
+                            const select = document.querySelector('#templatedynamicmodel-input_bloque');
+                            if (select) {
+                                const option = Array.from(select.options).find(opt => opt.text.replace(/[\/\s:]/g, '').includes(matchStr));
+                                if (option) {
+                                    select.value = option.value;
+                                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                                } else {
+                                    if (select.options.length > 1) {
+                                        select.selectedIndex = 1;
+                                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                                    }
+                                }
+                            }
+                        }, targetTextMatch);
+                        await new Promise(r => setTimeout(r, 800));
+
+                        log(`  → Seleccionando Persona en diálogo...`);
+                        await dialogFrame.waitForSelector('#select2-templatedynamicmodel-input_imputado-container', { visible: true, timeout: 10000 });
+                        await dialogFrame.click('#select2-templatedynamicmodel-input_imputado-container');
+                        
+                        const personaToPick = (doc.personasAnotificar && doc.personasAnotificar[0]) || '';
+                        if (personaToPick) {
+                            await page.keyboard.type(personaToPick, { delay: 50 });
+                            await new Promise(r => setTimeout(r, 1000));
+                            await page.keyboard.press('Enter');
+                        } else {
+                            await page.keyboard.press('ArrowDown');
+                            await page.keyboard.press('Enter');
+                        }
+                        await new Promise(r => setTimeout(r, 800));
+
+                        log(`  → Ejecutando 'Generar Texto' (Verde)...`);
+                        await dialogFrame.waitForSelector('.btn-success.btn-confirmar', { visible: true, timeout: 5000 });
+                        
+                        // Manejador para el alert de confirmación
+                        const onDialog = async d => {
+                            log(`  → Aceptando confirmación PUMA: ${d.message()}`);
+                            await d.accept();
+                        };
+                        page.on('dialog', onDialog);
+                        await dialogFrame.click('.btn-success.btn-confirmar');
+                        await new Promise(r => setTimeout(r, 2000));
+                        page.off('dialog', onDialog);
+
+                        log(`  → Cerrando diálogo...`);
+                        await page.click('.tox-button.tox-button--icon.tox-button--naked[title="Close"]');
+                        await new Promise(r => setTimeout(r, 800));
+
+                    } catch (err) {
+                        log(`⚠️ Fallo en flujo Generar Texto: ${err.message}`);
+                    }
                 }
 
-                log(`  → Confirmando Creación...`);
+                log(`  → Confirmando Creación de Notificación...`);
                 await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
                 await Promise.all([
-                    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 40000 }),
                     page.click('button[type="submit"].btn-success'),
                 ]);
-                log(`✅ Notificación Creada para doc: ${doc.descripcion}.`);
+                log(`✅ Notificación finalizada.`);
                 
                 // Si todavía quedan documentos por notificar, debemos reactivar la pestaña de Notificaciones
                 if (i < documentos.length - 1) {

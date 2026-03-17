@@ -14,7 +14,7 @@ export async function POST(request) {
     }
 
     const {
-        linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentosBase64
+        linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentosBase64, action
     } = body;
 
     // Configurar Server-Sent Events para un POST con fetch streaming
@@ -70,7 +70,10 @@ export async function POST(request) {
                     sala,
                     linkLeg,
                     agregar,
-                    documentos
+                    documentos,
+                    action,
+                    // Pass everything else just in case
+                    ...body
                 }, onProgress);
 
                 // 3. Notificar finalización del proceso

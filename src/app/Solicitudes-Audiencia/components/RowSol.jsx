@@ -60,6 +60,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [selectedPartsToNotify, setSelectedPartsToNotify] = useState([])
     const [notifNewName, setNotifNewName] = useState('')
     const [notifNewRole, setNotifNewRole] = useState('')
+    const [isNotificando, setIsNotificando] = useState(false)
+    const [notifStatus, setNotifStatus] = useState('')
 
     const availablePartsList = useMemo(() => {
         let list = []
@@ -115,6 +117,32 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [horaAudienciaT, setHoraAudienciaT] = useState(true)
     const [salaT, setSalaT] = useState(true)
     const [juezCausaT, setJuezCausaT] = useState(true)
+    const [motivRepro, setMotivRepro] = useState(savedData.motivRepro || '')
+    const [obsRepro, setObsRepro] = useState(savedData.obsRepro || '')
+    const [horaFinAudiencia, setHoraFinAudiencia] = useState(savedData.horaFinAudiencia || (data.intervinientes?.hora_fin_audiencia?.join(', ') ?? ''))
+    const [motivCancel, setMotivCancel] = useState(savedData.motivCancel || '')
+    const [obsCancel, setObsCancel] = useState(savedData.obsCancel || '')
+
+    const [showReproModal, setShowReproModal] = useState(false)
+    const [showCancelModal, setShowCancelModal] = useState(false)
+
+    const handleCloseRepro = () => {
+        if (!motivRepro || !obsRepro) {
+            setReprogramar(false);
+            setMotivRepro('');
+            setObsRepro('');
+        }
+        setShowReproModal(false);
+    }
+
+    const handleCloseCancel = () => {
+        if (!motivCancel || !obsCancel) {
+            setCancelar(false);
+            setMotivCancel('');
+            setObsCancel('');
+        }
+        setShowCancelModal(false);
+    }
 
     useEffect(() => {
         if (onStatusChange) onStatusChange(rowKey, toSave)
@@ -208,7 +236,12 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             revisado !== (savedData.revisado ?? false) ||
             marcarBorrar !== (savedData.marcarBorrar ?? false) ||
             reprogramar !== (savedData.reprogramar ?? false) ||
-            cancelar !== (savedData.cancelar ?? false)
+            cancelar !== (savedData.cancelar ?? false) ||
+            motivRepro !== (savedData.motivRepro || '') ||
+            obsRepro !== (savedData.obsRepro || '') ||
+            horaFinAudiencia !== (savedData.horaFinAudiencia || (data.intervinientes?.hora_fin_audiencia?.join(', ') ?? '')) ||
+            motivCancel !== (savedData.motivCancel || '') ||
+            obsCancel !== (savedData.obsCancel || '')
         )
         setToSave(hasChanges)
     }
@@ -280,6 +313,12 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             setPartesAgregar(saved.partesAgregar || [])
             setNotificaciones(saved.notificaciones || [])
 
+            setMotivRepro(saved.motivRepro || '')
+            setObsRepro(saved.obsRepro || '')
+            setHoraFinAudiencia(saved.horaFinAudiencia || (data.intervinientes?.hora_fin_audiencia?.join(', ') ?? ''))
+            setMotivCancel(saved.motivCancel || '')
+            setObsCancel(saved.obsCancel || '')
+
             // Retrasamos la sincronización inicial para permitir que los estados se asienten
             setTimeout(() => {
                 hasInitialSync.current = true
@@ -293,7 +332,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData, motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -308,7 +347,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         fyhcreacion: data.fyhcreacion,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, caratulaMod,
-                        imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar
+                        imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar,
+                        motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel
                     })
                 }
                 setDoSave(false)
@@ -815,7 +855,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 <textarea className={styles.inputCell} value={fechaAudiencia} onChange={e => setFechaAudiencia(e.target.value)} />
             </td>
             <td className={cell(horaAudienciaT)}>
-                <textarea className={styles.inputCell} value={horaAudiencia} onChange={e => setHoraAudiencia(e.target.value)} />
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <textarea className={styles.inputCell} style={{ height: '50%' }} value={horaAudiencia} onChange={e => setHoraAudiencia(e.target.value)} placeholder="Inicio" />
+                    <textarea className={styles.inputCell} style={{ height: '50%', borderTop: '1px solid var(--border)' }} value={horaFinAudiencia} onChange={e => setHoraFinAudiencia(e.target.value)} placeholder="Fin" />
+                </div>
             </td>
             <td className={cell(salaT)}>
                 <textarea className={styles.inputCell} value={sala} onChange={e => setSala(e.target.value)} />
@@ -899,12 +942,29 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     value={notifOption}
                                     onChange={e => setNotifOption(e.target.value)}
                                 >
-                                    <option value="cancelarAudienciaImputadoEnLibertad">Cancelar Audiencia Imputado Libre</option>
-                                    <option value="citacionDenunciante">Citación Denunciante</option>
-                                    <option value="citacionImputadoLibertadVideoconferencia">Citación Imputado Video</option>
-                                    <option value="citacionPersonalPolicial">Citación Personal Policial</option>
-                                    <option value="citacionImputadoCedulaPenalEnLibertad">Citación Imputado Cédula</option>
-                                    <option value="citacionConvenio">Citación por Convenio</option>
+                                    <option value="">Seleccione tipo...</option>
+                                    <optgroup label="Oficios/Cédulas (con PDF)">
+                                        <option value="cancelarAudienciaImputadoEnLibertad">Cancelar Audiencia Imputado Libre</option>
+                                        <option value="citacionDenunciante">Citación Denunciante</option>
+                                        <option value="citacionImputadoLibertadVideoconferencia">Citación Imputado Video</option>
+                                        <option value="citacionPersonalPolicial">Citación Personal Policial</option>
+                                        <option value="citacionImputadoCedulaPenalEnLibertad">Citación Imputado Cédula</option>
+                                        <option value="citacionConvenio">Citación por Convenio</option>
+                                    </optgroup>
+                                    <optgroup label="Plantillas PUMA (Sin PDF)">
+                                        <option value="AUDIENCIA  CITACION FISCAL DEFENSA">AUDIENCIA CITACION FISCAL DEFENSA</option>
+                                        <option value="AUDIENCIA OFICIO POLICÍA TRASLADO DETENIDO">AUDIENCIA OFICIO POLICÍA TRASLADO DETENIDO</option>
+                                        <option value="AUDIENCIA OFICIO POLICÍA TRASLADO PRISION DOMICILIARIA">AUDIENCIA OFICIO POLICÍA TRASLADO PRISION DOMICILIARIA</option>
+                                        <option value="CANCELACION AUDIENCIA FISCAL DEFENSA">CANCELACION AUDIENCIA FISCAL DEFENSA</option>
+                                        <option value="CITACION IMPUTADO DETENIDO PARA AUDIENCIA">CITACION IMPUTADO DETENIDO PARA AUDIENCIA</option>
+                                        <option value="Citación IMPUTADO IMPUGNACIÓN CONEXIÓN">Citación IMPUTADO IMPUGNACIÓN CONEXIÓN</option>
+                                        <option value="CONEXIÓN DE ZOOM IMPUTADOS PARA ANIVI">CONEXIÓN DE ZOOM IMPUTADOS PARA ANIVI</option>
+                                        <option value="Ejecución CITACIÓN FISCAL DEFENSA">Ejecución CITACIÓN FISCAL DEFENSA</option>
+                                        <option value="Ejecución CITACIÓN IMPUTADO ZOOM">Ejecución CITACIÓN IMPUTADO ZOOM</option>
+                                        <option value="MODELO">MODELO (Sin PDF)</option>
+                                        <option value="NOTIFICACIÓN ASESORÍAS PARA VIDEOGRABADA ANIVI">NOTIFICACIÓN ASESORÍAS PARA VIDEOGRABADA ANIVI</option>
+                                        <option value="NOTIFICACION DE ANIVI PARA SAP">NOTIFICACION DE ANIVI PARA SAP</option>
+                                    </optgroup>
                                 </select>
 
                                 <div style={{ marginTop: '12px' }}>
@@ -952,7 +1012,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     style={{ marginTop: '14px', alignSelf: 'flex-start' }}
                                     onClick={() => {
                                         if (selectedPartsToNotify.length === 0) return alert("Seleccione al menos una parte para agregar.");
-                                        setNotificaciones(prev => [...prev, { id: Date.now(), option: notifOption, parts: selectedPartsToNotify }]);
+                                        setNotificaciones(prev => [...prev, { id: Date.now(), option: notifOption, parts: selectedPartsToNotify, notificada: false }]);
                                         setSelectedPartsToNotify([]);
                                         setToSave(true);
                                     }}
@@ -970,6 +1030,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 <div>
                                                     <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{n.option}</strong>
                                                     <span style={{ fontSize: '12px', color: 'var(--text2)', marginLeft: '8px' }}>└ {n.parts.length} partes asignadas</span>
+                                                    {n.notificada && <span style={{ background: '#4ade80', color: '#fff', fontSize: '9px', padding: '1px 4px', borderRadius: '3px', marginLeft: '8px', fontWeight: 'bold' }}>ENVIADA</span>}
                                                 </div>
                                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                                     <button
@@ -1017,59 +1078,192 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
 
                             <div className={styles.modalButtonGroup}>
-                                <button className={styles.modalBtn} style={{ background: 'var(--green)' }} onClick={async () => {
-                                    if (notificaciones.length === 0) return alert("No hay notificaciones configuradas.")
+                                {(() => {
+                                    if (notificaciones.length === 0) return null;
 
-                                    try {
-                                        for (const notif of notificaciones) {
-                                            // Preparamos los datos básicos
-                                            const selectedPartsWithInfo = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', direccion: '', localidad: '', telefono: '', alias: '' });
-                                            const destinatariosStr = selectedPartsWithInfo.map(p => p.alias || p.nombre).join(', ');
-                                            const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
-                                            const firstDireccion = firstPart.direccion || '[DOMICILIO A COMPLETAR]';
-                                            const firstLocalidad = firstPart.localidad || '[LOCALIDAD A COMPLETAR]';
-                                            const firstTelefono = firstPart.telefono || '';
-
-                                            const datosList = {
-                                                destinatarioNombre: destinatariosStr,
-                                                destinatarioDomicilio: firstDireccion,
-                                                destinatarioLocalidad: firstLocalidad,
-                                                destinatarioTelefono: firstTelefono,
-                                                legajoFiscal: data.numeroLeg || '[LEGAJO]',
-                                                caratula: (tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) && caratulaMod) ? caratulaMod : (data.caratula || '[CARATULA]'),
-                                                tipoAudiencia: tipos.join(' - ') || '[TIPO]',
-                                                fechaAudiencia: fechaAudiencia || '[FECHA]',
-                                                horaAudiencia: horaAudiencia || '[HORA]',
-                                                juez: juez || '[JUEZ]',
-                                                // Solo para personal policial, lo acomodamos para que mande como lista
-                                                personasACitar: notif.parts.map(pKey => {
-                                                    const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
-                                                    return {
-                                                        nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
-                                                        dni: pInfo.dni || '',
-                                                        telefono: pInfo.telefono || '',
-                                                        fecha: fechaAudiencia || '[FECHA]',
-                                                        hora: horaAudiencia || '[HORA]'
-                                                    }
-                                                })
-                                            };
-
-                                            // Llamamos a la herramienta del PDF
-                                            await descargarPdfNotificacion(notif.option, datosList);
+                                    const handleNotificarManual = async () => {
+                                        if (!savedData.agendada) {
+                                            return alert("No se puede notificar si la audiencia no ha sido agendada en PUMA.");
                                         }
-                                        alert(`Se generaron ${notificaciones.length} archivos PDF!`);
-                                        onCloseNotificar();
-                                    } catch (err) {
-                                        console.error('Error generando PDF de notificaciones:', err);
-                                        alert('Hubo un error al generar las notificaciones PDF.');
-                                    }
-                                }}>
-                                    Generar Seleccionadas
-                                </button>
+
+                                        const pendientes = notificaciones.filter(n => !n.notificada);
+                                        if (pendientes.length === 0) {
+                                            return alert("No hay notificaciones pendientes de envío.");
+                                        }
+
+                                        try {
+                                            setIsNotificando(true);
+                                            setNotifStatus('Iniciando proceso de notificación...');
+
+                                            let documentosBase64 = [];
+                                            const TEMPLATES_NO_PDF = [
+                                                "AUDIENCIA  CITACION FISCAL DEFENSA",
+                                                "AUDIENCIA OFICIO POLICÍA TRASLADO DETENIDO",
+                                                "AUDIENCIA OFICIO POLICÍA TRASLADO PRISION DOMICILIARIA",
+                                                "CANCELACION AUDIENCIA FISCAL DEFENSA",
+                                                "CITACION IMPUTADO DETENIDO PARA AUDIENCIA",
+                                                "Citación IMPUTADO IMPUGNACIÓN CONEXIÓN",
+                                                "CONEXIÓN DE ZOOM IMPUTADOS PARA ANIVI",
+                                                "Ejecución CITACIÓN FISCAL DEFENSA",
+                                                "Ejecución CITACIÓN IMPUTADO ZOOM",
+                                                "MODELO",
+                                                "NOTIFICACIÓN ASESORÍAS PARA VIDEOGRABADA ANIVI",
+                                                "NOTIFICACION DE ANIVI PARA SAP"
+                                            ];
+
+                                            for (const notif of pendientes) {
+                                                const selectedPartsWithInfo = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', direccion: '', localidad: '', telefono: '', alias: '' });
+                                                
+                                                if (TEMPLATES_NO_PDF.includes(notif.option)) {
+                                                    documentosBase64.push({
+                                                        isTemplateOnly: true,
+                                                        templateName: notif.option,
+                                                        personasAnotificar: selectedPartsWithInfo.map(p => p.alias || p.nombre),
+                                                        descripcion: notif.option,
+                                                        fechaAudiencia: fechaAudiencia,
+                                                        horaAudiencia: horaAudiencia,
+                                                        localKey: notif.parts.join('|') + notif.option // para identificarla luego
+                                                    });
+                                                    continue;
+                                                }
+
+                                                // Generar PDF
+                                                const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
+                                                const tiposStr = tipos.join(' - ') || '[TIPO]';
+                                                const caratulaModStr = (tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) && caratulaMod) ? caratulaMod : (data.caratula || '[CARATULA]');
+                                                
+                                                const datosList = {
+                                                    destinatarioNombre: selectedPartsWithInfo.map(p => p.alias || p.nombre).join(', '),
+                                                    destinatarioDomicilio: firstPart.direccion || '[DOMICILIO A COMPLETAR]',
+                                                    destinatarioLocalidad: firstPart.localidad || '[LOCALIDAD A COMPLETAR]',
+                                                    destinatarioTelefono: firstPart.telefono || '',
+                                                    legajoFiscal: data.numeroLeg || '[LEGAJO]',
+                                                    caratula: caratulaModStr,
+                                                    tipoAudiencia: tiposStr,
+                                                    fechaAudiencia: fechaAudiencia || '[FECHA]',
+                                                    horaAudiencia: horaAudiencia || '[HORA]',
+                                                    horaFinAudiencia: savedData.horaFinAudiencia || '[HORA FIN]',
+                                                    juez: juez || '[JUEZ]',
+                                                    personasACitar: notif.parts.map(pKey => {
+                                                        const pInfo = availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', dni: '' };
+                                                        return {
+                                                            nombre: pInfo.nombre + (pInfo.rol ? ` (${pInfo.rol})` : ''),
+                                                            dni: pInfo.dni || '',
+                                                            telefono: pInfo.telefono || '',
+                                                            fecha: fechaAudiencia || '[FECHA]',
+                                                            hora: horaAudiencia || '[HORA]',
+                                                            horaFin: savedData.horaFinAudiencia || '[HORA FIN]'
+                                                        }
+                                                    })
+                                                };
+
+                                                const { buffer, textoPlano } = await descargarPdfNotificacion(notif.option, datosList, true);
+                                                const bytes = new Uint8Array(buffer);
+                                                let binary = '';
+                                                for (let j = 0; j < bytes.byteLength; j++) { binary += String.fromCharCode(bytes[j]); }
+                                                const base64Str = btoa(binary);
+
+                                                documentosBase64.push({
+                                                    nombreArchivo: `Notificacion_${notif.option}_${Date.now()}.pdf`,
+                                                    base64: base64Str,
+                                                    descripcion: `${data.numeroLeg} NOTIFICACION ${notif.option}`.toUpperCase(),
+                                                    personasAnotificar: selectedPartsWithInfo.map(p => p.alias || p.nombre),
+                                                    textoPlano: textoPlano,
+                                                    localKey: notif.parts.join('|') + notif.option
+                                                });
+                                            }
+
+                                            const res = await fetch('/api/agendar-puppeteer', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    solicitud: { ...data, ...savedData },
+                                                    documentosBase64: documentosBase64,
+                                                    action: 'notificar-solo'
+                                                })
+                                            });
+
+                                            if (!res.body) throw new Error("No response body");
+                                            const reader = res.body.getReader();
+                                            const decoder = new TextDecoder();
+                                            let done = false;
+
+                                            while(!done) {
+                                                const { value, done: doneRead } = await reader.read();
+                                                done = doneRead;
+                                                const chunk = decoder.decode(value);
+                                                const lines = chunk.split('\n');
+                                                for (const line of lines) {
+                                                    if (line.startsWith('data: ')) {
+                                                        const parsed = JSON.parse(line.substring(6));
+                                                        if (parsed.type === 'progress') setNotifStatus(parsed.message);
+                                                        if (parsed.type === 'error') throw new Error(parsed.error);
+                                                        if (parsed.type === 'done') {
+                                                            setNotifStatus('✓ Notificaciones enviadas con éxito.');
+                                                            const nuevasNotifs = notificaciones.map(n => {
+                                                                const key = n.parts.join('|') + n.option;
+                                                                // Si fue enviada en este lote, marcar como notificada
+                                                                if (documentosBase64.some(d => d.localKey === key)) {
+                                                                    return { ...n, notificada: true };
+                                                                }
+                                                                return n;
+                                                            });
+                                                            setNotificaciones(nuevasNotifs);
+                                                            await addSolicitudData(rowKey, { ...data, ...savedData, notificaciones: nuevasNotifs });
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                        } catch (err) {
+                                            console.error(err);
+                                            setNotifStatus(`Error: ${err.message}`);
+                                            alert(`Error al notificar: ${err.message}`);
+                                        } finally {
+                                            setIsNotificando(false);
+                                        }
+                                    };
+
+                                    return (
+                                        <button 
+                                            className={`${styles.modalBtn} ${styles.modalBtnSave}`} 
+                                            onClick={handleNotificarManual}
+                                            disabled={isNotificando || !savedData.agendada}
+                                            style={{
+                                                opacity: (isNotificando || !savedData.agendada) ? 0.5 : 1,
+                                                cursor: (isNotificando || !savedData.agendada) ? 'not-allowed' : 'pointer'
+                                            }}
+                                            title={!savedData.agendada ? "La audiencia debe estar agendada primero" : ""}
+                                        >
+                                            {isNotificando ? <><i className="fa fa-spinner fa-spin"></i> Notificando...</> : 'Notificar'}
+                                        </button>
+                                    );
+                                })()}
                                 <button className={`${styles.modalBtn} ${styles.modalBtnClose}`} onClick={onCloseNotificar}>
-                                    Cancelar
+                                    Cerrar
                                 </button>
                             </div>
+
+                            {notifStatus && (
+                                <div style={{ marginTop: '10px', fontSize: '11px', color: '#666', fontFamily: 'monospace', background: '#f5f5f5', padding: '5px', borderRadius: '4px' }}>
+                                    {notifStatus}
+                                </div>
+                            )}
+
+                            {/* Mostrar lista de ya notificadas */}
+                            {notificaciones.some(n => n.notificada) && (
+                                <div style={{ marginTop: '15px', borderTop: '1px solid #ddd', paddingTop: '10px' }}>
+                                    <h5 style={{ fontSize: '12px', marginBottom: '5px', color: 'var(--green)' }}>Notificadas con éxito:</h5>
+                                    <ul style={{ listStyle: 'none', padding: 0, fontSize: '11px' }}>
+                                        {notificaciones.filter(n => n.notificada).map((n, idx) => (
+                                            <li key={idx} style={{ marginBottom: '3px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <i className="fa fa-check-circle" style={{ color: 'var(--green)' }}></i>
+                                                <span><b>{n.option}:</b> {n.parts.join(', ')}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -1112,7 +1306,15 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     {/* Cancelar — naranja */}
                     <label className={`${styles.flagBtn}${cancelar ? ` ${styles.cancelarActive}` : ''}`}>
                         <input type="checkbox" className={styles.cancelarCheckbox} checked={cancelar}
-                            onChange={(e) => { setCancelar(e.target.checked); setToSave(true) }} />
+                            onChange={(e) => {
+                                const val = e.target.checked;
+                                if (val && !savedData.agendada) {
+                                    return alert("No se puede cancelar una audiencia que no ha sido programada");
+                                }
+                                setCancelar(val);
+                                if (val) setShowCancelModal(true);
+                                setToSave(true);
+                            }} />
                         Cancelar
                     </label>
 
@@ -1142,6 +1344,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     return alert("Audiencia sin agendar");
                                 }
                                 setReprogramar(val);
+                                if (val) setShowReproModal(true);
                                 setToSave(true);
                             }} />
                         Reprogramar
@@ -1181,6 +1384,95 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     )}
                 </div>
             </td>
+            {(showReproModal || showCancelModal) && (
+                <div className={styles.modalNotificarOverlay} onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}>
+                    <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalTitle}>
+                            <span>{showReproModal ? 'Detalles de Reprogramación' : 'Detalles de Cancelación'}</span>
+                            <button 
+                                className={styles.modalBtnClose} 
+                                style={{ border: 'none', background: 'transparent' }} 
+                                onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        <div className={styles.modalSection}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>
+                                {showReproModal ? 'Motivo de Reprogramación' : 'Motivo de Cancelación'}
+                            </label>
+                            {showReproModal ? (
+                                <select
+                                    className={styles.modalSelect}
+                                    value={motivRepro}
+                                    onChange={e => { setMotivRepro(e.target.value); setToSave(true); }}
+                                >
+                                    <option value="">Seleccione...</option>
+                                    <option value="DEMORA POR AUDIENCIA ANTERIOR">DEMORA POR AUDIENCIA ANTERIOR</option>
+                                    <option value="POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL">POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL</option>
+                                    <option value="POR INASISTENCIA DE PARTE">POR INASISTENCIA DE PARTE</option>
+                                    <option value="POR PEDIDO DEL DEFENSOR PÚBLICO">POR PEDIDO DEL DEFENSOR PÚBLICO</option>
+                                    <option value="POR PEDIDO DEL JUEZ">POR PEDIDO DEL JUEZ</option>
+                                    <option value="POR PEDIDO DEL MINISTERIO PUBLICO FISCAL">POR PEDIDO DEL MINISTERIO PUBLICO FISCAL</option>
+                                    <option value="POR PEDIDO DEL QUERELLANTE">POR PEDIDO DEL QUERELLANTE</option>
+                                    <option value="PROBLEMA TECNICO">PROBLEMA TECNICO</option>
+                                    <option value="SUPERPOSICION CON OTRA AUDIENCIA">SUPERPOSICION CON OTRA AUDIENCIA</option>
+                                </select>
+                            ) : (
+                                <select
+                                    className={styles.modalSelect}
+                                    value={motivCancel}
+                                    onChange={e => { setMotivCancel(e.target.value); setToSave(true); }}
+                                >
+                                    <option value="">Seleccione un Motivo ...</option>
+                                    <option value="AMENAZA DE BOMBA">AMENAZA DE BOMBA</option>
+                                    <option value="FISCALIA - DEFENSOR (DESISTE DEL PLANTEO POR ART. 228)">FISCALIA - DEFENSOR (DESISTE DEL PLANTEO POR ART. 228)</option>
+                                    <option value="JUEZ - DEFENSA - FISCAL POR SUPERPOSICIÓN DE AUDIENCIA">JUEZ - DEFENSA - FISCAL POR SUPERPOSICIÓN DE AUDIENCIA</option>
+                                    <option value="MENOR SE NIEGA A DECLARAR">MENOR SE NIEGA A DECLARAR</option>
+                                    <option value="OFICINA JUDICIAL SIN SISTEMA / PROBLEMAS TÉCNICOS">OFICINA JUDICIAL SIN SISTEMA / PROBLEMAS TÉCNICOS</option>
+                                    <option value="POR ACUERDO DE PARTES">POR ACUERDO DE PARTES</option>
+                                    <option value="POR AUSENCIA DE LA VÍCTIMA">POR AUSENCIA DE LA VÍCTIMA</option>
+                                    <option value="POR AUSENCIA DE MENOR TESTIGO / VICTIMA">POR AUSENCIA DE MENOR TESTIGO / VICTIMA</option>
+                                    <option value="POR AUSENCIA DE RECONOCIENTE">POR AUSENCIA DE RECONOCIENTE</option>
+                                    <option value="POR AUSENCIA DEL DEFENSOR PARTICULAR">POR AUSENCIA DEL DEFENSOR PARTICULAR</option>
+                                    <option value="POR AUSENCIA DEL DEFENSOR PÚBLICO">POR AUSENCIA DEL DEFENSOR PÚBLICO</option>
+                                    <option value="POR AUSENCIA DEL FISCAL">POR AUSENCIA DEL FISCAL</option>
+                                    <option value="POR AUSENCIA DEL IMPUTADO EN LIBERTAD">POR AUSENCIA DEL IMPUTADO EN LIBERTAD</option>
+                                    <option value="POR AUSENCIA DEL IMPUTADO EN PRISIÓN PREVENTIVA">POR AUSENCIA DEL IMPUTADO EN PRISIÓN PREVENTIVA</option>
+                                    <option value="POR AUSENCIA DEL JUEZ / JUECES">POR AUSENCIA DEL JUEZ / JUECES</option>
+                                    <option value="POR AUSENCIA DEL QUERELLANTE">POR AUSENCIA DEL QUERELLANTE</option>
+                                    <option value="POR DECISIÓN DE LA OFICINA JUDICIAL">POR DECISIÓN DE LA OFICINA JUDICIAL</option>
+                                    <option value="POR ERROR DE CARGA LEGAJO">POR ERROR DE CARGA LEGAJO</option>
+                                    <option value="POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL">POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL</option>
+                                    <option value="POR ERROR DE PROGRAMACION">POR ERROR DE PROGRAMACION</option>
+                                    <option value="POR PEDIDO DE LA DEFENSA">POR PEDIDO DE LA DEFENSA</option>
+                                    <option value="POR PEDIDO DEL DEFENSOR PÚBLICO">POR PEDIDO DEL DEFENSOR PÚBLICO</option>
+                                    <option value="POR PEDIDO DEL JUEZ">POR PEDIDO DEL JUEZ</option>
+                                    <option value="POR PEDIDO DEL MINISTERIO PUBLICO FISCAL">POR PEDIDO DEL MINISTERIO PUBLICO FISCAL</option>
+                                    <option value="POR PEDIDO DEL QUERELLANTE">POR PEDIDO DEL QUERELLANTE</option>
+                                    <option value="POR PETICIÓN DE LAS PARTES">POR PETICIÓN DE LAS PARTES</option>
+                                </select>
+                            )}
+
+                            <label style={{ display: 'block', marginTop: '16px', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>Observaciones</label>
+                            <textarea
+                                className={styles.modalInput}
+                                style={{ height: '100px', resize: 'vertical' }}
+                                value={showReproModal ? obsRepro : obsCancel}
+                                onChange={e => {
+                                    if (showReproModal) setObsRepro(e.target.value);
+                                    else setObsCancel(e.target.value);
+                                    setToSave(true);
+                                }}
+                                placeholder="Ingrese observaciones..."
+                            />
+                        </div>
+                        <div className={styles.modalButtonGroup}>
+                            <button className={styles.modalBtn} onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}>Aceptar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </tr>
     )
 }

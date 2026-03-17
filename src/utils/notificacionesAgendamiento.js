@@ -22,6 +22,7 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
         tipoAudiencia = '',
         fechaAudiencia = '',
         horaAudiencia = '',
+        horaFinAudiencia = '',
         juez = '',
         personasACitar = []
     } = datos || {};
@@ -58,8 +59,13 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
         sections.push({ text: introText, size: 10, bold: false, spacing: 2, align: 'justify' });
 
         const listaPersonas = personasACitar.length > 0
-            ? personasACitar.map(p => `- ${p.nombre.toUpperCase()}${p.dni ? ` (DNI ${p.dni})` : ''}${p.telefono ? ` - Cel: ${p.telefono}` : ''}, para que se presente el dia ${p.fecha || fechaAudiencia} a las ${p.hora || horaAudiencia}hs,`).join('\n')
-            : `- ${formattedName.toUpperCase()}${destinatarioTelefono ? ` - Cel: ${destinatarioTelefono}` : ''}, para que se presente el dia ${fechaAudiencia} a las ${horaAudiencia}hs,`;
+            ? personasACitar.map(p => {
+                const hInicio = p.hora || horaAudiencia;
+                const hFin = p.horaFin || horaFinAudiencia;
+                const horaStr = hFin ? `${hInicio} a ${hFin}` : hInicio;
+                return `- ${p.nombre.toUpperCase()}${p.dni ? ` (DNI ${p.dni})` : ''}${p.telefono ? ` - Cel: ${p.telefono}` : ''}, para que se presente el dia ${p.fecha || fechaAudiencia} a las ${horaStr}hs,`;
+            }).join('\n')
+            : `- ${formattedName.toUpperCase()}${destinatarioTelefono ? ` - Cel: ${destinatarioTelefono}` : ''}, para que se presente el dia ${fechaAudiencia} a las ${horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia}hs,`;
         sections.push({ text: listaPersonas, size: 10, bold: true, spacing: 2 });
 
         const restText = `Deberán comparecer para audiencia de ${tipoAudiencia} ante la Oficina Judicial Penal por la Unidad de Atención al Público y Trámite (Planta Baja del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.`;
@@ -75,24 +81,29 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
         sections.push({ text: contactBlock, size: 9, bold: true, spacing: 4 });
 
     } else if (opcion === 'cancelarAudienciaImputadoEnLibertad') {
-        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a los fines de notificarle que fue CANCELADA la Audiencia de ${tipoAudiencia} del día ${fechaAudiencia} a las ${horaAudiencia}hs.`;
+        const hRange = horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia;
+        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a los fines de notificarle que fue CANCELADA la Audiencia de ${tipoAudiencia} del día ${fechaAudiencia} a las ${hRange}hs.`;
         sections.push({ text: introText, size: 10, bold: false, spacing: 6, align: 'justify' });
 
     } else if (opcion === 'citacionDenunciante') {
-        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula},a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${horaAudiencia} ante la Oficina Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales (Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento nacional de identidad.\n(Cfr. LEY 1851-O ARTÍCULO 206.- Acceso del público: Todas las personas tienen derecho a acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que pudieren afectar la seguridad, orden o higiene de la audiencia,ni los menores de dieciséis (16) años de Edad...)`;
+        const hRange = horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia;
+        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula},a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${hRange} ante la Oficina Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales (Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento nacional de identidad.\n(Cfr. LEY 1851-O ARTÍCULO 206.- Acceso del público: Todas las personas tienen derecho a acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que pudieren afectar la seguridad, orden o higiene de la audiencia,ni los menores de dieciséis (16) años de Edad...)`;
         sections.push({ text: introText, size: 10, bold: false, spacing: 6, align: 'justify' });
 
     } else if (opcion === 'citacionImputadoLibertadVideoconferencia') {
-        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que deberá comparecer en forma VIRTUAL (VIDEOCONFERENCIA) para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${horaAudiencia} ante la Oficina Judicial Penal, debiendo conectarse a través del enlace que se le proporcionará oportunamente, con documento de identidad bajo apercibimiento de declarar su rebeldía.`;
+        const hRange = horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia;
+        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que deberá comparecer en forma VIRTUAL (VIDEOCONFERENCIA) para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${hRange} ante la Oficina Judicial Penal, debiendo conectarse a través del enlace que se le proporcionará oportunamente, con documento de identidad bajo apercibimiento de declarar su rebeldía.`;
         sections.push({ text: introText, size: 10, bold: false, spacing: 6, align: 'justify' });
 
     } else if (opcion === 'citacionConvenio') {
-        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula} ,a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} mediante VIDEOCONFERENCIA el día ${fechaAudiencia} a las ${horaAudiencia} hs. A tal fin comunicarse al numero de teléfono 2646613638 para enviarle el link corresponidente link de conexión. Preséntese, con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.\n(Cfr. LEY 1851-O ARTÍCULO 206.- Acceso del público: Todas las personas tienen derecho a acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que pudieren afectar la seguridad, orden o higiene de la audiencia,ni los menores de dieciséis (16) años de Edad…)`;
+        const hRange = horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia;
+        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula} ,a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} mediante VIDEOCONFERENCIA el día ${fechaAudiencia} a las ${hRange} hs. A tal fin comunicarse al numero de teléfono 2646613638 para enviarle el link corresponidente link de conexión. Preséntese, con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.\n(Cfr. LEY 1851-O ARTÍCULO 206.- Acceso del público: Todas las personas tienen derecho a acceder a la sala de audiencias. No pueden ingresar a la sala de audiencias personas que pudieren afectar la seguridad, orden o higiene de la audiencia,ni los menores de dieciséis (16) años de Edad…)`;
         sections.push({ text: introText, size: 10, bold: false, spacing: 6, align: 'justify' });
 
     } else {
         // Opción predeterminada
-        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${horaAudiencia} ante la Oficina Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales (Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.`;
+        const hRange = horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia;
+        const introText = `Me dirijo a Ud., en Legajo Fiscal ${legajoFiscal} Caratulado: ${caratula}, a fin de hacerle saber que deberá comparecer para audiencia de ${tipoAudiencia} el día ${fechaAudiencia} a las ${hRange} ante la Oficina Judicial Penal por ante la Unidad de Atención al Público y Trámite – Sala de audiencias Penales (Subsuelo del Edificio Tribunales, sito en calle Rivadavia 473 Este de esta ciudad), con documento de identidad bajo apercibimiento de declarar su rebeldía y librar orden de detención conforme Arts. 131 y 132 del C.P.P. Deberá comparecer acompañado de su abogado de confianza, conforme Art 121 inc 4 del C.P.P, caso contrario se le designará defensor oficial a fin de salvaguardar el debido proceso y su derecho de defensa.`;
         sections.push({ text: introText, size: 10, bold: false, spacing: 4, align: 'justify' });
     }
 

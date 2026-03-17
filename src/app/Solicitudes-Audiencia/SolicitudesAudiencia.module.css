@@ -996,6 +996,9 @@
 }
 
 .modalTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 20px;
     font-weight: 700;
     border-bottom: 1px solid var(--border2);
