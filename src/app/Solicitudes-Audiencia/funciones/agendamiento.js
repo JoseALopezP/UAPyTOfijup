@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
 
 async function login(page) {
-    await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
+    await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded" });
     await page.type("#loginform-username", "20423341980");
     await page.type("#loginform-password", "Marzo24");
     await page.click('button[name="login-button"]');
@@ -106,7 +106,7 @@ async function setTimepicker(page, inputId, value) {
  */
 async function agregarPartesAlLegajo(page, linkLeg, partes, log) {
     log(`Navegando al legajo para agregar ${partes.length} parte/s: ${linkLeg}`);
-    await page.goto(linkLeg, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(linkLeg, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // El tab "Partes" es el activo por defecto — verificar que esté cargado
     await page.waitForSelector('.modalButtonAgregarParte', { visible: true, timeout: 15000 });
@@ -196,7 +196,7 @@ async function subirDocumentosLegajo(page, linkLeg, documentos, log) {
     // Ensure we are in the legajo page
     if (!page.url().includes(linkLeg)) {
         log(`Navegando al legajo: ${linkLeg}`);
-        await page.goto(linkLeg, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(linkLeg, { waitUntil: 'domcontentloaded', timeout: 30000 });
     }
 
     log(`  → Abriendo pestaña Documentos`);
@@ -262,15 +262,26 @@ export async function agendarAudiencia({
         if (onProgress) onProgress(msg);
     };
 
-    const norm = (str) => str?.trim().toUpperCase().replace(/\s+/g, ' ') ?? '';
-    const tipos = (Array.isArray(tipo) ? tipo : (tipo ? [tipo] : [])).map(norm);
+    const activeLinkSol = linkSol || solicitud.linkSol;
+    const activeLinkLeg = linkLeg || solicitud.linkLeg;
+    const activeTipo = tipo || solicitud.tipos || solicitud.tipo;
+    const activeJueces = jueces || (solicitud.juez ? solicitud.juez.split(',').map(j => j.trim()) : []);
+    const activeIntervinientes = intervinientes || solicitud.intervinientes || {};
+    const activeSala = sala || solicitud.sala;
+    const activeAgregar = agregar && agregar.length > 0 ? agregar : (solicitud.partesAgregar || []);
 
-    // Parsear fecha y horas  "DD/MM/YYYY HH:mm" → fecha + horaInicio / horaFin
-    const [fechaStr, horaInicioStr] = fyhInicio.split(' ');
-    const horaFinStr = fyhFin.split(' ')[1];
+    const norm = (str) => str?.trim().toUpperCase().replace(/\s+/g, ' ') ?? '';
+    const tipos = (Array.isArray(activeTipo) ? activeTipo : (activeTipo ? [activeTipo] : [])).map(norm);
+
+    const fInicio = fyhInicio || (solicitud.fechaAudiencia ? `${solicitud.fechaAudiencia} ${solicitud.horaAudiencia || '00:00'}` : '');
+    const fFin = fyhFin || (solicitud.fechaAudiencia ? `${solicitud.fechaAudiencia} ${solicitud.horaFinAudiencia || solicitud.horaAudiencia || '00:30'}` : '');
+
+    const [fechaStr, horaInicioStr] = fInicio ? fInicio.split(' ') : ['', ''];
+    const horaFinStr = fFin ? (fFin.split(' ')[1] || '') : '';
 
     const browser = await puppeteer.launch({
         headless: false,
+        slowMo: 60, // Slower actions for visual testing
         args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox"],
         defaultViewport: { width: 1280, height: 720 },
     });
@@ -284,30 +295,30 @@ export async function agendarAudiencia({
         log("Login OK.");
 
         // ── 2. Agregar partes faltantes al legajo (si las hay) ────────────
-        if (linkLeg && agregar && agregar.length > 0) {
-            await agregarPartesAlLegajo(page, linkLeg, agregar, log);
+        if (activeLinkLeg && activeAgregar && activeAgregar.length > 0) {
+            await agregarPartesAlLegajo(page, activeLinkLeg, activeAgregar, log);
         }
 
         // ── 2b. Subir documentos (Notificaciones) al legajo ───────────────
-        if (linkLeg && documentos && documentos.length > 0) {
-            await subirDocumentosLegajo(page, linkLeg, documentos, log);
+        if (activeLinkLeg && documentos && documentos.length > 0) {
+            await subirDocumentosLegajo(page, activeLinkLeg, documentos, log);
         }
 
         if (action === 'notificar-solo') {
-            const urlNotif = solicitud.urlAgendamiento || linkSol;
+            const urlNotif = solicitud.urlAgendamiento || activeLinkSol;
             if (!urlNotif) throw new Error("No se proporcionó URL de la audiencia para notificar.");
             log(`Navegando directamente para NOTIFICAR: ${urlNotif}`);
-            await page.goto(urlNotif, { waitUntil: "networkidle2", timeout: 30000 });
+            await page.goto(urlNotif, { waitUntil: "domcontentloaded", timeout: 30000 });
         } 
         else if (action === 'cancelar') {
-            const urlCancel = solicitud.urlAgendamiento || linkSol;
+            const urlCancel = solicitud.urlAgendamiento || activeLinkSol;
             log(`Navegando para CANCELAR: ${urlCancel}`);
-            await page.goto(urlCancel, { waitUntil: "networkidle2", timeout: 30000 });
+            await page.goto(urlCancel, { waitUntil: "domcontentloaded", timeout: 30000 });
 
             log("Buscando botón Cancelar (fa-times)...");
             await page.waitForSelector('a[title="Cancelar"]', { visible: true, timeout: 15000 });
             await Promise.all([
-                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('a[title="Cancelar"]'),
             ]);
 
@@ -326,19 +337,19 @@ export async function agendarAudiencia({
 
             log("Enviando cancelación...");
             await page.click('button[type="submit"].btn-success');
-            await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 });
+            await page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 });
             log("✅ Cancelación completada.");
             return { success: true };
         } 
         else if (action === 'reprogramar') {
-            const urlRepro = solicitud.urlAgendamiento || linkSol;
+            const urlRepro = solicitud.urlAgendamiento || activeLinkSol;
             log(`Navegando para REPROGRAMAR: ${urlRepro}`);
-            await page.goto(urlRepro, { waitUntil: "networkidle2", timeout: 30000 });
+            await page.goto(urlRepro, { waitUntil: "domcontentloaded", timeout: 30000 });
             
             log("Buscando botón Reprogramar (glyphicon-time)...");
             await page.waitForSelector('a[title="Reprogramar"]', { visible: true, timeout: 15000 });
             await Promise.all([
-                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('a[title="Reprogramar"]'),
             ]);
 
@@ -362,14 +373,15 @@ export async function agendarAudiencia({
         } 
         else {
             // AGENDAR FLOW
-            log(`Navegando a la solicitud: ${linkSol}`);
-            await page.goto(linkSol, { waitUntil: "networkidle2", timeout: 30000 });
+            if (!activeLinkSol) throw new Error("No se proporcionó URL de solicitud (linkSol) para agendar.");
+            log(`Navegando a la solicitud: ${activeLinkSol}`);
+            await page.goto(activeLinkSol, { waitUntil: "domcontentloaded", timeout: 30000 });
             log("Solicitud cargada.");
 
             log("Buscando botón Agendar...");
             await page.waitForSelector('a[title="Agendar"]', { visible: true, timeout: 15000 });
             await Promise.all([
-                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('a[title="Agendar"]'),
             ]);
             log("Calendario cargado.");
@@ -377,7 +389,7 @@ export async function agendarAudiencia({
             log("Clickeando en el primer día del calendario...");
             await page.waitForSelector('thead tr td.fc-day-top', { visible: true, timeout: 15000 });
             await Promise.all([
-                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('thead tr td.fc-day-top'),
             ]);
             log("Formulario de agendamiento cargado.");
@@ -430,11 +442,11 @@ export async function agendarAudiencia({
                     await select2Agregar(page, tiposInput, t);
                 }
             }
-            log(`Agregando ${(jueces || []).length} juez/ces...`);
+            log(`Agregando ${(activeJueces || []).length} juez/ces...`);
             const juecesInput = '.group-audiencia-inputjueces .select2-search__field';
             await page.waitForSelector(juecesInput, { visible: true, timeout: 5000 });
 
-            for (const juez of (jueces || [])) {
+            for (const juez of (activeJueces || [])) {
                 const primerApellido = juez.split(',')[0].trim();
                 log(`  → "${juez}" (buscando por: "${primerApellido}")`);
                 await select2Agregar(page, juecesInput, primerApellido);
@@ -449,7 +461,7 @@ export async function agendarAudiencia({
             const intervsInput = '#audiencia-inputintervinientes + span .select2-search__field';
             await page.waitForSelector(intervsInput, { visible: true, timeout: 5000 });
 
-            for (const [, personas] of Object.entries(intervinientes || {})) {
+            for (const [, personas] of Object.entries(activeIntervinientes || {})) {
                 const lista = Array.isArray(personas) ? personas : [personas];
                 for (const persona of lista) {
                     const nombre = norm(typeof persona === 'object' ? persona.nombre : persona);
@@ -479,10 +491,10 @@ export async function agendarAudiencia({
             await setTimepicker(page, 'bloque-0-hora_fin_programada', horaFinStr);
             log("  → Hora fin seteada.");
 
-            log(`  → Seleccionando sala: "${sala}"`);
+            log(`  → Seleccionando sala: "${activeSala}"`);
             await page.click('#bloque-0-id_sala + span .select2-selection--single');
             await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
-            await page.type('.select2-dropdown .select2-search__field', sala, { delay: 40 });
+            await page.type('.select2-dropdown .select2-search__field', activeSala, { delay: 40 });
             await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
             await page.keyboard.press('Enter');
             await new Promise(r => setTimeout(r, 400));
@@ -494,7 +506,7 @@ export async function agendarAudiencia({
             log("  → Esperando a que el formulario procese...");
             // Espera a navegar (éxito) o a que aparezca un mensaje de error sin navegar (falla)
             const resultadoSubmit = await Promise.race([
-                page.waitForNavigation({ waitUntil: "networkidle2", timeout: 45000 }).then(() => ({ success: true })),
+                page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 45000 }).then(() => ({ success: true })),
                 page.waitForSelector('.form-group.has-error .help-block', { visible: true, timeout: 45000 })
                     .then(async el => {
                         const msgError = await page.evaluate(e => e.innerText, el);
@@ -530,7 +542,7 @@ export async function agendarAudiencia({
                 
                 await page.waitForSelector('.btn-success[href^="/notificacion/create/"]', { visible: true, timeout: 15000 });
                 await Promise.all([
-                    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
+                    page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                     page.click('.btn-success[href^="/notificacion/create/"]'),
                 ]);
 
@@ -692,7 +704,7 @@ export async function agendarAudiencia({
                 log(`  → Confirmando Creación de Notificación...`);
                 await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
                 await Promise.all([
-                    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 40000 }),
+                    page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 40000 }),
                     page.click('button[type="submit"].btn-success'),
                 ]);
                 log(`✅ Notificación finalizada.`);

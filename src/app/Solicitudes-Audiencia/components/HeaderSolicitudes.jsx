@@ -6,7 +6,7 @@ import styles from '../SolicitudesAudiencia.module.css'
 const STORAGE_KEY = 'app-theme'
 
 export default function HeaderSolicitudes() {
-    const { solicitudesPendientes, addSolicitudData, addAudiencia } = useContext(DataContext);
+    const { solicitudesPendientes, addSolicitudData, addAudiencia, desplegables } = useContext(DataContext);
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
     const [isLight, setIsLight] = useState(false);
