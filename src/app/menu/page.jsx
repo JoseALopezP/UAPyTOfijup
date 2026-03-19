@@ -6,7 +6,6 @@ import MenuImportantDates from './components/MenuImportantDates'
 import styles from './Menu.module.css'
 
 export default function Menu() {
-  console.log(styles);
   return (
     <>
       <AuthContextProvider>

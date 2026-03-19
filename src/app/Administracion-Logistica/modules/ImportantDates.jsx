@@ -57,7 +57,11 @@ export default function ImportantDates() {
         setNewEntryKey(val);
     }
     useEffect(() => {
-        setDates(importantDates)
+        if (importantDates && !Array.isArray(importantDates)) {
+            setDates(importantDates)
+        } else {
+            setDates({})
+        }
     }, [importantDates])
     useEffect(() => {
         updateImportantDates()
@@ -66,7 +70,7 @@ export default function ImportantDates() {
         <>
             <div className={`${styles.importantDatesContainer}`}>
                 <div style={{ marginBottom: '20px', padding: '15px', background: '#f5f5f5', borderRadius: '5px', border: '1px solid #ddd' }}>
-                    <span className={`${styles.titleSaveSpan}`}><h3 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>Fechas importantes:</h3>
+                    <span className={`${styles.titleSaveSpan}`}><h3 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>es:</h3>
                         <button onClick={() => handleUpdateList()} className={`${styles.saveDateButton}`}>
                             💾
                         </button></span>

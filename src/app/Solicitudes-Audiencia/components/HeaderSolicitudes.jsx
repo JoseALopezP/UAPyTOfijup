@@ -364,6 +364,43 @@ export default function HeaderSolicitudes() {
                                                 id: `i${idx + 1}`,
                                                 presencial: true
                                             }));
+
+                                            let defensaArray = [];
+                                            let dIndex = 1;
+                                            const addDefensores = (defs, tipoDef) => {
+                                                if (!Array.isArray(defs)) return;
+                                                for (const def of defs) {
+                                                    let imps = [];
+                                                    const defObj = typeof def === 'object' ? def : { nombre: def, representaA: [] };
+                                                    
+                                                    if (defObj.representaA && Array.isArray(defObj.representaA)) {
+                                                        for (const repName of defObj.representaA) {
+                                                            const matchImp = imputadosArray.find(i => 
+                                                                i.nombre.toLowerCase().includes(repName.toLowerCase()) || 
+                                                                repName.toLowerCase().includes(i.nombre.toLowerCase())
+                                                            );
+                                                            if (matchImp) {
+                                                                imps.push({ id: matchImp.id, nombre: matchImp.nombre });
+                                                            } else {
+                                                                // Si no se encuentra un match exacto, usar id temporal
+                                                                imps.push({ id: `i_desconocido`, nombre: repName });
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    defensaArray.push({
+                                                        id: `d${dIndex++}`,
+                                                        nombre: defObj.nombre,
+                                                        asistencia: "true",
+                                                        presencial: true,
+                                                        tipo: tipoDef, // 'particular' | 'oficial'
+                                                        imputado: imps
+                                                    });
+                                                }
+                                            };
+                                            
+                                            addDefensores(item.intervinientes?.defensor_particular, 'particular');
+                                            addDefensores(item.intervinientes?.defensor_oficial, 'oficial');
                                             
                                             const dataObj = {
                                                 aId,
@@ -377,7 +414,8 @@ export default function HeaderSolicitudes() {
                                                 juez: item.juez || '',
                                                 estado: "PROGRAMADA",
                                                 situacion: situacionStr,
-                                                imputado: imputadosArray
+                                                imputado: imputadosArray,
+                                                defensa: defensaArray
                                             };
                                             
                                             // Format date DDMMAAAA

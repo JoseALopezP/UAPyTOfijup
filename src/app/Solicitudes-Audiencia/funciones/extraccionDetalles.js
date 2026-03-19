@@ -98,18 +98,38 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
                             if (!th || !td) continue;
 
                             const key = th.innerText.trim().toLowerCase().replace(/\s+/g, '_');
-                            const firstText = Array.from(td.childNodes)
-                                .filter(n => n.nodeType === 3)
-                                .map(n => n.textContent.trim())
-                                .filter(Boolean)[0] || td.innerText.trim();
+                            
+                            let mainName = '';
+                            const representaA = [];
+                            const representadoPor = [];
+                            let currentMode = null;
+                            const childNodes = Array.from(td.childNodes);
+                            
+                            for (const node of childNodes) {
+                                if (node.nodeType === 3) {
+                                    const text = node.textContent.trim();
+                                    if (!text || text === '-') continue;
+                                    const clean = text.replace(/^-|-$/g, '').trim();
+                                    if (clean) {
+                                        if (currentMode === 'representa') representaA.push(clean);
+                                        else if (currentMode === 'representado') representadoPor.push(clean);
+                                        else if (!mainName) mainName = clean;
+                                    }
+                                } else if (node.nodeType === 1 && node.tagName.toLowerCase() === 'b') {
+                                    const bText = node.innerText.trim();
+                                    if (bText.includes('Representa a:')) currentMode = 'representa';
+                                    else if (bText.includes('Representado por:')) currentMode = 'representado';
+                                }
+                            }
+                            
+                            const finalName = mainName || td.innerText.trim();
 
                             if (!intervinientes[key]) intervinientes[key] = [];
 
-                            // Si es IMPUTADO, guardamos como objeto {nombre, dni: null}
                             if (key === 'imputado') {
-                                intervinientes[key].push({ nombre: firstText, dni: null });
+                                intervinientes[key].push({ nombre: finalName, dni: null, representadoPor });
                             } else {
-                                intervinientes[key].push(firstText);
+                                intervinientes[key].push({ nombre: finalName, representaA });
                             }
                         }
                         break;
@@ -179,15 +199,36 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
                                     const td = row.querySelector('td .kv-attribute');
                                     if (!th || !td) continue;
                                     const key = th.innerText.trim().toLowerCase().replace(/\s+/g, '_');
-                                    const firstText = Array.from(td.childNodes)
-                                        .filter(n => n.nodeType === 3)
-                                        .map(n => n.textContent.trim())
-                                        .filter(Boolean)[0] || td.innerText.trim();
+                                    let mainName = '';
+                                    const representaA = [];
+                                    const representadoPor = [];
+                                    let currentMode = null;
+                                    const childNodes = Array.from(td.childNodes);
+                                    
+                                    for (const node of childNodes) {
+                                        if (node.nodeType === 3) {
+                                            const text = node.textContent.trim();
+                                            if (!text || text === '-') continue;
+                                            const clean = text.replace(/^-|-$/g, '').trim();
+                                            if (clean) {
+                                                if (currentMode === 'representa') representaA.push(clean);
+                                                else if (currentMode === 'representado') representadoPor.push(clean);
+                                                else if (!mainName) mainName = clean;
+                                            }
+                                        } else if (node.nodeType === 1 && node.tagName.toLowerCase() === 'b') {
+                                            const bText = node.innerText.trim();
+                                            if (bText.includes('Representa a:')) currentMode = 'representa';
+                                            else if (bText.includes('Representado por:')) currentMode = 'representado';
+                                        }
+                                    }
+                                    
+                                    const finalName = mainName || td.innerText.trim();
+                                    
                                     if (!result[key]) result[key] = [];
                                     if (key === 'imputado') {
-                                        result[key].push({ nombre: firstText, dni: null });
+                                        result[key].push({ nombre: finalName, dni: null, representadoPor });
                                     } else {
-                                        result[key].push(firstText);
+                                        result[key].push({ nombre: finalName, representaA });
                                     }
                                 }
                                 break;
@@ -349,7 +390,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
                                     data.push({ nombre: nombreLimpio, rol: rolRaw, direccion: '', localidad: '', telefono: '', alias: aliasLimpio });
 
                                     if (key === 'imputado') {
-                                        impMatches.push({ nombre: nombreLimpio, link: aEl?.getAttribute('href') || null, dni: null });
+                                        impMatches.push({ nombre: nombreLimpio, link: aEl?.getAttribute('href') || null, dni: null, representadoPor: [] });
                                     }
                                 });
 
@@ -393,6 +434,23 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
                     if (imputadosMatch.length > 0) {
                         finalIntervinientes.imputado = imputadosMatch;
                     }
+
+                    partesLegajo.forEach(p => {
+                        let match = false;
+                        for (const key of Object.keys(finalIntervinientes)) {
+                            const arr = finalIntervinientes[key];
+                            if (arr && Array.isArray(arr)) {
+                                if (arr.some(iv => {
+                                    const n = (typeof iv === 'object' ? iv.nombre : iv) || '';
+                                    return n.toLowerCase().includes(p.nombre.toLowerCase()) || p.nombre.toLowerCase().includes(n.toLowerCase());
+                                })) {
+                                    match = true;
+                                    break;
+                                }
+                            }
+                        }
+                        p.enSolicitud = match;
+                    });
 
                     results[results.length - 1] = {
                         ...results[results.length - 1],

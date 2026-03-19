@@ -12,14 +12,17 @@ export default function MenuImportantDates() {
     }, [])
 
     const getEventsForDate = (date) => {
-        if (!importantDates) return { key: '', events: [] };
-        const standardKey = date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" }).split('/').join('');
+        if (!importantDates || Array.isArray(importantDates)) return { key: '', events: [] };
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const standardKey = d + m;
+
         const dayOfMonth = date.getDate();
         const t = Math.ceil(dayOfMonth / 7);
         const jsDay = date.getDay();
-        const d = jsDay === 0 ? 1 : jsDay + 1;
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const ruleKey = `${t}:${d}:${month}`;
+        const d_day = jsDay === 0 ? 1 : jsDay + 1;
+        const ruleKey = `${t}:${d_day}:${m}`;
+
         let events = [];
         if (importantDates[standardKey]) events = [...events, ...importantDates[standardKey]];
         if (importantDates[ruleKey]) events = [...events, ...importantDates[ruleKey]];

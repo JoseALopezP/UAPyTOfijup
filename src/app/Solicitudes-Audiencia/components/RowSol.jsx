@@ -32,20 +32,23 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [newTipo, setNewTipo] = useState('')
     const [sitCorporal, setSitCorporal] = useState(savedData.sitCorporal || data.sitCorporal || '')
     const [vencimiento, setVencimiento] = useState(savedData.vencimiento || data.vencimiento || '')
-    const [querella, setQuerella] = useState(savedData.querella || (data.intervinientes?.querella?.join(', ') ?? ''))
-    const [defensa, setDefensa] = useState(savedData.defensa || (data.intervinientes?.defensor_oficial?.join(', ') || data.intervinientes?.defensor_particular?.join(', ') || ''))
-    const [fiscal, setFiscal] = useState(savedData.fiscal || (data.intervinientes?.fiscal?.join(', ') ?? ''))
-    const [juez, setJuez] = useState(savedData.juez || (data.intervinientes?.juez?.join(', ') ?? ''))
-    const [motivo, setMotivo] = useState(savedData.motivo || (data.intervinientes?.motivo?.join(', ') ?? ''))
-    const [fechaAudiencia, setFechaAudiencia] = useState(savedData.fechaAudiencia || (data.intervinientes?.fecha_audiencia?.join(', ') ?? ''))
-    const [horaAudiencia, setHoraAudiencia] = useState(savedData.horaAudiencia || (data.intervinientes?.hora_audiencia?.join(', ') ?? ''))
-    const [sala, setSala] = useState(savedData.sala || (data.intervinientes?.sala?.join(', ') ?? ''))
-    const [juezCausa, setJuezCausa] = useState(savedData.juezCausa || (data.intervinientes?.juez_causa?.join(', ') ?? ''))
-    const [comentario, setComentario] = useState(savedData.comentario || (data.intervinientes?.comentario?.join(', ') ?? ''))
+    const [querella, setQuerella] = useState(savedData.querella || (data.intervinientes?.querella?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [defensa, setDefensa] = useState(savedData.defensa || (data.intervinientes?.defensor_oficial?.map(x => x.nombre || x).join(', ') || data.intervinientes?.defensor_particular?.map(x => x.nombre || x).join(', ') || ''))
+    const [fiscal, setFiscal] = useState(savedData.fiscal || (data.intervinientes?.fiscal?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [juez, setJuez] = useState(savedData.juez || (data.intervinientes?.juez?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [motivo, setMotivo] = useState(savedData.motivo || (data.intervinientes?.motivo?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [fechaAudiencia, setFechaAudiencia] = useState(savedData.fechaAudiencia || (data.intervinientes?.fecha_audiencia?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [horaAudiencia, setHoraAudiencia] = useState(savedData.horaAudiencia || (data.intervinientes?.hora_audiencia?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [sala, setSala] = useState(savedData.sala || (data.intervinientes?.sala?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [juezCausa, setJuezCausa] = useState(savedData.juezCausa || (data.intervinientes?.juez_causa?.map(x => x.nombre || x).join(', ') ?? ''))
+    const [comentario, setComentario] = useState(savedData.comentario || (data.intervinientes?.comentario?.map(x => x.nombre || x).join(', ') ?? ''))
     const [caratulaMod, setCaratulaMod] = useState(savedData.caratulaMod || data.caratula || '')
     const [imputados, setImputados] = useState(() => {
         const list = savedData.imputados || data.intervinientes?.imputado || [];
-        return list.map(item => typeof item === 'string' ? { nombre: item, dni: '' } : { nombre: item.nombre || '', dni: item.dni || '' });
+        return list.map(item => {
+            if (typeof item === 'string') return { nombre: item, dni: '' };
+            return { nombre: item.nombre || '', dni: item.dni || '', representadoPor: item.representadoPor || [] };
+        });
     })
     const [partesAgregar, setPartesAgregar] = useState(savedData.partesAgregar || [])
     const [newNombre, setNewNombre] = useState('')
@@ -53,6 +56,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [newMotivoParte, setNewMotivoParte] = useState('')
     const [newNombreParte, setNewNombreParte] = useState('')
     const [filterPartes, setFilterPartes] = useState('')
+    const [filterPartesSol, setFilterPartesSol] = useState('')
     const [partesLegajo, setPartesLegajo] = useState([])
 
     const [notificaciones, setNotificaciones] = useState(savedData.notificaciones || [])
@@ -183,20 +187,22 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             return [];
         }
 
+        const getNames = (arr) => arr ? arr.map(x => (typeof x === 'object' ? x.nombre : x)).filter(Boolean).join(', ') : '';
+
         const hasChanges = (
             JSON.stringify(tipos) !== JSON.stringify(getTiposBase()) ||
             (sitCorporal || '') !== getBaseValue('sitCorporal', data.sitCorporal) ||
             (vencimiento || '') !== getBaseValue('vencimiento', data.vencimiento) ||
-            (querella || '') !== getBaseValue('querella', data.intervinientes?.querella?.join(', ')) ||
-            (defensa || '') !== getBaseValue('defensa', data.intervinientes?.defensor_oficial?.join(', ') || data.intervinientes?.defensor_particular?.join(', ')) ||
-            (fiscal || '') !== getBaseValue('fiscal', data.intervinientes?.fiscal?.join(', ')) ||
-            (juez || '') !== getBaseValue('juez', data.intervinientes?.juez?.join(', ')) ||
-            (motivo || '') !== getBaseValue('motivo', data.intervinientes?.motivo?.join(', ')) ||
-            (fechaAudiencia || '') !== getBaseValue('fechaAudiencia', data.intervinientes?.fecha_audiencia?.join(', ')) ||
-            (horaAudiencia || '') !== getBaseValue('horaAudiencia', data.intervinientes?.hora_audiencia?.join(', ')) ||
-            (sala || '') !== getBaseValue('sala', data.intervinientes?.sala?.join(', ')) ||
-            (juezCausa || '') !== getBaseValue('juezCausa', data.intervinientes?.juez_causa?.join(', ')) ||
-            (comentario || '') !== getBaseValue('comentario', data.intervinientes?.comentario?.join(', ')) ||
+            (querella || '') !== getBaseValue('querella', getNames(data.intervinientes?.querella)) ||
+            (defensa || '') !== getBaseValue('defensa', getNames(data.intervinientes?.defensor_oficial) || getNames(data.intervinientes?.defensor_particular)) ||
+            (fiscal || '') !== getBaseValue('fiscal', getNames(data.intervinientes?.fiscal)) ||
+            (juez || '') !== getBaseValue('juez', getNames(data.intervinientes?.juez)) ||
+            (motivo || '') !== getBaseValue('motivo', getNames(data.intervinientes?.motivo)) ||
+            (fechaAudiencia || '') !== getBaseValue('fechaAudiencia', getNames(data.intervinientes?.fecha_audiencia)) ||
+            (horaAudiencia || '') !== getBaseValue('horaAudiencia', getNames(data.intervinientes?.hora_audiencia)) ||
+            (sala || '') !== getBaseValue('sala', getNames(data.intervinientes?.sala)) ||
+            (juezCausa || '') !== getBaseValue('juezCausa', getNames(data.intervinientes?.juez_causa)) ||
+            (comentario || '') !== getBaseValue('comentario', getNames(data.intervinientes?.comentario)) ||
             (caratulaMod || '') !== getBaseValue('caratulaMod', data.caratula) ||
             JSON.stringify(imputados) !== JSON.stringify((() => {
                 const list = savedData.imputados || data.intervinientes?.imputado || [];
@@ -258,16 +264,18 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             setTipos(saved.tipos !== undefined ? saved.tipos : (saved.tipo ? [saved.tipo] : (data.tipo ? [data.tipo] : [])))
             setSitCorporal(syncField(saved.sitCorporal, data.sitCorporal))
             setVencimiento(syncField(saved.vencimiento, data.vencimiento))
-            setQuerella(syncField(saved.querella, data.intervinientes?.querella?.join(', ')))
-            setDefensa(syncField(saved.defensa, data.intervinientes?.defensor_oficial?.join(', ') || data.intervinientes?.defensor_particular?.join(', ')))
-            setFiscal(syncField(saved.fiscal, data.intervinientes?.fiscal?.join(', ')))
-            setJuez(syncField(saved.juez, data.intervinientes?.juez?.join(', ')))
-            setMotivo(syncField(saved.motivo, data.intervinientes?.motivo?.join(', ')))
-            setFechaAudiencia(syncField(saved.fechaAudiencia, data.intervinientes?.fecha_audiencia?.join(', ')))
-            setHoraAudiencia(syncField(saved.horaAudiencia, data.intervinientes?.hora_audiencia?.join(', ')))
-            setSala(syncField(saved.sala, data.intervinientes?.sala?.join(', ')))
-            setJuezCausa(syncField(saved.juezCausa, data.intervinientes?.juez_causa?.join(', ')))
-            setComentario(syncField(saved.comentario, data.intervinientes?.comentario?.join(', ')))
+            const getNames = (arr) => arr ? arr.map(x => (typeof x === 'object' ? x.nombre : x)).filter(Boolean).join(', ') : '';
+
+            setQuerella(syncField(saved.querella, getNames(data.intervinientes?.querella)))
+            setDefensa(syncField(saved.defensa, getNames(data.intervinientes?.defensor_oficial) || getNames(data.intervinientes?.defensor_particular)))
+            setFiscal(syncField(saved.fiscal, getNames(data.intervinientes?.fiscal)))
+            setJuez(syncField(saved.juez, getNames(data.intervinientes?.juez)))
+            setMotivo(syncField(saved.motivo, getNames(data.intervinientes?.motivo)))
+            setFechaAudiencia(syncField(saved.fechaAudiencia, getNames(data.intervinientes?.fecha_audiencia)))
+            setHoraAudiencia(syncField(saved.horaAudiencia, getNames(data.intervinientes?.hora_audiencia)))
+            setSala(syncField(saved.sala, getNames(data.intervinientes?.sala)))
+            setJuezCausa(syncField(saved.juezCausa, getNames(data.intervinientes?.juez_causa)))
+            setComentario(syncField(saved.comentario, getNames(data.intervinientes?.comentario)))
             setCaratulaMod(syncField(saved.caratulaMod, data.caratula))
             setImputados((saved.imputados || data.intervinientes?.imputado || []).map(item => {
                 if (typeof item === 'string') return { nombre: item, dni: '' };
@@ -287,7 +295,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     dni: p.dni || '',
                     alias: p.alias || '',
                     situacionCorporal: p.situacionCorporal || '',
-                    situacionDetalle: p.situacionDetalle || ''
+                    situacionDetalle: p.situacionDetalle || '',
+                    enSolicitud: p.enSolicitud || false,
+                    agregadaEnPuppeteer: p.agregadaEnPuppeteer || false,
+                    agregadaOriginalmente: p.agregadaOriginalmente !== undefined ? p.agregadaOriginalmente : true
                 }))
             } else if (sourcePartes && typeof sourcePartes === 'object') {
                 Object.keys(sourcePartes).forEach(roleKey => {
@@ -527,9 +538,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 </button>
                 {showPartesLegajo && (
                     <div className={styles.modalNotificarOverlay} onClick={onClosePartesLegajo}>
-                        <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalNotificarContent} style={{ width: '90vw', maxWidth: '1200px' }} onClick={e => e.stopPropagation()}>
                             <div className={styles.modalTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span>Partes del Legajo</span>
+                                <span>Gestión de Partes</span>
                                 <button
                                     className={styles.modalBtnClose}
                                     style={{ border: 'none', fontSize: '24px', lineHeight: '1', padding: '0 8px', borderRadius: '4px' }}
@@ -540,211 +551,150 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 </button>
                             </div>
 
-                            <div className={styles.modalSection} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                    <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Lista de Partes</h4>
-                                    <input
-                                        className={styles.modalInput}
-                                        style={{ width: '200px', height: '30px', padding: '4px 10px', fontSize: '12px' }}
-                                        placeholder="Buscar por nombre o rol..."
-                                        value={filterPartes}
-                                        onChange={e => setFilterPartes(e.target.value)}
-                                    />
-                                </div>
-                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '12px', overflowY: 'auto' }}>
-                                    {(!Array.isArray(partesLegajo) || partesLegajo.length === 0) && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No hay partes extraídas.</p>}
-                                    {(Array.isArray(partesLegajo) ? partesLegajo : [])
-                                        .filter(p => {
-                                            const lower = filterPartes.toLowerCase();
-                                            return p.nombre.toLowerCase().includes(lower) || p.rol.toLowerCase().includes(lower);
-                                        })
-                                        .map((parte, idx) => {
-                                            // Encontrar el índice original para que el guardado funcione correctamente al filtrar
-                                            const originalIdx = partesLegajo.findIndex(orig => orig === parte);
+                            <div style={{ display: 'flex', gap: '20px', flex: 1, overflow: 'hidden', padding: '10px 0' }}>
+                                {/* PANEL IZQUIERDO: LEGAJO */}
+                                <div className={styles.modalSection} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: 0, height: '100%', padding: '15px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                        <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Partes del Legajo</h4>
+                                        <input
+                                            className={styles.modalInput}
+                                            style={{ width: '180px', height: '30px', padding: '4px 10px', fontSize: '12px' }}
+                                            placeholder="Buscar en legajo..."
+                                            value={filterPartes}
+                                            onChange={e => setFilterPartes(e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '8px', overflowY: 'auto' }}>
+                                        {(!Array.isArray(partesLegajo) || partesLegajo.length === 0) && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No hay partes extraídas.</p>}
+                                        {(Array.isArray(partesLegajo) ? partesLegajo : [])
+                                            .filter(p => {
+                                                const lower = filterPartes.toLowerCase();
+                                                return p.nombre.toLowerCase().includes(lower) || p.rol.toLowerCase().includes(lower);
+                                            })
+                                            .map((parte, idx) => {
+                                                const originalIdx = partesLegajo.findIndex(orig => orig === parte);
+                                                const isInSolicitud = parte.enSolicitud;
 
-                                            const getRoleStyle = (rol) => {
-                                                const r = (rol || '').toUpperCase();
-                                                if (r.includes('IMPUTADO')) return { bg: 'rgba(239, 68, 68, 0.1)', color: 'var(--red)', border: 'rgba(239, 68, 68, 0.3)' };
-                                                if (r.includes('VICTIMA') || r.includes('DAMNIFICADO')) return { bg: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', border: 'rgba(168, 85, 247, 0.3)' };
-                                                if (r.includes('DEFENSOR')) return { bg: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: 'rgba(34, 197, 94, 0.3)' };
-                                                if (r.includes('FISCAL')) return { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' };
-                                                if (r.includes('QUERELLA')) return { bg: 'rgba(249, 115, 22, 0.1)', color: '#f97316', border: 'rgba(249, 115, 22, 0.3)' };
-                                                if (r.includes('TESTIGO')) return { bg: 'rgba(234, 179, 8, 0.1)', color: '#eab308', border: 'rgba(234, 179, 8, 0.3)' };
-                                                return { bg: 'var(--surface)', color: 'var(--text3)', border: 'var(--border)' };
-                                            };
-                                            const roleStyle = getRoleStyle(parte.rol);
-
-                                            return (
-                                                <div key={idx} style={{ background: 'var(--surface2)', padding: '12px', borderRadius: '8px', border: `1px solid ${roleStyle.border}` }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                                        <strong style={{ color: 'var(--accent)' }}>{parte.nombre}</strong>
-                                                        <span style={{ fontSize: '11px', color: roleStyle.color, background: roleStyle.bg, padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold' }}>{parte.rol}</span>
-                                                    </div>
-                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Dirección / Domicilio:</label>
-                                                            <input
-                                                                className={styles.modalInput}
-                                                                value={parte.direccion || ''}
-                                                                onChange={e => {
-                                                                    const updated = [...partesLegajo]
-                                                                    updated[originalIdx] = { ...parte, direccion: e.target.value }
-                                                                    setPartesLegajo(updated)
-                                                                    setToSave(true)
-                                                                }}
-                                                                placeholder="Ingrese domicilio..."
-                                                            />
-                                                        </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Localidad:</label>
-                                                            <input
-                                                                className={styles.modalInput}
-                                                                value={parte.localidad || ''}
-                                                                onChange={e => {
-                                                                    const updated = [...partesLegajo]
-                                                                    updated[originalIdx] = { ...parte, localidad: e.target.value }
-                                                                    setPartesLegajo(updated)
-                                                                    setToSave(true)
-                                                                }}
-                                                                placeholder="Ingrese localidad..."
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Teléfono:</label>
-                                                            <input
-                                                                className={styles.modalInput}
-                                                                value={parte.telefono || ''}
-                                                                onChange={e => {
-                                                                    const updated = [...partesLegajo]
-                                                                    updated[originalIdx] = { ...parte, telefono: e.target.value }
-                                                                    setPartesLegajo(updated)
-                                                                    setToSave(true)
-                                                                }}
-                                                                placeholder="Móvil/Fijo..."
-                                                            />
-                                                        </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                            <label style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: '600' }}>Alias / Nombre notificación:</label>
-                                                            <input
-                                                                className={styles.modalInput}
-                                                                style={{ borderColor: 'var(--accent)' }}
-                                                                value={parte.alias || ''}
-                                                                onChange={e => {
-                                                                    const updated = [...partesLegajo]
-                                                                    updated[originalIdx] = { ...parte, alias: e.target.value }
-                                                                    setPartesLegajo(updated)
-                                                                    setToSave(true)
-                                                                }}
-                                                                placeholder="Ej: Sra. CORIA VEDIA..."
-                                                            />
-                                                        </div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                            <label style={{ fontSize: '11px', color: 'var(--text3)' }}>DNI:</label>
-                                                            <input
-                                                                className={styles.modalInput}
-                                                                value={parte.dni || ''}
-                                                                onChange={e => {
-                                                                    const updated = [...partesLegajo]
-                                                                    updated[originalIdx] = { ...parte, dni: e.target.value }
-                                                                    setPartesLegajo(updated)
-                                                                    setToSave(true)
-                                                                }}
-                                                                placeholder="Ingrese DNI..."
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    {parte.rol && parte.rol.toUpperCase().includes('IMPUTADO') && (
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px', background: 'rgba(239, 68, 68, 0.05)', padding: '8px', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                <label style={{ fontSize: '11px', color: 'var(--red)', fontWeight: '600' }}>Situación Corporal:</label>
-                                                                <select
-                                                                    className={styles.modalSelect}
-                                                                    style={{ borderColor: 'var(--red)', padding: '4px 8px', minHeight: '32px' }}
-                                                                    value={parte.situacionCorporal || ''}
-                                                                    onChange={e => {
-                                                                        const updated = [...partesLegajo]
-                                                                        updated[originalIdx] = { ...parte, situacionCorporal: e.target.value }
-                                                                        setPartesLegajo(updated)
-                                                                        setToSave(true)
+                                                return (
+                                                    <div key={idx} style={{ background: 'var(--surface2)', padding: '10px', borderRadius: '8px', border: `1px solid var(--border)` }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                            <div>
+                                                                <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{parte.nombre}</strong>
+                                                                <span style={{ fontSize: '10px', marginLeft: '8px', color: '#666', background: '#eee', padding: '2px 6px', borderRadius: '8px' }}>{parte.rol}</span>
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                                                {parte.agregadaOriginalmente === false ? (
+                                                                    <span style={{ fontSize: '9px', background: 'var(--orange)', color: 'white', padding: '2px 4px', borderRadius: '4px' }} title={parte.agregadaEnPuppeteer ? 'Agregado en PUMA' : 'Pendiente de agregar en PUMA'}>
+                                                                        {parte.agregadaEnPuppeteer ? '✓ PUMA' : 'Cargada Manual'}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span style={{ fontSize: '9px', background: '#e0e0e0', color: '#333', padding: '2px 4px', borderRadius: '4px' }}>Original de Legajo</span>
+                                                                )}
+                                                                <button 
+                                                                    style={{ background: isInSolicitud ? '#ccc' : 'var(--blue)', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: isInSolicitud ? 'not-allowed' : 'pointer', fontSize: '11px' }}
+                                                                    disabled={isInSolicitud}
+                                                                    onClick={() => {
+                                                                        const updated = [...partesLegajo];
+                                                                        updated[originalIdx] = { ...parte, enSolicitud: true };
+                                                                        setPartesLegajo(updated);
+                                                                        setToSave(true);
                                                                     }}
                                                                 >
-                                                                    <option value="">Seleccione...</option>
-                                                                    <option value="Libertad">Libertad</option>
-                                                                    <option value="Detenido">Detenido</option>
-                                                                </select>
-                                                            </div>
-                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                <label style={{ fontSize: '11px', color: 'var(--text3)' }}>Detalle Situación:</label>
-                                                                <input
-                                                                    className={styles.modalInput}
-                                                                    style={{ borderColor: parte.situacionCorporal === 'Detenido' ? 'var(--red)' : '' }}
-                                                                    value={parte.situacionDetalle || ''}
-                                                                    onChange={e => {
-                                                                        const updated = [...partesLegajo]
-                                                                        updated[originalIdx] = { ...parte, situacionDetalle: e.target.value }
-                                                                        setPartesLegajo(updated)
-                                                                        setToSave(true)
-                                                                    }}
-                                                                    placeholder="Ej: SPP, Comisaría..."
-                                                                />
+                                                                    {isInSolicitud ? 'En Solicitud' : 'Añadir a Solic →'}
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            )
-                                        })}
+                                                        {/* Restante de detalles igual... */}
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                                <label style={{ fontSize: '10px', color: 'var(--text3)' }}>DNI:</label>
+                                                                <input className={styles.modalInput} style={{ fontSize: '11px', padding: '4px' }} value={parte.dni || ''} onChange={e => { const updated = [...partesLegajo]; updated[originalIdx] = { ...parte, dni: e.target.value }; setPartesLegajo(updated); setToSave(true); }} placeholder="DNI..." />
+                                                            </div>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                                <label style={{ fontSize: '10px', color: 'var(--text3)' }}>Teléfono:</label>
+                                                                <input className={styles.modalInput} style={{ fontSize: '11px', padding: '4px' }} value={parte.telefono || ''} onChange={e => { const updated = [...partesLegajo]; updated[originalIdx] = { ...parte, telefono: e.target.value }; setPartesLegajo(updated); setToSave(true); }} placeholder="Teléfono..." />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                    </div>
+                                    <div style={{ marginTop: '10px', borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
+                                        <h5 style={{ fontSize: '12px', margin: '0 0 8px 0', color: 'var(--text2)' }}>+ Nueva Parte al Legajo</h5>
+                                        <div style={{ display: 'flex', gap: '6px' }}>
+                                            <input className={styles.modalInput} style={{ flex: 1, fontSize: '12px' }} placeholder="Nombre" value={notifNewName} onChange={e => setNotifNewName(e.target.value)} />
+                                            <input list="motivos-datalist" className={styles.modalInput} style={{ width: '120px', fontSize: '12px' }} placeholder="Rol" value={notifNewRole} onChange={e => setNotifNewRole(e.target.value)} />
+                                            <button className={styles.modalBtn} style={{ padding: '0 12px', fontSize: '12px' }} onClick={() => {
+                                                if (!notifNewName.trim() || !notifNewRole.trim()) return;
+                                                // Se guarda partesAgregar también para que Puppeteer sepa las nuevas a agregar al legajo
+                                                setPartesLegajo(prev => [...prev, { nombre: notifNewName.trim(), rol: notifNewRole.trim(), agregadaOriginalmente: false }]);
+                                                setPartesAgregar(prev => [...prev, { nombre: notifNewName.trim(), motivo: notifNewRole.trim() }]);
+                                                setNotifNewName(''); setNotifNewRole(''); setToSave(true);
+                                            }}>+ Ag</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={styles.modalSection}>
-                                <h4 className={styles.modalSectionTitle}>Agregar Nueva Parte al Legajo</h4>
-                                <div className={styles.addPartRow}>
-                                    <input
-                                        className={styles.modalInput}
-                                        placeholder="Nombre..."
-                                        value={notifNewName}
-                                        onChange={e => setNotifNewName(e.target.value)}
-                                    />
-                                    <input
-                                        list="motivos-datalist"
-                                        className={styles.modalInput}
-                                        placeholder="Rol (Motivo)..."
-                                        value={notifNewRole}
-                                        onChange={e => setNotifNewRole(e.target.value)}
-                                    />
-                                    <button
-                                        className={styles.modalBtn}
-                                        onClick={() => {
-                                            if (!notifNewName.trim() || !notifNewRole.trim()) return;
-                                            const newPart = {
-                                                nombre: notifNewName.trim(),
-                                                rol: notifNewRole.trim(),
-                                                direccion: '',
-                                                localidad: '',
-                                                telefono: '',
-                                                dni: '',
-                                                alias: '',
-                                                situacionCorporal: '',
-                                                situacionDetalle: ''
-                                            };
-                                            setPartesLegajo(prev => [...prev, newPart]);
-                                            setNotifNewName('');
-                                            setNotifNewRole('');
-                                            setToSave(true);
-                                        }}
-                                    >
-                                        Agregar +
-                                    </button>
+
+                                {/* PANEL DERECHO: SOLICITUD */}
+                                <div className={styles.modalSection} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: 0, height: '100%', padding: '15px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                        <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Partes de la Solicitud</h4>
+                                        <input
+                                            className={styles.modalInput}
+                                            style={{ width: '180px', height: '30px', padding: '4px 10px', fontSize: '12px' }}
+                                            placeholder="Buscar en solicitud..."
+                                            value={filterPartesSol}
+                                            onChange={e => setFilterPartesSol(e.target.value)}
+                                        />
+                                    </div>
+                                    <p style={{ fontSize: '11px', color: 'var(--text3)', margin: '0 0 10px 0' }}>Estas partes serán tomadas en cuenta para el agendamiento y notificaciones.</p>
+                                    
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '8px', overflowY: 'auto' }}>
+                                        {partesLegajo.filter(p => p.enSolicitud).length === 0 && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No se han agregado partes a la solicitud aún.</p>}
+                                        {partesLegajo
+                                            .filter(p => p.enSolicitud)
+                                            .filter(p => {
+                                                const lower = filterPartesSol.toLowerCase();
+                                                return p.nombre.toLowerCase().includes(lower) || p.rol.toLowerCase().includes(lower);
+                                            })
+                                            .map((parteSol, idx) => {
+                                                const originalIdx = partesLegajo.findIndex(orig => orig === parteSol);
+                                                return (
+                                                    <div key={idx} style={{ background: 'var(--surface2)', padding: '10px', borderRadius: '8px', border: `1px solid var(--accent)` }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <div>
+                                                                <strong style={{ color: 'var(--text)', fontSize: '13px' }}>{parteSol.nombre}</strong>
+                                                                <span style={{ fontSize: '10px', marginLeft: '8px', color: '#666', background: '#e0f2fe', padding: '2px 6px', borderRadius: '8px' }}>{parteSol.rol}</span>
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                                                {parteSol.agregadaOriginalmente === false ? (
+                                                                    <span style={{ fontSize: '9px', background: 'var(--orange)', color: 'white', padding: '2px 4px', borderRadius: '4px' }}>Agregada Manual</span>
+                                                                ) : (
+                                                                    <span style={{ fontSize: '9px', background: '#ccc', color: '#333', padding: '2px 4px', borderRadius: '4px' }}>Extraída Automática</span>
+                                                                )}
+                                                                <button 
+                                                                    style={{ background: 'transparent', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '14px', marginLeft: '8px' }}
+                                                                    onClick={() => {
+                                                                        const updated = [...partesLegajo];
+                                                                        updated[originalIdx] = { ...parteSol, enSolicitud: false };
+                                                                        setPartesLegajo(updated);
+                                                                        setToSave(true);
+                                                                    }}
+                                                                    title="Quitar de Solicitud"
+                                                                >✕</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <div className={styles.modalButtonGroup}>
+                            <div className={styles.modalButtonGroup} style={{ padding: '0 15px 15px' }}>
                                 <button className={styles.modalBtn} onClick={onClosePartesLegajo}>
-                                    Aceptar
-                                </button>
-                                <button className={`${styles.modalBtn} ${styles.modalBtnClose}`} onClick={onClosePartesLegajo}>
-                                    Cerrar
+                                    Listo
                                 </button>
                             </div>
                         </div>
