@@ -35,6 +35,7 @@ const COLUMNS = [
     { label: 'REVISADO', sortKey: 'revisado', filterKey: 'revisado', narrower: true },
     { label: 'ACCIONES', sortKey: null, filterKey: null },
     { label: 'DOCUMENTOS', sortKey: null, filterKey: null, narrow: true },
+    { label: 'CONV. JURISD.', sortKey: null, filterKey: null, narrow: true },
 ]
 
 function getFieldValue(sol, key) {
@@ -53,6 +54,7 @@ export default function TableSol() {
     const [sortKey, setSortKey] = useState('fyhcreacion')
     const [sortDir, setSortDir] = useState('asc')
     const [filters, setFilters] = useState({})
+    const [isSaving, setIsSaving] = useState(false)
     const [activeNotificarRow, setActiveNotificarRow] = useState(null)
     const [activePartesRow, setActivePartesRow] = useState(null)
     useEffect(() => {
@@ -72,7 +74,14 @@ export default function TableSol() {
         })
     }, [])
 
+    useEffect(() => {
+        if (isSaving && Object.keys(pendingRows).length === 0) {
+            setIsSaving(false)
+        }
+    }, [pendingRows, isSaving])
+
     const handleSaveAll = () => {
+        setIsSaving(true)
         setForceSave(true)
         setTimeout(() => setForceSave(false), 100)
     }
@@ -129,11 +138,18 @@ export default function TableSol() {
         <div className={styles.tableWrapper}>
             {pendingCount > 0 && (
                 <button
-                    className={styles.saveAllButton}
+                    className={`${styles.saveAllButton} ${isSaving ? styles.saveAllButtonSaving : ''}`}
                     onClick={handleSaveAll}
-                    title={`Guardar ${pendingCount} fila${pendingCount > 1 ? 's' : ''} con cambios`}
+                    disabled={isSaving}
+                    title={isSaving ? 'Guardando en la base de datos...' : `Guardar ${pendingCount} fila${pendingCount > 1 ? 's' : ''} con cambios`}
                 >
-                    💾 Guardar todo ({pendingCount})
+                    {isSaving ? (
+                        <>
+                            <span className={styles.spinner}>↻</span> Guardando... ({pendingCount})
+                        </>
+                    ) : (
+                        <>💾 Guardar todo ({pendingCount})</>
+                    )}
                 </button>
             )}
             <table className={`${styles.tableSol}`}>

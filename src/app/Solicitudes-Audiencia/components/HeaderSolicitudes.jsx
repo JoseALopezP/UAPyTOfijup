@@ -105,7 +105,13 @@ export default function HeaderSolicitudes() {
             const aProcesar = (solicitudesPendientes || []).filter(s => 
                 (s.agendar === true && !s.agendada) || 
                 (s.reprogramar === true) || 
-                (s.cancelar === true)
+                (s.cancelar === true) ||
+                (s.convertirJurisdiccional === true)
+            );
+            // Reconversiones: agendar=true y tiene tiposOriginales distintos de tipos actuales
+            const aReconvertir = (solicitudesPendientes || []).filter(s =>
+                (s.agendar === true || s.convertirJurisdiccional === true) &&
+                s.tiposOriginales && JSON.stringify(s.tiposOriginales) !== JSON.stringify(s.tipos)
             );
 
             if (aProcesar.length === 0) {
@@ -117,7 +123,7 @@ export default function HeaderSolicitudes() {
             for (let i = 0; i < aProcesar.length; i++) {
                 const item = aProcesar[i];
                 try {
-                    const action = item.cancelar ? 'Cancelando' : (item.reprogramar ? 'Reprogramando' : 'Agendando');
+                    const action = item.convertirJurisdiccional ? 'Convirtiendo a Jurisdiccional' : (item.cancelar ? 'Cancelando' : (item.reprogramar ? 'Reprogramando' : 'Agendando'));
                     setSyncStatus(`${action} ${i+1}/${aProcesar.length}: ${item.numeroLeg}...`);
                     
                     // Reconstruir availablePartsList (lógica idéntica a RowSol.jsx)
@@ -246,7 +252,10 @@ export default function HeaderSolicitudes() {
                         body: JSON.stringify({
                             solicitud: item,
                             documentosBase64: documentosBase64,
-                            action: item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : 'agendar')
+                            action: item.convertirJurisdiccional ? 'convertir-jurisdiccional' : (item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : 'agendar')),
+                            convertirJurisdiccionalTipo: item.convertirJurisdiccionalTipo || '',
+                            convertirJurisdiccionalMotivo: item.convertirJurisdiccionalMotivo || '',
+                            reconversionMotivo: item.reconversionMotivo || ''
                         })
                     });
 
@@ -280,7 +289,7 @@ export default function HeaderSolicitudes() {
                                         }
                                         throw new Error(parsed.error);
                                     } else if (parsed.type === 'done') {
-                                        const actionDone = item.cancelar ? 'Cancelado' : (item.reprogramar ? 'Reprogramado' : 'Agendado');
+                                        const actionDone = item.convertirJurisdiccional ? 'Convertido a Jurisdiccional' : (item.cancelar ? 'Cancelado' : (item.reprogramar ? 'Reprogramado' : 'Agendado'));
                                         setSyncStatus(`${actionDone} ${i+1}/${aProcesar.length}: Finalizado con éxito.`);
                                         
                                         const nuevasNotifs = (item.notificaciones || []).map(n => {
@@ -297,6 +306,7 @@ export default function HeaderSolicitudes() {
                                             agendar: false, 
                                             reprogramar: false, 
                                             cancelar: false,
+                                            convertirJurisdiccional: false,
                                             documentosSubidos: true, 
                                             agendadaError: null, 
                                             urlAgendamiento: parsed.data?.url,
@@ -467,17 +477,56 @@ export default function HeaderSolicitudes() {
                     {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
                 </button>
 
-                {/* Botón Agendar Masivo */}
-                <button
-                    className={styles.syncButton}
-                    style={{ background: 'var(--green)', color: 'white', borderColor: 'var(--green)' }}
-                    title="Agendar Solicitudes Marcadas"
-                    onClick={agendarMasivoHandler}
-                    disabled={isSyncing}
-                >
-                    <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-calendar'}`}></i>
-                    {isSyncing ? 'Agendando...' : 'Agendar'}
-                </button>
+                {/* Botón Procesar (ex-Agendar) */}
+                {(() => {
+                    const pendientes = Array.isArray(solicitudesPendientes) ? solicitudesPendientes : []
+                    const countAgendar = pendientes.filter(s => s.agendar && !s.agendada).length
+                    const countReconversiones = pendientes.filter(s => s.agendar && s.tiposOriginales && JSON.stringify(s.tiposOriginales) !== JSON.stringify(s.tipos)).length
+                    const countConvertir = pendientes.filter(s => s.convertirJurisdiccional).length
+                    const countBorrar = pendientes.filter(s => s.marcarBorrar).length
+                    const countReprog = pendientes.filter(s => s.reprogramar).length
+                    const countCancelar = pendientes.filter(s => s.cancelar).length
+                    const totalProcesar = pendientes.filter(s =>
+                        (s.agendar && !s.agendada) || s.reprogramar || s.cancelar || s.convertirJurisdiccional || s.marcarBorrar
+                    ).length
+
+                    const tooltipLines = [
+                        countAgendar > 0 ? `📅 Agendamientos: ${countAgendar}` : '',
+                        countReconversiones > 0 ? `🔄 Reconversiones: ${countReconversiones}` : '',
+                        countConvertir > 0 ? `⚖ Conv. Jurisdiccional: ${countConvertir}` : '',
+                        countBorrar > 0 ? `🗑 Borrado: ${countBorrar}` : '',
+                        countReprog > 0 ? `🔁 Reprogramaciones: ${countReprog}` : '',
+                        countCancelar > 0 ? `🚫 Cancelaciones: ${countCancelar}` : '',
+                    ].filter(Boolean).join('\n')
+
+                    return (
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <button
+                                className={styles.syncButton}
+                                style={{ background: 'var(--green)', color: 'white', borderColor: 'var(--green)' }}
+                                title={tooltipLines || 'Procesar Solicitudes Marcadas'}
+                                onClick={agendarMasivoHandler}
+                                disabled={isSyncing}
+                            >
+                                <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-cogs'}`}></i>
+                                {isSyncing ? 'Procesando...' : 'Procesar'}
+                            </button>
+                            {totalProcesar > 0 && !isSyncing && (
+                                <span style={{
+                                    position: 'absolute', top: '-8px', right: '-8px',
+                                    background: '#f59e0b', color: 'white',
+                                    borderRadius: '50%', width: '20px', height: '20px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '11px', fontWeight: 'bold',
+                                    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                                    pointerEvents: 'none'
+                                }}>
+                                    {totalProcesar}
+                                </span>
+                            )}
+                        </div>
+                    )
+                })()}
 
                 {/* Status */}
                 {syncStatus && (

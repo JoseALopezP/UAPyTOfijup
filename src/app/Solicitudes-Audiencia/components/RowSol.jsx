@@ -109,6 +109,19 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [reprogramar, setReprogramar] = useState(savedData.reprogramar ?? false)
     const [cancelar, setCancelar] = useState(savedData.cancelar ?? false)
 
+    // Reconversión: tipos originales guardados al primer save
+    const [tiposOriginales, setTiposOriginales] = useState(savedData.tiposOriginales || null)
+    const [reconversionMotivo, setReconversionMotivo] = useState(savedData.reconversionMotivo || '')
+    const [showReconversionModal, setShowReconversionModal] = useState(false)
+    const [pendingReconversionTipos, setPendingReconversionTipos] = useState(null)
+
+    // Convertir a Jurisdiccional
+    const [convertirJurisdiccional, setConvertirJurisdiccional] = useState(savedData.convertirJurisdiccional ?? false)
+    const [convertirJurisdiccionalTipo, setConvertirJurisdiccionalTipo] = useState(savedData.convertirJurisdiccionalTipo || '')
+    const [showConvertirModal, setShowConvertirModal] = useState(false)
+    const [convertirJurisdiccionalMotivo, setConvertirJurisdiccionalMotivo] = useState(savedData.convertirJurisdiccionalMotivo || '')
+    const [newConvertirTipo, setNewConvertirTipo] = useState('')
+
     const [tipoT, setTipoT] = useState(true)
     const [sitCorporalT, setSitCorporalT] = useState(true)
     const [vencimientoT, setVencimientoT] = useState(true)
@@ -175,9 +188,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         if (!hasInitialSync.current) return;
 
         // Debemos comparar contra lo mismo que usamos para inicializar
-        const getBaseValue = (field, scraperValue) => {
+        const getBaseValue = (field, scraperValue, isArray = false) => {
             if (savedData && savedData[field] !== undefined) return savedData[field];
-            return scraperValue || '';
+            return isArray ? (scraperValue || []) : (scraperValue || '');
         };
 
         const getTiposBase = () => {
@@ -188,6 +201,43 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         }
 
         const getNames = (arr) => arr ? arr.map(x => (typeof x === 'object' ? x.nombre : x)).filter(Boolean).join(', ') : '';
+
+        // Normalizar partesLegajo igual que en el useEffect de sincronización
+        const normalizePartesLegajo = (sourcePartes) => {
+            if (Array.isArray(sourcePartes)) {
+                return sourcePartes.map(p => ({
+                    nombre: p.nombre || '',
+                    rol: p.rol || '',
+                    direccion: p.direccion || '',
+                    localidad: p.localidad || '',
+                    telefono: p.telefono || '',
+                    dni: p.dni || '',
+                    alias: p.alias || '',
+                    situacionCorporal: p.situacionCorporal || '',
+                    situacionDetalle: p.situacionDetalle || '',
+                    enSolicitud: p.enSolicitud || false,
+                    agregadaEnPuppeteer: p.agregadaEnPuppeteer || false,
+                    agregadaOriginalmente: p.agregadaOriginalmente !== undefined ? p.agregadaOriginalmente : true
+                }))
+            }
+            if (sourcePartes && typeof sourcePartes === 'object') {
+                const converted = []
+                Object.keys(sourcePartes).forEach(roleKey => {
+                    const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                    const persons = sourcePartes[roleKey]
+                    if (Array.isArray(persons)) {
+                        persons.forEach(person => converted.push({
+                            nombre: person, rol: roleName,
+                            direccion: '', localidad: '', telefono: '', dni: '', alias: '',
+                            situacionCorporal: '', situacionDetalle: '',
+                            enSolicitud: false, agregadaEnPuppeteer: false, agregadaOriginalmente: true
+                        }))
+                    }
+                })
+                return converted
+            }
+            return []
+        }
 
         const hasChanges = (
             JSON.stringify(tipos) !== JSON.stringify(getTiposBase()) ||
@@ -208,36 +258,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 const list = savedData.imputados || data.intervinientes?.imputado || [];
                 return list.map(item => typeof item === 'string' ? { nombre: item, dni: '' } : { nombre: item.nombre || '', dni: item.dni || '' });
             })()) ||
-            JSON.stringify(partesLegajo) !== JSON.stringify((() => {
-                const sourcePartes = savedData?.partesLegajo || data.partesLegajo;
-                if (Array.isArray(sourcePartes)) {
-                    return sourcePartes.map(p => ({
-                        nombre: p.nombre || '',
-                        rol: p.rol || '',
-                        direccion: p.direccion || '',
-                        localidad: p.localidad || '',
-                        telefono: p.telefono || '',
-                        dni: p.dni || '',
-                        alias: p.alias || '',
-                        situacionCorporal: p.situacionCorporal || '',
-                        situacionDetalle: p.situacionDetalle || ''
-                    }));
-                }
-                if (sourcePartes && typeof sourcePartes === 'object') {
-                    const converted = [];
-                    Object.keys(sourcePartes).forEach(roleKey => {
-                        const roleName = roleKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                        const persons = sourcePartes[roleKey];
-                        if (Array.isArray(persons)) {
-                            persons.forEach(person => converted.push({ nombre: person, rol: roleName, direccion: '', localidad: '', telefono: '', dni: '', alias: '', situacionCorporal: '', situacionDetalle: '' }));
-                        }
-                    });
-                    return converted;
-                }
-                return [];
-            })()) ||
-            JSON.stringify(partesAgregar) !== JSON.stringify(getBaseValue('partesAgregar', [])) ||
-            JSON.stringify(notificaciones) !== JSON.stringify(getBaseValue('notificaciones', [])) ||
+            JSON.stringify(partesLegajo) !== JSON.stringify(normalizePartesLegajo(savedData?.partesLegajo || data.partesLegajo)) ||
+            JSON.stringify(partesAgregar) !== JSON.stringify(getBaseValue('partesAgregar', [], true)) ||
+            JSON.stringify(notificaciones) !== JSON.stringify(getBaseValue('notificaciones', [], true)) ||
             agendar !== (savedData.agendar ?? false) ||
             revisado !== (savedData.revisado ?? false) ||
             marcarBorrar !== (savedData.marcarBorrar ?? false) ||
@@ -247,12 +270,19 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             obsRepro !== (savedData.obsRepro || '') ||
             horaFinAudiencia !== (savedData.horaFinAudiencia || (data.intervinientes?.hora_fin_audiencia?.join(', ') ?? '')) ||
             motivCancel !== (savedData.motivCancel || '') ||
-            obsCancel !== (savedData.obsCancel || '')
+            obsCancel !== (savedData.obsCancel || '') ||
+            JSON.stringify(tiposOriginales) !== JSON.stringify(savedData.tiposOriginales || null) ||
+            reconversionMotivo !== (savedData.reconversionMotivo || '') ||
+            convertirJurisdiccional !== (savedData.convertirJurisdiccional ?? false) ||
+            convertirJurisdiccionalTipo !== (savedData.convertirJurisdiccionalTipo || '') ||
+            convertirJurisdiccionalMotivo !== (savedData.convertirJurisdiccionalMotivo || '')
         )
         setToSave(hasChanges)
     }
 
     useEffect(() => {
+        if (hasInitialSync.current) return;
+
         if (solicitudesPendientes && Array.isArray(solicitudesPendientes)) {
             // Buscamos si hay datos guardados
             const saved = solicitudesPendientes.find(item => item.rowKey === rowKey) || {}
@@ -320,17 +350,18 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 })
             }
             setPartesLegajo(initialPartes)
-
             setPartesAgregar(saved.partesAgregar || [])
             setNotificaciones(saved.notificaciones || [])
-
             setMotivRepro(saved.motivRepro || '')
             setObsRepro(saved.obsRepro || '')
             setHoraFinAudiencia(saved.horaFinAudiencia || (data.intervinientes?.hora_fin_audiencia?.join(', ') ?? ''))
             setMotivCancel(saved.motivCancel || '')
             setObsCancel(saved.obsCancel || '')
-
-            // Retrasamos la sincronización inicial para permitir que los estados se asienten
+            setTiposOriginales(saved.tiposOriginales || null)
+            setReconversionMotivo(saved.reconversionMotivo || '')
+            setConvertirJurisdiccional(saved.convertirJurisdiccional ?? false)
+            setConvertirJurisdiccionalTipo(saved.convertirJurisdiccionalTipo || '')
+            setConvertirJurisdiccionalMotivo(saved.convertirJurisdiccionalMotivo || '')
             setTimeout(() => {
                 hasInitialSync.current = true
             }, 800)
@@ -343,7 +374,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData, motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel])
+    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData, motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel, tiposOriginales, reconversionMotivo, convertirJurisdiccional, convertirJurisdiccionalTipo, convertirJurisdiccionalMotivo])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -351,6 +382,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 if (marcarBorrar) {
                     await removeSolicitudPendiente(rowKey)
                 } else {
+                    // Al guardar por primera vez, fijar los tiposOriginales
+                    const newTiposOriginales = tiposOriginales || (tipos.length > 0 ? [...tipos] : null)
+                    if (!tiposOriginales && tipos.length > 0) setTiposOriginales(newTiposOriginales)
+
                     await addSolicitudData(rowKey, {
                         ...data,
                         rowKey,
@@ -359,7 +394,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, caratulaMod,
                         imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar,
-                        motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel
+                        motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel,
+                        tiposOriginales: newTiposOriginales,
+                        reconversionMotivo,
+                        convertirJurisdiccional, convertirJurisdiccionalTipo, convertirJurisdiccionalMotivo
                     })
                 }
                 setDoSave(false)
@@ -416,14 +454,25 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         <tr className={styles.tableRow} style={rowStyle} title={savedData.agendadaError ? `Error de agendamiento: ${savedData.agendadaError}` : (savedData.agendada ? '¡Audiencia Agendada con Éxito!' : '')}>
             <td className={`${styles.cellBodyFixed}${data.urgente ? ` ${styles.urgenteCell}` : ''}`}>
                 {data.urgente && <span className={styles.urgenteLabel}>⚠ Urgente</span>}
-                {savedData.agendada && <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', marginRight: '6px' }} title="Agendada en PUMA"></span>}
-                {savedData.agendadaError && <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', marginRight: '6px' }} title="Error en PUMA"></span>}
+                {savedData.agendada && <span className={styles.agendadaSuccessDot} title="Agendada en PUMA"></span>}
+                {savedData.agendadaError && <span className={styles.agendadaErrorDot} title="Error en PUMA"></span>}
                 {data.numeroLeg}
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.fyhcreacion}</div></td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.solicitante}</div></td>
             <td className={`${styles.cellBodyFixed}`}>
-                <div className={styles.scrollCell}>
+                <div className={styles.scrollCellTargetRelative}>
+                    {/* Burbuja de Reconversión */}
+                    {tiposOriginales && tipos.length > 0 && JSON.stringify(tiposOriginales) !== JSON.stringify(tipos) && (
+                        <div className={styles.reconversionBubbleWrapper}>
+                            <span
+                                className={styles.reconversionBubbleSpin}
+                                title={`Reconversión - ${tiposOriginales.join(', ')}`}
+                            >
+                                ↻
+                            </span>
+                        </div>
+                    )}
                     {tipos.map((t, i) => (
                         <div key={i} className={`${styles.listPill} ${styles.pillTipo}`}>
                             <div className={styles.listPillInfo}>
@@ -433,8 +482,21 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 className={styles.listDeleteBtn}
                                 onClick={() => {
                                     const updated = tipos.filter((_, idx) => idx !== i)
-                                    setTipos(updated)
-                                    setToSave(true)
+                                    // Detectar si se está eliminando un tipo original (reconversión)
+                                    const esTipoOriginal = tiposOriginales && tiposOriginales.includes(t)
+                                    if (esTipoOriginal && updated.length >= 0) {
+                                        // Guardar el cambio pendiente, preguntar motivo si hay tipos restantes
+                                        setPendingReconversionTipos(updated)
+                                        if (!reconversionMotivo) {
+                                            setShowReconversionModal(true)
+                                        } else {
+                                            setTipos(updated)
+                                            setToSave(true)
+                                        }
+                                    } else {
+                                        setTipos(updated)
+                                        setToSave(true)
+                                    }
                                 }}
                                 title="Eliminar"
                             >✕</button>
@@ -538,12 +600,12 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 </button>
                 {showPartesLegajo && (
                     <div className={styles.modalNotificarOverlay} onClick={onClosePartesLegajo}>
-                        <div className={styles.modalNotificarContent} style={{ width: '90vw', maxWidth: '1200px' }} onClick={e => e.stopPropagation()}>
-                            <div className={styles.modalTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className={`${styles.modalNotificarContent} ${styles.partesOverlayContent}`} onClick={e => e.stopPropagation()}>
+                            <div className={`${styles.modalTitle} ${styles.modalTitleFlex}`}>
                                 <span>Gestión de Partes</span>
                                 <button
-                                    className={styles.modalBtnClose}
-                                    style={{ border: 'none', fontSize: '24px', lineHeight: '1', padding: '0 8px', borderRadius: '4px' }}
+                                    className={`${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`}
+                                    style={{ fontSize: '24px', lineHeight: '1', padding: '0 8px', borderRadius: '4px' }}
                                     onClick={onClosePartesLegajo}
                                     title="Cerrar"
                                 >
@@ -551,21 +613,20 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 </button>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '20px', flex: 1, overflow: 'hidden', padding: '10px 0' }}>
+                            <div className={styles.partesFlexWrapper}>
                                 {/* PANEL IZQUIERDO: LEGAJO */}
-                                <div className={styles.modalSection} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: 0, height: '100%', padding: '15px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                <div className={`${styles.modalSection} ${styles.partesPanel}`}>
+                                    <div className={styles.partesHeader}>
                                         <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Partes del Legajo</h4>
                                         <input
-                                            className={styles.modalInput}
-                                            style={{ width: '180px', height: '30px', padding: '4px 10px', fontSize: '12px' }}
+                                            className={`${styles.modalInput} ${styles.partesSearchInput}`}
                                             placeholder="Buscar en legajo..."
                                             value={filterPartes}
                                             onChange={e => setFilterPartes(e.target.value)}
                                         />
                                     </div>
-                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '8px', overflowY: 'auto' }}>
-                                        {(!Array.isArray(partesLegajo) || partesLegajo.length === 0) && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No hay partes extraídas.</p>}
+                                    <div className={styles.partesListWrapper}>
+                                        {(!Array.isArray(partesLegajo) || partesLegajo.length === 0) && <p className={styles.partesEmpty}>No hay partes extraídas.</p>}
                                         {(Array.isArray(partesLegajo) ? partesLegajo : [])
                                             .filter(p => {
                                                 const lower = filterPartes.toLowerCase();
@@ -576,22 +637,22 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 const isInSolicitud = parte.enSolicitud;
 
                                                 return (
-                                                    <div key={idx} style={{ background: 'var(--surface2)', padding: '10px', borderRadius: '8px', border: `1px solid var(--border)` }}>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                    <div key={idx} className={styles.parteCard}>
+                                                        <div className={styles.parteCardHeader}>
                                                             <div>
-                                                                <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{parte.nombre}</strong>
-                                                                <span style={{ fontSize: '10px', marginLeft: '8px', color: '#666', background: '#eee', padding: '2px 6px', borderRadius: '8px' }}>{parte.rol}</span>
+                                                                <strong className={styles.parteName}>{parte.nombre}</strong>
+                                                                <span className={styles.parteRolPill}>{parte.rol}</span>
                                                             </div>
-                                                            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                                            <div className={styles.parteStatusFlex}>
                                                                 {parte.agregadaOriginalmente === false ? (
-                                                                    <span style={{ fontSize: '9px', background: 'var(--orange)', color: 'white', padding: '2px 4px', borderRadius: '4px' }} title={parte.agregadaEnPuppeteer ? 'Agregado en PUMA' : 'Pendiente de agregar en PUMA'}>
+                                                                    <span className={styles.parteStatusOrange} title={parte.agregadaEnPuppeteer ? 'Agregado en PUMA' : 'Pendiente de agregar en PUMA'}>
                                                                         {parte.agregadaEnPuppeteer ? '✓ PUMA' : 'Cargada Manual'}
                                                                     </span>
                                                                 ) : (
-                                                                    <span style={{ fontSize: '9px', background: '#e0e0e0', color: '#333', padding: '2px 4px', borderRadius: '4px' }}>Original de Legajo</span>
+                                                                    <span className={styles.parteStatusGray}>Original de Legajo</span>
                                                                 )}
-                                                                <button 
-                                                                    style={{ background: isInSolicitud ? '#ccc' : 'var(--blue)', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: isInSolicitud ? 'not-allowed' : 'pointer', fontSize: '11px' }}
+                                                                <button
+                                                                    className={`${styles.parteAddBtn} ${isInSolicitud ? styles.parteAddBtnDisabled : styles.parteAddBtnActive}`}
                                                                     disabled={isInSolicitud}
                                                                     onClick={() => {
                                                                         const updated = [...partesLegajo];
@@ -605,26 +666,26 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                             </div>
                                                         </div>
                                                         {/* Restante de detalles igual... */}
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                <label style={{ fontSize: '10px', color: 'var(--text3)' }}>DNI:</label>
-                                                                <input className={styles.modalInput} style={{ fontSize: '11px', padding: '4px' }} value={parte.dni || ''} onChange={e => { const updated = [...partesLegajo]; updated[originalIdx] = { ...parte, dni: e.target.value }; setPartesLegajo(updated); setToSave(true); }} placeholder="DNI..." />
+                                                        <div className={styles.parteFieldsGrid}>
+                                                            <div className={styles.parteFieldCol}>
+                                                                <label className={styles.parteFieldLabel}>DNI:</label>
+                                                                <input className={`${styles.modalInput} ${styles.parteFieldInput}`} value={parte.dni || ''} onChange={e => { const updated = [...partesLegajo]; updated[originalIdx] = { ...parte, dni: e.target.value }; setPartesLegajo(updated); setToSave(true); }} placeholder="DNI..." />
                                                             </div>
-                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                <label style={{ fontSize: '10px', color: 'var(--text3)' }}>Teléfono:</label>
-                                                                <input className={styles.modalInput} style={{ fontSize: '11px', padding: '4px' }} value={parte.telefono || ''} onChange={e => { const updated = [...partesLegajo]; updated[originalIdx] = { ...parte, telefono: e.target.value }; setPartesLegajo(updated); setToSave(true); }} placeholder="Teléfono..." />
+                                                            <div className={styles.parteFieldCol}>
+                                                                <label className={styles.parteFieldLabel}>Teléfono:</label>
+                                                                <input className={`${styles.modalInput} ${styles.parteFieldInput}`} value={parte.telefono || ''} onChange={e => { const updated = [...partesLegajo]; updated[originalIdx] = { ...parte, telefono: e.target.value }; setPartesLegajo(updated); setToSave(true); }} placeholder="Teléfono..." />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 )
                                             })}
                                     </div>
-                                    <div style={{ marginTop: '10px', borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
-                                        <h5 style={{ fontSize: '12px', margin: '0 0 8px 0', color: 'var(--text2)' }}>+ Nueva Parte al Legajo</h5>
-                                        <div style={{ display: 'flex', gap: '6px' }}>
-                                            <input className={styles.modalInput} style={{ flex: 1, fontSize: '12px' }} placeholder="Nombre" value={notifNewName} onChange={e => setNotifNewName(e.target.value)} />
-                                            <input list="motivos-datalist" className={styles.modalInput} style={{ width: '120px', fontSize: '12px' }} placeholder="Rol" value={notifNewRole} onChange={e => setNotifNewRole(e.target.value)} />
-                                            <button className={styles.modalBtn} style={{ padding: '0 12px', fontSize: '12px' }} onClick={() => {
+                                    <div className={styles.partesNewBlock}>
+                                        <h5 className={styles.partesNewTitle}>+ Nueva Parte al Legajo</h5>
+                                        <div className={styles.partesNewFlex}>
+                                            <input className={`${styles.modalInput} ${styles.parteNewInputName}`} placeholder="Nombre" value={notifNewName} onChange={e => setNotifNewName(e.target.value)} />
+                                            <input list="motivos-datalist" className={`${styles.modalInput} ${styles.parteNewInputRole}`} placeholder="Rol" value={notifNewRole} onChange={e => setNotifNewRole(e.target.value)} />
+                                            <button className={`${styles.modalBtn} ${styles.parteNewBtn}`} onClick={() => {
                                                 if (!notifNewName.trim() || !notifNewRole.trim()) return;
                                                 // Se guarda partesAgregar también para que Puppeteer sepa las nuevas a agregar al legajo
                                                 setPartesLegajo(prev => [...prev, { nombre: notifNewName.trim(), rol: notifNewRole.trim(), agregadaOriginalmente: false }]);
@@ -636,21 +697,20 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 </div>
 
                                 {/* PANEL DERECHO: SOLICITUD */}
-                                <div className={styles.modalSection} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: 0, height: '100%', padding: '15px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                <div className={`${styles.modalSection} ${styles.partesPanel}`}>
+                                    <div className={styles.partesHeader}>
                                         <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Partes de la Solicitud</h4>
                                         <input
-                                            className={styles.modalInput}
-                                            style={{ width: '180px', height: '30px', padding: '4px 10px', fontSize: '12px' }}
+                                            className={`${styles.modalInput} ${styles.partesSearchInput}`}
                                             placeholder="Buscar en solicitud..."
                                             value={filterPartesSol}
                                             onChange={e => setFilterPartesSol(e.target.value)}
                                         />
                                     </div>
-                                    <p style={{ fontSize: '11px', color: 'var(--text3)', margin: '0 0 10px 0' }}>Estas partes serán tomadas en cuenta para el agendamiento y notificaciones.</p>
-                                    
-                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '8px', overflowY: 'auto' }}>
-                                        {partesLegajo.filter(p => p.enSolicitud).length === 0 && <p style={{ fontStyle: 'italic', color: 'var(--text3)' }}>No se han agregado partes a la solicitud aún.</p>}
+                                    <p className={styles.partesSubtext}>Estas partes serán tomadas en cuenta para el agendamiento y notificaciones.</p>
+
+                                    <div className={styles.partesListWrapper}>
+                                        {partesLegajo.filter(p => p.enSolicitud).length === 0 && <p className={styles.partesEmpty}>No se han agregado partes a la solicitud aún.</p>}
                                         {partesLegajo
                                             .filter(p => p.enSolicitud)
                                             .filter(p => {
@@ -660,20 +720,20 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                             .map((parteSol, idx) => {
                                                 const originalIdx = partesLegajo.findIndex(orig => orig === parteSol);
                                                 return (
-                                                    <div key={idx} style={{ background: 'var(--surface2)', padding: '10px', borderRadius: '8px', border: `1px solid var(--accent)` }}>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <div key={idx} className={styles.parteSolCard}>
+                                                        <div className={styles.parteSolHeader}>
                                                             <div>
-                                                                <strong style={{ color: 'var(--text)', fontSize: '13px' }}>{parteSol.nombre}</strong>
-                                                                <span style={{ fontSize: '10px', marginLeft: '8px', color: '#666', background: '#e0f2fe', padding: '2px 6px', borderRadius: '8px' }}>{parteSol.rol}</span>
+                                                                <strong className={styles.parteSolName}>{parteSol.nombre}</strong>
+                                                                <span className={styles.parteSolRolPill}>{parteSol.rol}</span>
                                                             </div>
-                                                            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                                            <div className={styles.parteStatusFlex}>
                                                                 {parteSol.agregadaOriginalmente === false ? (
-                                                                    <span style={{ fontSize: '9px', background: 'var(--orange)', color: 'white', padding: '2px 4px', borderRadius: '4px' }}>Agregada Manual</span>
+                                                                    <span className={styles.parteStatusOrange}>Agregada Manual</span>
                                                                 ) : (
-                                                                    <span style={{ fontSize: '9px', background: '#ccc', color: '#333', padding: '2px 4px', borderRadius: '4px' }}>Extraída Automática</span>
+                                                                    <span className={styles.parteStatusGray}>Extraída Automática</span>
                                                                 )}
-                                                                <button 
-                                                                    style={{ background: 'transparent', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '14px', marginLeft: '8px' }}
+                                                                <button
+                                                                    className={styles.parteSolRemoveBtn}
                                                                     onClick={() => {
                                                                         const updated = [...partesLegajo];
                                                                         updated[originalIdx] = { ...parteSol, enSolicitud: false };
@@ -692,7 +752,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 </div>
                             </div>
 
-                            <div className={styles.modalButtonGroup} style={{ padding: '0 15px 15px' }}>
+                            <div className={`${styles.modalButtonGroup} ${styles.partesFooter}`}>
                                 <button className={styles.modalBtn} onClick={onClosePartesLegajo}>
                                     Listo
                                 </button>
@@ -902,18 +962,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                         <option value="citacionConvenio">Citación por Convenio</option>
                                     </optgroup>
                                     <optgroup label="Plantillas PUMA (Sin PDF)">
-                                        <option value="AUDIENCIA  CITACION FISCAL DEFENSA">AUDIENCIA CITACION FISCAL DEFENSA</option>
-                                        <option value="AUDIENCIA OFICIO POLICÍA TRASLADO DETENIDO">AUDIENCIA OFICIO POLICÍA TRASLADO DETENIDO</option>
-                                        <option value="AUDIENCIA OFICIO POLICÍA TRASLADO PRISION DOMICILIARIA">AUDIENCIA OFICIO POLICÍA TRASLADO PRISION DOMICILIARIA</option>
-                                        <option value="CANCELACION AUDIENCIA FISCAL DEFENSA">CANCELACION AUDIENCIA FISCAL DEFENSA</option>
-                                        <option value="CITACION IMPUTADO DETENIDO PARA AUDIENCIA">CITACION IMPUTADO DETENIDO PARA AUDIENCIA</option>
-                                        <option value="Citación IMPUTADO IMPUGNACIÓN CONEXIÓN">Citación IMPUTADO IMPUGNACIÓN CONEXIÓN</option>
-                                        <option value="CONEXIÓN DE ZOOM IMPUTADOS PARA ANIVI">CONEXIÓN DE ZOOM IMPUTADOS PARA ANIVI</option>
-                                        <option value="Ejecución CITACIÓN FISCAL DEFENSA">Ejecución CITACIÓN FISCAL DEFENSA</option>
-                                        <option value="Ejecución CITACIÓN IMPUTADO ZOOM">Ejecución CITACIÓN IMPUTADO ZOOM</option>
-                                        <option value="MODELO">MODELO (Sin PDF)</option>
-                                        <option value="NOTIFICACIÓN ASESORÍAS PARA VIDEOGRABADA ANIVI">NOTIFICACIÓN ASESORÍAS PARA VIDEOGRABADA ANIVI</option>
-                                        <option value="NOTIFICACION DE ANIVI PARA SAP">NOTIFICACION DE ANIVI PARA SAP</option>
+                                        {(Array.isArray(desplegables?.plantillasPuma) ? desplegables.plantillasPuma : []).map((t, idx) => (
+                                            <option key={idx} value={t} />
+                                        ))}
                                     </optgroup>
                                 </select>
 
@@ -1063,7 +1114,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
                                             for (const notif of pendientes) {
                                                 const selectedPartsWithInfo = notif.parts.map(pKey => availablePartsList.find(x => x.key === pKey) || { nombre: pKey, rol: '', direccion: '', localidad: '', telefono: '', alias: '' });
-                                                
+
                                                 if (TEMPLATES_NO_PDF.includes(notif.option)) {
                                                     documentosBase64.push({
                                                         isTemplateOnly: true,
@@ -1081,7 +1132,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 const firstPart = selectedPartsWithInfo.find(p => p.direccion || p.localidad || p.telefono) || {};
                                                 const tiposStr = tipos.join(' - ') || '[TIPO]';
                                                 const caratulaModStr = (tipos.some(t => String(t || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().includes('formalizacion')) && caratulaMod) ? caratulaMod : (data.caratula || '[CARATULA]');
-                                                
+
                                                 const datosList = {
                                                     destinatarioNombre: selectedPartsWithInfo.map(p => p.alias || p.nombre).join(', '),
                                                     destinatarioDomicilio: firstPart.direccion || '[DOMICILIO A COMPLETAR]',
@@ -1138,7 +1189,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                             const decoder = new TextDecoder();
                                             let done = false;
 
-                                            while(!done) {
+                                            while (!done) {
                                                 const { value, done: doneRead } = await reader.read();
                                                 done = doneRead;
                                                 const chunk = decoder.decode(value);
@@ -1164,7 +1215,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                     }
                                                 }
                                             }
-                                            
+
                                         } catch (err) {
                                             console.error(err);
                                             setNotifStatus(`Error: ${err.message}`);
@@ -1175,8 +1226,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     };
 
                                     return (
-                                        <button 
-                                            className={`${styles.modalBtn} ${styles.modalBtnSave}`} 
+                                        <button
+                                            className={`${styles.modalBtn} ${styles.modalBtnSave}`}
                                             onClick={handleNotificarManual}
                                             disabled={isNotificando || !savedData.agendada}
                                             style={{
@@ -1334,21 +1385,51 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     )}
                 </div>
             </td>
+            {/* Convertir a Jurisdiccional */}
+            <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 4px', minWidth: '80px' }}>
+                {convertirJurisdiccional ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', padding: '4px' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--accent)', fontWeight: '600', textAlign: 'center' }}>
+                            {convertirJurisdiccionalTipo || 'Pendiente tipo'}
+                        </span>
+                        <button
+                            style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', color: 'var(--red)', borderRadius: '4px', fontSize: '10px', padding: '2px 6px', cursor: 'pointer' }}
+                            onClick={() => {
+                                const conf = window.confirm('¿Cancelar la conversión a Jurisdiccional?')
+                                if (conf) {
+                                    setConvertirJurisdiccional(false)
+                                    setConvertirJurisdiccionalTipo('')
+                                    setConvertirJurisdiccionalMotivo('')
+                                    setToSave(true)
+                                }
+                            }}
+                        >✕ Cancelar</button>
+                    </div>
+                ) : (
+                    <button
+                        className={styles.flagBtn}
+                        style={{ background: 'var(--surface2)', fontSize: '10px', height: '70%', margin: '0 auto', padding: '0 6px' }}
+                        onClick={() => setShowConvertirModal(true)}
+                        title="Convertir esta solicitud a Jurisdiccional"
+                    >
+                        ⚖ Jurisdic.
+                    </button>
+                )}
+            </td>
             {(showReproModal || showCancelModal) && (
                 <div className={styles.modalNotificarOverlay} onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}>
                     <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
                         <div className={styles.modalTitle}>
                             <span>{showReproModal ? 'Detalles de Reprogramación' : 'Detalles de Cancelación'}</span>
-                            <button 
-                                className={styles.modalBtnClose} 
-                                style={{ border: 'none', background: 'transparent' }} 
+                            <button
+                                className={`${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`}
                                 onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}
                             >
                                 &times;
                             </button>
                         </div>
                         <div className={styles.modalSection}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>
+                            <label className={styles.modalLabel}>
                                 {showReproModal ? 'Motivo de Reprogramación' : 'Motivo de Cancelación'}
                             </label>
                             {showReproModal ? (
@@ -1357,16 +1438,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     value={motivRepro}
                                     onChange={e => { setMotivRepro(e.target.value); setToSave(true); }}
                                 >
-                                    <option value="">Seleccione...</option>
-                                    <option value="DEMORA POR AUDIENCIA ANTERIOR">DEMORA POR AUDIENCIA ANTERIOR</option>
-                                    <option value="POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL">POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL</option>
-                                    <option value="POR INASISTENCIA DE PARTE">POR INASISTENCIA DE PARTE</option>
-                                    <option value="POR PEDIDO DEL DEFENSOR PÚBLICO">POR PEDIDO DEL DEFENSOR PÚBLICO</option>
-                                    <option value="POR PEDIDO DEL JUEZ">POR PEDIDO DEL JUEZ</option>
-                                    <option value="POR PEDIDO DEL MINISTERIO PUBLICO FISCAL">POR PEDIDO DEL MINISTERIO PUBLICO FISCAL</option>
-                                    <option value="POR PEDIDO DEL QUERELLANTE">POR PEDIDO DEL QUERELLANTE</option>
-                                    <option value="PROBLEMA TECNICO">PROBLEMA TECNICO</option>
-                                    <option value="SUPERPOSICION CON OTRA AUDIENCIA">SUPERPOSICION CON OTRA AUDIENCIA</option>
+                                    {(Array.isArray(desplegables?.motivRepro) ? desplegables.motivRepro : []).map((t, idx) => (
+                                        <option key={idx} value={t} />
+                                    ))}
                                 </select>
                             ) : (
                                 <select
@@ -1374,40 +1448,15 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     value={motivCancel}
                                     onChange={e => { setMotivCancel(e.target.value); setToSave(true); }}
                                 >
-                                    <option value="">Seleccione un Motivo ...</option>
-                                    <option value="AMENAZA DE BOMBA">AMENAZA DE BOMBA</option>
-                                    <option value="FISCALIA - DEFENSOR (DESISTE DEL PLANTEO POR ART. 228)">FISCALIA - DEFENSOR (DESISTE DEL PLANTEO POR ART. 228)</option>
-                                    <option value="JUEZ - DEFENSA - FISCAL POR SUPERPOSICIÓN DE AUDIENCIA">JUEZ - DEFENSA - FISCAL POR SUPERPOSICIÓN DE AUDIENCIA</option>
-                                    <option value="MENOR SE NIEGA A DECLARAR">MENOR SE NIEGA A DECLARAR</option>
-                                    <option value="OFICINA JUDICIAL SIN SISTEMA / PROBLEMAS TÉCNICOS">OFICINA JUDICIAL SIN SISTEMA / PROBLEMAS TÉCNICOS</option>
-                                    <option value="POR ACUERDO DE PARTES">POR ACUERDO DE PARTES</option>
-                                    <option value="POR AUSENCIA DE LA VÍCTIMA">POR AUSENCIA DE LA VÍCTIMA</option>
-                                    <option value="POR AUSENCIA DE MENOR TESTIGO / VICTIMA">POR AUSENCIA DE MENOR TESTIGO / VICTIMA</option>
-                                    <option value="POR AUSENCIA DE RECONOCIENTE">POR AUSENCIA DE RECONOCIENTE</option>
-                                    <option value="POR AUSENCIA DEL DEFENSOR PARTICULAR">POR AUSENCIA DEL DEFENSOR PARTICULAR</option>
-                                    <option value="POR AUSENCIA DEL DEFENSOR PÚBLICO">POR AUSENCIA DEL DEFENSOR PÚBLICO</option>
-                                    <option value="POR AUSENCIA DEL FISCAL">POR AUSENCIA DEL FISCAL</option>
-                                    <option value="POR AUSENCIA DEL IMPUTADO EN LIBERTAD">POR AUSENCIA DEL IMPUTADO EN LIBERTAD</option>
-                                    <option value="POR AUSENCIA DEL IMPUTADO EN PRISIÓN PREVENTIVA">POR AUSENCIA DEL IMPUTADO EN PRISIÓN PREVENTIVA</option>
-                                    <option value="POR AUSENCIA DEL JUEZ / JUECES">POR AUSENCIA DEL JUEZ / JUECES</option>
-                                    <option value="POR AUSENCIA DEL QUERELLANTE">POR AUSENCIA DEL QUERELLANTE</option>
-                                    <option value="POR DECISIÓN DE LA OFICINA JUDICIAL">POR DECISIÓN DE LA OFICINA JUDICIAL</option>
-                                    <option value="POR ERROR DE CARGA LEGAJO">POR ERROR DE CARGA LEGAJO</option>
-                                    <option value="POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL">POR ERROR DE NOTIFICACIÓN DE LA OFICINA JUDICIAL</option>
-                                    <option value="POR ERROR DE PROGRAMACION">POR ERROR DE PROGRAMACION</option>
-                                    <option value="POR PEDIDO DE LA DEFENSA">POR PEDIDO DE LA DEFENSA</option>
-                                    <option value="POR PEDIDO DEL DEFENSOR PÚBLICO">POR PEDIDO DEL DEFENSOR PÚBLICO</option>
-                                    <option value="POR PEDIDO DEL JUEZ">POR PEDIDO DEL JUEZ</option>
-                                    <option value="POR PEDIDO DEL MINISTERIO PUBLICO FISCAL">POR PEDIDO DEL MINISTERIO PUBLICO FISCAL</option>
-                                    <option value="POR PEDIDO DEL QUERELLANTE">POR PEDIDO DEL QUERELLANTE</option>
-                                    <option value="POR PETICIÓN DE LAS PARTES">POR PETICIÓN DE LAS PARTES</option>
+                                    {(Array.isArray(desplegables?.motivCancel) ? desplegables.motivCancel : []).map((t, idx) => (
+                                        <option key={idx} value={t} />
+                                    ))}
                                 </select>
                             )}
 
-                            <label style={{ display: 'block', marginTop: '16px', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>Observaciones</label>
+                            <label className={styles.modalLabelMt}>Observaciones</label>
                             <textarea
-                                className={styles.modalInput}
-                                style={{ height: '100px', resize: 'vertical' }}
+                                className={`${styles.modalInput} ${styles.modalTextareaLg}`}
                                 value={showReproModal ? obsRepro : obsCancel}
                                 onChange={e => {
                                     if (showReproModal) setObsRepro(e.target.value);
@@ -1419,6 +1468,139 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         </div>
                         <div className={styles.modalButtonGroup}>
                             <button className={styles.modalBtn} onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}>Aceptar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Modal de Reconversión */}
+            {showReconversionModal && (
+                <div className={styles.modalNotificarOverlay} onClick={() => setShowReconversionModal(false)}>
+                    <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
+                        <div className={`${styles.modalTitle} ${styles.modalTitleFlex}`}>
+                            <span>⚠️ Reconversión de Audiencia</span>
+                            <button className={`${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`} onClick={() => setShowReconversionModal(false)}>&times;</button>
+                        </div>
+                        <div className={styles.modalSection}>
+                            <div className={styles.reconversionWarningBox}>
+                                <strong>Tipo original:</strong> {tiposOriginales?.join(', ')}<br />
+                                <span className={styles.warningTextSmall}>
+                                    Al cambiar el tipo de audiencia original se realizará una <strong>reconversión</strong> de la solicitud en PUMA.
+                                </span>
+                            </div>
+                            <label className={styles.modalLabel}>
+                                Motivo de Transformación (opcional)
+                            </label>
+                            <textarea
+                                className={`${styles.modalInput} ${styles.modalTextareaMd}`}
+                                value={reconversionMotivo}
+                                onChange={e => setReconversionMotivo(e.target.value)}
+                                placeholder="Ej: Cambio de tipo por modificación del objeto procesal..."
+                            />
+                        </div>
+                        <div className={styles.modalButtonGroup}>
+                            <button
+                                className={styles.modalBtn}
+                                onClick={() => {
+                                    if (pendingReconversionTipos !== null) {
+                                        setTipos(pendingReconversionTipos)
+                                        setPendingReconversionTipos(null)
+                                        setToSave(true)
+                                    }
+                                    setShowReconversionModal(false)
+                                }}
+                            >Confirmar Reconversión</button>
+                            <button
+                                className={`${styles.modalBtn} ${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`}
+                                onClick={() => {
+                                    setPendingReconversionTipos(null)
+                                    setShowReconversionModal(false)
+                                }}
+                            >Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Modal Convertir a Jurisdiccional */}
+            {showConvertirModal && (
+                <div className={styles.modalNotificarOverlay} onClick={() => setShowConvertirModal(false)}>
+                    <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>
+                        <div className={`${styles.modalTitle} ${styles.modalTitleFlex}`}>
+                            <span>⚖ Convertir a Solicitud Jurisdiccional</span>
+                            <button className={`${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`} onClick={() => setShowConvertirModal(false)}>&times;</button>
+                        </div>
+                        <div className={styles.modalSection}>
+                            <div className={styles.jurisdiccionalWarningBox}>
+                                Esta acción convertirá la solicitud de audiencia en una <strong>Solicitud Jurisdiccional</strong>.
+                                Se ejecutará en PUMA al procesar.
+                            </div>
+                            <label className={styles.modalLabel}>
+                                Tipo de Solicitud Jurisdiccional
+                            </label>
+                            <input
+                                list="tipos-jurisdicc-datalist"
+                                className={styles.modalInput}
+                                placeholder="Buscar tipo jurisdiccional..."
+                                value={newConvertirTipo}
+                                onChange={e => setNewConvertirTipo(e.target.value)}
+                            />
+                            <datalist id="tipos-jurisdicc-datalist">
+                                {(Array.isArray(desplegables?.tiposJurisdiccional) ? desplegables.tiposJurisdiccional : []).map((t, idx) => (
+                                    <option key={idx} value={t} />
+                                ))}
+                            </datalist>
+                            <div className={styles.jurisdiccionalList}>
+                                {TIPOS_JURISDICCIONALES
+                                    .filter(t => !newConvertirTipo || t.toLowerCase().includes(newConvertirTipo.toLowerCase()))
+                                    .map((t, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={styles.jurisdiccionalListItem}
+                                            style={{
+                                                background: convertirJurisdiccionalTipo === t ? 'rgba(99,102,241,0.15)' : 'transparent',
+                                                color: convertirJurisdiccionalTipo === t ? 'var(--accent)' : 'var(--text)',
+                                                fontWeight: convertirJurisdiccionalTipo === t ? '600' : 'normal'
+                                            }}
+                                            onClick={() => setConvertirJurisdiccionalTipo(t)}
+                                            onMouseOver={e => { if (convertirJurisdiccionalTipo !== t) e.currentTarget.style.background = 'var(--surface2)' }}
+                                            onMouseOut={e => { if (convertirJurisdiccionalTipo !== t) e.currentTarget.style.background = 'transparent' }}
+                                        >
+                                            {t}
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                            {convertirJurisdiccionalTipo && (
+                                <div className={styles.jurisdiccionalMotivoBox}>
+                                    ✓ Seleccionado: <strong>{convertirJurisdiccionalTipo}</strong>
+                                </div>
+                            )}
+                            <label className={styles.modalLabelMt}>
+                                Motivo de Transformación (opcional)
+                            </label>
+                            <textarea
+                                className={`${styles.modalInput} ${styles.modalTextareaSm}`}
+                                value={convertirJurisdiccionalMotivo}
+                                onChange={e => setConvertirJurisdiccionalMotivo(e.target.value)}
+                                placeholder="Motivo de la conversión a jurisdiccional..."
+                            />
+                        </div>
+                        <div className={styles.modalButtonGroup}>
+                            <button
+                                className={styles.modalBtn}
+                                disabled={!convertirJurisdiccionalTipo}
+                                style={{ opacity: !convertirJurisdiccionalTipo ? 0.5 : 1 }}
+                                onClick={() => {
+                                    if (!convertirJurisdiccionalTipo) return alert('Seleccione un tipo jurisdiccional.')
+                                    setConvertirJurisdiccional(true)
+                                    setNewConvertirTipo('')
+                                    setToSave(true)
+                                    setShowConvertirModal(false)
+                                }}
+                            >Confirmar</button>
+                            <button
+                                className={`${styles.modalBtn} ${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`}
+                                onClick={() => setShowConvertirModal(false)}
+                            >Cancelar</button>
                         </div>
                     </div>
                 </div>
