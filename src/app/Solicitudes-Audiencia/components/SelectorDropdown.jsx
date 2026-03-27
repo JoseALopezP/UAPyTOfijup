@@ -40,7 +40,7 @@ export default function SelectorDropdown({ options = [], onSelect, title = "Opci
             </button>
 
             {isOpen && (
-                <div className={styles.expandDropdown} style={{ top: '25px', left: '0', minWidth: '180px', zIndex: 1000 }}>
+                <div className={styles.expandDropdown} style={{ top: '25px', left: '0', minWidth: '180px', zIndex: 999999 }}>
                     <div className={styles.dropdownHeader}>
                         <span>{title}</span>
                         <button onClick={() => setIsOpen(false)} className={styles.closeBtn}>×</button>

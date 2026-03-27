@@ -11,28 +11,23 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const hasInitialSync = useRef(false)
     const [toSave, setToSave] = useState(false)
     const [doSave, setDoSave] = useState(false)
-
     const rowKey = data.linkSol
         ? data.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
         : `${data.numeroLeg}_${data.fyhcreacion}`
-
     const savedData = useMemo(() => {
         if (!solicitudesPendientes || !Array.isArray(solicitudesPendientes)) return {}
         return solicitudesPendientes.find(item => item.rowKey === rowKey) || {}
     }, [solicitudesPendientes, rowKey])
-
     const initialTipos = () => {
         if (savedData.tipos) return savedData.tipos;
         if (savedData.tipo) return [savedData.tipo];
         if (data.tipo) return [data.tipo];
         return [];
     }
-
     const [tipos, setTipos] = useState(initialTipos())
     const [newTipo, setNewTipo] = useState('')
     const [sitCorporal, setSitCorporal] = useState(savedData.sitCorporal || data.sitCorporal || '')
     const [vencimiento, setVencimiento] = useState(savedData.vencimiento || data.vencimiento || '')
-    const [querella, setQuerella] = useState(savedData.querella || (data.intervinientes?.querella?.map(x => x.nombre || x).join(', ') ?? ''))
     const [defensa, setDefensa] = useState(savedData.defensa || (data.intervinientes?.defensor_oficial?.map(x => x.nombre || x).join(', ') || data.intervinientes?.defensor_particular?.map(x => x.nombre || x).join(', ') || ''))
     const [fiscal, setFiscal] = useState(savedData.fiscal || (data.intervinientes?.fiscal?.map(x => x.nombre || x).join(', ') ?? ''))
     const [juez, setJuez] = useState(savedData.juez || (data.intervinientes?.juez?.map(x => x.nombre || x).join(', ') ?? ''))
@@ -50,15 +45,13 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             return { nombre: item.nombre || '', dni: item.dni || '', representadoPor: item.representadoPor || [] };
         });
     })
-    const [partesAgregar, setPartesAgregar] = useState(savedData.partesAgregar || [])
     const [newNombre, setNewNombre] = useState('')
     const [newDni, setNewDni] = useState('')
-    const [newMotivoParte, setNewMotivoParte] = useState('')
-    const [newNombreParte, setNewNombreParte] = useState('')
+    const [showAddTipo, setShowAddTipo] = useState(false)
+    const [showAddImputado, setShowAddImputado] = useState(false)
     const [filterPartes, setFilterPartes] = useState('')
     const [filterPartesSol, setFilterPartesSol] = useState('')
     const [partesLegajo, setPartesLegajo] = useState([])
-
     const [notificaciones, setNotificaciones] = useState(savedData.notificaciones || [])
     const [notifOption, setNotifOption] = useState('cancelarAudienciaImputadoEnLibertad')
     const [selectedPartsToNotify, setSelectedPartsToNotify] = useState([])
@@ -66,10 +59,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [notifNewRole, setNotifNewRole] = useState('')
     const [isNotificando, setIsNotificando] = useState(false)
     const [notifStatus, setNotifStatus] = useState('')
-
     const availablePartsList = useMemo(() => {
         let list = []
-        // Manejar tanto array nuevo como objeto viejo
         if (Array.isArray(partesLegajo) && partesLegajo.length > 0) {
             partesLegajo.forEach(p => {
                 list.push({
@@ -95,37 +86,25 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 }
             })
         }
-        partesAgregar.forEach(p => {
-            if (p.nombre && p.motivo) {
-                list.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, isNew: true, alias: '', dni: '' })
-            }
-        })
         return list
-    }, [partesLegajo, data.partesLegajo, partesAgregar])
-
+    }, [partesLegajo, data.partesLegajo])
     const [agendar, setAgendar] = useState(savedData.agendar ?? false)
     const [revisado, setRevisado] = useState(savedData.revisado ?? false)
     const [marcarBorrar, setMarcarBorrar] = useState(savedData.marcarBorrar ?? false)
     const [reprogramar, setReprogramar] = useState(savedData.reprogramar ?? false)
     const [cancelar, setCancelar] = useState(savedData.cancelar ?? false)
-
-    // Reconversión: tipos originales guardados al primer save
     const [tiposOriginales, setTiposOriginales] = useState(savedData.tiposOriginales || null)
     const [reconversionMotivo, setReconversionMotivo] = useState(savedData.reconversionMotivo || '')
     const [showReconversionModal, setShowReconversionModal] = useState(false)
     const [pendingReconversionTipos, setPendingReconversionTipos] = useState(null)
-
-    // Convertir a Jurisdiccional
     const [convertirJurisdiccional, setConvertirJurisdiccional] = useState(savedData.convertirJurisdiccional ?? false)
     const [convertirJurisdiccionalTipo, setConvertirJurisdiccionalTipo] = useState(savedData.convertirJurisdiccionalTipo || '')
     const [showConvertirModal, setShowConvertirModal] = useState(false)
     const [convertirJurisdiccionalMotivo, setConvertirJurisdiccionalMotivo] = useState(savedData.convertirJurisdiccionalMotivo || '')
     const [newConvertirTipo, setNewConvertirTipo] = useState('')
-
     const [tipoT, setTipoT] = useState(true)
     const [sitCorporalT, setSitCorporalT] = useState(true)
     const [vencimientoT, setVencimientoT] = useState(true)
-    const [querellaT, setQuerellaT] = useState(true)
     const [defensaT, setDefensaT] = useState(true)
     const [fiscalT, setFiscalT] = useState(true)
     const [juezT, setJuezT] = useState(true)
@@ -139,7 +118,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [horaFinAudiencia, setHoraFinAudiencia] = useState(savedData.horaFinAudiencia || (data.intervinientes?.hora_fin_audiencia?.join(', ') ?? ''))
     const [motivCancel, setMotivCancel] = useState(savedData.motivCancel || '')
     const [obsCancel, setObsCancel] = useState(savedData.obsCancel || '')
-
     const [showReproModal, setShowReproModal] = useState(false)
     const [showCancelModal, setShowCancelModal] = useState(false)
 
@@ -173,7 +151,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         setTipoT(tipos.length > 0)
         setSitCorporalT(sitCorporal !== '')
         setVencimientoT(vencimiento !== '')
-        setQuerellaT(querella !== '')
         setDefensaT(defensa !== '')
         setFiscalT(fiscal !== '')
         setJuezT(juez !== '')
@@ -186,8 +163,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     const checkChanges = () => {
         if (!hasInitialSync.current) return;
-
-        // Debemos comparar contra lo mismo que usamos para inicializar
         const getBaseValue = (field, scraperValue, isArray = false) => {
             if (savedData && savedData[field] !== undefined) return savedData[field];
             return isArray ? (scraperValue || []) : (scraperValue || '');
@@ -201,8 +176,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         }
 
         const getNames = (arr) => arr ? arr.map(x => (typeof x === 'object' ? x.nombre : x)).filter(Boolean).join(', ') : '';
-
-        // Normalizar partesLegajo igual que en el useEffect de sincronización
         const normalizePartesLegajo = (sourcePartes) => {
             if (Array.isArray(sourcePartes)) {
                 return sourcePartes.map(p => ({
@@ -243,7 +216,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             JSON.stringify(tipos) !== JSON.stringify(getTiposBase()) ||
             (sitCorporal || '') !== getBaseValue('sitCorporal', data.sitCorporal) ||
             (vencimiento || '') !== getBaseValue('vencimiento', data.vencimiento) ||
-            (querella || '') !== getBaseValue('querella', getNames(data.intervinientes?.querella)) ||
             (defensa || '') !== getBaseValue('defensa', getNames(data.intervinientes?.defensor_oficial) || getNames(data.intervinientes?.defensor_particular)) ||
             (fiscal || '') !== getBaseValue('fiscal', getNames(data.intervinientes?.fiscal)) ||
             (juez || '') !== getBaseValue('juez', getNames(data.intervinientes?.juez)) ||
@@ -259,7 +231,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 return list.map(item => typeof item === 'string' ? { nombre: item, dni: '' } : { nombre: item.nombre || '', dni: item.dni || '' });
             })()) ||
             JSON.stringify(partesLegajo) !== JSON.stringify(normalizePartesLegajo(savedData?.partesLegajo || data.partesLegajo)) ||
-            JSON.stringify(partesAgregar) !== JSON.stringify(getBaseValue('partesAgregar', [], true)) ||
+
             JSON.stringify(notificaciones) !== JSON.stringify(getBaseValue('notificaciones', [], true)) ||
             agendar !== (savedData.agendar ?? false) ||
             revisado !== (savedData.revisado ?? false) ||
@@ -284,7 +256,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         if (hasInitialSync.current) return;
 
         if (solicitudesPendientes && Array.isArray(solicitudesPendientes)) {
-            // Buscamos si hay datos guardados
             const saved = solicitudesPendientes.find(item => item.rowKey === rowKey) || {}
 
             const syncField = (savedVal, scraperVal) => {
@@ -296,7 +267,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             setVencimiento(syncField(saved.vencimiento, data.vencimiento))
             const getNames = (arr) => arr ? arr.map(x => (typeof x === 'object' ? x.nombre : x)).filter(Boolean).join(', ') : '';
 
-            setQuerella(syncField(saved.querella, getNames(data.intervinientes?.querella)))
             setDefensa(syncField(saved.defensa, getNames(data.intervinientes?.defensor_oficial) || getNames(data.intervinientes?.defensor_particular)))
             setFiscal(syncField(saved.fiscal, getNames(data.intervinientes?.fiscal)))
             setJuez(syncField(saved.juez, getNames(data.intervinientes?.juez)))
@@ -350,7 +320,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 })
             }
             setPartesLegajo(initialPartes)
-            setPartesAgregar(saved.partesAgregar || [])
+
             setNotificaciones(saved.notificaciones || [])
             setMotivRepro(saved.motivRepro || '')
             setObsRepro(saved.obsRepro || '')
@@ -370,11 +340,11 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     useEffect(() => {
         checkForDiff()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa])
+    }, [tipos, sitCorporal, vencimiento, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa])
 
     useEffect(() => {
         checkChanges()
-    }, [tipos, sitCorporal, vencimiento, querella, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData, motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel, tiposOriginales, reconversionMotivo, convertirJurisdiccional, convertirJurisdiccionalTipo, convertirJurisdiccionalMotivo])
+    }, [tipos, sitCorporal, vencimiento, defensa, fiscal, juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, imputados, partesLegajo, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar, savedData, motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel, tiposOriginales, reconversionMotivo, convertirJurisdiccional, convertirJurisdiccionalTipo, convertirJurisdiccionalMotivo])
 
     useEffect(() => {
         const saveRow = async () => {
@@ -382,7 +352,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 if (marcarBorrar) {
                     await removeSolicitudPendiente(rowKey)
                 } else {
-                    // Al guardar por primera vez, fijar los tiposOriginales
                     const newTiposOriginales = tiposOriginales || (tipos.length > 0 ? [...tipos] : null)
                     if (!tiposOriginales && tipos.length > 0) setTiposOriginales(newTiposOriginales)
 
@@ -391,9 +360,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         rowKey,
                         numeroLeg: data.numeroLeg,
                         fyhcreacion: data.fyhcreacion,
-                        tipos, sitCorporal, vencimiento, querella, defensa, fiscal,
+                        tipos, sitCorporal, vencimiento, defensa, fiscal,
                         juez, motivo, fechaAudiencia, horaAudiencia, sala, juezCausa, comentario, caratulaMod,
-                        imputados, partesLegajo, partesAgregar, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar,
+                        imputados, partesLegajo, notificaciones, agendar, revisado, marcarBorrar, reprogramar, cancelar,
                         motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel,
                         tiposOriginales: newTiposOriginales,
                         reconversionMotivo,
@@ -413,38 +382,38 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const rowStyle = (() => {
         if (savedData.agendadaError) return {
             '--row-input-tint': 'rgba(239, 68, 68, 0.1)',
-            '--sticky-col-override': 'rgba(239, 68, 68, 0.12)',
+            '--sticky-col-override': 'linear-gradient(rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.12)), var(--sticky-col)',
             background: 'rgba(239, 68, 68, 0.12)',
         }
         if (savedData.agendada) return {
             '--row-input-tint': 'rgba(16, 185, 129, 0.1)',
-            '--sticky-col-override': 'rgba(16, 185, 129, 0.15)',
+            '--sticky-col-override': 'linear-gradient(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15)), var(--sticky-col)',
             background: 'rgba(16, 185, 129, 0.15)',
             borderLeft: '4px solid #10b981'
         }
         if (cancelar) return {
             '--row-input-tint': 'rgba(251, 146, 60, 0.08)',
-            '--sticky-col-override': 'rgba(251, 146, 60, 0.10)',
+            '--sticky-col-override': 'linear-gradient(rgba(251, 146, 60, 0.10), rgba(251, 146, 60, 0.10)), var(--sticky-col)',
             background: 'rgba(251, 146, 60, 0.10)',
         }
         if (reprogramar) return {
             '--row-input-tint': 'rgba(168, 85, 247, 0.07)',
-            '--sticky-col-override': 'rgba(168, 85, 247, 0.08)',
+            '--sticky-col-override': 'linear-gradient(rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.08)), var(--sticky-col)',
             background: 'rgba(168, 85, 247, 0.08)',
         }
         if (marcarBorrar) return {
             '--row-input-tint': 'rgba(220, 38, 38, 0.10)',
-            '--sticky-col-override': 'rgba(220, 38, 38, 0.20)',
+            '--sticky-col-override': 'linear-gradient(rgba(220, 38, 38, 0.20), rgba(220, 38, 38, 0.20)), var(--sticky-col)',
             background: 'rgba(220, 38, 38, 0.20)',
         }
         if (revisado) return {
             '--row-input-tint': 'rgba(59, 130, 246, 0.07)',
-            '--sticky-col-override': 'rgba(59, 130, 246, 0.08)',
+            '--sticky-col-override': 'linear-gradient(rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.08)), var(--sticky-col)',
             background: 'rgba(59, 130, 246, 0.08)',
         }
         if (agendar) return {
             '--row-input-tint': 'rgba(34, 197, 94, 0.08)',
-            '--sticky-col-override': 'rgba(34, 197, 94, 0.10)',
+            '--sticky-col-override': 'linear-gradient(rgba(34, 197, 94, 0.10), rgba(34, 197, 94, 0.10)), var(--sticky-col)',
             background: 'rgba(34, 197, 94, 0.10)',
         }
         return {}
@@ -460,9 +429,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.fyhcreacion}</div></td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.solicitante}</div></td>
-            <td className={`${styles.cellBodyFixed}`}>
+            <td className={`${styles.cellBodyFixed}`} style={{ position: 'relative' }}>
                 <div className={styles.scrollCellTargetRelative}>
-                    {/* Burbuja de Reconversión */}
                     {tiposOriginales && tipos.length > 0 && JSON.stringify(tiposOriginales) !== JSON.stringify(tipos) && (
                         <div className={styles.reconversionBubbleWrapper}>
                             <span
@@ -482,10 +450,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 className={styles.listDeleteBtn}
                                 onClick={() => {
                                     const updated = tipos.filter((_, idx) => idx !== i)
-                                    // Detectar si se está eliminando un tipo original (reconversión)
                                     const esTipoOriginal = tiposOriginales && tiposOriginales.includes(t)
                                     if (esTipoOriginal && updated.length >= 0) {
-                                        // Guardar el cambio pendiente, preguntar motivo si hay tipos restantes
                                         setPendingReconversionTipos(updated)
                                         if (!reconversionMotivo) {
                                             setShowReconversionModal(true)
@@ -502,25 +468,49 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                             >✕</button>
                         </div>
                     ))}
-                    <div className={styles.listAddContainer}>
-                        <input
-                            list="tipos-datalist"
-                            className={styles.listAddInput}
-                            placeholder="Agregar Tipo..."
-                            value={newTipo}
-                            onChange={e => setNewTipo(e.target.value)}
-                        />
+                    {showAddTipo ? (
+                        <div style={{ position: 'absolute', left: '0px', right: '0px', bottom: '0px', background: 'var(--surface)', zIndex: 20, display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '4px', borderTop: '1px solid var(--border)', boxShadow: '0 -2px 6px rgba(0,0,0,0.1)', gap: '4px', paddingRight: '26px' }}>
+                            <input
+                                list={`tipos-datalist-${rowKey}`}
+                                className={styles.listAddInput}
+                                placeholder="Nuevo Tipo..."
+                                value={newTipo}
+                                onChange={e => setNewTipo(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        if (!newTipo.trim()) { setShowAddTipo(false); return; }
+                                        setTipos(prev => [...prev, newTipo.trim()]);
+                                        setNewTipo(''); setToSave(true); setShowAddTipo(false);
+                                    }
+                                }}
+                                style={{ flex: 1, minHeight: '22px', margin: 0 }}
+                                autoFocus
+                            />
+                            <button
+                                className={styles.listAddBtn}
+                                style={{ width: 'auto', padding: '0 8px', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', height: '22px', display: 'flex', alignItems: 'center' }}
+                                onClick={() => {
+                                    if (!newTipo.trim()) { setShowAddTipo(false); return; }
+                                    setTipos(prev => [...prev, newTipo.trim()]);
+                                    setNewTipo(''); setToSave(true); setShowAddTipo(false);
+                                }}
+                            >Agregar</button>
+                            <button
+                                onClick={() => setShowAddTipo(false)}
+                                style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', background: '#ef4444', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', cursor: 'pointer', zIndex: 30 }}
+                                title="Cerrar"
+                            >&times;</button>
+                        </div>
+                    ) : (
                         <button
                             className={styles.listAddBtn}
-                            onClick={() => {
-                                if (!newTipo.trim()) return
-                                setTipos(prev => [...prev, newTipo.trim()])
-                                setNewTipo('')
-                                setToSave(true)
-                            }}
+                            style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', zIndex: 10 }}
+                            onClick={() => setShowAddTipo(true)}
+                            title="Agregar Tipo"
                         >+</button>
-                    </div>
-                    <datalist id="tipos-datalist">
+                    )}
+                    <datalist id={`tipos-datalist-${rowKey}`}>
                         {(Array.isArray(desplegables?.tiposPuma) ? desplegables.tiposPuma : []).map((t, idx) => (
                             <option key={idx} value={t} />
                         ))}
@@ -539,7 +529,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 </div>
             </td>
             <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.length ?? 0}</td>
-            <td className={`${styles.cellBodyFixed}`}>
+            <td className={`${styles.cellBodyFixed}`} style={{ position: 'relative' }}>
                 <div className={styles.scrollCell}>
                     {imputados.map((imp, i) => (
                         <div key={i} className={`${styles.listPill} ${styles.pillImputado}`}>
@@ -558,31 +548,61 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                             >✕</button>
                         </div>
                     ))}
-                    {/* Agregar nuevo imputado */}
-                    <div className={styles.listAddContainer}>
-                        <input
-                            className={styles.listAddInput}
-                            placeholder="Nombre..."
-                            value={newNombre}
-                            onChange={e => setNewNombre(e.target.value)}
-                        />
-                        <input
-                            className={styles.listAddInput}
-                            placeholder="DNI..."
-                            value={newDni}
-                            onChange={e => setNewDni(e.target.value)}
-                        />
+                    {showAddImputado ? (
+                        <div style={{ position: 'absolute', left: '0px', right: '0px', bottom: '0px', background: 'var(--surface)', zIndex: 20, display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '4px', borderTop: '1px solid var(--border)', boxShadow: '0 -2px 6px rgba(0,0,0,0.1)', gap: '4px', paddingRight: '26px' }}>
+                            <select
+                                className={styles.listAddInput}
+                                value={`${newNombre}|${newDni}`}
+                                onChange={e => {
+                                    if (e.target.value === '|') {
+                                        setNewNombre(''); setNewDni('');
+                                    } else {
+                                        const [nombre, dni] = e.target.value.split('|');
+                                        setNewNombre(nombre); setNewDni(dni);
+                                    }
+                                }}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        if (!newNombre.trim()) { setShowAddImputado(false); return; }
+                                        setImputados(prev => [...prev, { nombre: newNombre.trim(), dni: newDni.trim() || null }]);
+                                        setNewNombre(''); setNewDni(''); setToSave(true); setShowAddImputado(false);
+                                    }
+                                }}
+                                style={{ flex: 1, minWidth: '0', minHeight: '22px', margin: 0, paddingLeft: '4px' }}
+                                autoFocus
+                            >
+                                <option value="|">Seleccionar imputado...</option>
+                                {availablePartsList
+                                    .filter(p => p.rol && p.rol.toLowerCase().includes('imputado'))
+                                    .filter(p => !imputados.some(imp => imp.nombre === p.nombre))
+                                    .map((p, idx) => (
+                                        <option key={idx} value={`${p.nombre}|${p.dni || ''}`}>{p.nombre} {p.dni ? `(${p.dni})` : ''}</option>
+                                    ))}
+                            </select>
+                            <button
+                                className={styles.listAddBtn}
+                                style={{ width: 'auto', padding: '0 8px', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', height: '22px', display: 'flex', alignItems: 'center' }}
+                                onClick={() => {
+                                    if (!newNombre.trim()) { setShowAddImputado(false); return; }
+                                    setImputados(prev => [...prev, { nombre: newNombre.trim(), dni: newDni.trim() || null }]);
+                                    setNewNombre(''); setNewDni(''); setToSave(true); setShowAddImputado(false);
+                                }}
+                            >Agregar</button>
+                            <button
+                                onClick={() => setShowAddImputado(false)}
+                                style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', background: '#ef4444', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', cursor: 'pointer', zIndex: 30 }}
+                                title="Cerrar"
+                            >&times;</button>
+                        </div>
+                    ) : (
                         <button
                             className={styles.listAddBtn}
-                            onClick={() => {
-                                if (!newNombre.trim()) return
-                                setImputados(prev => [...prev, { nombre: newNombre.trim(), dni: newDni.trim() || null }])
-                                setNewNombre('')
-                                setNewDni('')
-                                setToSave(true)
-                            }}
+                            style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', zIndex: 10 }}
+                            onClick={() => setShowAddImputado(true)}
+                            title="Agregar Imputado"
                         >+</button>
-                    </div>
+                    )}
                 </div>
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 4px', zIndex: showPartesLegajo ? 4000 : 'auto' }}>
@@ -614,7 +634,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                             </div>
 
                             <div className={styles.partesFlexWrapper}>
-                                {/* PANEL IZQUIERDO: LEGAJO */}
                                 <div className={`${styles.modalSection} ${styles.partesPanel}`}>
                                     <div className={styles.partesHeader}>
                                         <h4 className={styles.modalSectionTitle} style={{ margin: 0, border: 'none' }}>Partes del Legajo</h4>
@@ -684,12 +703,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                         <h5 className={styles.partesNewTitle}>+ Nueva Parte al Legajo</h5>
                                         <div className={styles.partesNewFlex}>
                                             <input className={`${styles.modalInput} ${styles.parteNewInputName}`} placeholder="Nombre" value={notifNewName} onChange={e => setNotifNewName(e.target.value)} />
-                                            <input list="motivos-datalist" className={`${styles.modalInput} ${styles.parteNewInputRole}`} placeholder="Rol" value={notifNewRole} onChange={e => setNotifNewRole(e.target.value)} />
+                                            <input list={`motivos-datalist-${rowKey}`} className={`${styles.modalInput} ${styles.parteNewInputRole}`} placeholder="Rol" value={notifNewRole} onChange={e => setNotifNewRole(e.target.value)} />
                                             <button className={`${styles.modalBtn} ${styles.parteNewBtn}`} onClick={() => {
                                                 if (!notifNewName.trim() || !notifNewRole.trim()) return;
-                                                // Se guarda partesAgregar también para que Puppeteer sepa las nuevas a agregar al legajo
                                                 setPartesLegajo(prev => [...prev, { nombre: notifNewName.trim(), rol: notifNewRole.trim(), agregadaOriginalmente: false }]);
-                                                setPartesAgregar(prev => [...prev, { nombre: notifNewName.trim(), motivo: notifNewRole.trim() }]);
                                                 setNotifNewName(''); setNotifNewRole(''); setToSave(true);
                                             }}>+ Ag</button>
                                         </div>
@@ -764,78 +781,35 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             <td className={cell(sitCorporalT)}>
                 <textarea className={styles.inputCell} value={sitCorporal} onChange={e => setSitCorporal(e.target.value)} />
             </td>
-            <td className={`${styles.cellBodyFixed}`}>
-                <div className={styles.scrollCell}>
-                    {partesAgregar.map((parte, i) => (
-                        <div key={i} className={`${styles.listPill} ${styles.pillMotivo}`}>
-                            <div className={styles.listPillInfo}>
-                                <span className={styles.listNombre}>{parte.nombre}</span>
-                                {parte.motivo && <span className={styles.listDni}>{parte.motivo}</span>}
-                            </div>
-                            <button
-                                className={styles.listDeleteBtn}
-                                onClick={() => {
-                                    const updated = partesAgregar.filter((_, idx) => idx !== i)
-                                    setPartesAgregar(updated)
-                                    setToSave(true)
-                                }}
-                                title="Eliminar"
-                            >✕</button>
-                        </div>
-                    ))}
-                    {/* Agregar nueva parte */}
-                    <div className={styles.listAddContainer}>
-                        <input
-                            list="motivos-datalist"
-                            className={styles.listAddInput}
-                            placeholder="Motivo..."
-                            value={newMotivoParte}
-                            onChange={e => setNewMotivoParte(e.target.value)}
-                        />
-                        <input
-                            list="enlaces-datalist"
-                            className={styles.listAddInput}
-                            placeholder="Nombre/DNI..."
-                            value={newNombreParte}
-                            onChange={e => setNewNombreParte(e.target.value)}
-                        />
-                        <button
-                            className={styles.listAddBtn}
-                            onClick={() => {
-                                if (!newNombreParte.trim() || !newMotivoParte.trim()) return
-                                setPartesAgregar(prev => [...prev, { nombre: newNombreParte.trim(), motivo: newMotivoParte.trim() }])
-                                setNewNombreParte('')
-                                setNewMotivoParte('')
-                                setToSave(true)
-                            }}
-                        >+</button>
-                    </div>
-                    <datalist id="motivos-datalist">
-                        {[
-                            "ABOGADO QUERELLANTE - APODERADO", "ABOGADO QUERELLANTE - PATROCINANTE",
-                            "DAMNIFICADO", "DEFENSOR DE MENORES", "DEFENSOR GENERAL", "DEFENSOR OFICIAL",
-                            "DEFENSOR PARTICULAR", "DENUNCIANTE", "ENLACE DE LA DEFENSA", "EXHORTO ORGANISMO EXTERNO",
-                            "FISCAL", "FISCAL GENERAL", "IMPUTADO", "INSTRUCTOR DEL LEGAJO", "LETRADO",
-                            "ORGANISMO AUXILIAR", "PERITO", "PSICÓLOGO/A DE CÁMARA GESELL", "QUERELLA",
-                            "TESTIGO", "VICTIMA"
-                        ].map(opt => <option key={opt} value={opt} />)}
-                    </datalist>
-                    <datalist id="enlaces-datalist">
-                        <option value="ENLACE DE LA DEFENSA" />
-                    </datalist>
-                </div>
-            </td>
+
             <td className={cell(vencimientoT)}>
-                <textarea className={styles.inputCell} value={vencimiento} onChange={e => setVencimiento(e.target.value)} />
+                <input type="datetime-local" className={styles.inputCell} value={vencimiento} onChange={e => {setVencimiento(e.target.value); setToSave(true)}} />
             </td>
-            <td className={cell(querellaT)}>
-                <textarea className={styles.inputCell} value={querella} onChange={e => setQuerella(e.target.value)} />
-            </td>
-            <td className={cell(defensaT)}>
+            <td className={`${cell(defensaT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
+                <SelectorDropdown
+                    title="Defensores"
+                    options={[...new Set(availablePartsList
+                        .filter(p => p.rol && p.rol.toLowerCase().includes('defens'))
+                        .map(p => p.nombre))]}
+                    onSelect={(val) => {
+                        setDefensa(prev => prev ? prev + ', ' + val : val);
+                        setToSave(true);
+                    }}
+                />
                 <textarea className={styles.inputCell} value={defensa} onChange={e => setDefensa(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.ufi}</div></td>
-            <td className={cell(fiscalT)}>
+            <td className={`${cell(fiscalT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
+                <SelectorDropdown
+                    title="Fiscales"
+                    options={[...new Set(availablePartsList
+                        .filter(p => p.rol && p.rol.toLowerCase().includes('fiscal'))
+                        .map(p => p.nombre))]}
+                    onSelect={(val) => {
+                        setFiscal(prev => prev ? prev + ', ' + val : val);
+                        setToSave(true);
+                    }}
+                />
                 <textarea className={styles.inputCell} value={fiscal} onChange={e => setFiscal(e.target.value)} />
             </td>
             <td className={`${cell(juezT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
@@ -845,14 +819,14 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     onSelect={(val) => setJuez(val)}
                 />
                 <input
-                    list="jueces-datalist"
+                    list={`jueces-datalist-${rowKey}`}
                     className={styles.inputCell}
                     value={juez}
                     onChange={e => { setJuez(e.target.value); setToSave(true) }}
                     placeholder="Buscar juez..."
                     autoComplete="off"
                 />
-                <datalist id="jueces-datalist">
+                <datalist id={`jueces-datalist-${rowKey}`}>
                     {(Array.isArray(desplegables?.juecesPuma) ? desplegables.juecesPuma : []).map((j, idx) => (
                         <option key={idx} value={j} />
                     ))}
@@ -862,19 +836,35 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 <textarea className={styles.inputCell} value={motivo} onChange={e => setMotivo(e.target.value)} />
             </td>
             <td className={cell(fechaAudienciaT)}>
-                <textarea className={styles.inputCell} value={fechaAudiencia} onChange={e => setFechaAudiencia(e.target.value)} />
+                <input type="date" className={styles.inputCell} value={fechaAudiencia} onChange={e => {setFechaAudiencia(e.target.value); setToSave(true)}} />
             </td>
             <td className={cell(horaAudienciaT)}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <textarea className={styles.inputCell} style={{ height: '50%' }} value={horaAudiencia} onChange={e => setHoraAudiencia(e.target.value)} placeholder="Inicio" />
-                    <textarea className={styles.inputCell} style={{ height: '50%', borderTop: '1px solid var(--border)' }} value={horaFinAudiencia} onChange={e => setHoraFinAudiencia(e.target.value)} placeholder="Fin" />
+                    <input type="time" className={styles.inputCell} style={{ height: '50%' }} value={horaAudiencia} onChange={e => {setHoraAudiencia(e.target.value); setToSave(true)}} placeholder="Inicio" />
+                    <input type="time" className={styles.inputCell} style={{ height: '50%', borderTop: '1px solid var(--border)' }} value={horaFinAudiencia} onChange={e => {setHoraFinAudiencia(e.target.value); setToSave(true)}} placeholder="Fin" />
                 </div>
             </td>
             <td className={cell(salaT)}>
-                <textarea className={styles.inputCell} value={sala} onChange={e => setSala(e.target.value)} />
+                <select className={styles.inputCell} value={sala} onChange={e => {setSala(e.target.value); setToSave(true)}}>
+                    <option value="">(Sin Sala)</option>
+                    {(Array.isArray(desplegables?.salas) ? desplegables.salas : []).map((s, idx) => (
+                        <option key={idx} value={s}>{s}</option>
+                    ))}
+                    {sala && !(Array.isArray(desplegables?.salas) ? desplegables.salas : []).includes(sala) && (
+                        <option value={sala}>{sala}</option>
+                    )}
+                </select>
             </td>
             <td className={cell(juezCausaT)}>
-                <textarea className={styles.inputCell} value={juezCausa} onChange={e => setJuezCausa(e.target.value)} />
+                <select className={styles.inputCell} value={juezCausa} onChange={e => {setJuezCausa(e.target.value); setToSave(true)}}>
+                    <option value="">(Sin Juez de Causa)</option>
+                    {(Array.isArray(desplegables?.juecesPuma) ? desplegables.juecesPuma : []).map((j, idx) => (
+                        <option key={idx} value={j}>{j}</option>
+                    ))}
+                    {juezCausa && !(Array.isArray(desplegables?.juecesPuma) ? desplegables.juecesPuma : []).includes(juezCausa) && (
+                        <option value={juezCausa}>{juezCausa}</option>
+                    )}
+                </select>
             </td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`}>
                 <textarea className={styles.inputCell} value={comentario} onChange={e => setComentario(e.target.value)} />
@@ -1537,13 +1527,13 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 Tipo de Solicitud Jurisdiccional
                             </label>
                             <input
-                                list="tipos-jurisdicc-datalist"
+                                list={`tipos-jurisdicc-datalist-${rowKey}`}
                                 className={styles.modalInput}
                                 placeholder="Buscar tipo jurisdiccional..."
                                 value={newConvertirTipo}
                                 onChange={e => setNewConvertirTipo(e.target.value)}
                             />
-                            <datalist id="tipos-jurisdicc-datalist">
+                            <datalist id={`tipos-jurisdicc-datalist-${rowKey}`}>
                                 {(Array.isArray(desplegables?.tiposJurisdiccional) ? desplegables.tiposJurisdiccional : []).map((t, idx) => (
                                     <option key={idx} value={t} />
                                 ))}

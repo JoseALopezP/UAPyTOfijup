@@ -144,12 +144,6 @@ export default function HeaderSolicitudes() {
                             }
                         });
                     }
-                    (item.partesAgregar || []).forEach(p => {
-                        if (p.nombre && p.motivo) {
-                            availablePartsList.push({ key: `${p.nombre}-${p.motivo}`, nombre: p.nombre, rol: p.motivo, alias: '', dni: '' });
-                        }
-                    });
-
                 // Preparar PDFs de notificaciones si no se han subido ya
                 let documentosBase64 = [];
                 const TEMPLATES_NO_PDF = [
