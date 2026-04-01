@@ -505,7 +505,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     ) : (
                         <button
                             className={styles.listAddBtn}
-                            style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', zIndex: 10 }}
+                            style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', zIndex: 1 }}
                             onClick={() => setShowAddTipo(true)}
                             title="Agregar Tipo"
                         >+</button>
@@ -598,7 +598,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     ) : (
                         <button
                             className={styles.listAddBtn}
-                            style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', zIndex: 10 }}
+                            style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', padding: '0', borderRadius: '50%', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', zIndex: 1 }}
                             onClick={() => setShowAddImputado(true)}
                             title="Agregar Imputado"
                         >+</button>
@@ -783,7 +783,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             </td>
 
             <td className={cell(vencimientoT)}>
-                <input type="datetime-local" className={styles.inputCell} value={vencimiento} onChange={e => {setVencimiento(e.target.value); setToSave(true)}} />
+                <input type="datetime-local" className={styles.inputCell} value={vencimiento} onChange={e => { setVencimiento(e.target.value); setToSave(true) }} />
             </td>
             <td className={`${cell(defensaT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
                 <SelectorDropdown
@@ -836,16 +836,16 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 <textarea className={styles.inputCell} value={motivo} onChange={e => setMotivo(e.target.value)} />
             </td>
             <td className={cell(fechaAudienciaT)}>
-                <input type="date" className={styles.inputCell} value={fechaAudiencia} onChange={e => {setFechaAudiencia(e.target.value); setToSave(true)}} />
+                <input type="date" className={styles.inputCell} value={fechaAudiencia} onChange={e => { setFechaAudiencia(e.target.value); setToSave(true) }} />
             </td>
             <td className={cell(horaAudienciaT)}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <input type="time" className={styles.inputCell} style={{ height: '50%' }} value={horaAudiencia} onChange={e => {setHoraAudiencia(e.target.value); setToSave(true)}} placeholder="Inicio" />
-                    <input type="time" className={styles.inputCell} style={{ height: '50%', borderTop: '1px solid var(--border)' }} value={horaFinAudiencia} onChange={e => {setHoraFinAudiencia(e.target.value); setToSave(true)}} placeholder="Fin" />
+                    <input type="time" className={styles.inputCell} style={{ height: '50%' }} value={horaAudiencia} onChange={e => { setHoraAudiencia(e.target.value); setToSave(true) }} placeholder="Inicio" />
+                    <input type="time" className={styles.inputCell} style={{ height: '50%', borderTop: '1px solid var(--border)' }} value={horaFinAudiencia} onChange={e => { setHoraFinAudiencia(e.target.value); setToSave(true) }} placeholder="Fin" />
                 </div>
             </td>
             <td className={cell(salaT)}>
-                <select className={styles.inputCell} value={sala} onChange={e => {setSala(e.target.value); setToSave(true)}}>
+                <select className={styles.inputCell} value={sala} onChange={e => { setSala(e.target.value); setToSave(true) }}>
                     <option value="">(Sin Sala)</option>
                     {(Array.isArray(desplegables?.salas) ? desplegables.salas : []).map((s, idx) => (
                         <option key={idx} value={s}>{s}</option>
@@ -856,7 +856,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 </select>
             </td>
             <td className={cell(juezCausaT)}>
-                <select className={styles.inputCell} value={juezCausa} onChange={e => {setJuezCausa(e.target.value); setToSave(true)}}>
+                <select className={styles.inputCell} value={juezCausa} onChange={e => { setJuezCausa(e.target.value); setToSave(true) }}>
                     <option value="">(Sin Juez de Causa)</option>
                     {(Array.isArray(desplegables?.juecesPuma) ? desplegables.juecesPuma : []).map((j, idx) => (
                         <option key={idx} value={j}>{j}</option>
@@ -1539,7 +1539,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 ))}
                             </datalist>
                             <div className={styles.jurisdiccionalList}>
-                                {TIPOS_JURISDICCIONALES
+                                {desplegables?.tiposJurisdiccional
                                     .filter(t => !newConvertirTipo || t.toLowerCase().includes(newConvertirTipo.toLowerCase()))
                                     .map((t, idx) => (
                                         <div
