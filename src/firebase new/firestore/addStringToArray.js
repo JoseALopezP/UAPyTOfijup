@@ -9,7 +9,7 @@ export default async function addStringToArray(collectionName, documentName, lis
             [listFieldName]: arrayUnion(stringToAdd)
         });
     } catch (error) {
-        console.error("Error adding string to list:", e);
-        throw new Error(e.message || "Failed to add object");
+        console.error("Error adding string to list:", error);
+        throw new Error(error.message || "Failed to add object");
     }
 }

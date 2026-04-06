@@ -246,7 +246,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         try {
             await removeObject('desplegables', 'modelosMinuta', name)
         } catch (error) {
-            removeObject(`${error.message}`);
+            setErrorMessage(`${error.message}`);
         }
     }
     const updateModelosMinuta = async () => {

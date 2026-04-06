@@ -1527,17 +1527,11 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                 Tipo de Solicitud Jurisdiccional
                             </label>
                             <input
-                                list={`tipos-jurisdicc-datalist-${rowKey}`}
                                 className={styles.modalInput}
                                 placeholder="Buscar tipo jurisdiccional..."
                                 value={newConvertirTipo}
                                 onChange={e => setNewConvertirTipo(e.target.value)}
                             />
-                            <datalist id={`tipos-jurisdicc-datalist-${rowKey}`}>
-                                {(Array.isArray(desplegables?.tiposJurisdiccional) ? desplegables.tiposJurisdiccional : []).map((t, idx) => (
-                                    <option key={idx} value={t} />
-                                ))}
-                            </datalist>
                             <div className={styles.jurisdiccionalList}>
                                 {desplegables?.tiposJurisdiccional
                                     .filter(t => !newConvertirTipo || t.toLowerCase().includes(newConvertirTipo.toLowerCase()))

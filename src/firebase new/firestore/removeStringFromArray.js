@@ -11,6 +11,6 @@ export default async function removeStringFromArray(collectionName, documentName
         });
     } catch (error) {
         console.error("Error removing string from array: ", error);
-        throw new Error(e.message || "Failed to remove from array");
+        throw new Error(error.message || "Failed to remove from array");
     }
 }

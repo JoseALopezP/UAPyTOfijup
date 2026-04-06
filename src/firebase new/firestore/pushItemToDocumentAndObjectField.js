@@ -1,17 +1,18 @@
 import firebase_app from "../config";
-import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { getFirestore, doc, arrayUnion, writeBatch } from "firebase/firestore";
 const db = getFirestore(firebase_app);
 
 export const pushItemToDocumentAndObjectField = async (date, audId, field, item) => {
   try {
-    const audDocRef = doc(db, "audiencias", date, 'audiencias', audId);
-    await updateDoc(audDocRef, {
-      [field]: arrayUnion(item),
-    });
+    const batch = writeBatch(db);
+
+    const audDocRef = doc(db, "audiencias", date, "audiencias", audId);
+    batch.update(audDocRef, { [field]: arrayUnion(item) });
+
     const viewDocRef = doc(db, "audienciasView", date);
-    await updateDoc(viewDocRef, {
-      [`${audId}.${field}`]: arrayUnion(item),
-    });
+    batch.update(viewDocRef, { [`${audId}.${field}`]: arrayUnion(item) });
+
+    await batch.commit();
   } catch (e) {
     console.error("❌ Failed to push item to array:", e);
     throw new Error(e.message || "Failed to push item to array.");

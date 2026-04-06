@@ -6,6 +6,7 @@ import DownloadXLSX from './modules/DownloadXLSX';
 import DownloadXLSXInforme from './modules/DownloadXLSXInforme';
 import ImportantDates from './modules/ImportantDates';
 import BloqueoMasivo from './modules/BloqueoMasivo';
+import MigrationPanel from './modules/MigrationPanel';
 
 export default function page() {
   return (
@@ -23,6 +24,9 @@ export default function page() {
           </div>
           <div className={`${styles.container}`}>
             <BloqueoMasivo />
+          </div>
+          <div className={`${styles.container}`}>
+            <MigrationPanel />
           </div>
           {/*<div className={`${styles.container}`}>
             <button className={`${styles.button}`} onClick={() => renameDocument()}>POR FAVOR NO TOCAR</button>
