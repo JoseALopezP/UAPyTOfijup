@@ -78,7 +78,7 @@ export async function POST(request) {
 
                 // 3. Notificar finalización del proceso
                 sendEvent({
-                    type: 'complete',
+                    type: 'done',
                     data: resultado
                 });
 

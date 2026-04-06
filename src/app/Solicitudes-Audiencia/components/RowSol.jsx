@@ -126,6 +126,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             setReprogramar(false);
             setMotivRepro('');
             setObsRepro('');
+        } else {
+            if (notificaciones.some(n => n.notificada)) {
+                setNotificaciones(prev => prev.map(n => ({ ...n, notificada: false })));
+            }
         }
         setShowReproModal(false);
     }
@@ -366,7 +370,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         motivRepro, obsRepro, horaFinAudiencia, motivCancel, obsCancel,
                         tiposOriginales: newTiposOriginales,
                         reconversionMotivo,
-                        convertirJurisdiccional, convertirJurisdiccionalTipo, convertirJurisdiccionalMotivo
+                        convertirJurisdiccional, convertirJurisdiccionalTipo, convertirJurisdiccionalMotivo,
+                        ...(reprogramar ? { documentosSubidos: false } : {})
                     })
                 }
                 setDoSave(false)
@@ -900,21 +905,21 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     {notificaciones.filter(n => !n.notificada).length}
                                 </span>
                             )}
-                            {notificaciones.filter(n => n.notificada).length > 0 && (
+                            {notificaciones.filter(n => n.notificada).length > 0 && notificaciones.filter(n => !n.notificada).length === 0 && (
                                 <span title="Notificadas" style={{
-                                    background: '#888', // Gris
+                                    background: 'var(--green)',
                                     color: '#fff',
-                                    borderRadius: '50%',
-                                    width: '18px',
-                                    height: '18px',
+                                    borderRadius: '4px',
+                                    padding: '1px 4px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '10px',
+                                    fontSize: '9px',
                                     fontWeight: 'bold',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                    textTransform: 'uppercase'
                                 }}>
-                                    {notificaciones.filter(n => n.notificada).length}
+                                    Notificada
                                 </span>
                             )}
                         </div>
@@ -1021,7 +1026,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 <div>
                                                     <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{n.option}</strong>
                                                     <span style={{ fontSize: '12px', color: 'var(--text2)', marginLeft: '8px' }}>└ {n.parts.length} partes asignadas</span>
-                                                    {n.notificada && <span style={{ background: '#4ade80', color: '#fff', fontSize: '9px', padding: '1px 4px', borderRadius: '3px', marginLeft: '8px', fontWeight: 'bold' }}>ENVIADA</span>}
+                                                    {n.notificada && <span style={{ background: 'var(--green)', color: '#fff', fontSize: '9px', padding: '1px 4px', borderRadius: '3px', marginLeft: '8px', fontWeight: 'bold' }}>NOTIFICADA</span>}
                                                 </div>
                                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                                     <button
@@ -1274,6 +1279,9 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                             onChange={(e) => {
                                 const val = e.target.checked;
                                 if (val) {
+                                    if (savedData.agendada) {
+                                        return alert("Esta solicitud ya se encuentra agendada en PUMA.");
+                                    }
                                     if (!fechaAudiencia) return alert("Falta ingresar la fecha de la audiencia para poder agendar.");
                                     if (!sala) return alert("Falta ingresar la sala de la audiencia para poder agendar.");
                                     if (!juez) return alert("Falta ingresar el juez de la audiencia para poder agendar.");
@@ -1299,8 +1307,14 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         <input type="checkbox" className={styles.cancelarCheckbox} checked={cancelar}
                             onChange={(e) => {
                                 const val = e.target.checked;
-                                if (val && !savedData.agendada) {
-                                    return alert("No se puede cancelar una audiencia que no ha sido programada");
+                                if (val) {
+                                    if (!savedData.agendada) {
+                                        return alert("No se puede cancelar una audiencia que no ha sido programada");
+                                    }
+                                    const esJurisdiccional = tipos.some(t => t.toLowerCase().includes('jurisdiccional')) || convertirJurisdiccional;
+                                    if (esJurisdiccional) {
+                                        return alert("No se puede cancelar una solicitud jurisdiccional por este medio.");
+                                    }
                                 }
                                 setCancelar(val);
                                 if (val) setShowCancelModal(true);
@@ -1313,8 +1327,11 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     <label className={`${styles.flagBtn}${marcarBorrar ? ` ${styles.borrarActive}` : ''}`}>
                         <input type="checkbox" className={styles.borrarCheckbox} checked={marcarBorrar}
                             onChange={(e) => {
-                                const val = e.target.checked
+                                const val = e.target.checked;
                                 if (val) {
+                                    if (agendar || cancelar || reprogramar || convertirJurisdiccional || savedData.agendada) {
+                                        return alert("No podés borrar si ya realizaste o marcaste alguna acción (Agendar, Cancelar, Reprogramar o Jurisdiccional).");
+                                    }
                                     const hora = horaAudiencia || data.intervinientes?.hora_audiencia?.join(', ') || 'sin hora'
                                     const confirmado = window.confirm(
                                         `¿Estás seguro que querés borrar la solicitud del legajo ${data.numeroLeg || 'sin legajo'}, de tipo "${data.tipo || 'sin tipo'}", a las ${hora}?\n\nEsta acción se ejecutará al presionar "Guardar todo".`
@@ -1399,7 +1416,12 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     <button
                         className={styles.flagBtn}
                         style={{ background: 'var(--surface2)', fontSize: '10px', height: '70%', margin: '0 auto', padding: '0 6px' }}
-                        onClick={() => setShowConvertirModal(true)}
+                        onClick={() => {
+                            if (savedData.agendada) {
+                                return alert("No se puede reconvertir a jurisdiccional una solicitud que ya está agendada.");
+                            }
+                            setShowConvertirModal(true);
+                        }}
                         title="Convertir esta solicitud a Jurisdiccional"
                     >
                         ⚖ Jurisdic.

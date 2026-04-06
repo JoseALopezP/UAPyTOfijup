@@ -239,7 +239,7 @@ export default function HeaderSolicitudes() {
 
                 try {
                     // Llamar a la API
-                    setSyncStatus(`Agendando ${i+1}/${aAgendar.length}: Conectando con PUMA...`);
+                    setSyncStatus(`Agendando ${i+1}/${aProcesar.length}: Conectando con PUMA...`);
                     const response = await fetch('/api/agendar-puppeteer', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -272,7 +272,7 @@ export default function HeaderSolicitudes() {
                                 try {
                                     const parsed = JSON.parse(line.substring(6));
                                     if (parsed.type === 'progress') {
-                                        setSyncStatus(`Ag. ${i+1}/${aAgendar.length}: ${parsed.message}`);
+                                        setSyncStatus(`Ag. ${i+1}/${aProcesar.length}: ${parsed.message}`);
                                     } else if (parsed.type === 'error') {
                                         // Marcar error (y tal vez guardar documentosSubidos si falló después de subirlos)
                                         console.error(`Error de agendamiento: ${parsed.error}`);
@@ -294,9 +294,20 @@ export default function HeaderSolicitudes() {
                                             return n;
                                         });
 
+                                        let finalFechaAudiencia = item.fechaAudiencia;
+                                        let finalHoraAudiencia = item.horaAudiencia;
+                                        
+                                        if (item.convertirJurisdiccional) {
+                                            const now = new Date();
+                                            finalFechaAudiencia = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                                            finalHoraAudiencia = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                                        }
+
                                         await addSolicitudData(item.rowKey, { 
                                             ...item, 
                                             agendada: item.cancelar ? false : true, 
+                                            fechaAudiencia: finalFechaAudiencia,
+                                            horaAudiencia: finalHoraAudiencia,
                                             agendar: false, 
                                             reprogramar: false, 
                                             cancelar: false,
@@ -309,7 +320,7 @@ export default function HeaderSolicitudes() {
                                         
                                         // AGREGAR LA AUDIENCIA A FIRESTORE
                                         if (addAudiencia) {
-                                            const horaAudienciaStr = item.horaAudiencia || '';
+                                            const horaAudienciaStr = finalHoraAudiencia || '';
                                             let horaInicioStr = '00:00';
                                             let minutosInicio = 0;
                                             let minutosFin = 30; // default 30 min
@@ -423,7 +434,7 @@ export default function HeaderSolicitudes() {
                                             };
                                             
                                             // Format date DDMMAAAA
-                                            let fDate = item.fechaAudiencia || ''; // expected DD/MM/YYYY
+                                            let fDate = finalFechaAudiencia || ''; // expected DD/MM/YYYY
                                             fDate = fDate.replace(/\//g, '');
                                             // Llenado si fDate es distinto? asumo fDate va bien
                                             await addAudiencia(dataObj, fDate);
