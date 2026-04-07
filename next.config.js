@@ -4,7 +4,6 @@ const nextConfig = {
     images: {
         unoptimized: true
     },
-    serverExternalPackages: ["puppeteer"],
     experimental: {
         serverComponentsExternalPackages: ["puppeteer"]
     }

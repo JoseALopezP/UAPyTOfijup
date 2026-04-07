@@ -22,7 +22,7 @@ export async function GET() {
             solicitudes: aAgendar,
         });
     } catch (error) {
-        console.error('[API] Error en solicitudes-a-agendar:', error);
-        return Response.json({ error: error.message }, { status: 500 });
+        console.error('[API] Error en solicitudes-a-agendar:', error.message);
+        return Response.json({ error: error.message, solicitudes: [] }, { status: 200 });
     }
 }
