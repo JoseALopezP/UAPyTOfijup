@@ -1,37 +1,62 @@
-.ql-container {
-  border: #2B2B2B 1px solid !important;
-  border-left: none !important;
-  border-right: none !important;
-  outline: none;
-  height: calc(100vh - 120px);
-  overflow: auto;
-}
-
-.ql-toolbar {
-  border: none !important;
-  outline: none;
-}
-
-.ql-editor {
-  font-size: 30px;
-  border: none !important;
-  font-family: "Arial", sans-serif;
-}
-
-.conversionButtonBlock {
-  position: fixed;
-  width: 60%;
-  display: inline-flex;
+/* Toolbar personalizada */
+.customToolbar {
+  display: flex;
   flex-direction: row;
-  justify-content: end;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+  flex-wrap: wrap;
 }
 
-.conversionButtonBlock button {
-  height: 40px;
+.toolbarBtn {
+  height: 32px;
+  min-width: 32px;
+  padding: 0 6px;
   border-radius: 4px;
-  width: 40px;
-  border: solid 1px #ffffff25;
+  border: 1px solid transparent;
   background-color: transparent;
-  margin-top: 1px;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toolbarBtn:hover {
+  background-color: #2e2e2e;
   color: #fff;
+  border-color: #444;
+}
+
+.toolbarBtnActive {
+  background-color: #3a5080 !important;
+  color: #fff !important;
+  border-color: #4a70b0 !important;
+}
+
+.toolbarSelect {
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.toolbarSep {
+  width: 1px;
+  height: 20px;
+  background: #444;
+  margin: 0 4px;
+}
+
+/* Botones A↑ a↓ (ahora en customToolbar, sin position:fixed) */
+.conversionButtonBlock {
+  display: none; /* ya no se usa — integrado en customToolbar */
 }

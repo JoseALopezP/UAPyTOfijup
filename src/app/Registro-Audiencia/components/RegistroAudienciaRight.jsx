@@ -71,8 +71,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         await setGuardando(false)
         await updateByDate(dateToUse)
     }
-    const handleSubmit = async (event) => {
-        if(event) event.preventDefault();
+    const handleSubmit = async () => {
         await updateDataAud()
     };
     const handleDescargar2 = async() =>{
@@ -137,8 +136,8 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
                 <p>{checkDescarga}</p>
                 <button type='button' className={`${styles.buttonDownload2}`} onClick={() => handleDescargar2()}>DESCARGAR</button>
             </div>}
-            <form className={`${styles.controlBlockRight}`} onSubmit={(event) => handleSubmit(event)}>
-            {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
+            <div className={`${styles.controlBlockRight}`}>
+            {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="button" id='submit-btn' onClick={handleSubmit}>
                 <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
                 <span className={`${styles.guardar}`}>GUARDAR</span>
                 <span className={`${styles.guardando}`}>GUARDANDO...</span>
@@ -171,12 +170,12 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
             </div>
             <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
             {selectedTab === 'Cuerpo minuta' &&
-                <TextEditor textValue={minuta} setTextValue={setMinuta}/>
+                <TextEditor key={`minuta-${item.id}`} textValue={minuta} setTextValue={setMinuta}/>
             }{selectedTab === 'Resuelvo' &&
-                <TextEditor textValue={resuelvo} setTextValue={setResuelvo}/>
+                <TextEditor key={`resuelvo-${item.id}`} textValue={resuelvo} setTextValue={setResuelvo}/>
             }{selectedTab === 'Cierre' &&
-                <TextEditor textValue={cierre} setTextValue={setCierre}/>
+                <TextEditor key={`cierre-${item.id}`} textValue={cierre} setTextValue={setCierre}/>
             }
-        </form></>
+        </div></>
     );
 }
