@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from '../listasDesplegables.module.css'
 import { DataContext } from '@/context New/DataContext';
-import Selector from './selector';
+import Selector from './Selector';
 
 export default function DesplegablesList({desplegableFunction, listSelection, setListSelection}) {
     const { updateDesplegables, desplegables, updateFeriados, feriados } = useContext(DataContext);
