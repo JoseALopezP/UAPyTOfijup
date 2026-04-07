@@ -158,16 +158,16 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             await updateData(dateToUse, item.id, 'mpf', mpf);
             setMpf2(mpf)} 
         if (!deepEqual(defensa2, defensa)){
-            await updateData(dateToUse, item.id, 'defensa');
+            await updateData(dateToUse, item.id, 'defensa', defensa);
             setDefensa2(defensa)}
         if (!deepEqual(imputado2, imputado)){
-            await updateData(dateToUse, item.id, 'imputado');
+            await updateData(dateToUse, item.id, 'imputado', imputado);
             setImputado2(imputado)}
         if (!deepEqual(partes2, partes)){
-            await updateData(dateToUse, item.id, 'partes');
+            await updateData(dateToUse, item.id, 'partes', partes);
             setPartes2(partes)}
         if (!deepEqual(razonDemora2, razonDemora)){
-            await updateData(dateToUse, item.id, 'razonDemora');
+            await updateData(dateToUse, item.id, 'razonDemora', razonDemora);
             setRazonDemora2(razonDemora)}
         if (!deepEqual(ufi2, ufi)){
             await updateData(dateToUse, item.id, 'ufi', ufi);
@@ -332,8 +332,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <option key={option} value={option}>{option}</option>
                     ))}</datalist></span>
             <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
-                {imputado.filter(el => !el.condenado).map((input, index) => (
-                    <><div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                {imputado.map((input, realIndex) => input.condenado ? null : (
+                    <><div key={input.id} className={`${styles.imputadoInput} ${styles.inputRow}`}>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.nombre}
@@ -344,8 +344,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             value={input.dni}
                             onChange={(e) => updateImputado(input.id, { dni: e.target.value })}
                             placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
                             {input.presencial ?  'FIS' : 'VIR'}
                         </button>
                         <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
@@ -354,7 +354,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
                         type="text"
                         value={input.detenido}
-                        onChange={(e) => handleInputChange(setImputado, index, 'detenido', e.target.value)}
+                        onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
                         placeholder="detenido en... 00/00/00"/>}
                         </>
                 ))}
@@ -364,20 +364,20 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         >+ IMPUTADO</button>
                 </span></span>
                 <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Condenados</label></span>
-                {imputado.filter(el => el.condenado).map((input, index) => (
-                    <><div key={input.id} className={input.condenado ? `${styles.condenadoInput} ${styles.inputRow}` : `${styles.imputadoInput} ${styles.inputRow}`}>
+                {imputado.map((input, realIndex) => !input.condenado ? null : (
+                    <><div key={input.id} className={`${styles.condenadoInput} ${styles.inputRow}`}>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.nombre}
-                            onChange={(e) => handleInputChange(setImputado, index, 'nombre', e.target.value)}
+                            onChange={(e) => handleInputChange(setImputado, realIndex, 'nombre', e.target.value)}
                             placeholder="Nombre"/>
                         <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
                             type="text"
                             value={input.dni}
-                            onChange={(e) => handleInputChange(setImputado, index, 'dni', e.target.value)}
+                            onChange={(e) => handleInputChange(setImputado, realIndex, 'dni', e.target.value)}
                             placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, index, 'presencial', (!input.presencial))}>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
                             {input.presencial ?  'FIS' : 'VIR'}
                         </button>
                         <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
@@ -386,7 +386,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
                         type="text"
                         value={input.detenido}
-                        onChange={(e) => handleInputChange(setImputado, index, 'detenido', e.target.value)}
+                        onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
                         placeholder="detenido en... 00/00/00"/>}
                         </>
                 ))}
