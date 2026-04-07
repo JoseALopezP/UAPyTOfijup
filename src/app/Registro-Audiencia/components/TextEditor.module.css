@@ -1,3 +1,10 @@
+/* Contenedor que limita la altura del editor — no afecta otras páginas */
+.quillContainer {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 /* Toolbar personalizada */
 .customToolbar {
   display: flex;
@@ -58,5 +65,6 @@
 
 /* Botones A↑ a↓ (ahora en customToolbar, sin position:fixed) */
 .conversionButtonBlock {
-  display: none; /* ya no se usa — integrado en customToolbar */
+  display: none;
+  /* ya no se usa — integrado en customToolbar */
 }

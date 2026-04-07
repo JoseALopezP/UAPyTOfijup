@@ -145,11 +145,13 @@ export default function TextEditor({ textValue, setTextValue }) {
         </button>
       </div>
 
-      <ReactQuill
-        ref={quillRef}
-        onChange={handleChange}
-        modules={QUILL_MODULES}
-      />
+      <div className={styles.quillContainer}>
+        <ReactQuill
+          ref={quillRef}
+          onChange={handleChange}
+          modules={QUILL_MODULES}
+        />
+      </div>
     </div>
   );
 }
