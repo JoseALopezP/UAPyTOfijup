@@ -1,4 +1,5 @@
 {
-  "buildCommand": "next build",
-  "framework": "nextjs"
+  "buildCommand": "PUPPETEER_SKIP_DOWNLOAD=true next build",
+  "framework": "nextjs",
+  "installCommand": "PUPPETEER_SKIP_DOWNLOAD=true npm install"
 }

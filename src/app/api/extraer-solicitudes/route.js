@@ -11,7 +11,7 @@ export async function GET(request) {
     }
 
     if (!tipo) {
-        return new Response(JSON.stringify({ error: 'Falta parámetro tipo' }), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Falta parámetro tipo', data: [] }), { status: 200 });
     }
 
     const encoder = new TextEncoder();

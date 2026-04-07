@@ -6,6 +6,14 @@ const nextConfig = {
     },
     experimental: {
         serverComponentsExternalPackages: ["puppeteer"]
+    },
+    webpack: (config, { isServer }) => {
+        if (isServer) {
+            // Mark puppeteer as external so webpack doesn't try to bundle it
+            config.externals = config.externals || [];
+            config.externals.push('puppeteer');
+        }
+        return config;
     }
 };
 

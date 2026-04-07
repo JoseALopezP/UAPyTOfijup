@@ -9,8 +9,8 @@ export async function GET(request) {
     }
 
     if (!dia) {
-        return new Response(JSON.stringify({ error: 'Día requerido' }), {
-            status: 400,
+        return new Response(JSON.stringify({ error: 'Día requerido', data: [] }), {
+            status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
     }
