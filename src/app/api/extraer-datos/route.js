@@ -1,5 +1,3 @@
-import { extraerDatosDeUrl } from '@/app/Solicitudes-Audiencia/funciones/extraccionLegajo';
-
 export async function POST(request) {
     try {
         const { url } = await request.json();
@@ -12,6 +10,8 @@ export async function POST(request) {
         }
 
         console.log(`[API] Iniciando extracción para: ${url}`);
+        
+        const { extraerDatosDeUrl } = await import('@/app/Solicitudes-Audiencia/funciones/extraccionLegajo');
 
         // Llamamos a la función de extracción (que usa Puppeteer)
         const data = await extraerDatosDeUrl(url);

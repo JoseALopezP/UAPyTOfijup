@@ -3,6 +3,10 @@ const nextConfig = {
     output: "export",
     images: {
         unoptimized: true
+    },
+    serverExternalPackages: ["puppeteer"],
+    experimental: {
+        serverComponentsExternalPackages: ["puppeteer"]
     }
 };
 

@@ -1,4 +1,6 @@
-import { agendarAudiencia } from '@/app/Solicitudes-Audiencia/funciones/agendamiento';
+if (typeof global !== 'undefined' && typeof global.document === 'undefined') {
+    global.document = { querySelector: () => null, querySelectorAll: () => [], getElementById: () => null };
+}
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';

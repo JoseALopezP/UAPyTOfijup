@@ -1,8 +1,12 @@
-import { getInfoAudiencia } from '@/app/Pumba/components/scrappingUAL';
-
 export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    const dia = searchParams.get('dia');
+    let dia = null;
+    try {
+        if (!request || !request.url) return new Response('BUILD', { status: 200 });
+        const { searchParams } = new URL(request.url);
+        dia = searchParams.get('dia');
+    } catch {
+        return new Response('Statically generated dummy', { status: 200 });
+    }
 
     if (!dia) {
         return new Response(JSON.stringify({ error: 'Día requerido' }), {
@@ -33,6 +37,8 @@ export async function GET(request) {
                     });
                 };
 
+                const { getInfoAudiencia } = await import('@/app/Pumba/components/scrappingUAL');
+                
                 // Ejecutar scraping con callback de progreso
                 const resultados = await getInfoAudiencia(dia, onProgress);
 

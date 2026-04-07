@@ -1,25 +1,32 @@
-import { extraerSolicitudes } from '@/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes';
+if (typeof global !== 'undefined' && typeof global.document === 'undefined') {
+    global.document = { querySelector: () => null, querySelectorAll: () => [], getElementById: () => null };
+}
 
 export const maxDuration = 300; // Si usás Vercel hobby, máximo 60s, pro 300s. Solo por las dudas.
 
-export async function POST(request) {
-    const { existingData, tiposAudiencia = [] } = await request.json().catch(() => ({ existingData: [], tiposAudiencia: [] }));
+export async function GET(request) {
+    let tipo = null;
+    try {
+        if (!request || !request.url) return new Response('BUILD', { status: 200 });
+        const { searchParams } = new URL(request.url);
+        tipo = searchParams.get('tipo'); // P.ej. "NUEVA" o "REPROGRAMACION"
+    } catch {
+        return new Response('Statically generated dummy', { status: 200 });
+    }
+
+    if (!tipo) {
+        return new Response(JSON.stringify({ error: 'Falta parámetro tipo' }), { status: 400 });
+    }
 
     const encoder = new TextEncoder();
-
     const stream = new ReadableStream({
         async start(controller) {
-            console.log(`[API] Iniciando extracción masiva de solicitudes (Streaming)...`);
-
-            // Callback que envía JSON \n a la respuesta
-            const onProgress = (msg, pct = null) => {
-                const data = JSON.stringify({ type: 'progress', message: msg, progress: pct }) + '\n';
-                controller.enqueue(encoder.encode(data));
+            const emit = (obj) => {
+                const dataStr = `data: ${JSON.stringify(obj)}\n\n`;
+                controller.enqueue(encoder.encode(dataStr));
             };
 
             try {
-                // Notificamos inicio
-                onProgress("Iniciando proceso en el servidor...");
 
                 // Puppeteer
                 const data = await extraerSolicitudes(existingData, onProgress, tiposAudiencia);
