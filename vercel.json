@@ -1,5 +1,10 @@
 {
-  "buildCommand": "PUPPETEER_SKIP_DOWNLOAD=true next build",
+  "buildCommand": "next build",
   "framework": "nextjs",
-  "installCommand": "PUPPETEER_SKIP_DOWNLOAD=true npm install"
+  "build": {
+    "env": {
+      "PUPPETEER_SKIP_DOWNLOAD": "true",
+      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
+    }
+  }
 }
