@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
-import { ButtonSelection } from './buttonSelection'
+import { ButtonSelection } from './ButtonSelection'
 import { numberCheck, listCheck, typeCheck, changeHandler, changeHandlerSplitter } from '@/utils/inputChecks'
 
 export default function EditExisting({ original, newState, setNewState, previousVersion, setPreviousVersion }) {

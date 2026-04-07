@@ -1,5 +1,3 @@
-import { bloqueoMasivoAuto, parsearBloques } from '@/firebase new/firestore/bloqueoAuto';
-
 /**
  * POST /api/bloqueo-auto/stream
  * Igual que /api/bloqueo-auto pero usa Server-Sent Events para
@@ -12,6 +10,8 @@ import { bloqueoMasivoAuto, parsearBloques } from '@/firebase new/firestore/bloq
  * }
  */
 export async function POST(request) {
+    const { bloqueoMasivoAuto, parsearBloques } = await import('@/firebase new/firestore/bloqueoAuto');
+
     const body = await request.json().catch(() => ({}));
 
     const fixed = body.fixed || {};

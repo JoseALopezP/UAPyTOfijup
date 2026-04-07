@@ -1,6 +1,3 @@
-if (typeof global !== 'undefined' && typeof global.document === 'undefined') {
-    global.document = { querySelector: () => null, querySelectorAll: () => [], getElementById: () => null };
-}
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
@@ -62,6 +59,9 @@ export async function POST(request) {
 
                 // 2. Ejecutar Puppeteer pasándole la ruta temporal de los archivos
                 sendEvent({ type: 'progress', message: 'Iniciando agendamiento con Puppeteer...' });
+                
+                const { agendarAudiencia } = await import('@/app/Solicitudes-Audiencia/funciones/agendamiento');
+                
                 const resultado = await agendarAudiencia({
                     linkSol,
                     tipo,

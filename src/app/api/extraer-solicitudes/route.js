@@ -1,15 +1,11 @@
-if (typeof global !== 'undefined' && typeof global.document === 'undefined') {
-    global.document = { querySelector: () => null, querySelectorAll: () => [], getElementById: () => null };
-}
-
-export const maxDuration = 300; // Si usás Vercel hobby, máximo 60s, pro 300s. Solo por las dudas.
+export const maxDuration = 300;
 
 export async function GET(request) {
     let tipo = null;
     try {
         if (!request || !request.url) return new Response('BUILD', { status: 200 });
         const { searchParams } = new URL(request.url);
-        tipo = searchParams.get('tipo'); // P.ej. "NUEVA" o "REPROGRAMACION"
+        tipo = searchParams.get('tipo');
     } catch {
         return new Response('Statically generated dummy', { status: 200 });
     }
@@ -27,11 +23,12 @@ export async function GET(request) {
             };
 
             try {
+                const { extraerSolicitudes } = await import('@/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes');
 
-                // Puppeteer
-                const data = await extraerSolicitudes(existingData, onProgress, tiposAudiencia);
+                const data = await extraerSolicitudes(tipo, (msg, done = false) => {
+                    emit({ message: msg, done });
+                });
 
-                // Resultado final
                 const finalData = JSON.stringify({ type: 'done', data }) + '\n';
                 controller.enqueue(encoder.encode(finalData));
             } catch (error) {
