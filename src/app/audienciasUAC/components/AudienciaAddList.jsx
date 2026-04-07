@@ -36,9 +36,12 @@ export function AudienciaAddList() {
                     <span className={`${styles.tableCell} ${styles.tableCellResultado}`}>RESULT.</span>
                     <span className={`${styles.tableCell} ${styles.tableCellAction}`}>ACCIÓN</span>
                 </div>
-                {bydateView && bydateView.sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el => (
-                    <AudienciaIndiv date={dateToUse} element={el} key={el.numeroLeg + el.hora} />
-                ))}
+                {bydateView && Object.values(bydateView)
+                    .filter(el => el?.hora)
+                    .sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join('')))
+                    .map(el => (
+                        <AudienciaIndiv date={dateToUse} element={el} key={el.id || el.numeroLeg + el.hora} />
+                    ))}
             </div>
         </section>
     );
