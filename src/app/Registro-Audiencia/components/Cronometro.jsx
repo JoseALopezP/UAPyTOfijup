@@ -21,7 +21,9 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
     const [prevColor, setPrevColor] = useState(translateColor[item.estado] || '#6c757d');
     const [newColor, setNewColor] = useState(translateColor[item.estado] || '#6c757d');
     const [guardando, setGuardando] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
     const [newState, setNewState] = useState('');
+    const setNewStateAndRef = (val) => { setNewState(val); newStateRef.current = val; };
     const [cuartoShow, setCuartoShow] = useState(false);
     const [pidiente, setPidiente] = useState('JUEZ');
     const [pedido, setPedido] = useState(0);
@@ -34,6 +36,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
 
     const intervalRef = useRef(null);
     const savingRef = useRef(false);
+    const newStateRef = useRef('');
 
     const states = {
         'FINALIZADA': ['INICIAR', 'RESUELVO'],
@@ -85,36 +88,59 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
         }
     };
 
+    // Reintenta una función async hasta maxAttempts veces con backoff exponencial
+    const withRetry = async (fn, maxAttempts = 3, baseDelayMs = 1000) => {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return await fn();
+            } catch (err) {
+                if (attempt === maxAttempts) throw err;
+                const delay = baseDelayMs * Math.pow(2, attempt - 1); // 1s, 2s
+                console.warn(`Firebase: intento ${attempt} fallido, reintentando en ${delay}ms...`, err);
+                await new Promise(res => setTimeout(res, delay));
+            }
+        }
+    };
+
     const changeState = async () => {
-        if (newState === 'CUARTO_INTERMEDIO' && !cuartoShow) {
+        const currentState = newStateRef.current;
+        if (currentState === 'CUARTO_INTERMEDIO' && !cuartoShow) {
             setCuartoShow(true);
             return;
         }
         if (savingRef.current) return;
+        if (!currentState) return;
 
         savingRef.current = true;
+        setErrorMsg('');
         setGuardando(true);
 
-        if (newState === 'RESUELVO') {
-            await updateData(dateToUse, item.id, 'resuelvo', updateRealTimeFunction());
-            await pushToAudienciaArray(dateToUse, item.id, 'hitos', `${updateRealTimeFunction()} | ${newState}`);
-        } else {
-            if (newState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
-            if (estadoActual === 'EN_CURSO' && newState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
+        try {
+            if (currentState === 'RESUELVO') {
+                await withRetry(() => updateData(dateToUse, item.id, 'resuelvo', updateRealTimeFunction()));
+                await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', `${updateRealTimeFunction()} | ${currentState}`));
+            } else {
+                if (currentState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
+                if (estadoActual === 'EN_CURSO' && currentState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
 
-            const entry = newState === 'CUARTO_INTERMEDIO'
-                ? `${updateRealTimeFunction()} | ${newState} | ${pedido || 0} | ${pidiente || "juez"}`
-                : `${updateRealTimeFunction()} | ${newState}`;
+                const entry = currentState === 'CUARTO_INTERMEDIO'
+                    ? `${updateRealTimeFunction()} | ${currentState} | ${pedido || 0} | ${pidiente || "juez"}`
+                    : `${updateRealTimeFunction()} | ${currentState}`;
 
-            await pushToAudienciaArray(dateToUse, item.id, 'hitos', entry);
-            setCuartoShow(false);
+                await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', entry));
+                setCuartoShow(false);
+            }
+
+            await withRetry(() => updateData(dateToUse, item.id, 'estado', currentState));
+            setEstadoActual(currentState);
+            await updateByDate(dateToUse);
+        } catch (err) {
+            console.error('Error en changeState (todos los reintentos fallaron):', err);
+            setErrorMsg('Error al guardar. Verificá tu conexión e intentá de nuevo.');
+        } finally {
+            setGuardando(false);
+            savingRef.current = false;
         }
-
-        await updateData(dateToUse, item.id, 'estado', newState);
-        setEstadoActual(newState);
-        setGuardando(false);
-        await updateByDate(dateToUse);
-        savingRef.current = false;
     };
 
     useEffect(() => {
@@ -179,42 +205,42 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
             {/* Botones */}
             <span>
                 <button
-                    onMouseDown={() => { if (states[estadoActual].includes('INICIAR')) { setIsPressing(true); setNewColor('#17a2b8'); setNewState('EN_CURSO'); } }}
+                    onMouseDown={() => { if (states[estadoActual].includes('INICIAR')) { setIsPressing(true); setNewColor('#17a2b8'); setNewStateAndRef('EN_CURSO'); } }}
                     onMouseUp={() => { setIsPressing(false); setNewColor(prevColor); }}
                     onMouseLeave={() => { setIsPressing(false); setNewColor(prevColor); }}
                     className={`${styles.buttonEstado} ${states[estadoActual].includes('INICIAR') && styles.INICIAR}`}>
                     {estadoActual === 'FINALIZADA' ? 'Reiniciar' : estadoActual === 'PROGRAMADA' ? 'Iniciar' : 'Continuar'}
                 </button>
                 <button
-                    onMouseDown={() => { if (states[estadoActual].includes('CUARTO_INTERMEDIO')) { setIsPressing(true); setNewColor(translateColor['CUARTO_INTERMEDIO']); setNewState('CUARTO_INTERMEDIO'); } }}
+                    onMouseDown={() => { if (states[estadoActual].includes('CUARTO_INTERMEDIO')) { setIsPressing(true); setNewColor(translateColor['CUARTO_INTERMEDIO']); setNewStateAndRef('CUARTO_INTERMEDIO'); } }}
                     onMouseUp={() => { setIsPressing(false); setNewColor(prevColor); }}
                     onMouseLeave={() => { setIsPressing(false); setNewColor(prevColor); }}
                     className={`${styles.buttonEstado} ${states[estadoActual].includes('CUARTO_INTERMEDIO') && styles.CUARTOINTERMEDIO}`}>
                     1/4 Intermedio
                 </button>
                 <button
-                    onMouseDown={() => { if (states[estadoActual].includes('FINALIZAR')) { setIsPressing(true); setNewColor(translateColor['FINALIZADA']); setNewState('FINALIZADA'); } }}
+                    onMouseDown={() => { if (states[estadoActual].includes('FINALIZAR')) { setIsPressing(true); setNewColor(translateColor['FINALIZADA']); setNewStateAndRef('FINALIZADA'); } }}
                     onMouseUp={() => { setIsPressing(false); setNewColor(prevColor); }}
                     onMouseLeave={() => { setIsPressing(false); setNewColor(prevColor); }}
                     className={`${styles.buttonEstado} ${states[estadoActual].includes('FINALIZAR') && styles.FINALIZAR}`}>
                     Finalizar
                 </button>
                 <button
-                    onMouseDown={() => { if (states[estadoActual].includes('REPROGRAMAR')) { setIsPressing(true); setNewColor(translateColor['REPROGRAMADA']); setNewState('REPROGRAMADA'); } }}
+                    onMouseDown={() => { if (states[estadoActual].includes('REPROGRAMAR')) { setIsPressing(true); setNewColor(translateColor['REPROGRAMADA']); setNewStateAndRef('REPROGRAMADA'); } }}
                     onMouseUp={() => { setIsPressing(false); setNewColor(prevColor); }}
                     onMouseLeave={() => { setIsPressing(false); setNewColor(prevColor); }}
                     className={`${styles.buttonEstado} ${states[estadoActual].includes('REPROGRAMAR') && styles.REPROGRAMAR}`}>
                     Reprogramar
                 </button>
                 <button
-                    onMouseDown={() => { if (states[estadoActual].includes('CANCELAR')) { setIsPressing(true); setNewColor(translateColor['CANCELADA']); setNewState('CANCELADA'); } }}
+                    onMouseDown={() => { if (states[estadoActual].includes('CANCELAR')) { setIsPressing(true); setNewColor(translateColor['CANCELADA']); setNewStateAndRef('CANCELADA'); } }}
                     onMouseUp={() => { setIsPressing(false); setNewColor(prevColor); }}
                     onMouseLeave={() => { setIsPressing(false); setNewColor(prevColor); }}
                     className={`${styles.buttonEstado} ${states[estadoActual].includes('CANCELAR') && styles.CANCELAR}`}>
                     Cancelar
                 </button>
                 <button
-                    onMouseDown={() => { if (states[estadoActual].includes('RESUELVO')) { setIsPressing(true); setNewColor(translateColor['RESUELVO']); setNewState('RESUELVO'); } }}
+                    onMouseDown={() => { if (states[estadoActual].includes('RESUELVO')) { setIsPressing(true); setNewColor(translateColor['RESUELVO']); setNewStateAndRef('RESUELVO'); } }}
                     onMouseUp={() => { setIsPressing(false); setNewColor(prevColor); }}
                     onMouseLeave={() => { setIsPressing(false); setNewColor(prevColor); }}
                     className={`${styles.buttonEstado} ${states[estadoActual].includes('RESUELVO') && styles.RESUELVOSUB}`}>
@@ -226,7 +252,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
             <span className={isPressing ? `${styles.cronoBlock} ${styles.cronoBlockPressing}` : styles.cronoBlock}>
                 {cuartoShow ? (
                     <>
-                        <button className={styles.confirmarButton} onClick={() => changeState()}>CONFIRMAR</button>
+                        <button type="button" className={styles.confirmarButton} onClick={() => changeState()}>CONFIRMAR</button>
                         <span className={styles.timeBlock}>
                             <p>PEDIDO POR:</p>
                             <input
@@ -262,6 +288,12 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
                     </>
                 )}
             </span>
+            {errorMsg && (
+                <span className={styles.errorBlock}>
+                    <p className={styles.errorText}>⚠️ {errorMsg}</p>
+                    <button type="button" className={styles.errorDismiss} onClick={() => setErrorMsg('')}>✕</button>
+                </span>
+            )}
         </div>
     );
 }
