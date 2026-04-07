@@ -1,4 +1,4 @@
-.ql-container{
+.ql-container {
   border: #2B2B2B 1px solid !important;
   border-left: none !important;
   border-right: none !important;
@@ -6,23 +6,27 @@
   height: calc(100vh - 120px);
   overflow: auto;
 }
-.ql-toolbar{
+
+.ql-toolbar {
   border: none !important;
   outline: none;
 }
+
 .ql-editor {
-    font-size: 20px;
-    border: none !important;
-    font-family: "Arial", sans-serif;
+  font-size: 30px;
+  border: none !important;
+  font-family: "Arial", sans-serif;
 }
-.conversionButtonBlock{
+
+.conversionButtonBlock {
   position: fixed;
   width: 60%;
   display: inline-flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: end;
 }
-.conversionButtonBlock button{
+
+.conversionButtonBlock button {
   height: 40px;
   border-radius: 4px;
   width: 40px;

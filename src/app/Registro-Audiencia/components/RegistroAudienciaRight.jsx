@@ -20,7 +20,7 @@ function extractNames(obj) {
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
-    const {updateDataDeep, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
+    const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -50,18 +50,18 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
             setResuelvo(modelosMinuta[modeloSelector].resuelvo.replace(/\n/g, '<br>'));
         }
     }
-    const updateDataAud = async() =>{
+    const updateDataAud = async() => {
         setGuardando(true)
         if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-            await updateDataDeep(dateToUse, item.id, 'resuelvoText', resuelvo);
+            await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
             setResuelvo2(resuelvo);
         }
         if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-            await updateDataDeep(dateToUse, item.id, 'minuta', minuta);
+            await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
             setMinuta2(minuta);
         }
         if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
-            await updateDataDeep(dateToUse, item.id, 'cierre', cierre);
+            await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
             setCierre2(cierre);
         }        
         if (checkForResuelvo(item)) {

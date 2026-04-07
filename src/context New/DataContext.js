@@ -17,6 +17,7 @@ import { yearFunction } from "@/utils/dateUtils";
 import { updateInternalFieldJuicio } from "@/firebase new/firestore/updateInternalFieldJuicio";
 import replaceDocument from "@/firebase new/firestore/replaceDocument";
 import { updateInternalUALData } from "@/firebase new/firestore/updateInternalUALData";
+import { updateDocumentOnly } from "@/firebase new/firestore/updateDocumentOnly";
 
 export const DataContext = createContext({});
 
@@ -157,6 +158,15 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const updateDataDeep = async (date, audId, property, newValue) => {
         try {
             await updateDocumentField(date, audId, property, newValue)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    // Solo escribe en audiencias, NO sincroniza con audienciasView
+    // Usar para: stopwatch, stopwatchStart, resuelvoText, minuta, cierre
+    const updateDataOnly = async (date, audId, property, newValue) => {
+        try {
+            await updateDocumentOnly(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
@@ -426,7 +436,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
-        updateSolicitudesPendientes, removeSolicitudPendiente,
+        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes
     };

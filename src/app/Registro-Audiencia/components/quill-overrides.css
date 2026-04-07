@@ -1,0 +1,51 @@
+/* Estilos globales de ReactQuill — NO es un CSS Module */
+
+.ql-container {
+  border: #2B2B2B 1px solid !important;
+  border-left: none !important;
+  border-right: none !important;
+  outline: none;
+  height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+.ql-toolbar {
+  border: none !important;
+  outline: none;
+}
+
+.ql-editor {
+  font-size: 20px;
+  border: none !important;
+  font-family: "Arial", sans-serif;
+}
+
+/* Iconos del toolbar — tema oscuro */
+.ql-toolbar .ql-stroke {
+  stroke: #ccc;
+}
+.ql-toolbar .ql-fill {
+  fill: #ccc;
+}
+.ql-toolbar .ql-picker {
+  color: #ccc;
+}
+.ql-toolbar button:hover .ql-stroke,
+.ql-toolbar .ql-picker-label:hover .ql-stroke {
+  stroke: #fff;
+}
+.ql-toolbar button:hover .ql-fill,
+.ql-toolbar .ql-picker-label:hover .ql-fill {
+  fill: #fff;
+}
+.ql-toolbar .ql-picker-options {
+  background: #1f1f1f;
+  color: #ccc;
+  border-color: #3c3c3c;
+}
+.ql-toolbar .ql-active .ql-stroke {
+  stroke: #fff;
+}
+.ql-toolbar .ql-active .ql-fill {
+  fill: #fff;
+}

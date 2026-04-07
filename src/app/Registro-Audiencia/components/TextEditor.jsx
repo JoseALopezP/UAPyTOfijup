@@ -12,6 +12,18 @@ export default function TextEditor({ textValue, setTextValue }) {
       setEditor(instance);
     }
   }, []);
+  // Fix: los botones de la toolbar de Quill no tienen type="button",
+  // dentro de un <form> los trata como type="submit" y disparan el submit.
+  useEffect(() => {
+    if (editor) {
+      const toolbar = editor.getModule('toolbar');
+      if (toolbar && toolbar.container) {
+        toolbar.container.querySelectorAll('button').forEach(btn => {
+          btn.setAttribute('type', 'button');
+        });
+      }
+    }
+  }, [editor]);
   useEffect(() => {
     if (editor && textValue !== undefined) {
       const current = editor.root.innerHTML;
@@ -50,7 +62,6 @@ export default function TextEditor({ textValue, setTextValue }) {
       </div>
       <ReactQuill
         ref={quillRef}
-        value={textValue}
         onChange={handleChange}
       />
     </div>

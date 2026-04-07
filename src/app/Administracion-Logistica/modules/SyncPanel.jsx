@@ -18,10 +18,6 @@ const SYNCED_FIELDS = [
     'mpf', 'ufi', 'defensa', 'imputado', 'partes',
     // Tipo y reconversión
     'tipo', 'tipo2', 'tipo3', 'reconvertida',
-    // Contenido de la audiencia
-    'resuelvoText', 'minuta', 'cierre',
-    // Cronómetro
-    'stopwatch', 'stopwatchStart',
     // Situación corporal
     'situacion',
     // Otros

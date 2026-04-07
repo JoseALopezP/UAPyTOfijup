@@ -16,7 +16,7 @@ const translateColor = {
 };
 
 export default function Cronometro({ item, dateToUse, isHovered }) {
-    const { updateData, pushToAudienciaArray, updateByDate } = useContext(DataContext);
+    const { updateData, updateDataOnly, pushToAudienciaArray, updateByDate } = useContext(DataContext);
     const [estadoActual, setEstadoActual] = useState(item.estado);
     const [prevColor, setPrevColor] = useState(translateColor[item.estado] || '#6c757d');
     const [newColor, setNewColor] = useState(translateColor[item.estado] || '#6c757d');
@@ -68,22 +68,19 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
     };
 
     const stopwatch = async () => {
-        const current = Date.now() - timeStampStart;
-        const sum = stopwatchAccum + current;
         if (stopwatchRunning) {
             const now = Date.now();
             const elapsed = now - timeStampStart;
-
             const newAccum = stopwatchAccum + elapsed;
             setStopwatchAccum(newAccum);
-            await updateData(dateToUse, item.id, 'stopwatch', newAccum);
-            await updateData(dateToUse, item.id, 'stopwatchStart', 0);
+            await updateDataOnly(dateToUse, item.id, 'stopwatch', newAccum);
+            await updateDataOnly(dateToUse, item.id, 'stopwatchStart', 0);
             setStopwatchCurrent(0);
             setStopwatchRunning(false);
         } else {
             const now = Date.now();
             setTimeStampStart(now);
-            await updateData(dateToUse, item.id, 'stopwatchStart', now);
+            await updateDataOnly(dateToUse, item.id, 'stopwatchStart', now);
             setStopwatchRunning(true);
         }
     };
