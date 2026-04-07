@@ -73,7 +73,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
 
             const newAccum = stopwatchAccum + elapsed;
             setStopwatchAccum(newAccum);
-            await updateData(dateToUse, item.is, 'stopwatch', newAccum);
+            await updateData(dateToUse, item.id, 'stopwatch', newAccum);
             await updateData(dateToUse, item.id, 'stopwatchStart', 0);
             setStopwatchCurrent(0);
             setStopwatchRunning(false);
@@ -96,8 +96,8 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
         setGuardando(true);
 
         if (newState === 'RESUELVO') {
-            await updateData(dateToUse, id, 'resuelvo', updateRealTimeFunction());
-            await pushToAudienciaArray(dateToUse, item, 'hitos', `${updateRealTimeFunction()} | ${newState}`);
+            await updateData(dateToUse, item.id, 'resuelvo', updateRealTimeFunction());
+            await pushToAudienciaArray(dateToUse, item.id, 'hitos', `${updateRealTimeFunction()} | ${newState}`);
         } else {
             if (newState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
             if (estadoActual === 'EN_CURSO' && newState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
@@ -106,7 +106,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
                 ? `${updateRealTimeFunction()} | ${newState} | ${pedido || 0} | ${pidiente || "juez"}`
                 : `${updateRealTimeFunction()} | ${newState}`;
 
-            await pushtToArray(dateToUse, item.numeroLeg, item.hora, entry);
+            await pushToAudienciaArray(dateToUse, item.id, 'hitos', entry);
             setCuartoShow(false);
         }
 
