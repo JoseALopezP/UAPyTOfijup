@@ -315,6 +315,44 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             </option>
                         ))}
                     </datalist>
+                    <div className={`${styles.inputLeftColumn}`}>
+                        {imputado.length > 0 && imputado.map(el => {
+                            const isSelected = Array.isArray(mpf[index].representa) &&
+                                               mpf[index].representa.some(item => item.id === el.id);
+
+                            return (
+                                <span
+                                    key={`imp-${el.id}`}
+                                    className={
+                                        isSelected
+                                        ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
+                                        : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
+                                    }
+                                    onClick={() => handleInputChange(setMpf, index, "representa", { id: el.id, nombre: el.nombre }, true)}
+                                >
+                                    {el.nombre}
+                                </span>
+                            );
+                        })}
+                        {partes && partes.length > 0 && partes.filter(p => p.role === 'Denunciante').map(el => {
+                            const isSelected = Array.isArray(mpf[index].representa) &&
+                                               mpf[index].representa.some(item => item.id === el.id);
+
+                            return (
+                                <span
+                                    key={`part-${el.id}`}
+                                    className={
+                                        isSelected
+                                        ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
+                                        : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
+                                    }
+                                    onClick={() => handleInputChange(setMpf, index, "representa", { id: el.id, nombre: el.name }, true)}
+                                >
+                                    {el.name} (Denunciante)
+                                </span>
+                            );
+                        })}
+                    </div>
                     <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
                         {input.asistencia ?  'PRE' : 'AUS'}
                     </button>
@@ -324,7 +362,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
                 </div>
             ))}
-            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', asistencia: true, presencial: true }, 'f', mpfCounter)}>+ FISCAL</button></span>
+            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true }, 'f', mpfCounter)}>+ FISCAL</button></span>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
@@ -472,6 +510,46 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             </datalist>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
+                            {input.role !== 'Querella' && (
+                                <div className={`${styles.inputLeftColumn}`}>
+                                    {imputado.length > 0 && imputado.map(el => {
+                                        const isSelected = Array.isArray(partes[index].representa) &&
+                                            partes[index].representa.some(item => item.id === el.id);
+
+                                        return (
+                                            <span
+                                            key={`imp-${el.id}`}
+                                            className={
+                                                isSelected
+                                                ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
+                                                : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
+                                            }
+                                            onClick={() => handleInputChange(setPartes, index, "representa", { id: el.id, nombre: el.nombre }, true)}
+                                            >
+                                            {el.nombre}
+                                            </span>
+                                        );
+                                    })}
+                                    {partes && partes.length > 0 && partes.filter(p => p.role === 'Denunciante').map(el => {
+                                        const isSelected = Array.isArray(partes[index].representa) &&
+                                            partes[index].representa.some(item => item.id === el.id);
+
+                                        return (
+                                            <span
+                                            key={`part-${el.id}`}
+                                            className={
+                                                isSelected
+                                                ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
+                                                : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
+                                            }
+                                            onClick={() => handleInputChange(setPartes, index, "representa", { id: el.id, nombre: el.name }, true)}
+                                            >
+                                            {el.name} (Denunciante)
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            )}
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FIS' : 'VIR'}
@@ -479,7 +557,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', asistencia: true, presencial: true }, 'p', partesCounter)}>+ PARTE</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p', partesCounter)}>+ PARTE</button></span>
             {(item.hora && item.hitos && checkHoraDiff() > 5) &&
                 <>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>

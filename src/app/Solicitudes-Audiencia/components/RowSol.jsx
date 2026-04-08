@@ -1169,43 +1169,67 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                 });
                                             }
 
-                                            const res = await fetch('/api/agendar-puppeteer', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({
-                                                    solicitud: { ...data, ...savedData },
-                                                    documentosBase64: documentosBase64,
-                                                    action: 'notificar-solo'
-                                                })
-                                            });
+                                            const bodyData = {
+                                                solicitud: { ...data, ...savedData },
+                                                documentosBase64: documentosBase64,
+                                                action: 'notificar-solo'
+                                            };
 
-                                            if (!res.body) throw new Error("No response body");
-                                            const reader = res.body.getReader();
-                                            const decoder = new TextDecoder();
-                                            let done = false;
-
-                                            while (!done) {
-                                                const { value, done: doneRead } = await reader.read();
-                                                done = doneRead;
-                                                const chunk = decoder.decode(value);
-                                                const lines = chunk.split('\n');
-                                                for (const line of lines) {
-                                                    if (line.startsWith('data: ')) {
-                                                        const parsed = JSON.parse(line.substring(6));
-                                                        if (parsed.type === 'progress') setNotifStatus(parsed.message);
-                                                        if (parsed.type === 'error') throw new Error(parsed.error);
-                                                        if (parsed.type === 'done') {
-                                                            setNotifStatus('✓ Notificaciones enviadas con éxito.');
-                                                            const nuevasNotifs = notificaciones.map(n => {
-                                                                const key = n.parts.join('|') + n.option;
-                                                                // Si fue enviada en este lote, marcar como notificada
-                                                                if (documentosBase64.some(d => d.localKey === key)) {
-                                                                    return { ...n, notificada: true };
-                                                                }
-                                                                return n;
-                                                            });
-                                                            setNotificaciones(nuevasNotifs);
-                                                            await addSolicitudData(rowKey, { ...data, ...savedData, notificaciones: nuevasNotifs });
+                                            if (typeof window !== 'undefined' && window.electronAPI) {
+                                                window.electronAPI.removeAllListeners('agendar-puppeteer-progress');
+                                                window.electronAPI.on('agendar-puppeteer-progress', (event, parsed) => {
+                                                    if (parsed.type === 'progress') setNotifStatus(parsed.message);
+                                                });
+                                                
+                                                const result = await window.electronAPI.invoke('agendar-puppeteer', bodyData);
+                                                if (!result.success) throw new Error(result.error);
+                                                
+                                                setNotifStatus('✓ Notificaciones enviadas con éxito.');
+                                                const nuevasNotifs = notificaciones.map(n => {
+                                                    const key = n.parts.join('|') + n.option;
+                                                    // Si fue enviada en este lote, marcar como notificada
+                                                    if (documentosBase64.some(d => d.localKey === key)) {
+                                                        return { ...n, notificada: true };
+                                                    }
+                                                    return n;
+                                                });
+                                                setNotificaciones(nuevasNotifs);
+                                                await addSolicitudData(rowKey, { ...data, ...savedData, notificaciones: nuevasNotifs });
+                                            } else {
+                                                const res = await fetch('/api/agendar-puppeteer', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify(bodyData)
+                                                });
+    
+                                                if (!res.body) throw new Error("No response body");
+                                                const reader = res.body.getReader();
+                                                const decoder = new TextDecoder();
+                                                let done = false;
+    
+                                                while (!done) {
+                                                    const { value, done: doneRead } = await reader.read();
+                                                    done = doneRead;
+                                                    const chunk = decoder.decode(value);
+                                                    const lines = chunk.split('\n');
+                                                    for (const line of lines) {
+                                                        if (line.startsWith('data: ')) {
+                                                            const parsed = JSON.parse(line.substring(6));
+                                                            if (parsed.type === 'progress') setNotifStatus(parsed.message);
+                                                            if (parsed.type === 'error') throw new Error(parsed.error);
+                                                            if (parsed.type === 'done') {
+                                                                setNotifStatus('✓ Notificaciones enviadas con éxito.');
+                                                                const nuevasNotifs = notificaciones.map(n => {
+                                                                    const key = n.parts.join('|') + n.option;
+                                                                    // Si fue enviada en este lote, marcar como notificada
+                                                                    if (documentosBase64.some(d => d.localKey === key)) {
+                                                                        return { ...n, notificada: true };
+                                                                    }
+                                                                    return n;
+                                                                });
+                                                                setNotificaciones(nuevasNotifs);
+                                                                await addSolicitudData(rowKey, { ...data, ...savedData, notificaciones: nuevasNotifs });
+                                                            }
                                                         }
                                                     }
                                                 }

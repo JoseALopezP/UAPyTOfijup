@@ -33,6 +33,29 @@ export function listDefensa(arr) {
     return aux;
 }
 
+export function listRepresentantes(arr, rolText) {
+    let aux = '';
+    arr && arr.forEach((el, i) => {
+        const representados = (el.representa && el.representa.length > 0)
+            ? el.representa
+                .map((p, idx) => {
+                    if (idx === 0) return p.nombre.split(',').join('');
+                    if (idx === el.representa.length - 1) return ` y ${p.nombre.split(',').join('')}`;
+                    return `, ${p.nombre.split(',').join('')}`;
+                })
+                .join('')
+            : '';
+            
+        const rol = rolText || el.role || el.tipo || 'Parte'; 
+        const name = el.name || el.nombre || '';
+        
+        aux += `${rol}: ${name} ${representados ? `(En representación de ${representados})` : ''
+            } ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'
+            }${arr.length !== i + 1 ? '\n' : ''}`;
+    });
+    return aux;
+}
+
 export function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {

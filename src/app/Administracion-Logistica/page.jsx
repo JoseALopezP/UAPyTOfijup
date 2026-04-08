@@ -8,6 +8,7 @@ import ImportantDates from './modules/ImportantDates';
 import BloqueoMasivo from './modules/BloqueoMasivo';
 import MigrationPanel from './modules/MigrationPanel';
 import SyncPanel from './modules/SyncPanel';
+import PatchAudienceData from './modules/PatchAudienceData';
 
 export default function page() {
   return (
@@ -31,6 +32,9 @@ export default function page() {
           </div>
           <div className={`${styles.container}`}>
             <SyncPanel />
+          </div>
+          <div className={`${styles.container}`}>
+            <PatchAudienceData />
           </div>
           {/*<div className={`${styles.container}`}>
             <button className={`${styles.button}`} onClick={() => renameDocument()}>POR FAVOR NO TOCAR</button>

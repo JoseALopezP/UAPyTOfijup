@@ -40,49 +40,74 @@ export default function HeaderSolicitudes() {
 
             const existingData = Array.isArray(solicitudesPendientes) ? solicitudesPendientes : [];
 
-            const response = await fetch('/api/extraer-solicitudes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ existingData, tiposAudiencia: desplegables?.tiposPuma || [] }),
-            });
+            const bodyData = { existingData, tiposAudiencia: desplegables?.tiposPuma || [] };
 
-            if (!response.body) throw new Error("No readable stream");
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                window.electronAPI.removeAllListeners('extraer-solicitudes-progress');
+                window.electronAPI.on('extraer-solicitudes-progress', (event, parsed) => {
+                    if (parsed.type === 'progress') setSyncStatus(parsed.message);
+                    else if (parsed.type === 'error') setSyncStatus(`Error: ${parsed.error}`);
+                });
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder("utf-8");
-            let buffer = '';
+                const result = await window.electronAPI.invoke('extraer-solicitudes', bodyData);
+                if (!result.success) throw new Error(result.error);
 
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop();
-
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    try {
-                        const parsed = JSON.parse(line);
-                        if (parsed.type === 'progress') {
-                            setSyncStatus(parsed.message);
-                        } else if (parsed.type === 'done') {
-                            const newItems = parsed.data || [];
-                            console.log(`[ui] Guardando ${newItems.length} solicitudes nuevas en Firestore...`);
-                            setSyncStatus(`Guardando ${newItems.length} solicitudes...`);
-                            for (const item of newItems) {
-                                const rowKey = item.linkSol
-                                    ? item.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
-                                    : `${item.numeroLeg}_${item.fyhcreacion}`;
-                                await addSolicitudData(rowKey, item);
+                const newItems = result.data || [];
+                console.log(`[ui] Guardando ${newItems.length} solicitudes nuevas en Firestore...`);
+                setSyncStatus(`Guardando ${newItems.length} solicitudes...`);
+                for (const item of newItems) {
+                    const rowKey = item.linkSol
+                        ? item.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
+                        : `${item.numeroLeg}_${item.fyhcreacion}`;
+                    await addSolicitudData(rowKey, item);
+                }
+                setSyncStatus(`✓ ${newItems.length} solicitudes guardadas.`);
+                console.log("[ui] Guardado completo.");
+            } else {
+                const response = await fetch('/api/extraer-solicitudes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData),
+                });
+    
+                if (!response.body) throw new Error("No readable stream");
+    
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = '';
+    
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+    
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const parsed = JSON.parse(line);
+                            if (parsed.type === 'progress') {
+                                setSyncStatus(parsed.message);
+                            } else if (parsed.type === 'done') {
+                                const newItems = parsed.data || [];
+                                console.log(`[ui] Guardando ${newItems.length} solicitudes nuevas en Firestore...`);
+                                setSyncStatus(`Guardando ${newItems.length} solicitudes...`);
+                                for (const item of newItems) {
+                                    const rowKey = item.linkSol
+                                        ? item.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
+                                        : `${item.numeroLeg}_${item.fyhcreacion}`;
+                                    await addSolicitudData(rowKey, item);
+                                }
+                                setSyncStatus(`✓ ${newItems.length} solicitudes guardadas.`);
+                                console.log("[ui] Guardado completo.");
+                            } else if (parsed.type === 'error') {
+                                setSyncStatus(`Error: ${parsed.error}`);
                             }
-                            setSyncStatus(`✓ ${newItems.length} solicitudes guardadas.`);
-                            console.log("[ui] Guardado completo.");
-                        } else if (parsed.type === 'error') {
-                            setSyncStatus(`Error: ${parsed.error}`);
+                        } catch (e) {
+                            console.error("Error parseando chunk JSON:", e, line);
                         }
-                    } catch (e) {
-                        console.error("Error parseando chunk JSON:", e, line);
                     }
                 }
             }
@@ -238,88 +263,119 @@ export default function HeaderSolicitudes() {
                 }
 
                 try {
-                    // Llamar a la API
                     setSyncStatus(`Agendando ${i+1}/${aProcesar.length}: Conectando con PUMA...`);
-                    const response = await fetch('/api/agendar-puppeteer', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            solicitud: item,
-                            documentosBase64: documentosBase64,
-                            action: item.convertirJurisdiccional ? 'convertir-jurisdiccional' : (item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : 'agendar')),
-                            convertirJurisdiccionalTipo: item.convertirJurisdiccionalTipo || '',
-                            convertirJurisdiccionalMotivo: item.convertirJurisdiccionalMotivo || '',
-                            reconversionMotivo: item.reconversionMotivo || ''
-                        })
-                    });
+                    const bodyData = {
+                        solicitud: item,
+                        documentosBase64: documentosBase64,
+                        action: item.convertirJurisdiccional ? 'convertir-jurisdiccional' : (item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : 'agendar')),
+                        convertirJurisdiccionalTipo: item.convertirJurisdiccionalTipo || '',
+                        convertirJurisdiccionalMotivo: item.convertirJurisdiccionalMotivo || '',
+                        reconversionMotivo: item.reconversionMotivo || ''
+                    };
 
-                    if (!response.body) throw new Error("No readable stream");
+                    const procesarFinalizado = async (parsedData) => {
+                        const actionDone = item.convertirJurisdiccional ? 'Convertido a Jurisdiccional' : (item.cancelar ? 'Cancelado' : (item.reprogramar ? 'Reprogramado' : 'Agendado'));
+                        setSyncStatus(`${actionDone} ${i+1}/${aProcesar.length}: Finalizado con éxito.`);
+                        
+                        const nuevasNotifs = (item.notificaciones || []).map(n => {
+                            const key = n.parts.join('|') + n.option;
+                            if (documentosBase64.some(d => d.localKey === key)) {
+                                return { ...n, notificada: true };
+                            }
+                            return n;
+                        });
 
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8");
-                    let bufferText = '';
+                        let finalFechaAudiencia = item.fechaAudiencia;
+                        let finalHoraAudiencia = item.horaAudiencia;
+                        
+                        if (item.convertirJurisdiccional) {
+                            const now = new Date();
+                            finalFechaAudiencia = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                            finalHoraAudiencia = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                        }
 
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) break;
+                        await addSolicitudData(item.rowKey, { 
+                            ...item, 
+                            agendada: item.cancelar ? false : true, 
+                            fechaAudiencia: finalFechaAudiencia,
+                            horaAudiencia: finalHoraAudiencia,
+                            agendar: false, 
+                            reprogramar: false, 
+                            cancelar: false,
+                            convertirJurisdiccional: false,
+                            documentosSubidos: true, 
+                            agendadaError: null, 
+                            urlAgendamiento: parsedData?.url,
+                            notificaciones: nuevasNotifs 
+                        });
+                        return { finalFechaAudiencia, finalHoraAudiencia };
+                    };
 
-                        bufferText += decoder.decode(value, { stream: true });
-                        const lines = bufferText.split('\n');
-                        bufferText = lines.pop();
+                    const procesarError = async (parsedError) => {
+                        console.error(`Error de agendamiento: ${parsedError}`);
+                        if (parsedError.documentosSubidos || parsedError.includes('documentosSubidos: true')) {
+                            await addSolicitudData(item.rowKey, { ...item, agendadaError: parsedError, documentosSubidos: true });
+                        } else {
+                            await addSolicitudData(item.rowKey, { ...item, agendadaError: parsedError });
+                        }
+                        throw new Error(parsedError);
+                    };
 
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                try {
-                                    const parsed = JSON.parse(line.substring(6));
-                                    if (parsed.type === 'progress') {
-                                        setSyncStatus(`Ag. ${i+1}/${aProcesar.length}: ${parsed.message}`);
-                                    } else if (parsed.type === 'error') {
-                                        // Marcar error (y tal vez guardar documentosSubidos si falló después de subirlos)
-                                        console.error(`Error de agendamiento: ${parsed.error}`);
-                                        if (parsed.documentosSubidos) {
-                                            await addSolicitudData(item.rowKey, { ...item, agendadaError: parsed.error, documentosSubidos: true });
-                                        } else {
-                                            await addSolicitudData(item.rowKey, { ...item, agendadaError: parsed.error });
+                    let finalFechas = null;
+
+                    if (typeof window !== 'undefined' && window.electronAPI) {
+                        window.electronAPI.removeAllListeners('agendar-puppeteer-progress');
+                        window.electronAPI.on('agendar-puppeteer-progress', (event, parsed) => {
+                            if (parsed.type === 'progress') setSyncStatus(`Ag. ${i+1}/${aProcesar.length}: ${parsed.message}`);
+                        });
+                        
+                        const result = await window.electronAPI.invoke('agendar-puppeteer', bodyData);
+                        if (!result.success) await procesarError(result.error);
+                        else finalFechas = await procesarFinalizado(result.resultado);
+                    } else {
+                        // Llamar a la API
+                        const response = await fetch('/api/agendar-puppeteer', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(bodyData)
+                        });
+    
+                        if (!response.body) throw new Error("No readable stream");
+    
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder("utf-8");
+                        let bufferText = '';
+    
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            if (done) break;
+    
+                            bufferText += decoder.decode(value, { stream: true });
+                            const lines = bufferText.split('\n');
+                            bufferText = lines.pop();
+    
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const parsed = JSON.parse(line.substring(6));
+                                        if (parsed.type === 'progress') {
+                                            setSyncStatus(`Ag. ${i+1}/${aProcesar.length}: ${parsed.message}`);
+                                        } else if (parsed.type === 'error') {
+                                            await procesarError(parsed.error);
+                                        } else if (parsed.type === 'done') {
+                                            finalFechas = await procesarFinalizado(parsed.data);
                                         }
-                                        throw new Error(parsed.error);
-                                    } else if (parsed.type === 'done') {
-                                        const actionDone = item.convertirJurisdiccional ? 'Convertido a Jurisdiccional' : (item.cancelar ? 'Cancelado' : (item.reprogramar ? 'Reprogramado' : 'Agendado'));
-                                        setSyncStatus(`${actionDone} ${i+1}/${aProcesar.length}: Finalizado con éxito.`);
-                                        
-                                        const nuevasNotifs = (item.notificaciones || []).map(n => {
-                                            const key = n.parts.join('|') + n.option;
-                                            if (documentosBase64.some(d => d.localKey === key)) {
-                                                return { ...n, notificada: true };
-                                            }
-                                            return n;
-                                        });
+                                    } catch (e) {
+                                        console.error("Error parseando data SSE", e);
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                                        let finalFechaAudiencia = item.fechaAudiencia;
-                                        let finalHoraAudiencia = item.horaAudiencia;
-                                        
-                                        if (item.convertirJurisdiccional) {
-                                            const now = new Date();
-                                            finalFechaAudiencia = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
-                                            finalHoraAudiencia = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                                        }
-
-                                        await addSolicitudData(item.rowKey, { 
-                                            ...item, 
-                                            agendada: item.cancelar ? false : true, 
-                                            fechaAudiencia: finalFechaAudiencia,
-                                            horaAudiencia: finalHoraAudiencia,
-                                            agendar: false, 
-                                            reprogramar: false, 
-                                            cancelar: false,
-                                            convertirJurisdiccional: false,
-                                            documentosSubidos: true, 
-                                            agendadaError: null, 
-                                            urlAgendamiento: parsed.data?.url,
-                                            notificaciones: nuevasNotifs 
-                                        });
-                                        
-                                        // AGREGAR LA AUDIENCIA A FIRESTORE
-                                        if (addAudiencia) {
+                    // AGREGAR LA AUDIENCIA A FIRESTORE
+                    if (finalFechas) {
+                        const { finalFechaAudiencia, finalHoraAudiencia } = finalFechas;
                                             const horaAudienciaStr = finalHoraAudiencia || '';
                                             let horaInicioStr = '00:00';
                                             let minutosInicio = 0;
@@ -439,13 +495,6 @@ export default function HeaderSolicitudes() {
                                             // Llenado si fDate es distinto? asumo fDate va bien
                                             await addAudiencia(dataObj, fDate);
                                         }
-                                    }
-                                } catch (e) {
-                                    console.error("Error parseando data SSE", e);
-                                }
-                            }
-                        }
-                        }
                     } catch (e) {
                         console.error("Error en el stream de agendamiento:", e);
                     }

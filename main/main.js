@@ -1,7 +1,13 @@
-import { app, BrowserWindow, globalShortcut } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
 import serve from 'electron-serve';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import fs from 'fs/promises';
+import os from 'os';
+
+// Dynamically import required puppeteer modules from the Next.js src folder
+import { agendarAudiencia } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
+import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +49,81 @@ const createWindow = () => {
 
 app.on("ready", () => {
   createWindow();
+
+  // ------ IPC Handlers for Puppeteer Scripts ------
+
+  ipcMain.handle('agendar-puppeteer', async (event, body) => {
+    const sendEvent = (data) => {
+      event.sender.send('agendar-puppeteer-progress', data);
+    };
+    const onProgress = (msg) => {
+      sendEvent({ type: 'progress', message: msg });
+    };
+
+    const tmpFilesToClean = [];
+    try {
+      const { linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentosBase64, action } = body;
+      
+      let documentos = [];
+      if (documentosBase64 && Array.isArray(documentosBase64)) {
+        sendEvent({ type: 'progress', message: `Procesando ${documentosBase64.length} documentos temporales...` });
+        for (const doc of documentosBase64) {
+          try {
+            const base64Data = doc.base64.replace(/^data:application\/[\w.-]+;base64,/, "");
+            const buffer = Buffer.from(base64Data, 'base64');
+            const safeDesc = (doc.descripcion || 'documento').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const tmpPath = path.join(os.tmpdir(), `notificacion_${Date.now()}_${safeDesc}.pdf`);
+            await fs.writeFile(tmpPath, buffer);
+            tmpFilesToClean.push(tmpPath);
+            documentos.push({ path: tmpPath, descripcion: doc.descripcion || 'Notificacion' });
+          } catch (err) {
+            console.error("Error decodificando dcoumento", err);
+            sendEvent({ type: 'progress', message: `⚠️ Error procesando documento: ${doc.descripcion}` });
+          }
+        }
+      }
+
+      sendEvent({ type: 'progress', message: 'Iniciando agendamiento con Puppeteer local...' });
+      
+      const resultado = await agendarAudiencia({
+        linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentos, action, ...body
+      }, onProgress);
+
+      sendEvent({ type: 'done', data: resultado });
+      return { success: true, resultado };
+    } catch (error) {
+      console.error('Error in agendar-puppeteer IPC:', error);
+      sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    } finally {
+      for (const tmpP of tmpFilesToClean) {
+        try { await fs.unlink(tmpP); } catch(e) {}
+      }
+    }
+  });
+
+  ipcMain.handle('extraer-solicitudes', async (event, body) => {
+    const sendEvent = (data) => {
+      event.sender.send('extraer-solicitudes-progress', data);
+    };
+    const onProgress = (msg) => {
+      sendEvent({ type: 'progress', message: msg });
+    };
+
+    try {
+      const { existingData, tiposAudiencia } = body;
+      sendEvent({ type: 'progress', message: 'Extraer: Inicializando Puppeteer...' });
+      
+      const result = await extraerSolicitudes(existingData || [], onProgress, tiposAudiencia || []);
+      
+      sendEvent({ type: 'done', data: result });
+      return { success: true, data: result };
+    } catch (error) {
+      console.error('Error in extraer-solicitudes IPC:', error);
+      sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
 });
 
 app.on("window-all-closed", () => {
