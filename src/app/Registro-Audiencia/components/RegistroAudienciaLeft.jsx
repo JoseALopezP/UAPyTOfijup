@@ -10,6 +10,7 @@ import deepEqual from '@/utils/deepEqual';
 import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
 import { nameTranslate } from '@/utils/traductorNombres';
+import { RepresentationSelector } from './RepresentationSelector';
 
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
@@ -315,44 +316,11 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             </option>
                         ))}
                     </datalist>
-                    <div className={`${styles.inputLeftColumn}`}>
-                        {imputado.length > 0 && imputado.map(el => {
-                            const isSelected = Array.isArray(mpf[index].representa) &&
-                                               mpf[index].representa.some(item => item.id === el.id);
-
-                            return (
-                                <span
-                                    key={`imp-${el.id}`}
-                                    className={
-                                        isSelected
-                                        ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
-                                        : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
-                                    }
-                                    onClick={() => handleInputChange(setMpf, index, "representa", { id: el.id, nombre: el.nombre }, true)}
-                                >
-                                    {el.nombre}
-                                </span>
-                            );
-                        })}
-                        {partes && partes.length > 0 && partes.filter(p => p.role === 'Denunciante').map(el => {
-                            const isSelected = Array.isArray(mpf[index].representa) &&
-                                               mpf[index].representa.some(item => item.id === el.id);
-
-                            return (
-                                <span
-                                    key={`part-${el.id}`}
-                                    className={
-                                        isSelected
-                                        ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
-                                        : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
-                                    }
-                                    onClick={() => handleInputChange(setMpf, index, "representa", { id: el.id, nombre: el.name }, true)}
-                                >
-                                    {el.name} (Denunciante)
-                                </span>
-                            );
-                        })}
-                    </div>
+                    <RepresentationSelector 
+                        selectedItems={mpf[index].representa} 
+                        availableItems={[...imputado, ...partes.filter(p => p.role === 'Denunciante')]}
+                        onUpdate={(newItems) => handleInputChange(setMpf, index, "representa", newItems)}
+                    />
                     <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
                         {input.asistencia ?  'PRE' : 'AUS'}
                     </button>
@@ -468,26 +436,11 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                     </>
                                 )
                             )}
-                            <div className={`${styles.inputLeftColumn}`}>
-                            {imputado.length > 0 && imputado.map(el => {
-                            const isSelected = Array.isArray(defensa[index].imputado) &&
-                                defensa[index].imputado.some(item => item.id === el.id); // check by id
-
-                            return (
-                                <span
-                                key={el.id}
-                                className={
-                                    isSelected
-                                    ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
-                                    : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
-                                }
-                                onClick={() => handleInputChange(setDefensa, index, "imputado", { id: el.id, nombre: el.nombre }, true)}
-                                >
-                                {el.nombre}
-                                </span>
-                            );
-                            })}
-                            </div>
+                            <RepresentationSelector 
+                                selectedItems={defensa[index].imputado} 
+                                availableItems={imputado}
+                                onUpdate={(newItems) => handleInputChange(setDefensa, index, "imputado", newItems)}
+                            />
                             <button className={`${styles.inputLeft} ${styles.inputLeft40}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRESENTE' : 'AUSENTE'}</button>
                             <button className={`${styles.inputLeft} ${styles.inputLeft40}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FISICAMENTE' : 'VIRTUALMENTE'}
@@ -510,46 +463,11 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             </datalist>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
-                            {input.role !== 'Querella' && (
-                                <div className={`${styles.inputLeftColumn}`}>
-                                    {imputado.length > 0 && imputado.map(el => {
-                                        const isSelected = Array.isArray(partes[index].representa) &&
-                                            partes[index].representa.some(item => item.id === el.id);
-
-                                        return (
-                                            <span
-                                            key={`imp-${el.id}`}
-                                            className={
-                                                isSelected
-                                                ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
-                                                : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
-                                            }
-                                            onClick={() => handleInputChange(setPartes, index, "representa", { id: el.id, nombre: el.nombre }, true)}
-                                            >
-                                            {el.nombre}
-                                            </span>
-                                        );
-                                    })}
-                                    {partes && partes.length > 0 && partes.filter(p => p.role === 'Denunciante').map(el => {
-                                        const isSelected = Array.isArray(partes[index].representa) &&
-                                            partes[index].representa.some(item => item.id === el.id);
-
-                                        return (
-                                            <span
-                                            key={`part-${el.id}`}
-                                            className={
-                                                isSelected
-                                                ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftSelected}`
-                                                : `${styles.inputLeft} ${styles.inputLeft100} ${styles.inputLeftDeSelected}`
-                                            }
-                                            onClick={() => handleInputChange(setPartes, index, "representa", { id: el.id, nombre: el.name }, true)}
-                                            >
-                                            {el.name} (Denunciante)
-                                            </span>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            <RepresentationSelector 
+                                    selectedItems={partes[index].representa} 
+                                    availableItems={[...imputado, ...partes.filter(p => p.role === 'Denunciante')]}
+                                    onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
+                                />
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FIS' : 'VIR'}

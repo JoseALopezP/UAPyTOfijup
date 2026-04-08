@@ -71,15 +71,36 @@ export function listImputado(arr) {
 export function listPartes(arr) {
     let groupedRoles = {};
     arr?.forEach(el => {
-        if (!groupedRoles[el.role]) {
-            groupedRoles[el.role] = [];
+        const roleName = el.role || 'Parte';
+        if (!groupedRoles[roleName]) {
+            groupedRoles[roleName] = [];
         }
-        let personInfo = el.name ? el.name : '';
+
+        const representados = (el.representa && el.representa.length > 0)
+            ? el.representa
+                .map((p, idx) => {
+                    const pName = p.nombre || p.name || '';
+                    if (idx === 0) return pName.split(',').join('');
+                    if (idx === el.representa.length - 1) return ` y ${pName.split(',').join('')}`;
+                    return `, ${pName.split(',').join('')}`;
+                })
+                .join('')
+            : '';
+
+        let personInfo = el.name ? el.name : (el.nombre ? el.nombre : '');
+        
+        if (representados) {
+            personInfo += ` (En representación de ${representados})`;
+        }
+
         if (el.dni) {
-            personInfo += ` D.N.I. N.°:${el.dni} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}`;
+            personInfo += ` D.N.I. N.°: ${el.dni}`;
         }
+
+        personInfo += ` ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}`;
+
         if (personInfo.trim() !== '') {
-            groupedRoles[el.role].push(personInfo);
+            groupedRoles[roleName].push(personInfo.trim());
         }
     });
     return groupedRoles;
@@ -98,7 +119,7 @@ Juez Interviniente: ${capitalizeFirst(item.juez.toLowerCase())}
 ${item.mpf && listFiscal(item.mpf, item.ufi)}
 ${listDefensa(item.defensa)}
 ${listImputado(item.imputado)}
-${listPartes(item.partes)}
+${Object.entries(listPartes(item.partes)).map(([role, people]) => `${role}: ${people.join(', ')}`).join('\n')}
 Operador: ${item.operador}
 
 Fundamentos y Resolución: ${removeHtmlTags(item.resuelvoText)}
@@ -193,7 +214,7 @@ export async function generateOficioSection(item, date, traslado = '', oficiados
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
-    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? item.partes.map(el => ` ${el.role}: ${el.name}.`).join(' ') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
+    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
         `+ traslado : ''}
     Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);
