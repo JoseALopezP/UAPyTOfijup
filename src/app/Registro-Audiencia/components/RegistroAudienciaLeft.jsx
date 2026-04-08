@@ -318,7 +318,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     </datalist>
                     <RepresentationSelector 
                         selectedItems={mpf[index].representa} 
-                        availableItems={[...imputado, ...partes.filter(p => p.role === 'Denunciante')]}
+                        availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
                         onUpdate={(newItems) => handleInputChange(setMpf, index, "representa", newItems)}
                     />
                     <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
@@ -438,7 +438,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             )}
                             <RepresentationSelector 
                                 selectedItems={defensa[index].imputado} 
-                                availableItems={imputado}
+                                availableItems={Array.isArray(imputado) ? imputado : []}
                                 onUpdate={(newItems) => handleInputChange(setDefensa, index, "imputado", newItems)}
                             />
                             <button className={`${styles.inputLeft} ${styles.inputLeft40}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRESENTE' : 'AUSENTE'}</button>
@@ -463,9 +463,9 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             </datalist>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre"/>
                             <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni"/>
-                            <RepresentationSelector 
+                                <RepresentationSelector 
                                     selectedItems={partes[index].representa} 
-                                    availableItems={[...imputado, ...partes.filter(p => p.role === 'Denunciante')]}
+                                    availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
                                     onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
                                 />
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
