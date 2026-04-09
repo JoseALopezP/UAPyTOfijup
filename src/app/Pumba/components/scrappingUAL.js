@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { getBrowserPath } from '../../../utils/browserPath.js';
 
 const width = 1280;
 const height = 720;
@@ -10,6 +11,7 @@ async function initBrowser() {
     if (browser && (await browser.pages()).length > 0) return;
     browser = await puppeteer.launch({
         headless: false,
+        executablePath: getBrowserPath(),
         args: [`--window-size=${width},${height}`, '--no-sandbox', '--disable-setuid-sandbox'],
         defaultViewport: {
             width: width,
@@ -252,6 +254,7 @@ async function goToAgenda(fechaStr, pageInstance) {
 async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLinks, onProgressChunk) {
     const browserInstance = await puppeteer.launch({
         headless: true,
+        executablePath: getBrowserPath(),
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
 

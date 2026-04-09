@@ -14,6 +14,7 @@ export default function page() {
     const handleSave = (newDate) => {
         setDate(newDate);
         localStorage.setItem('dateToUse', newDate);
+        setSelectedAud(null);
     };
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -25,8 +26,8 @@ export default function page() {
       <AuthContextProvider>
         <DataContextProvider>
           <div className={styles.container}>
-            {date && <AudienciasListBlock audFunction={setSelectedAud} dateFunction={handleSave} dateToUse={date} setShowList={setShowList} showList={showList}/>}
-            {selectedAud && <OficioBlock dateToUse={date} aud={selectedAud} showList={showList}/>}
+            {date && <AudienciasListBlock key={`list-${date}`} audFunction={setSelectedAud} dateFunction={handleSave} dateToUse={date} setShowList={setShowList} showList={showList}/>}
+            {selectedAud && <OficioBlock key={`oficio-${selectedAud.id || selectedAud.numeroLeg+selectedAud.hora}`} dateToUse={date} aud={selectedAud} showList={showList}/>}
           </div>
         </DataContextProvider>
       </AuthContextProvider>

@@ -7,9 +7,9 @@ import styles from "../SolicitudesAudiencia.module.css"
 
 export default function SolicitudesBlock() {
     return (
-        <container className={styles.containerSol}>
+        <div className={styles.containerSol}>
             <HeaderSolicitudes />
             <TableSol />
-        </container>
+        </div>
     )
 }

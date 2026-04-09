@@ -403,6 +403,11 @@
     resize: none;
     line-height: 1.45;
     text-align: center;
+    /* Explicitly ensure selectability in production */
+    pointer-events: auto !important;
+    user-select: text !important;
+    position: relative;
+    z-index: 1;
 }
 
 .inputCell:focus {

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, Menu } from 'electron';
 import serve from 'electron-serve';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -8,6 +8,7 @@ import os from 'os';
 // Dynamically import required puppeteer modules from the Next.js src folder
 import { agendarAudiencia } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
 import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
+import { getInfoAudiencia } from '../src/app/Pumba/components/scrappingUAL.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,14 +21,71 @@ let mainWindow;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
     autoHideMenuBar: true,
     devTools: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       enableRemoteModule: false,
+    }
+  });
+
+  const template = [
+    {
+      label: 'Archivo',
+      submenu: [
+        { label: 'Salir', role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edición',
+      submenu: [
+        { label: 'Deshacer', role: 'undo' },
+        { label: 'Rehacer', role: 'redo' },
+        { type: 'separator' },
+        { label: 'Cortar', role: 'cut' },
+        { label: 'Copiar', role: 'copy' },
+        { label: 'Pegar', role: 'paste' },
+        { label: 'Eliminar', role: 'delete' },
+        { type: 'separator' },
+        { label: 'Seleccionar todo', role: 'selectAll' }
+      ]
+    },
+    {
+      label: 'Vista',
+      submenu: [
+        { label: 'Recargar', role: 'reload' },
+        { label: 'Forzar recarga', role: 'forceReload' },
+        { label: 'Herramientas de desarrollo', role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
+  mainWindow.webContents.on('context-menu', (e, props) => {
+    const { isEditable } = props;
+    if (isEditable) {
+      const contextMenu = Menu.buildFromTemplate([
+        { label: 'Deshacer', role: 'undo' },
+        { label: 'Rehacer', role: 'redo' },
+        { type: 'separator' },
+        { label: 'Cortar', role: 'cut' },
+        { label: 'Copiar', role: 'copy' },
+        { label: 'Pegar', role: 'paste' },
+        { type: 'separator' },
+        { label: 'Seleccionar todo', role: 'selectAll' }
+      ]);
+      contextMenu.popup(mainWindow);
     }
   });
 
@@ -120,6 +178,37 @@ app.on("ready", () => {
       return { success: true, data: result };
     } catch (error) {
       console.error('Error in extraer-solicitudes IPC:', error);
+      sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+  
+  ipcMain.handle('scrape-pumba', async (event, { dia }) => {
+    const sendEvent = (data) => {
+      event.sender.send('scrape-pumba-progress', data);
+    };
+    const onProgress = (progress, current, total) => {
+      sendEvent({
+        type: 'progress',
+        progress,
+        current,
+        total,
+        message: `Procesando ${current} de ${total}...`
+      });
+    };
+
+    try {
+      console.log(`[IPC] Iniciando scrape-pumba para día: ${dia}`);
+      const resultados = await getInfoAudiencia(dia, onProgress);
+      
+      sendEvent({
+        type: 'complete',
+        data: resultados,
+        progress: 100
+      });
+      return { success: true, data: resultados };
+    } catch (error) {
+      console.error('Error in scrape-pumba IPC:', error);
       sendEvent({ type: 'error', error: error.message });
       return { success: false, error: error.message };
     }

@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { getBrowserPath } from '../../../utils/browserPath.js';
 
 const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
 const BROWSER_COUNT = 4;
@@ -26,6 +27,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
 
     const browser = await puppeteer.launch({
         headless: true,
+        executablePath: getBrowserPath(),
         args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox"],
         defaultViewport: { width: 1280, height: 720 },
     });

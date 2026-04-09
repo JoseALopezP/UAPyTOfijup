@@ -15,7 +15,7 @@ export function AddAudienciaBlock() {
     const { user } = useAuthContext()
     const dateFunction = (value) =>{
         setDateToUse(value)
-        updateByDate(dateToUse)
+        updateByDate(value)
     }
     useEffect(() => {
         updateDesplegables()
@@ -25,8 +25,8 @@ export function AddAudienciaBlock() {
       }, [user])
     return(
         <section className={`${styles.addAudienciaBlock}`}>
-            <AddAudienciaForm dateFunction={dateFunction} date={dateToUse}/>
-            <AddAudienciaList date={dateToUse}/>
+            <AddAudienciaForm key={`form-${dateToUse}`} dateFunction={dateFunction} date={dateToUse}/>
+            <AddAudienciaList key={`list-${dateToUse}`} date={dateToUse}/>
         </section>
     )
 }

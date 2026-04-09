@@ -41,32 +41,63 @@ export default function HeaderPumba({ setDateToUse, autofillB, setAutofillB }) {
         setProgress(0);
 
         try {
-            const eventSource = new EventSource(`/api/scrape-audiencias?dia=${fechaScrap}`);
-            eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'progress') {
-                    setProgress(data.progress);
-                    console.log(data.message);
-                } else if (data.type === 'complete') {
-                    eventSource.close();
-                    setLoading(false);
-                    setProgress(100);
-                    console.log('Datos scrapeados:', data.data.length);
-                    addPumaData(fechaScrap, data.data);
-                } else if (data.type === 'error') {
-                    eventSource.close();
-                    setLoading(false);
-                    setError(data.error);
-                    alert('Error: ' + data.error);
-                }
-            };
+            // Check if running in Electron
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                console.log('[ui] Iniciando scraping Pumba vía IPC...');
+                
+                // Set up progress listener
+                window.electronAPI.removeAllListeners('scrape-pumba-progress');
+                window.electronAPI.on('scrape-pumba-progress', (event, data) => {
+                    if (data.type === 'progress') {
+                        setProgress(data.progress);
+                        console.log(data.message);
+                    } else if (data.type === 'complete') {
+                        setLoading(false);
+                        setProgress(100);
+                        console.log('Datos scrapeados:', data.data.length);
+                        addPumaData(fechaScrap, data.data);
+                    } else if (data.type === 'error') {
+                        setLoading(false);
+                        setError(data.error);
+                        alert('Error: ' + data.error);
+                    }
+                });
 
-            eventSource.onerror = (error) => {
-                console.error('Error en EventSource:', error);
-                eventSource.close();
-                setLoading(false);
-                setError('Error de conexión con el servidor');
-            };
+                // Trigger scraping
+                const result = await window.electronAPI.invoke('scrape-pumba', { dia: fechaScrap });
+                if (!result.success) {
+                    setError(result.error);
+                    setLoading(false);
+                }
+            } else {
+                // Fallback to fetch/EventSource for web development
+                const eventSource = new EventSource(`/api/scrape-audiencias?dia=${fechaScrap}`);
+                eventSource.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'progress') {
+                        setProgress(data.progress);
+                        console.log(data.message);
+                    } else if (data.type === 'complete') {
+                        eventSource.close();
+                        setLoading(false);
+                        setProgress(100);
+                        console.log('Datos scrapeados:', data.data.length);
+                        addPumaData(fechaScrap, data.data);
+                    } else if (data.type === 'error') {
+                        eventSource.close();
+                        setLoading(false);
+                        setError(data.error);
+                        alert('Error: ' + data.error);
+                    }
+                };
+
+                eventSource.onerror = (error) => {
+                    console.error('Error en EventSource:', error);
+                    eventSource.close();
+                    setLoading(false);
+                    setError('Error de conexión con el servidor');
+                };
+            }
 
         } catch (err) {
             console.error('Error:', err);

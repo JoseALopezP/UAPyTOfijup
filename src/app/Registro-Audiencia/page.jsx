@@ -22,6 +22,8 @@ export default function Page() {
     const handleSave = (newDate) => {
         setDate(newDate);
         localStorage.setItem('dateToUse', newDate);
+        setSelectedAud(null);
+        setFullSelectedAud(null);
     };
 
     useEffect(() => {
@@ -58,8 +60,8 @@ export default function Page() {
     return (
         <AuthContextProvider><DataContextProvider>
         <div className={[styles.container]}>
-            {date && <RegistroAudienciaList needsSaving1={needsSaving1} needsSaving2={needsSaving2} dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && (selectedAud.id || selectedAud.numeroLeg+selectedAud.hora)} setIsHovered={setIsHovered} isHovered={isHovered}/>}
-            <RegistroAudienciaControl aud={fullSelectedAud} dateToUse={date} isHovered={isHovered} setNeedsSaving1={setNeedsSaving1} setNeedsSaving2={setNeedsSaving2}/>
+            {date && <RegistroAudienciaList key={`list-${date}`} needsSaving1={needsSaving1} needsSaving2={needsSaving2} dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && (selectedAud.id || selectedAud.numeroLeg+selectedAud.hora)} setIsHovered={setIsHovered} isHovered={isHovered}/>}
+            {fullSelectedAud && <RegistroAudienciaControl key={`control-${fullSelectedAud.id || fullSelectedAud.numeroLeg+fullSelectedAud.hora}`} aud={fullSelectedAud} dateToUse={date} isHovered={isHovered} setNeedsSaving1={setNeedsSaving1} setNeedsSaving2={setNeedsSaving2}/>}
         </div>
         </DataContextProvider></AuthContextProvider>
     );

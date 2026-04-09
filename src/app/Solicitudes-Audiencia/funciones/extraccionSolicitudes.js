@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { getBrowserPath } from '../../../utils/browserPath.js';
 import { extraerDetalles } from './extraccionDetalles.js';
 
 const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
@@ -23,6 +24,7 @@ export async function extraerSolicitudes(existingData = [], onProgress, tiposAud
 
     const browser = await puppeteer.launch({
         headless: false,
+        executablePath: getBrowserPath(),
         args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox"],
         defaultViewport: { width: 1280, height: 720 },
     });

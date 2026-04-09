@@ -1,28 +1,25 @@
-import { getFirestore, collection, getDocs, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import firebase_app from "../../firebase/config";
 
 const db = getFirestore(firebase_app);
 
 export default async function renameDocument() {
-  const oldParentId = "06.1082025";
-  const newParentId = "06082025";
-  const subcollectionName = "audiencias";
+  const oldDocumentId = "08042026";
+  const newDocumentId = "09042026";
+  const collectionName = "audienciasView";
 
-  const oldSubColRef = collection(db, "audiencias", oldParentId, subcollectionName);
-  const newSubColPath = collection(db, "audiencias", newParentId, subcollectionName);
+  const oldDocRef = doc(db, collectionName, oldDocumentId);
+  const newDocRef = doc(db, collectionName, newDocumentId);
 
-  const snapshot = await getDocs(oldSubColRef);
+  const docSnap = await getDoc(oldDocRef);
 
-  if (snapshot.empty) {
-    console.log("La subcolección original no tiene documentos.");
+  if (!docSnap.exists()) {
+    console.log(`El documento original ${oldDocumentId} no existe en ${collectionName}.`);
     return;
   }
 
-  for (const docSnap of snapshot.docs) {
-    const data = docSnap.data();
-    const newDocRef = doc(newSubColPath, docSnap.id);
-    await setDoc(newDocRef, data);
-  }
+  const data = docSnap.data();
+  await setDoc(newDocRef, data);
 
-  console.log(`Subcolección '${subcollectionName}' copiada de ${oldParentId} a ${newParentId}`);
+  console.log(`Documento '${oldDocumentId}' copiado a '${newDocumentId}' en la colección '${collectionName}'`);
 }

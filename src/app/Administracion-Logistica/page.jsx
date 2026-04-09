@@ -9,6 +9,7 @@ import BloqueoMasivo from './modules/BloqueoMasivo';
 import MigrationPanel from './modules/MigrationPanel';
 import SyncPanel from './modules/SyncPanel';
 import PatchAudienceData from './modules/PatchAudienceData';
+import renameDocument from '@/firebase new/firestore/renameDocument';
 
 export default function page() {
   return (
@@ -36,9 +37,9 @@ export default function page() {
           <div className={`${styles.container}`}>
             <PatchAudienceData />
           </div>
-          {/*<div className={`${styles.container}`}>
+          <div className={`${styles.container}`}>
             <button className={`${styles.button}`} onClick={() => renameDocument()}>POR FAVOR NO TOCAR</button>
-          </div>*/}
+          </div>
         </DataContextProvider>
       </AuthContextProvider>
     </>
