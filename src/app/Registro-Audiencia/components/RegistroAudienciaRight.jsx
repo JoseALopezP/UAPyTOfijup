@@ -41,13 +41,31 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         setCierre2(item.cierre || '');
         setIsInitialized(true);
     };
-    const insertarModelo = () =>{
-        if(minuta.replace(/<[^>]*>/g, '') !== '' || resuelvo.replace(/<[^>]*>/g, '') !== ''){
+    const insertarModelo = () => {
+        if (minuta.replace(/<[^>]*>/g, '').trim() !== '' || resuelvo.replace(/<[^>]*>/g, '').trim() !== '') {
             alert("Borre el contenido ya incluído antes de insertar un modelo")
-        }else{
+        } else {
+            const up = item.juez.toUpperCase().trim();
+            const isMale = (up.includes('DR.') || up.startsWith('DR ')) && !up.includes('DRA');
+
+            let cuerpo = modelosMinuta[modeloSelector].cuerpo;
+            let resuelvoText = modelosMinuta[modeloSelector].resuelvo;
+
+            // Función para reemplazar títulos respetando el género del juez actual
+            const fixGender = (text) => {
+                if (!text) return text;
+                return text
+                    .replace(/El Sr\. Juez/g, isMale ? "El Sr. Juez" : "La Sra. Jueza")
+                    .replace(/Sr\. Juez/g, isMale ? "Sr. Juez" : "Sra. Jueza")
+                    .replace(/La Sra\. Jueza/g, !isMale ? "La Sra. Jueza" : "El Sr. Juez")
+                    .replace(/Sra\. Jueza/g, !isMale ? "Sra. Jueza" : "Sr. Juez")
+                    .replace(/La Sra\. Juez/g, !isMale ? "La Sra. Jueza" : "El Sr. Juez") // Manejar variante detectada en Tramite_de_ejecucion
+                    .replace(/La Sra\. Jueza/g, isMale ? "El Sr. Juez" : "La Sra. Jueza"); // Doble check por si acaso
+            };
+
             setCierre(cierreModelo);
-            setMinuta(modelosMinuta[modeloSelector].cuerpo.replace(/\n/g, '<br>'));
-            setResuelvo(modelosMinuta[modeloSelector].resuelvo.replace(/\n/g, '<br>'));
+            setMinuta(fixGender(cuerpo).replace(/\n/g, '<br>'));
+            setResuelvo(fixGender(resuelvoText).replace(/\n/g, '<br>'));
         }
     }
     const updateDataAud = async() => {

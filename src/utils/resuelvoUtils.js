@@ -140,7 +140,8 @@ export function generateResuelvoSection(item, date) {
     if (item.juez.split('+').length > 1) {
         sections.push({ title: 'Tribunal Colegiado:', text: item.juez.split('+').map(j => capitalizeFirst(j.toLowerCase())).join('\n') });
     } else {
-        sections.push({ title: (item.juez.includes('DR.') || item.juez.includes('Dr.')) ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez.toLowerCase()) });
+        const isMale = (item.juez.toUpperCase().includes('DR.') || item.juez.toUpperCase().startsWith('DR ')) && !item.juez.toUpperCase().includes('DRA');
+        sections.push({ title: isMale ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez.toLowerCase()) });
     }
     if (item.mpf && item.mpf.length > 0) {
         let fiscales = [];
@@ -191,14 +192,25 @@ export function generateResuelvoSection(item, date) {
 
 function juecesPart(jueces) {
     let aux = '';
-    if (jueces.split('+').length > 1) {
+    const judgesList = jueces.split('+');
+    
+    const formatJudge = (name) => {
+        const up = name.toUpperCase().trim();
+        const isMale = (up.startsWith('DR.') || up.startsWith('DR ')) && !up.startsWith('DRA');
+        return isMale ? `Sr. Juez ${capitalizeFirst(name.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(name.toLowerCase())}`;
+    };
+
+    if (judgesList.length > 1) {
         aux = 'el Tribunal Colegiado compuesto por ';
-        jueces.split('+').forEach((juez, index) => {
-            aux += (juez.split('.')[0] === 'DR' || juez.split('.')[0] === 'Dr.') ? `Sr. Juez ${capitalizeFirst(juez.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(juez.toLowerCase())}`;
-            if (index < jueces.split('+').length - 1) aux += ', ';
+        judgesList.forEach((juez, index) => {
+            aux += formatJudge(juez);
+            if (index < judgesList.length - 1) {
+                if (index === judgesList.length - 2) aux += ' y ';
+                else aux += ', ';
+            }
         });
     } else {
-        aux = jueces.split('.')[0] === 'DR' || jueces.split('.')[0] === 'Dr.' ? `Sr. Juez ${capitalizeFirst(jueces.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(jueces.toLowerCase())}`;
+        aux = formatJudge(jueces);
     }
     return aux;
 }

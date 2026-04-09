@@ -77,9 +77,11 @@ function splitNormalBold(text) {
     }).filter(Boolean);
 }
 function resuelvoStructure(juez) {
+    const up = juez.toUpperCase().trim();
+    const isMale = (up.includes('DR.') || up.startsWith('DR ')) && !up.includes('DRA');
     if (juez.includes('+')) {
         return "<strong><br/>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
-    } else if (juez.includes('DR.')) {
+    } else if (isMale) {
         return "<strong><br/>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
     } else {
         return "<strong><br/>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
@@ -87,12 +89,12 @@ function resuelvoStructure(juez) {
 }
 function extractFundamento(text) {
     const regex = new RegExp(
-      `<strong>\\s*Fundamentos\\s*y\\s*Resoluci[oó]n\\s*:\\s*</strong>\\s*El\\s*(Tribunal\\s+Colegiado|Sr\\.?\\s+Juez|Sra\\.?\\s+Jueza)\\s*<strong>\\s*MOTIVA\\s*y\\s*RESUELVE\\s*</strong>`,
-      'gi'
+        `<strong>\\s*Fundamentos\\s*y\\s*Resoluci[oó]n\\s*:\\s*</strong>\\s*(El\\s+Tribunal\\s+Colegiado|El\\s+Sr\\.?\\s+Juez|La\\s+Sra\\.?\\s+Jueza)\\s*<strong>\\s*MOTIVA\\s*y\\s*RESUELVE\\s*</strong>`,
+        'gi'
     );
-  
+
     return text.replace(regex, '');
-  }
+}
   
   
 
