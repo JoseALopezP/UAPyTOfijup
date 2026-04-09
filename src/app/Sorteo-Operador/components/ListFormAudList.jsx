@@ -7,19 +7,25 @@ import { todayFunction } from '@/utils/dateUtils';
 export default function ListFormAudList({filtroValue,operadorFilled}) {
     const { updateByDate, bydate } = useContext(DataContext);
     const sortFunction = (a, b) => {
+        let cmp = 0;
         switch (filtroValue) {
             case 'OPERADOR':
-                return (!a.operador ? 1 : !b.operador ? -1 : a.operador.localeCompare(b.operador));
+                cmp = (!a.operador ? 1 : !b.operador ? -1 : a.operador.localeCompare(b.operador));
+                break;
             case 'HORA':
-                return (!a.hora ? 1 : !b.hora ? -1 : a.hora.localeCompare(b.hora));
+                cmp = (!a.hora ? 1 : !b.hora ? -1 : a.hora.localeCompare(b.hora));
+                break;
             case 'TIPO':
-                return (!a.tipo ? 1 : !b.tipo ? -1 : a.tipo.localeCompare(b.tipo));
+                cmp = (!a.tipo ? 1 : !b.tipo ? -1 : a.tipo.localeCompare(b.tipo));
+                break;
             case 'JUEZ':
-                return (!a.juez ? 1 : !b.juez ? -1 : a.juez.localeCompare(b.juez));
-            case 'DURACIÓN':
+                cmp = (!a.juez ? 1 : !b.juez ? -1 : a.juez.localeCompare(b.juez));
+                break;
             default:
-                return 0;
+                cmp = 0;
         }
+        if (cmp !== 0) return cmp;
+        return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
     };
     const filterFunction = (el) => {
         switch (operadorFilled) {

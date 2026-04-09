@@ -37,7 +37,12 @@ export default function TableBody({ date, filterValue }) {
         <>
             {todayFiltered &&
                 todayFiltered
-                    .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
+                    .sort((a, b) => {
+                        const timeA = a.hora.split(':').join('');
+                        const timeB = b.hora.split(':').join('');
+                        if (timeA !== timeB) return timeA - timeB;
+                        return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                    })
                     .map((el) => (
                         <TableIndiv item={el} date={date} key={el.numeroLeg} />
                     ))}

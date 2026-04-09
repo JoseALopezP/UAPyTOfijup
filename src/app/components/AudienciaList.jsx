@@ -25,7 +25,12 @@ export function AudienciaList() {
                         </tr>
                     </thead>
                     <tbody className={`${styles.tableBody}`}>
-                        {bydate && bydate.sort((a, b) => a - b).map(el =>
+                        {bydate && bydate.sort((a, b) => {
+                            const timeA = a.hora.split(':').join('');
+                            const timeB = b.hora.split(':').join('');
+                            if (timeA !== timeB) return timeA - timeB;
+                            return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                        }).map(el =>
                         (<tr key={el.numeroLeg + el.hora}>
                             <td>{el.hora}</td>
                             <td>SALA {el.sala}</td>

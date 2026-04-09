@@ -22,8 +22,13 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction, 
     return (
         <><div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>
-            <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={[styles.listadoBlock]}>{bydateView && Object.values(bydateView).sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join(''))).map(el =>(
-                <AudienciaRegistroIndiv key={el.id || el.numeroLeg + el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud===(el.id || el.numeroLeg+el.hora)} needsSaving1={needsSaving1} needsSaving2={needsSaving2}/>
+            <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={[styles.listadoBlock]}>{bydateView && Object.values(bydateView).sort((a, b) => {
+                const timeA = a.hora.split(':').join('');
+                const timeB = b.hora.split(':').join('');
+                if (timeA !== timeB) return timeA - timeB;
+                return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+            }).map(el => (
+                <AudienciaRegistroIndiv key={el.id || el.numeroLeg + el.hora} aud={el} audFunction={audFunction} selectedAud={selectedAud === (el.id || el.numeroLeg + el.hora)} needsSaving1={needsSaving1} needsSaving2={needsSaving2}/>
             ))}</div>
         </div>
         <div className={isHovered ? `${styles.expandBlock} ${styles.expandBlockHovered}` : `${styles.expandBlock}`}>

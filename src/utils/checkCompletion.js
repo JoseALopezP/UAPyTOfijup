@@ -24,9 +24,9 @@ export const checkCompletion = (aud) => {
   if (!aud.juez) {
     missingFields.push('juez');
   }
-  if (!aud.mpf) {
+/*  if (!aud.mpf) {
     missingFields.push('datos fiscalía');
-  }
+  }*/
   if (!aud.defensa) {
     missingFields.push('datos defensa');
   }

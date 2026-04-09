@@ -12,6 +12,11 @@ import EditHitos from './EditHitos';
 import { nameTranslate } from '@/utils/traductorNombres';
 import { RepresentationSelector } from './RepresentationSelector';
 
+const deepCopy = (obj) => {
+    if (obj === null || typeof obj !== 'object') return obj;
+    return JSON.parse(JSON.stringify(obj));
+};
+
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
@@ -40,7 +45,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const partesCounter = useRef(0);
 
     const checkUFI = () =>{
-        if((ufi == '' || ufi == null) && typeof mpf[0] === 'object' && mpf[0].nombre !== null){
+        if((ufi == '' || ufi == null) && mpf && mpf[0] && typeof mpf[0] === 'object' && mpf[0].nombre && mpf[0].nombre.includes(' - ')){
             setUfi(mpf[0].nombre.split(' - ')[1])
         }
     }
@@ -109,18 +114,26 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         removedSetter(prev => [...prev, items[index]]);
     };
     const updateComparisson = () => {
-        setMpf(item.mpf ? [...item.mpf] : []);
-        setMpf2(item.mpf ? [...item.mpf] : []);
-        setImputado(item.imputado ? [...item.imputado] : []);
-        setImputado2(item.imputado ? [...item.imputado] : []);
-        setDefensa(item.defensa ? [...item.defensa] : []);
-        setDefensa2(item.defensa ? [...item.defensa] : []);
+        const initialMpf = item.mpf ? deepCopy(item.mpf) : [];
+        setMpf(initialMpf);
+        setMpf2(deepCopy(initialMpf));
+
+        const initialImputado = item.imputado ? deepCopy(item.imputado) : [];
+        setImputado(initialImputado);
+        setImputado2(deepCopy(initialImputado));
+
+        const initialDefensa = item.defensa ? deepCopy(item.defensa) : [];
+        setDefensa(initialDefensa);
+        setDefensa2(deepCopy(initialDefensa));
+
+        const initialPartes = item.partes ? deepCopy(item.partes) : [];
+        setPartes(initialPartes);
+        setPartes2(deepCopy(initialPartes));
+
         setCaratula(item.caratula || '');
         setCaratula2(item.caratula || '');
         setSaeNum(item.saeNum || '');
         setSaeNum2(item.saeNum || '');
-        setPartes(item.partes ? [...item.partes] : []);
-        setPartes2(item.partes ? [...item.partes] : []);
         setRazonDemora(item.razonDemora || '');
         setRazonDemora2(item.razonDemora || '');
         setUfi(item.ufi || '');
@@ -219,21 +232,26 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setTipo3(tipo3Aux)
     }
     const checkGuardar = useCallback(() => {
-        const guardarStatus = !deepEqual(caratula2, caratula) ||
+        const normalize = (val) => (val === null || val === undefined ? '' : val);
+
+        const hasChanges = 
+            normalize(caratula2) !== normalize(caratula) ||
+            normalize(saeNum2) !== normalize(saeNum) ||
+            normalize(razonDemora2) !== normalize(razonDemora) ||
+            normalize(ufi2) !== normalize(ufi) ||
+            (showReconversion && (
+                normalize(tipoAux) !== normalize(tipo) ||
+                normalize(tipo2Aux) !== normalize(tipo2) ||
+                normalize(tipo3Aux) !== normalize(tipo3)
+            )) ||
             !deepEqual(mpf2, mpf) ||
-            !deepEqual(razonDemora2, razonDemora) ||
             !deepEqual(defensa2, defensa) ||
-            (showReconversion & !deepEqual(tipoAux, tipo)) ||
-            (showReconversion & !deepEqual(tipo2Aux, tipo2)) ||
-            (showReconversion & !deepEqual(tipo3Aux, tipo3)) ||
             !deepEqual(imputado2, imputado) ||
-            !deepEqual(partes2, partes) ||
-            !deepEqual(saeNum2, saeNum) ||
-            !deepEqual(ufi2, ufi);
+            !deepEqual(partes2, partes);
     
-        setGuardarInc(guardarStatus);
-        setNeedsSaving1(guardarStatus)
-    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo2, tipo, tipo3, showReconversion, saeNum, saeNum2]);
+        setGuardarInc(hasChanges);
+        setNeedsSaving1(hasChanges);
+    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, tipo, tipo2, tipo3, tipoAux, tipo2Aux, tipo3Aux, showReconversion, saeNum, saeNum2]);
     const operadorChange = (valueAux) =>{
         updateData(dateToUse, item.id, 'operador', valueAux)
         setOperadorAud(valueAux)
@@ -316,11 +334,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             </option>
                         ))}
                     </datalist>
-                    <RepresentationSelector 
-                        selectedItems={mpf[index].representa} 
-                        availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
-                        onUpdate={(newItems) => handleInputChange(setMpf, index, "representa", newItems)}
-                    />
                     <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
                         {input.asistencia ?  'PRE' : 'AUS'}
                     </button>

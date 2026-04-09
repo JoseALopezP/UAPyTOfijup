@@ -42,7 +42,9 @@ export default function BodyPumba({ dateToUse }) {
             .sort((a, b) => {
                 const timeA = a.inicioProgramada.split(':');
                 const timeB = b.inicioProgramada.split(':');
-                return (parseInt(timeA[0]) * 60 + parseInt(timeA[1])) - (parseInt(timeB[0]) * 60 + parseInt(timeB[1]));
+                const cmp = (parseInt(timeA[0]) * 60 + parseInt(timeA[1])) - (parseInt(timeB[0]) * 60 + parseInt(timeB[1]));
+                if (cmp !== 0) return cmp;
+                return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
             });
 
         const rowsText = sortedRows.map(audData => {
@@ -221,7 +223,13 @@ export default function BodyPumba({ dateToUse }) {
                     {pumaData && pumaData.filter(item => item.estado !== "CANCELADA"
                         && item.tipo !== "ANIVI" && item.tipo !== "DEBATE DEL JUICIO ORAL"
                         && item.tipo !== "PRESENTACIÓN"
-                        && item.tipo !== "FINALIZACIÓN").sort((a, b) => parseInt(a.inicioProgramada.split(':')[0]) * 60 + parseInt(a.inicioProgramada.split(':')[1]) - (parseInt(b.inicioProgramada.split(':')[0]) * 60 + parseInt(b.inicioProgramada.split(':')[1]))).map((item, index) => (
+                        && item.tipo !== "FINALIZACIÓN").sort((a, b) => {
+                            const timeA = a.inicioProgramada.split(':');
+                            const timeB = b.inicioProgramada.split(':');
+                            const cmp = (parseInt(timeA[0]) * 60 + parseInt(timeA[1])) - (parseInt(timeB[0]) * 60 + parseInt(timeB[1]));
+                            if (cmp !== 0) return cmp;
+                            return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                        }).map((item, index) => (
                             <TableRow
                                 key={index}
                                 audData={item}

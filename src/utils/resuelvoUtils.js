@@ -142,7 +142,7 @@ export function generateResuelvoSection(item, date) {
     } else {
         sections.push({ title: (item.juez.includes('DR.') || item.juez.includes('Dr.')) ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez.toLowerCase()) });
     }
-    if (item.mpf) {
+    if (item.mpf && item.mpf.length > 0) {
         let fiscales = [];
         listFiscal(item.mpf, item.ufi)
             .split('\n')
@@ -214,7 +214,7 @@ export async function generateOficioSection(item, date, traslado = '', oficiados
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
-    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ')} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
+    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
         `+ traslado : ''}
     Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);
@@ -230,5 +230,5 @@ export function copyResuelvoToClipboard(item, date) {
 }
 
 export function checkForResuelvo(item) {
-    return item.imputado && item.defensa && item.caratula && item.mpf && item.resuelvoText;
+    return item.imputado && item.defensa && item.caratula && item.resuelvoText;
 }

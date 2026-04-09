@@ -55,7 +55,12 @@ export function ScheduleTable({ filterValue }) {
                                     ((sentence.hora + ' ' + sentence.estado + ' ' + sentence.numeroLeg + ' ' + sentence.tipo + ' ' + sentence.tipo2 + ' ' + sentence.tipo3).toLowerCase().includes(word))
                                 )
                             )
-                            .sort((a, b) => a.hora.split(':').join('') - b.hora.split(':').join(''))
+                            .sort((a, b) => {
+                                const timeA = a.hora.split(':').join('');
+                                const timeB = b.hora.split(':').join('');
+                                if (timeA !== timeB) return timeA - timeB;
+                                return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                            })
                             .map((el) => {
                                 return (
                                     <tr key={el.numeroLeg + el.hora} className={`${styles["fila" + el.estado]}`}>

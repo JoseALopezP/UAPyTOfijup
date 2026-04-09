@@ -124,7 +124,12 @@ export default function TableSol() {
             const aVal = getFieldValue(a, sortKey).toLowerCase()
             const bVal = getFieldValue(b, sortKey).toLowerCase()
             const cmp = aVal.localeCompare(bVal)
-            return sortDir === 'asc' ? cmp : -cmp
+            if (cmp !== 0) return sortDir === 'asc' ? cmp : -cmp
+
+            // Secondary sort by numeroLeg for stability
+            const aLeg = String(a.numeroLeg || '')
+            const bLeg = String(b.numeroLeg || '')
+            return aLeg.localeCompare(bLeg)
         })
 
         return rows

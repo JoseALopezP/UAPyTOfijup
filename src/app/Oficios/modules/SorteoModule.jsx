@@ -22,11 +22,18 @@ export default function SorteoModule({date, arr}) {
         setListaSeleccionado(updatedSelectedList);
     };
     const handleAsignacion = async () => {
-        for (const [index, el] of arr.entries()) {
-            if(turno === true && parseInt(el.hora.split(':')[0], 10) < 14) {
+        const sortedArr = [...arr].sort((a, b) => {
+            const timeA = a.hora.split(':').join('');
+            const timeB = b.hora.split(':').join('');
+            if (timeA !== timeB) return timeA - timeB;
+            return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+        });
+
+        for (const [index, el] of sortedArr.entries()) {
+            if (turno === true && parseInt(el.hora.split(':')[0], 10) < 14) {
                 await updateData(date, el.id, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
-            if(turno === false && parseInt(el.hora.split(':')[0], 10) >= 14){
+            if (turno === false && parseInt(el.hora.split(':')[0], 10) >= 14) {
                 await updateData(date, el.id, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
         }

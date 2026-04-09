@@ -12,9 +12,14 @@ export function AddAudienciaList ({date}){
         <section className={`${styles.audienciaListSection}`}>
             <div className={`${styles.audienciaListTable}`}>
                 <AddAudienciaTableHead/>
-                {bydate && bydate.sort((a,b)=>(a.hora.split(':').join('') - b.hora.split(':').join(''))).map((el)=>{
-                    return(
-                        <AddAudienciaIndiv date={date} element={el} key={el.numeroLeg + el.hora}/>
+                {bydate && bydate.sort((a, b) => {
+                    const timeA = a.hora.split(':').join('');
+                    const timeB = b.hora.split(':').join('');
+                    if (timeA !== timeB) return timeA - timeB;
+                    return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                }).map((el) => {
+                    return (
+                        <AddAudienciaIndiv date={date} element={el} key={el.numeroLeg + el.hora} />
                     )
                 })}
             </div>

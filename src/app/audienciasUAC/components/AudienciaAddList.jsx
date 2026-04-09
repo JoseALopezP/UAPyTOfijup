@@ -38,7 +38,12 @@ export function AudienciaAddList() {
                 </div>
                 {bydateView && Object.values(bydateView)
                     .filter(el => el?.hora)
-                    .sort((a, b) => (a.hora.split(':').join('') - b.hora.split(':').join('')))
+                    .sort((a, b) => {
+                        const timeA = a.hora.split(':').join('');
+                        const timeB = b.hora.split(':').join('');
+                        if (timeA !== timeB) return timeA - timeB;
+                        return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                    })
                     .map(el => (
                         <AudienciaIndiv date={dateToUse} element={el} key={el.id || el.numeroLeg + el.hora} />
                     ))}
