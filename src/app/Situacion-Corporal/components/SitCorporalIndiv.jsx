@@ -15,7 +15,7 @@ export default function SitCorporalIndiv({aud, date, selected, selectedF}) {
         <div className={`${styles.sitCorporalIndivFirst}`} onClick={() => selectedF((selected !== aud.numeroLeg+aud.hora) && aud.numeroLeg+aud.hora)}>
             <span className={`${styles.sitIndivValue} ${styles.sitIndivHora}`}>{aud.hora}</span>
             <span className={`${styles.sitIndivValue} ${styles.sitIndivLeg}`}>{aud.numeroLeg}</span>
-            <span className={`${styles.sitIndivValue} ${styles.sitIndivJuez}`}>{aud.juez.split('+').join(' - ')}</span>
+            <span className={`${styles.sitIndivValue} ${styles.sitIndivJuez}`}>{aud.juez?.split('+')?.join(' - ') || ''}</span>
         </div>
         <span className={(aud.numeroLeg+aud.hora === selected) ? `${styles.sitCorporalIndivSecond}` : `${styles.sitCorporalIndivSecondHidden}`}>
             <textarea onChange={e => setSit(e.target.value)} value={sit} rows={2} className={`${styles.textAreaSituacion}`}/>

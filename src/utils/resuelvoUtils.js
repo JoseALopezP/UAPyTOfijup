@@ -8,7 +8,7 @@ import { todayFunction } from "./dateUtils";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre?.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -20,9 +20,9 @@ export function listDefensa(arr) {
         const imputados = (el.imputado && el.imputado.length > 0)
             ? el.imputado
                 .map((p, idx) => {
-                    if (idx === 0) return p.nombre.split(',').join('');
-                    if (idx === el.imputado.length - 1) return ` y ${p.nombre.split(',').join('')}`;
-                    return `, ${p.nombre.split(',').join('')}`;
+                    if (idx === 0) return p.nombre?.split(',').join('') || '';
+                    if (idx === el.imputado.length - 1) return ` y ${p.nombre?.split(',').join('') || ''}`;
+                    return `, ${p.nombre?.split(',').join('') || ''}`;
                 })
                 .join('')
             : '';
@@ -39,9 +39,9 @@ export function listRepresentantes(arr, rolText) {
         const representados = (el.representa && el.representa.length > 0)
             ? el.representa
                 .map((p, idx) => {
-                    if (idx === 0) return p.nombre.split(',').join('');
-                    if (idx === el.representa.length - 1) return ` y ${p.nombre.split(',').join('')}`;
-                    return `, ${p.nombre.split(',').join('')}`;
+                    if (idx === 0) return p.nombre?.split(',').join('') || '';
+                    if (idx === el.representa.length - 1) return ` y ${p.nombre?.split(',').join('') || ''}`;
+                    return `, ${p.nombre?.split(',').join('') || ''}`;
                 })
                 .join('')
             : '';
@@ -80,9 +80,9 @@ export function listPartes(arr) {
             ? el.representa
                 .map((p, idx) => {
                     const pName = p.nombre || p.name || '';
-                    if (idx === 0) return pName.split(',').join('');
-                    if (idx === el.representa.length - 1) return ` y ${pName.split(',').join('')}`;
-                    return `, ${pName.split(',').join('')}`;
+                    if (idx === 0) return pName?.split(',').join('') || '';
+                    if (idx === el.representa.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
+                    return `, ${pName?.split(',').join('') || ''}`;
                 })
                 .join('')
             : '';
@@ -114,7 +114,7 @@ Tipo de Audiencia: ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tip
 Legajo: N° ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} Caratulado ${item.caratula}
 Sala de Audiencias: ${item.sala}
 Hora programada: ${item.hora} horas
-Hora real de inicio: ${item.hitos[0].split(' | ')[0]} horas
+Hora real de inicio: ${item.hitos?.[0]?.split(' | ')[0] || ''} horas
 Juez Interviniente: ${capitalizeFirst(item.juez.toLowerCase())}
 ${item.mpf && listFiscal(item.mpf, item.ufi)}
 ${listDefensa(item.defensa)}
@@ -134,14 +134,14 @@ export function generateResuelvoSection(item, date) {
         { title: 'Legajo:', text: `N° ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} Caratulado ${item.caratula}.` },
         { title: 'Sala de Audiencias:', text: `${item.sala}.` },
         { title: 'Hora programada:', text: `${item.hora} horas.` },
-        { title: 'Hora real de inicio:', text: `${item.hitos[0].split(' | ')[0]} horas.` },
+        { title: 'Hora real de inicio:', text: `${item.hitos?.[0]?.split(' | ')[0] || ''} horas.` },
     ];
 
-    if (item.juez.split('+').length > 1) {
+    if (item.juez?.split('+').length > 1) {
         sections.push({ title: 'Tribunal Colegiado:', text: item.juez.split('+').map(j => capitalizeFirst(j.toLowerCase())).join('\n') });
     } else {
-        const isMale = (item.juez.toUpperCase().includes('DR.') || item.juez.toUpperCase().startsWith('DR ')) && !item.juez.toUpperCase().includes('DRA');
-        sections.push({ title: isMale ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez.toLowerCase()) });
+        const isMale = (item.juez?.toUpperCase().includes('DR.') || item.juez?.toUpperCase().startsWith('DR ')) && !item.juez?.toUpperCase().includes('DRA');
+        sections.push({ title: isMale ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez?.toLowerCase() || '') });
     }
     if (item.mpf && item.mpf.length > 0) {
         let fiscales = [];
@@ -192,7 +192,7 @@ export function generateResuelvoSection(item, date) {
 
 function juecesPart(jueces) {
     let aux = '';
-    const judgesList = jueces.split('+');
+    const judgesList = jueces?.split('+') || [];
     
     const formatJudge = (name) => {
         const up = name.toUpperCase().trim();
@@ -226,7 +226,7 @@ export async function generateOficioSection(item, date, traslado = '', oficiados
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
-    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre.split('-')[0]}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
+    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${el.nombre?.split('-')[0] || el.nombre}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${el.nombre}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
         `+ traslado : ''}
     Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);
