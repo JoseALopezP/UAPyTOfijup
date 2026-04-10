@@ -19,7 +19,7 @@ function extractNames(obj) {
     return Object.keys(obj);
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
-export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes }) {
+export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes, needsSaving, onGlobalSave, isSaving }) {
     const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
@@ -33,11 +33,8 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     const [reloadHistorial, setReloadHistorial] = useState(0);
     const [isInitialized, setIsInitialized] = useState(false);
     const updateComparisson = () => {
-        setResuelvo(item.resuelvoText || '');
         setResuelvo2(item.resuelvoText || '');
-        setMinuta(item.minuta || '');
         setMinuta2(item.minuta || '');
-        setCierre(item.cierre || '');
         setCierre2(item.cierre || '');
         setIsInitialized(true);
     };
@@ -155,11 +152,6 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
                 <button type='button' className={`${styles.buttonDownload2}`} onClick={() => handleDescargar2()}>DESCARGAR</button>
             </div>}
             <div className={`${styles.controlBlockRight}`}>
-            {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="button" id='submit-btn' onClick={handleSubmit}>
-                <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
-                <span className={`${styles.guardar}`}>GUARDAR</span>
-                <span className={`${styles.guardando}`}>GUARDANDO...</span>
-            </button>}
             <div className={`${styles.topBlockMinuta}`}>
                 <span className={`${styles.insertarModeloBlock}`} onClick={() => callUpdateModelosMinuta()}>
                 <select className={`${styles.inputLeft} ${styles.inputModelo}`}
@@ -186,7 +178,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
 
                 <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
-            <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
+            <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab} needsSaving={needsSaving} onSave={onGlobalSave} isSaving={isSaving}/>
             {selectedTab === 'Cuerpo minuta' &&
                 <TextEditor key={`minuta-${item.id}`} textValue={minuta} setTextValue={setMinuta}/>
             }{selectedTab === 'Resuelvo' &&

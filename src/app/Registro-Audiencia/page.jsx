@@ -61,7 +61,7 @@ export default function Page() {
         <AuthContextProvider><DataContextProvider>
         <div className={[styles.container]}>
             {date && <RegistroAudienciaList key={`list-${date}`} needsSaving1={needsSaving1} needsSaving2={needsSaving2} dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && (selectedAud.id || selectedAud.numeroLeg+selectedAud.hora)} setIsHovered={setIsHovered} isHovered={isHovered}/>}
-            {fullSelectedAud && <RegistroAudienciaControl key={`control-${fullSelectedAud.id || fullSelectedAud.numeroLeg+fullSelectedAud.hora}`} aud={fullSelectedAud} dateToUse={date} isHovered={isHovered} setNeedsSaving1={setNeedsSaving1} setNeedsSaving2={setNeedsSaving2}/>}
+            {fullSelectedAud && <RegistroAudienciaControl key={`control-${fullSelectedAud.id || fullSelectedAud.numeroLeg+fullSelectedAud.hora}`} aud={fullSelectedAud} dateToUse={date} isHovered={isHovered} setNeedsSaving1={setNeedsSaving1} setNeedsSaving2={setNeedsSaving2} needsSaving1={needsSaving1} needsSaving2={needsSaving2}/>}
         </div>
         </DataContextProvider></AuthContextProvider>
     );

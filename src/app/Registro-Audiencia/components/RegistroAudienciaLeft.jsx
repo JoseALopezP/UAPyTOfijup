@@ -17,7 +17,7 @@ const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj));
 };
 
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes }) {
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
@@ -39,6 +39,12 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const [removedPartes, setRemovedPartes] = useState([]);
     const [showEditHitos, setShowEditHitos] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [sectionsVisible, setSectionsVisible] = useState({
+        mpf: true,
+        imputados: true,
+        defensa: true,
+        partes: false
+    });
     const mpfCounter = useRef(0);
     const defensaCounter = useRef(0);
     const imputadoCounter = useRef(0);
@@ -114,38 +120,17 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         removedSetter(prev => [...prev, items[index]]);
     };
     const updateComparisson = () => {
-        const initialMpf = item.mpf ? deepCopy(item.mpf) : [];
-        setMpf(initialMpf);
-        setMpf2(deepCopy(initialMpf));
-
-        const initialImputado = item.imputado ? deepCopy(item.imputado) : [];
-        setImputado(initialImputado);
-        setImputado2(deepCopy(initialImputado));
-
-        const initialDefensa = item.defensa ? deepCopy(item.defensa) : [];
-        setDefensa(initialDefensa);
-        setDefensa2(deepCopy(initialDefensa));
-
-        const initialPartes = item.partes ? deepCopy(item.partes) : [];
-        setPartes(initialPartes);
-        setPartes2(deepCopy(initialPartes));
-
-        setCaratula(item.caratula || '');
+        setMpf2(item.mpf ? deepCopy(item.mpf) : []);
+        setImputado2(item.imputado ? deepCopy(item.imputado) : []);
+        setDefensa2(item.defensa ? deepCopy(item.defensa) : []);
+        setPartes2(item.partes ? deepCopy(item.partes) : []);
         setCaratula2(item.caratula || '');
-        setSaeNum(item.saeNum || '');
         setSaeNum2(item.saeNum || '');
-        setRazonDemora(item.razonDemora || '');
         setRazonDemora2(item.razonDemora || '');
-        setUfi(item.ufi || '');
         setUfi2(item.ufi || '');
-        setEstado(item.estado || '');
-        setTipo(item.tipo || '');
         setTipoAux(item.tipo || '');
-        setTipo2(item.tipo2 || '');
         setTipo2Aux(item.tipo2 || '');
-        setTipo3(item.tipo3 || '');
         setTipo3Aux(item.tipo3 || '');
-        setOperadorAud(item.operador || '')
         setIsInitialized(true);
     };
     
@@ -264,6 +249,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     useEffect(() => {
         checkUFI()
     }, [mpf])
+    const toggleSection = (section) => {
+        setSectionsVisible(prev => ({ ...prev, [section]: !prev[section] }));
+    };
+
     useEffect(() => {
     if (isInitialized) {
         checkGuardar();
@@ -283,11 +272,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     return (
         <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
             
-            {guardarInc && <button className={guardando ? `${styles.inputLeft} ${styles.guardarButton} ${styles.guardandoButton}` : `${styles.inputLeft} ${styles.guardarButton}`} type="submit" id='submit-btn' value="GUARDAR">
-                <span className={`${styles.sinGuardar}`}>CAMBIOS SIN GUARDAR</span>
-                <span className={`${styles.guardar}`}>GUARDAR</span>
-                <span className={`${styles.guardando}`}>GUARDANDO...</span>
-            </button>}
             {item.hitos &&
                 <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
                 <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -318,101 +302,123 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)}/></span>
             <button className={showReconversion ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButtonClicked}` : `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
             {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux}/> : ''}
-            <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
-            {mpf.map((input, index) => (
-                <div key={input.id} className={`${styles.inputRow}`}>
-                    <input
-                        list='mpf'
-                        className={`${styles.inputLeft} ${styles.inputTyped70}`}
-                        value={input.nombre}
-                        onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
-                    />
-                    <datalist id='mpf'>
-                        {desplegables.fiscal && desplegables.fiscal.map(option => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </datalist>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
-                        {input.asistencia ?  'PRE' : 'AUS'}
-                    </button>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setMpf, index, 'presencial', (!input.presencial))}>
-                        {input.presencial ?  'FIS' : 'VIR'}
-                    </button>
-                    <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
-                </div>
-            ))}
-            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true }, 'f', mpfCounter)}>+ FISCAL</button></span>
+            <div className={styles.sectionHeader} onClick={() => toggleSection('mpf')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
+                <span className={`${styles.chevron} ${sectionsVisible.mpf ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.mpf && (
+                <span className={`${styles.inputLeftColumn}`}>
+                    {mpf.map((input, index) => (
+                        <div key={input.id} className={`${styles.inputRow}`}>
+                            <input
+                                list='mpf'
+                                className={`${styles.inputLeft} ${styles.inputTyped70}`}
+                                value={input.nombre}
+                                onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
+                            />
+                            <datalist id='mpf'>
+                                {desplegables.fiscal && desplegables.fiscal.map(option => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </datalist>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
+                                {input.asistencia ?  'PRE' : 'AUS'}
+                            </button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setMpf, index, 'presencial', (!input.presencial))}>
+                                {input.presencial ?  'FIS' : 'VIR'}
+                            </button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
+                        </div>
+                    ))}
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true }, 'f', mpfCounter)}>+ FISCAL</button>
+                </span>
+            )}
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
                 <datalist id='ufi'>{desplegables.fiscal && desplegables.ufi.map(option => (
                         <option key={option} value={option}>{option}</option>
                     ))}</datalist></span>
-            <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Imputados</label>
-                {imputado.map((input, realIndex) => input.condenado ? null : (
-                    <><div key={input.id} className={`${styles.imputadoInput} ${styles.inputRow}`}>
-                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('imputados')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Imputados y Condenados</label>
+                <span className={`${styles.chevron} ${sectionsVisible.imputados ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.imputados && (
+                <span className={`${styles.inputLeftColumn}`}>
+                    {imputado.map((input, realIndex) => input.condenado ? null : (
+                        <div key={input.id}>
+                            <div className={`${styles.imputadoInput} ${styles.inputRow}`}>
+                                <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                                    type="text"
+                                    value={input.nombre}
+                                    onChange={(e) => updateImputado(input.id, { nombre: e.target.value })}
+                                    placeholder="Nombre"/>
+                                <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                                    type="text"
+                                    value={input.dni}
+                                    onChange={(e) => updateImputado(input.id, { dni: e.target.value })}
+                                    placeholder="DNI"/>
+                                <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
+                                    {input.presencial ?  'FIS' : 'VIR'}
+                                </button>
+                                <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
+                            </div>
+                            {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
+                            <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
                             type="text"
-                            value={input.nombre}
-                            onChange={(e) => updateImputado(input.id, { nombre: e.target.value })}
-                            placeholder="Nombre"/>
-                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                            value={input.detenido}
+                            onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
+                            placeholder="detenido en... 00/00/00"/>}
+                        </div>
+                    ))}
+                    <span className={styles.imputadoButtons}>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
+                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
+                            >+ IMPUTADO</button>
+                    </span>
+
+                    <label className={`${styles.inputLeftNameDColumn}`} style={{ marginTop: '10px' }}>Condenados</label>
+                    {imputado.map((input, realIndex) => !input.condenado ? null : (
+                        <div key={input.id}>
+                            <div className={`${styles.condenadoInput} ${styles.inputRow}`}>
+                                <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                                    type="text"
+                                    value={input.nombre}
+                                    onChange={(e) => handleInputChange(setImputado, realIndex, 'nombre', e.target.value)}
+                                    placeholder="Nombre"/>
+                                <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
+                                    type="text"
+                                    value={input.dni}
+                                    onChange={(e) => handleInputChange(setImputado, realIndex, 'dni', e.target.value)}
+                                    placeholder="DNI"/>
+                                <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
+                                    {input.presencial ?  'FIS' : 'VIR'}
+                                </button>
+                                <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
+                            </div>
+                            {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
+                            <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
                             type="text"
-                            value={input.dni}
-                            onChange={(e) => updateImputado(input.id, { dni: e.target.value })}
-                            placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
-                            {input.presencial ?  'FIS' : 'VIR'}
-                        </button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
-                    </div>
-                        {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
-                        <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
-                        type="text"
-                        value={input.detenido}
-                        onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
-                        placeholder="detenido en... 00/00/00"/>}
-                        </>
-                ))}
-                <span className={styles.imputadoButtons}>
+                            value={input.detenido}
+                            onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
+                            placeholder="detenido en... 00/00/00"/>}
+                        </div>
+                    ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                    onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
-                        >+ IMPUTADO</button>
-                </span></span>
-                <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Condenados</label></span>
-                {imputado.map((input, realIndex) => !input.condenado ? null : (
-                    <><div key={input.id} className={`${styles.condenadoInput} ${styles.inputRow}`}>
-                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
-                            type="text"
-                            value={input.nombre}
-                            onChange={(e) => handleInputChange(setImputado, realIndex, 'nombre', e.target.value)}
-                            placeholder="Nombre"/>
-                        <input className={`${styles.inputLeft} ${styles.inputTyped35}`}
-                            type="text"
-                            value={input.dni}
-                            onChange={(e) => handleInputChange(setImputado, realIndex, 'dni', e.target.value)}
-                            placeholder="DNI"/>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.asistencia ?  'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
-                            {input.presencial ?  'FIS' : 'VIR'}
-                        </button>
-                        <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF/></button>
-                    </div>
-                        {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
-                        <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
-                        type="text"
-                        value={input.detenido}
-                        onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
-                        placeholder="detenido en... 00/00/00"/>}
-                        </>
-                ))}
-                <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
+                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
                     >+ CONDENADO</button>
-                <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
+                </span>
+            )}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('defensa')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
+                <span className={`${styles.chevron} ${sectionsVisible.defensa ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.defensa && (
+                <span className={`${styles.inputLeftColumn}`}>
                     {defensa.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
                             <select className={`${styles.inputLeft} ${styles.inputTyped50} ${styles.dropDownSelect}`}
@@ -461,8 +467,15 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true }, 'd', defensaCounter)}>+ DEFENSA</button></span>
-                    <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true }, 'd', defensaCounter)}>+ DEFENSA</button>
+                </span>
+            )}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('partes')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
+                <span className={`${styles.chevron} ${sectionsVisible.partes ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.partes && (
+                <span className={`${styles.inputLeftColumn}`}>
                     {partes.map((input, index) => (
                         <div key={input.id}>
                             <input list='partesVarias'
@@ -488,7 +501,9 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p', partesCounter)}>+ PARTE</button></span>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p', partesCounter)}>+ PARTE</button>
+                </span>
+            )}
             {(item.hora && item.hitos && checkHoraDiff() > 5) &&
                 <>
                     <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
@@ -499,7 +514,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 </>
             }
             <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
-            <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered}/>
+            <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered} minuta={minuta} setMinuta={setMinuta}/>
         </form>
     );
 }

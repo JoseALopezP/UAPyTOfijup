@@ -15,8 +15,18 @@ const translateColor = {
     'RESUELVO': '#1F572B'
 };
 
-export default function Cronometro({ item, dateToUse, isHovered }) {
+export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinuta }) {
     const { updateData, updateDataOnly, pushToAudienciaArray, updateByDate } = useContext(DataContext);
+
+    const formatJudges = (j) => {
+        if (!j) return "";
+        return j.split('+').map(part =>
+            part.trim().split(' ').map(word => {
+                if (!word) return "";
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            }).join(' ')
+        ).join(' + ');
+    };
     const [estadoActual, setEstadoActual] = useState(item.estado);
     const [prevColor, setPrevColor] = useState(translateColor[item.estado] || '#6c757d');
     const [newColor, setNewColor] = useState(translateColor[item.estado] || '#6c757d');
@@ -26,7 +36,7 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
     const setNewStateAndRef = (val) => { setNewState(val); newStateRef.current = val; };
     const [cuartoShow, setCuartoShow] = useState(false);
     const [pidiente, setPidiente] = useState('JUEZ');
-    const [pedido, setPedido] = useState(0);
+    const [pedido, setPedido] = useState('');
     const [stopwatchRunning, setStopwatchRunning] = useState(Boolean(item.stopwatchStart));
     const [stopwatchCurrent, setStopwatchCurrent] = useState(item.stopwatchStart ? Date.now() - item.stopwatchStart : 0);
     const [stopwatchAccum, setStopwatchAccum] = useState(item.stopwatch || 0);
@@ -126,6 +136,31 @@ export default function Cronometro({ item, dateToUse, isHovered }) {
 
                 await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', entry));
                 setCuartoShow(false);
+
+                // Actualizar Minuta con texto automático
+                const currentHora = updateRealTimeFunction();
+                let updatedMinuta = minuta || item.minuta || "";
+
+                if (currentState === 'CUARTO_INTERMEDIO') {
+                    let pValue = pidiente;
+                    if (!pValue || pValue === "JUEZ") {
+                        // Tomar solo el nombre del primer juez y formatearlo
+                        const firstJudge = (item.juez || "").split('+')[0];
+                        pValue = formatJudges(firstJudge);
+                    } else {
+                        // El pidiente siempre en minúsculas
+                        pValue = pValue.toLowerCase();
+                    }
+                    const text = `<br><b>Siendo las ${currentHora} horas se ordena un cuarto intermedio pedido por ${pValue}. </b>`;
+                    updatedMinuta += text;
+                    setMinuta(updatedMinuta);
+                    await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
+                } else if (estadoActual === 'CUARTO_INTERMEDIO' && currentState === 'EN_CURSO') {
+                    const text = ` <b>Siendo las ${currentHora} horas se reanuda la presente audiencia.</b>`;
+                    updatedMinuta += text;
+                    setMinuta(updatedMinuta);
+                    await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
+                }
             }
 
             await withRetry(() => updateData(dateToUse, item.id, 'estado', currentState));

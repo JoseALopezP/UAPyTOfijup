@@ -4,7 +4,7 @@ import styles from '../RegistroAudiencia.module.css';
 
 const STORAGE_KEY = 'app-theme'
 
-export default function RegistroNavBar({ navbarList, selectedTab, setSelectedTab }) {
+export default function RegistroNavBar({ navbarList, selectedTab, setSelectedTab, needsSaving, onSave, isSaving }) {
   const [isLight, setIsLight] = useState(false)
 
   // Restaurar preferencia al montar
@@ -42,6 +42,26 @@ export default function RegistroNavBar({ navbarList, selectedTab, setSelectedTab
           <p>{el}</p>
         </span>
       ))}
+
+      {/* Botón de Guardado Unificado */}
+      <button
+        type="button"
+        onClick={onSave}
+        disabled={isSaving || !needsSaving}
+        className={isSaving 
+          ? `${styles.saveBtn} ${styles.saveBtnSaving}` 
+          : needsSaving 
+            ? `${styles.saveBtn} ${styles.saveBtnUnsaved}` 
+            : `${styles.saveBtn} ${styles.saveBtnSaved}`
+        }
+      >
+        <span className={styles.saveIcon}>
+          {isSaving ? '⏳' : needsSaving ? '💾' : '✅'}
+        </span>
+        <span className={styles.saveText}>
+          {isSaving ? 'Guardando...' : needsSaving ? 'Guardar Cambios' : 'Guardado'}
+        </span>
+      </button>
 
       {/* Botón de tema — empujado a la derecha por margin-left: auto en CSS */}
       <button

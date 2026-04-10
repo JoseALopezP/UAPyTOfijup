@@ -539,54 +539,9 @@
 }
 
 /* ── Botón guardar / guardando ───────────────────────────────── */
-.guardarButton {
-    font-size: 20px;
-    background: var(--guardar-bg);
-    color: #fff;
-    cursor: pointer;
-    position: fixed;
-    align-self: flex-end;
-    height: 50px;
-    width: 23vw;
-    font-weight: 700;
-    opacity: .9;
-    border: none;
-    transition: opacity 0.15s, transform 0.1s;
-}
-
-.guardarButton:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-.guardar {
+/* ── Botón guardar (Estilo anterior removido) ──────────────── */
+.guardarButtonOld {
     display: none;
-}
-
-.guardarButton:hover .guardar {
-    display: block;
-}
-
-.guardarButton:hover .sinGuardar {
-    display: none;
-}
-
-.guardando {
-    display: none;
-}
-
-.guardandoButton .guardando {
-    display: block;
-}
-
-.guardandoButton .guardar,
-.guardandoButton .sinGuardar,
-.guardandoButton:hover .guardar {
-    display: none;
-}
-
-.guardarButtonSaving {
-    background-color: #ffc107;
 }
 
 /* ── Panel derecho ───────────────────────────────────────────── */
@@ -830,8 +785,52 @@
     padding: 5px 15px;
     color: var(--text3);
     background: transparent;
+    transition: transform 0.2s ease;
     cursor: pointer;
-    transition: color 0.15s;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 10px 0 5px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sectionHeader:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-left: 3px solid #ffc107;
+}
+
+.sectionHeader label {
+    margin-bottom: 0 !important;
+    cursor: pointer;
+}
+
+.chevron {
+    font-size: 10px;
+    color: #888;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+    color: #ffc107;
+}
+
+.inputLeftColumn {
+    padding-left: 5px;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    margin-left: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .tab p {
@@ -855,11 +854,10 @@
 
 /* Botón de tema — dentro del navBar, empujado a la derecha */
 .themeToggleBtn {
-    margin-left: auto;
     margin-right: 10px;
-    height: 26px;
+    height: 28px;
     padding: 0 12px;
-    border-radius: 5px;
+    border-radius: 6px;
     border: 1px solid var(--border2);
     background: var(--surface);
     color: var(--text2);
@@ -876,6 +874,67 @@
 .themeToggleBtn:hover {
     border-color: var(--accent);
     color: var(--text);
+}
+
+/* Unified Save Button in NavBar */
+.saveBtn {
+    margin-left: auto;
+    margin-right: 8px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.saveBtnSaved {
+    background: transparent;
+    color: var(--text3);
+    cursor: default;
+    opacity: 0.6;
+}
+
+.saveBtnUnsaved {
+    background: #f59e0b;
+    color: #fff;
+    border-color: #d97706;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+    animation: pulseSave 3s infinite;
+}
+
+.saveBtnUnsaved:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
+}
+
+.saveBtnSaving {
+    background: var(--surface3);
+    color: var(--text2);
+    border-color: var(--border);
+    cursor: wait;
+}
+
+@keyframes pulseSave {
+    0% { transform: scale(1); box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); }
+    50% { transform: scale(1.03); box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5); }
+    100% { transform: scale(1); box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); }
+}
+
+.saveIcon {
+    font-size: 14px;
+}
+
+.saveText {
+    opacity: 1;
 }
 
 /* ── Text editor container ───────────────────────────────────── */

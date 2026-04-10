@@ -35,6 +35,16 @@ export default function TextEditor({ textValue, setTextValue }) {
     });
   }, []);
 
+  // Update editor content when textValue prop changes externally
+  useEffect(() => {
+    if (editorRef.current && textValue !== undefined) {
+      const currentHtml = editorRef.current.root.innerHTML;
+      if (textValue !== currentHtml) {
+        editorRef.current.clipboard.dangerouslyPasteHTML(textValue || "");
+      }
+    }
+  }, [textValue]);
+
   const handleChange = (value) => {
     if (setTextValue) setTextValue(value);
   };
