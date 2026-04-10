@@ -23,8 +23,8 @@ export default function RegistroAudienciaList({date, dateFunction, audFunction, 
         <><div className={[styles.listaBlock]}>
             <SelectDate dateFunction={dateFunction} date={date}/>
             <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={[styles.listadoBlock]}>{bydateView && Object.values(bydateView).sort((a, b) => {
-                const timeA = a.hora.split(':').join('');
-                const timeB = b.hora.split(':').join('');
+                const timeA = (a.hora || '').split(':').join('');
+                const timeB = (b.hora || '').split(':').join('');
                 if (timeA !== timeB) return timeA - timeB;
                 return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
             }).map(el => (
