@@ -120,6 +120,11 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [obsCancel, setObsCancel] = useState(savedData.obsCancel || '')
     const [showReproModal, setShowReproModal] = useState(false)
     const [showCancelModal, setShowCancelModal] = useState(false)
+    const [showRechazarModal, setShowRechazarModal] = useState(false)
+    const [razonRechazo, setRazonRechazo] = useState('')
+    const [solicitanteRechazo, setSolicitanteRechazo] = useState('MPF') // 'MPF' | 'Defensa'
+    const [isRechazando, setIsRechazando] = useState(false)
+    const [rechazarStatus, setRechazarStatus] = useState('')
 
     const handleCloseRepro = () => {
         if (!motivRepro || !obsRepro) {
@@ -133,6 +138,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
         }
         setShowReproModal(false);
     }
+
+    const [openDropdownDefensa, setOpenDropdownDefensa] = useState(false)
+    const [openDropdownFiscal, setOpenDropdownFiscal] = useState(false)
+    const [openDropdownJuez, setOpenDropdownJuez] = useState(false)
 
     const handleCloseCancel = () => {
         if (!motivCancel || !obsCancel) {
@@ -434,7 +443,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.fyhcreacion}</div></td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.solicitante}</div></td>
-            <td className={`${styles.cellBodyFixed}`} style={{ position: 'relative' }}>
+            <td className={`${styles.cellBodyFixed}`} style={{ position: 'relative', zIndex: showAddTipo ? 200 : 'auto' }}>
                 <div className={styles.scrollCellTargetRelative}>
                     {tiposOriginales && tipos.length > 0 && JSON.stringify(tiposOriginales) !== JSON.stringify(tipos) && (
                         <div className={styles.reconversionBubbleWrapper}>
@@ -534,7 +543,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 </div>
             </td>
             <td className={`${styles.cellBodyFixed}`}>{data.intervinientes?.imputado?.length ?? 0}</td>
-            <td className={`${styles.cellBodyFixed}`} style={{ position: 'relative' }}>
+            <td className={`${styles.cellBodyFixed}`} style={{ position: 'relative', zIndex: showAddImputado ? 200 : 'auto' }}>
                 <div className={styles.scrollCell}>
                     {imputados.map((imp, i) => (
                         <div key={i} className={`${styles.listPill} ${styles.pillImputado}`}>
@@ -790,7 +799,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
             <td className={cell(vencimientoT)}>
                 <input type="datetime-local" className={styles.inputCell} value={vencimiento} onChange={e => { setVencimiento(e.target.value); setToSave(true) }} />
             </td>
-            <td className={`${cell(defensaT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
+            <td className={`${cell(defensaT)} ${styles.cellBodyActions}`} style={{ position: 'relative', zIndex: openDropdownDefensa ? 300 : 'auto' }}>
                 <SelectorDropdown
                     title="Defensores"
                     options={[...new Set(availablePartsList
@@ -800,11 +809,12 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         setDefensa(prev => prev ? prev + ', ' + val : val);
                         setToSave(true);
                     }}
+                    onToggle={setOpenDropdownDefensa}
                 />
                 <textarea className={styles.inputCell} value={defensa} onChange={e => setDefensa(e.target.value)} />
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.ufi}</div></td>
-            <td className={`${cell(fiscalT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
+            <td className={`${cell(fiscalT)} ${styles.cellBodyActions}`} style={{ position: 'relative', zIndex: openDropdownFiscal ? 300 : 'auto' }}>
                 <SelectorDropdown
                     title="Fiscales"
                     options={[...new Set(availablePartsList
@@ -814,14 +824,16 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         setFiscal(prev => prev ? prev + ', ' + val : val);
                         setToSave(true);
                     }}
+                    onToggle={setOpenDropdownFiscal}
                 />
                 <textarea className={styles.inputCell} value={fiscal} onChange={e => setFiscal(e.target.value)} />
             </td>
-            <td className={`${cell(juezT)} ${styles.cellBodyActions}`} style={{ position: 'relative' }}>
+            <td className={`${cell(juezT)} ${styles.cellBodyActions}`} style={{ position: 'relative', zIndex: openDropdownJuez ? 300 : 'auto' }}>
                 <SelectorDropdown
                     title="Jueces"
                     options={data.jueces || []}
                     onSelect={(val) => setJuez(val)}
+                    onToggle={setOpenDropdownJuez}
                 />
                 <input
                     list={`jueces-datalist-${rowKey}`}
@@ -1416,42 +1428,240 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                     )}
                 </div>
             </td>
-            {/* Convertir a Jurisdiccional */}
+            {/* Convertir a Jurisdiccional + Rechazar */}
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyOk}`} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '0 4px', minWidth: '80px' }}>
-                {convertirJurisdiccional ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', padding: '4px' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--accent)', fontWeight: '600', textAlign: 'center' }}>
-                            {convertirJurisdiccionalTipo || 'Pendiente tipo'}
-                        </span>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '2px', padding: '3px 0' }}>
+                    {/* JURISDIC. — 50% */}
+                    {convertirJurisdiccional ? (
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: '9px', color: 'var(--accent)', fontWeight: '600', textAlign: 'center', lineHeight: 1.2 }}>
+                                {convertirJurisdiccionalTipo || 'Pendiente tipo'}
+                            </span>
+                            <button
+                                style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', color: 'var(--red)', borderRadius: '4px', fontSize: '9px', padding: '1px 5px', cursor: 'pointer' }}
+                                onClick={() => {
+                                    const conf = window.confirm('¿Cancelar la conversión a Jurisdiccional?')
+                                    if (conf) {
+                                        setConvertirJurisdiccional(false)
+                                        setConvertirJurisdiccionalTipo('')
+                                        setConvertirJurisdiccionalMotivo('')
+                                        setToSave(true)
+                                    }
+                                }}
+                            >✕ Cancelar</button>
+                        </div>
+                    ) : (
                         <button
-                            style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', color: 'var(--red)', borderRadius: '4px', fontSize: '10px', padding: '2px 6px', cursor: 'pointer' }}
+                            className={styles.flagBtn}
+                            style={{ flex: 1, background: 'var(--surface2)', fontSize: '9px', padding: '0 4px', height: 'auto', margin: 0 }}
                             onClick={() => {
-                                const conf = window.confirm('¿Cancelar la conversión a Jurisdiccional?')
-                                if (conf) {
-                                    setConvertirJurisdiccional(false)
-                                    setConvertirJurisdiccionalTipo('')
-                                    setConvertirJurisdiccionalMotivo('')
-                                    setToSave(true)
+                                if (savedData.agendada) {
+                                    return alert("No se puede reconvertir a jurisdiccional una solicitud que ya está agendada.");
                                 }
+                                setShowConvertirModal(true);
                             }}
-                        >✕ Cancelar</button>
-                    </div>
-                ) : (
+                            title="Convertir esta solicitud a Jurisdiccional"
+                        >
+                            ⚖ JURISDIC.
+                        </button>
+                    )}
+                    {/* RECHAZAR — 50% */}
                     <button
                         className={styles.flagBtn}
-                        style={{ background: 'var(--surface2)', fontSize: '10px', height: '70%', margin: '0 auto', padding: '0 6px' }}
-                        onClick={() => {
-                            if (savedData.agendada) {
-                                return alert("No se puede reconvertir a jurisdiccional una solicitud que ya está agendada.");
-                            }
-                            setShowConvertirModal(true);
+                        style={{
+                            flex: 1,
+                            background: isRechazando ? 'rgba(239,68,68,0.25)' : 'rgba(239,68,68,0.12)',
+                            border: '1px solid rgba(239,68,68,0.5)',
+                            color: '#ef4444',
+                            fontSize: '9px',
+                            padding: '0 4px',
+                            height: 'auto',
+                            margin: 0,
+                            fontWeight: '800',
+                            letterSpacing: '0.06em',
+                            cursor: isRechazando ? 'wait' : 'pointer',
+                            opacity: isRechazando ? 0.7 : 1
                         }}
-                        title="Convertir esta solicitud a Jurisdiccional"
+                        onClick={() => {
+                            if (isRechazando) return;
+                            if (!data.linkLeg && !savedData.linkLeg) {
+                                return alert('No hay link de legajo disponible para ejecutar el rechazo.');
+                            }
+                            setShowRechazarModal(true);
+                        }}
+                        title="Rechazar solicitud: notificar y anular en PUMA"
+                        disabled={isRechazando}
                     >
-                        ⚖ Jurisdic.
+                        {isRechazando ? <><i className="fa fa-spinner fa-spin" style={{ marginRight: '2px' }}></i>...</> : '✕ RECHAZAR'}
                     </button>
-                )}
+                </div>
             </td>
+            {/* Modal RECHAZAR */}
+            {showRechazarModal && (
+                <div className={styles.modalNotificarOverlay} onClick={() => setShowRechazarModal(false)}>
+                    <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+                        <div className={`${styles.modalTitle} ${styles.modalTitleFlex}`}>
+                            <span>✕ Rechazar Solicitud — Legajo {data.numeroLeg}</span>
+                            <button
+                                className={`${styles.modalBtnClose} ${styles.modalBtnCloseNoBorder}`}
+                                onClick={() => setShowRechazarModal(false)}
+                            >&times;</button>
+                        </div>
+                        <div className={styles.modalSection}>
+                            <div style={{
+                                background: 'rgba(239,68,68,0.08)',
+                                border: '1px solid rgba(239,68,68,0.3)',
+                                borderRadius: '6px',
+                                padding: '10px 14px',
+                                marginBottom: '14px',
+                                fontSize: '12px',
+                                color: '#ef4444',
+                                lineHeight: 1.5
+                            }}>
+                                <strong>⚠ Este proceso es automatizado e irreversible.</strong><br />
+                                Ejecutará: (1) PDF de rechazo en el legajo, (2) Notificación General, (3) Anulación en PUMA.
+                            </div>
+
+                            {/* Selector MPF / Defensa */}
+                            <label className={styles.modalLabel} style={{ marginBottom: '6px', display: 'block' }}>Institución Solicitante</label>
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
+                                {['MPF', 'Defensa'].map(opc => (
+                                    <button
+                                        key={opc}
+                                        onClick={() => setSolicitanteRechazo(opc)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '8px 0',
+                                            borderRadius: '6px',
+                                            border: solicitanteRechazo === opc ? '2px solid #ef4444' : '1px solid var(--border)',
+                                            background: solicitanteRechazo === opc ? 'rgba(239,68,68,0.18)' : 'var(--surface2)',
+                                            color: solicitanteRechazo === opc ? '#ef4444' : 'var(--text2)',
+                                            fontWeight: solicitanteRechazo === opc ? '700' : '400',
+                                            fontSize: '13px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.15s'
+                                        }}
+                                    >
+                                        {opc === 'MPF' ? '⚖ MPF / Fiscalía' : '🛡 Defensa'}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Selector razón */}
+                            <label className={styles.modalLabel}>Razón del Rechazo</label>
+                            <select
+                                className={styles.modalSelect}
+                                value={razonRechazo}
+                                onChange={e => setRazonRechazo(e.target.value)}
+                                style={{ borderColor: !razonRechazo ? 'rgba(239,68,68,0.5)' : undefined, marginBottom: '14px' }}
+                            >
+                                <option value="">Seleccione una razón...</option>
+                                <option value="datos identificatorios de las partes">Datos identificatorios de las partes</option>
+                                <option value="partes intervinientes cargadas e impactadas en Sistema PUMA">Partes intervinientes en Sistema PUMA</option>
+                                <option value="fecha de hecho o denuncia">Fecha de hecho o denuncia</option>
+                            </select>
+
+                            {/* Vista previa cuerpo del documento */}
+                            {razonRechazo && (
+                                <div style={{
+                                    background: 'var(--surface2)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: '6px',
+                                    padding: '10px 12px',
+                                    fontSize: '11px',
+                                    color: 'var(--text2)',
+                                    lineHeight: 1.7,
+                                    fontStyle: 'italic',
+                                    marginBottom: '10px'
+                                }}>
+                                    <div style={{ fontSize: '10px', color: 'var(--text3)', fontStyle: 'normal', fontWeight: '700', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Vista previa del texto:</div>
+                                    Atento a que desde el <strong style={{ color: '#ef4444' }}>{solicitanteRechazo === 'MPF' ? 'MPF' : 'DEFENSA'}</strong> solicitan Audiencia, y que dicho pedido se encuentra incompleto ya que carece de <strong style={{ color: '#ef4444' }}>{razonRechazo}</strong>, imposibilitando a esta Oficina Judicial Penal realizar la gestión adecuada de lo solicitado, es que se procede a cancelar dicha solicitud conforme lo establecido en Acuerdo de Superintendencia 05/2024. Subsanado o completada la información faltante proceder a realizar nuevamente el pedido a través del Sistema Informático.
+                                </div>
+                            )}
+
+                            {rechazarStatus && (
+                                <div style={{ marginTop: '6px', fontSize: '11px', fontFamily: 'monospace', background: 'var(--surface2)', padding: '8px', borderRadius: '4px', color: rechazarStatus.startsWith('✓') ? 'var(--green)' : rechazarStatus.startsWith('❌') ? '#ef4444' : 'var(--text2)', maxHeight: '120px', overflowY: 'auto' }}>
+                                    {rechazarStatus}
+                                </div>
+                            )}
+                        </div>
+                        <div className={styles.modalButtonGroup}>
+                            <button
+                                className={`${styles.modalBtn} ${styles.modalBtnSave}`}
+                                disabled={!razonRechazo || isRechazando}
+                                style={{
+                                    background: !razonRechazo || isRechazando ? undefined : '#ef4444',
+                                    opacity: !razonRechazo || isRechazando ? 0.5 : 1,
+                                    cursor: !razonRechazo || isRechazando ? 'not-allowed' : 'pointer'
+                                }}
+                                onClick={async () => {
+                                    if (!razonRechazo) return;
+                                    const linkLeg = data.linkLeg || savedData.linkLeg;
+                                    const linkSol = data.linkSol || savedData.linkSol;
+                                    if (!linkLeg) return alert('No hay link de legajo disponible.');
+
+                                    setIsRechazando(true);
+                                    setRechazarStatus('Iniciando proceso de rechazo...');
+
+                                    const bodyData = {
+                                        solicitud: { ...data, ...savedData, linkLeg, linkSol },
+                                        razonRechazo,
+                                        solicitanteRechazo, // 'MPF' | 'Defensa'
+                                        action: 'rechazar'
+                                    };
+
+                                    try {
+                                        if (typeof window !== 'undefined' && window.electronAPI) {
+                                            window.electronAPI.removeAllListeners('agendar-puppeteer-progress');
+                                            window.electronAPI.on('agendar-puppeteer-progress', (event, parsed) => {
+                                                if (parsed.type === 'progress') setRechazarStatus(parsed.message);
+                                            });
+                                            const result = await window.electronAPI.invoke('rechazar-solicitud', bodyData);
+                                            if (!result.success) throw new Error(result.error);
+                                            setRechazarStatus('✓ Rechazo ejecutado con éxito.');
+                                        } else {
+                                            const res = await fetch('/api/rechazar-solicitud', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify(bodyData)
+                                            });
+                                            if (!res.body) throw new Error('No response body');
+                                            const reader = res.body.getReader();
+                                            const decoder = new TextDecoder();
+                                            let done = false;
+                                            while (!done) {
+                                                const { value, done: doneRead } = await reader.read();
+                                                done = doneRead;
+                                                const chunk = decoder.decode(value);
+                                                for (const line of chunk.split('\n')) {
+                                                    if (line.startsWith('data: ')) {
+                                                        const parsed = JSON.parse(line.substring(6));
+                                                        if (parsed.type === 'progress') setRechazarStatus(parsed.message);
+                                                        if (parsed.type === 'error') throw new Error(parsed.error);
+                                                        if (parsed.type === 'done') setRechazarStatus('✓ Rechazo ejecutado con éxito.');
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        setRechazarStatus(`❌ Error: ${err.message}`);
+                                        alert(`Error al rechazar: ${err.message}`);
+                                    } finally {
+                                        setIsRechazando(false);
+                                    }
+                                }}
+                            >
+                                {isRechazando ? <><i className="fa fa-spinner fa-spin"></i> Procesando...</> : '✕ Confirmar Rechazo'}
+                            </button>
+                            <button
+                                className={`${styles.modalBtn} ${styles.modalBtnClose}`}
+                                onClick={() => { setShowRechazarModal(false); setRechazarStatus(''); }}
+                            >Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {(showReproModal || showCancelModal) && (
                 <div className={styles.modalNotificarOverlay} onClick={() => { if (showReproModal) handleCloseRepro(); else handleCloseCancel(); }}>
                     <div className={styles.modalNotificarContent} onClick={e => e.stopPropagation()}>

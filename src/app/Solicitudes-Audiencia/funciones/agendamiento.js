@@ -284,7 +284,7 @@ export async function agendarAudiencia({
         headless: false,
         executablePath: getBrowserPath(),
         slowMo: 60, // Slower actions for visual testing
-        args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox"],
+        args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox", "--disable-quic"],
         defaultViewport: { width: 1280, height: 720 },
     });
 
@@ -795,5 +795,390 @@ export async function agendarAudiencia({
         return { success: false, error: err.message };
     } finally {
         await browser.close();
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rechazo / Anulación de Solicitud (flujo automatizado de 3 fases)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Genera un hash hex de 4 dígitos aleatorio.
+ */
+function generarHashHex4() {
+    return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
+
+/**
+ * Flujo automatizado de rechazo de solicitud en 3 fases:
+ *   1. Sube PDF de rechazo oficial al legajo con estado "Procesal"
+ *   2. Crea Notificación General, filtrando destinatarios por FISCAL (MPF) o DEFENSOR (Defensa)
+ *   3. Anula la solicitud desde /solicitud, adjuntando el mismo PDF con nueva descripción
+ *
+ * @param {object} params
+ * @param {string} params.linkLeg          URL del legajo
+ * @param {string} params.linkSol          URL de la solicitud
+ * @param {string} params.razonRechazo     Razón de rechazo (va en el cuerpo del doc)
+ * @param {string} params.numeroLeg        Número de legajo (interno)
+ * @param {string} [params.legajoFiscal]   Número de legajo fiscal (ej. "MPF-SJ-XXXXX-2024")
+ * @param {string} [params.solicitante]    'MPF' | 'Defensa'
+ * @param {string} params.fyhcreacion      Fecha/hora de creación de la solicitud
+ * @param {Function} onProgress
+ */
+export async function rechazarSolicitud({
+    linkLeg,
+    linkSol,
+    razonRechazo,
+    numeroLeg,
+    legajoFiscal,
+    solicitante = 'MPF',
+    fyhcreacion,
+}, onProgress) {
+    const log = (msg) => {
+        console.log(`[rechazarSolicitud] ${msg}`);
+        if (onProgress) onProgress(msg);
+    };
+
+    // El filtro de destinatarios en PUMA según institución
+    const filtroDestinatario = solicitante === 'Defensa' ? 'DEFENSOR' : 'FISCAL';
+    const textoSolicitante   = solicitante === 'Defensa' ? 'DEFENSA' : 'MPF';
+
+    // ── Resolver URL base del sistema ─────────────────────────────────────────
+    const baseUrl = (() => {
+        try {
+            const ref = linkLeg || linkSol || '';
+            const u = new URL(ref);
+            return `${u.protocol}//${u.host}`;
+        } catch {
+            return 'http://10.107.1.184:8092';
+        }
+    })();
+
+    const hash1 = generarHashHex4();
+    const hash2 = generarHashHex4();
+    const legajoRef  = legajoFiscal || String(numeroLeg);
+    const descDoc1   = `${legajoRef}-${hash1}`;   // descripción documento de notificación
+    const descDoc2   = `${legajoRef}-${hash2}`;   // descripción documento de anulación (distinto)
+
+    // ── Generar PDF oficial usando descargarPdfNotificacion ───────────────────
+    log('Generando PDF oficial de rechazo...');
+    let pdfBuffer;
+    try {
+        const { descargarPdfNotificacion } = await import('../../../utils/notificacionesAgendamiento.js');
+        const pdfResult = await descargarPdfNotificacion(
+            'rechazarSolicitud',
+            {
+                legajoFiscal: legajoRef,
+                solicitante:  textoSolicitante,
+                razonRechazo: razonRechazo,
+            },
+            true  // returnBuffer = true → devuelve { buffer, textoPlano }
+        );
+        pdfBuffer = pdfResult.buffer;
+        log('PDF generado correctamente.');
+    } catch (pdfErr) {
+        log(`⚠ Error generando PDF oficial (${pdfErr.message}), usando PDF de respaldo...`);
+        // Fallback: PDF mínimo de texto plano
+        const streamContent = `BT /F1 11 Tf 50 780 Td (RECHAZO) Tj T* (Legajo: ${legajoRef}) Tj T* (Razon: ${razonRechazo}) Tj ET`;
+        const pdfParts = [
+            '%PDF-1.4\n',
+            '1 0 obj<</Type /Catalog /Pages 2 0 R>>\nendobj\n',
+            '2 0 obj<</Type /Pages /Kids[3 0 R] /Count 1>>\nendobj\n',
+            '3 0 obj<</Type /Page /Parent 2 0 R /MediaBox[0 0 595 842] /Contents 4 0 R /Resources<</Font<</F1 5 0 R>>>>>>\nendobj\n',
+            `4 0 obj<</Length ${streamContent.length}>>\nstream\n${streamContent}\nendstream\nendobj\n`,
+            '5 0 obj<</Type /Font /Subtype /Type1 /BaseFont /Helvetica>>\nendobj\n',
+            'xref\n0 6\ntrailer<</Size 6 /Root 1 0 R>>\nstartxref\n0\n%%EOF'
+        ].join('');
+        pdfBuffer = Buffer.from(pdfParts, 'utf-8');
+    }
+
+    const browser = await puppeteer.launch({
+        headless: false,
+        executablePath: getBrowserPath(),
+        slowMo: 50,
+        args: ['--window-size=1280,720', '--no-sandbox', '--disable-setuid-sandbox', '--disable-quic'],
+        defaultViewport: { width: 1280, height: 720 },
+    });
+
+    const page = (await browser.pages())[0] || await browser.newPage();
+
+    const os   = (await import('os')).default;
+    const fs   = (await import('fs/promises')).default;
+    const path = (await import('path')).default;
+
+    const tmpDir  = os.tmpdir();
+    const tmpPdf1 = path.join(tmpDir, `rechazo_notif_${Date.now()}.pdf`);
+    const tmpPdf2 = path.join(tmpDir, `rechazo_anul_${Date.now() + 1}.pdf`);
+    await fs.writeFile(tmpPdf1, pdfBuffer);
+    await fs.writeFile(tmpPdf2, pdfBuffer);
+
+    try {
+        // ── LOGIN ──────────────────────────────────────────────────────────────
+        log('Iniciando login...');
+        await login(page);
+        log('Login OK.');
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // FASE 1: Subir PDF de rechazo al legajo con estado "Procesal"
+        // ═══════════════════════════════════════════════════════════════════════
+        log(`[Fase 1] Navegando al legajo: ${linkLeg}`);
+        await page.goto(linkLeg, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+        log('[Fase 1] Abriendo pestaña Documentos...');
+        await page.waitForSelector('a[href="#documentos"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+        await page.click('a[href="#documentos"][data-toggle="tab"]');
+        await page.waitForSelector('.modalButtonAgregarDocumento', { visible: true, timeout: 15000 });
+
+        log('[Fase 1] Abriendo modal de carga de documento...');
+        await page.click('.modalButtonAgregarDocumento');
+        await page.waitForSelector('#documento-form-id', { visible: true, timeout: 15000 });
+        await new Promise(r => setTimeout(r, 600));
+
+        log('[Fase 1] Subiendo PDF...');
+        await page.waitForSelector('input[type="file"][id="documento-documento"]', { timeout: 10000 });
+        const fileInput1 = await page.$('input[type="file"][id="documento-documento"]');
+        await fileInput1.uploadFile(tmpPdf1);
+        await page.waitForFunction(
+            () => { const el = document.querySelector('.file-caption-name'); return el && el.value.length > 0; },
+            { timeout: 10000 }
+        ).catch(() => null);
+
+        log('[Fase 1] Seleccionando estado "Procesal"...');
+        await page.click('#documento-estado + span .select2-selection--single');
+        await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
+        await page.type('.select2-dropdown .select2-search__field', 'Procesal', { delay: 40 });
+        await page.waitForSelector('.select2-results__option', { visible: true, timeout: 5000 });
+        await page.keyboard.press('Enter');
+        await new Promise(r => setTimeout(r, 300));
+
+        log(`[Fase 1] Ingresando descripción: ${descDoc1}`);
+        await page.type('#documento-descripcion', descDoc1, { delay: 20 });
+        await new Promise(r => setTimeout(r, 200));
+
+        log('[Fase 1] Guardando documento...');
+        await page.click('#documento-form-id [id="boton-submit"]');
+        await page.waitForFunction(
+            () => !document.querySelector('.modal.in #documento-form-id'),
+            { timeout: 30000 }
+        ).catch(() => null);
+        await new Promise(r => setTimeout(r, 800));
+        log('[Fase 1] ✅ Documento subido: ' + descDoc1);
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // FASE 2: Crear Notificación General en el legajo
+        // ═══════════════════════════════════════════════════════════════════════
+        log('[Fase 2] Abriendo pestaña Notificaciones...');
+        await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+        await page.click('a[href="#notificaciones"][data-toggle="tab"]');
+        await new Promise(r => setTimeout(r, 600));
+
+        log('[Fase 2] Clickeando "Crear notificación"...');
+        await page.waitForSelector('.btn-success[href^="/notificacion/create/"]', { visible: true, timeout: 15000 });
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }),
+            page.click('.btn-success[href^="/notificacion/create/"]'),
+        ]);
+
+        log('[Fase 2] Seleccionando tipo "NOTIFICACIÓN GENERAL"...');
+        await page.waitForSelector('#notificacion-id_tipo_notificacion_template + span .select2-selection--single', { visible: true, timeout: 15000 });
+        await page.click('#notificacion-id_tipo_notificacion_template + span .select2-selection--single');
+        await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
+        await page.type('.select2-dropdown .select2-search__field', 'NOTIFICACION GENERAL', { delay: 40 });
+        await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 8000 }).catch(() => null);
+        await page.keyboard.press('Enter');
+        await new Promise(r => setTimeout(r, 800));
+
+        log(`[Fase 2] Eliminando personas que NO contienen "${filtroDestinatario}"...`);
+        await page.waitForSelector('#notificacion-personas + span .select2-selection--multiple', { visible: true, timeout: 10000 });
+        let attempts = 0;
+        while (attempts < 30) {
+            const textos = await page.evaluate(() =>
+                Array.from(document.querySelectorAll('#notificacion-personas + span .select2-selection__choice')).map(
+                    el => (el.getAttribute('title') || el.textContent || '').toUpperCase().trim()
+                )
+            );
+            if (textos.length === 0) break;
+            const noMatchIdx = textos.findIndex(t => !t.includes(filtroDestinatario));
+            if (noMatchIdx === -1) break; // todos coinciden con el filtro
+            const removeBtn = await page.$(
+                `#notificacion-personas + span .select2-selection__choice:nth-child(${noMatchIdx + 1}) .select2-selection__choice__remove`
+            );
+            if (removeBtn) {
+                await removeBtn.click();
+                await new Promise(r => setTimeout(r, 200));
+            } else {
+                break;
+            }
+            attempts++;
+        }
+
+        log('[Fase 2] Adjuntando documento ' + descDoc1 + '...');
+        await page.waitForSelector('#notificacion-documentos + span .select2-search__field', { visible: true, timeout: 10000 });
+        await page.click('#notificacion-documentos + span .select2-search__field');
+        await page.type('#notificacion-documentos + span .select2-search__field', descDoc1, { delay: 40 });
+        await page.waitForSelector('.select2-results__option--highlighted', { visible: true, timeout: 5000 }).catch(() => null);
+        await page.keyboard.press('Enter');
+        await new Promise(r => setTimeout(r, 600));
+
+        log('[Fase 2] Pegando texto oficial de rechazo en el cuerpo...');
+        try {
+            await page.waitForSelector('iframe#notificacion-texto_ifr', { visible: true, timeout: 8000 });
+            const frameEl = await page.$('iframe#notificacion-texto_ifr');
+            const frame = await frameEl.contentFrame();
+            await frame.evaluate((sol, razon) => {
+                const body = document.querySelector('body');
+                if (body) {
+                    body.innerHTML = `<p>\tAtento a que desde el ${sol} solicitan Audiencia, y que dicho pedido se encuentra incompleto ya que carece de ${razon}, imposibilitando a esta Oficina Judicial Penal realizar la gestión adecuada de lo solicitado, es que se procede a cancelar dicha solicitud conforme lo establecido en Acuerdo de Superintendencia 05/2024. Subsanado o completada la información faltante proceder a realizar nuevamente el pedido a través del Sistema Informático.</p>`;
+                }
+            }, textoSolicitante, razonRechazo);
+        } catch (e) {
+            log('[Fase 2] ⚠ No se pudo cargar el iframe del cuerpo: ' + e.message);
+        }
+
+        log('[Fase 2] Confirmando creación de notificación...');
+        await page.waitForSelector('button[type="submit"].btn-success', { visible: true, timeout: 5000 });
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 40000 }),
+            page.click('button[type="submit"].btn-success'),
+        ]);
+
+        log('[Fase 2] Notificación creada. Enviando desde tabla...');
+        await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+        await page.click('a[href="#notificaciones"][data-toggle="tab"]');
+        await new Promise(r => setTimeout(r, 800));
+        await page.waitForSelector('#view-grid-notificaciones-container table tbody', { visible: true, timeout: 20000 });
+        await new Promise(r => setTimeout(r, 1000));
+
+        const rows = await page.$$('#view-grid-notificaciones-container table tbody tr');
+        let checkedCount = 0;
+        for (const row of rows) {
+            try {
+                const dateText = await row.$eval('td[data-col-seq="6"]', td => td.innerText.trim()).catch(() => '');
+                if (!dateText || dateText === '(sin datos)') continue;
+                const [datePart, timePart] = dateText.split(' ');
+                const [d, m, y] = datePart.split('/');
+                const [H, M, S] = (timePart || '0:0:0').split(':');
+                const rowDate = new Date(y, m - 1, d, H, M, S);
+                if ((Date.now() - rowDate.getTime()) / 60000 <= 35) {
+                    const isDisabled = await row.$eval('input.kv-row-checkbox', el => el.disabled).catch(() => true);
+                    if (!isDisabled) {
+                        await row.evaluate(el => { const cb = el.querySelector('input.kv-row-checkbox'); if (cb && !cb.checked) cb.click(); });
+                        checkedCount++;
+                    }
+                }
+            } catch { }
+        }
+        if (checkedCount > 0) {
+            log(`[Fase 2] Enviando ${checkedCount} notificación/es...`);
+            await page.click('#btn-notificar');
+            await new Promise(r => setTimeout(r, 4000));
+        }
+        log('[Fase 2] ✅ Notificación general enviada.');
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // FASE 3: Anular la Solicitud en /solicitud
+        // ═══════════════════════════════════════════════════════════════════════
+        const urlSolicitudes = `${baseUrl}/solicitud`;
+        log(`[Fase 3] Navegando a: ${urlSolicitudes}`);
+        await page.goto(urlSolicitudes, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+        log(`[Fase 3] Filtrando por legajo "${numeroLeg}"...`);
+        await new Promise(r => setTimeout(r, 800));
+        const filterInputs = await page.$$('#grid-solicitud-filters input[type="text"], input[data-key]');
+        if (filterInputs.length > 0) {
+            await filterInputs[0].click({ clickCount: 3 });
+            await filterInputs[0].type(String(numeroLeg), { delay: 40 });
+            await filterInputs[0].press('Enter');
+        }
+
+        // Esperar carga completa
+        await new Promise(r => setTimeout(r, 1500));
+        let loadAttempts = 0;
+        while (loadAttempts < 10) {
+            const loader = await page.$('.kv-loader').catch(() => null);
+            if (!loader) break;
+            await new Promise(r => setTimeout(r, 500));
+            loadAttempts++;
+        }
+        await new Promise(r => setTimeout(r, 600));
+
+        log(`[Fase 3] Buscando fila con fecha coincidente (${fyhcreacion})...`);
+        const normFyh = (fyhcreacion || '').replace(/[-/\s:]/g, '').substring(0, 12);
+
+        let anularBtn = null;
+        const tbodyRows = await page.$$('table tbody tr');
+
+        for (const tr of tbodyRows) {
+            try {
+                const rowHtml = await tr.evaluate(el => el.innerText || '');
+                const normCell = rowHtml.replace(/[-/\s:]/g, '');
+                if (normFyh && normCell.includes(normFyh.substring(0, 8))) {
+                    const btn = await tr.$('i.fa-times').catch(() => null);
+                    if (btn) { anularBtn = btn; break; }
+                }
+            } catch { }
+        }
+
+        if (!anularBtn) {
+            log('[Fase 3] ⚠ No se encontró fila con fecha exacta, usando primera disponible...');
+            anularBtn = await page.$('table tbody i.fa-times').catch(() => null);
+        }
+
+        if (!anularBtn) {
+            throw new Error('No se encontró el botón de anulación (fa-times) en la tabla de solicitudes.');
+        }
+
+        log('[Fase 3] Clickeando botón de anulación...');
+        const anularLink = await page.evaluateHandle(el => el.closest('a') || el.closest('button') || el, anularBtn);
+        await anularLink.click();
+        await new Promise(r => setTimeout(r, 800));
+
+        log('[Fase 3] Esperando formulario #solicitud-form-id...');
+        await page.waitForSelector('#solicitud-form-id', { visible: true, timeout: 15000 });
+        await new Promise(r => setTimeout(r, 400));
+
+        log(`[Fase 3] Ingresando motivo: ${razonRechazo}`);
+        const obsEl = await page.$('#solicitud-observacion').catch(() => null)
+            || await page.$('#solicitud-form-id textarea').catch(() => null);
+        if (obsEl) {
+            await obsEl.click({ clickCount: 3 });
+            await obsEl.type(razonRechazo, { delay: 20 });
+        }
+
+        log('[Fase 3] Subiendo PDF de anulación...');
+        const fileInput2 = await page.$('#solicitud-form-id input[type="file"]').catch(() => null);
+        if (fileInput2) {
+            await fileInput2.uploadFile(tmpPdf2);
+            await new Promise(r => setTimeout(r, 600));
+        }
+
+        const descInput2 = await page.$('#solicitud-form-id input[id*="descripcion"]').catch(() => null)
+            || await page.$('#solicitud-form-id input[name*="descripcion"]').catch(() => null);
+        if (descInput2) {
+            await descInput2.click({ clickCount: 3 });
+            await descInput2.type(descDoc2, { delay: 20 });
+        }
+
+        log('[Fase 3] Confirmando anulación (#btnAnular)...');
+        await page.waitForSelector('#btnAnular', { visible: true, timeout: 10000 });
+        await page.click('#btnAnular');
+        await Promise.race([
+            page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }),
+            new Promise(r => setTimeout(r, 5000))
+        ]).catch(() => null);
+        log('[Fase 3] ✅ Anulación ejecutada.');
+
+        log('Retornando al legajo...');
+        await page.goto(linkLeg, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        log('✅ Flujo de rechazo completado con éxito.');
+
+        return { success: true };
+    } catch (err) {
+        log(`❌ Error en rechazarSolicitud: ${err.message}`);
+        return { success: false, error: err.message };
+    } finally {
+        await browser.close();
+        try { await fs.unlink(tmpPdf1); } catch { }
+        try { await fs.unlink(tmpPdf2); } catch { }
     }
 }

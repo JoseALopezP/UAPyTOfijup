@@ -6,9 +6,10 @@ import fs from 'fs/promises';
 import os from 'os';
 
 // Dynamically import required puppeteer modules from the Next.js src folder
-import { agendarAudiencia } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
+import { agendarAudiencia, rechazarSolicitud } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
 import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
 import { getInfoAudiencia } from '../src/app/Pumba/components/scrappingUAL.js';
+import { bloqueoMasivoAuto, parsearBloques } from '../src/firebase new/firestore/bloqueoAuto.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -209,6 +210,58 @@ app.on("ready", () => {
       return { success: true, data: resultados };
     } catch (error) {
       console.error('Error in scrape-pumba IPC:', error);
+      sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('bloqueo-masivo', async (event, body) => {
+    const sendEvent = (data) => {
+      event.sender.send('bloqueo-masivo-progress', data);
+    };
+
+    try {
+      const { fixed, bloques, periodos } = body;
+      const periodosParsed = bloques ? parsearBloques(bloques) : (periodos || []);
+      
+      await bloqueoMasivoAuto(fixed, periodosParsed, sendEvent);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in bloqueo-masivo IPC:', error);
+      sendEvent({ type: 'fatal', message: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('rechazar-solicitud', async (event, body) => {
+    const sendEvent = (data) => {
+      event.sender.send('agendar-puppeteer-progress', data);
+    };
+    const onProgress = (msg) => {
+      sendEvent({ type: 'progress', message: msg });
+    };
+
+    try {
+      const { solicitud, razonRechazo, solicitanteRechazo } = body;
+      const linkLeg = solicitud.linkLeg;
+      const linkSol = solicitud.linkSol;
+      const numeroLeg = solicitud.numeroLeg;
+      const fyhcreacion = solicitud.fyhcreacion;
+      const legajoFiscal = solicitud.legajoFiscal || numeroLeg;
+
+      if (!linkLeg) throw new Error('No se proporcionó linkLeg para rechazar la solicitud.');
+
+      sendEvent({ type: 'progress', message: `Iniciando rechazo de solicitud ${numeroLeg}...` });
+
+      const resultado = await rechazarSolicitud({
+        linkLeg, linkSol, razonRechazo, numeroLeg, fyhcreacion, legajoFiscal,
+        solicitante: solicitanteRechazo || 'MPF'
+      }, onProgress);
+
+      sendEvent({ type: 'done', data: resultado });
+      return { success: true, resultado };
+    } catch (error) {
+      console.error('Error in rechazar-solicitud IPC:', error);
       sendEvent({ type: 'error', error: error.message });
       return { success: false, error: error.message };
     }

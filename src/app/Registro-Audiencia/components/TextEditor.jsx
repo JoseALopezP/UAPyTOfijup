@@ -17,6 +17,12 @@ export default function TextEditor({ textValue, setTextValue }) {
     const editor = quillRef.current.getEditor();
     editorRef.current = editor;
 
+    // Habilitar motor de corrección ortográfica del navegador en español
+    if (editor.root) {
+      editor.root.setAttribute('spellcheck', 'true');
+      editor.root.setAttribute('lang', 'es');
+    }
+
     // Contenido inicial
     if (textValue) {
       editor.clipboard.dangerouslyPasteHTML(textValue);

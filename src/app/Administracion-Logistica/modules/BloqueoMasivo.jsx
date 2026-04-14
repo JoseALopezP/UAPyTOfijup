@@ -491,6 +491,7 @@ export default function BloqueoMasivo() {
     }
 
     // ── Lanzar (con streaming SSE) ──────────────────────────────────────────
+    // ── Lanzar (via IPC) ────────────────────────────────────────────────────
     const handleLanzar = async () => {
         if (!idPersona || !idMotivo) {
             setMensajeFinal('⚠️ Seleccioná Persona y Motivo antes de continuar.')
@@ -508,71 +509,90 @@ export default function BloqueoMasivo() {
         setMensajeFinal('')
         setProgreso({ index: 0, total: bloques.length, exitosos: 0, erroresCount: 0 })
 
+        const removeListener = window.electronAPI ? window.electronAPI.on('bloqueo-masivo-progress', (event, data) => {
+            const ev = typeof data === 'string' ? JSON.parse(data) : data;
+            if (ev.type === 'progress') {
+                setProgreso({
+                    index: ev.index,
+                    total: ev.total,
+                    exitosos: ev.exitosos,
+                    erroresCount: ev.erroresCount,
+                })
+            } else if (ev.type === 'block_error') {
+                setErroresList(prev => [...prev, { bloque: ev.bloque, motivo: ev.motivo }])
+            } else if (ev.type === 'done') {
+                setEstado('ok')
+                setMensajeFinal(
+                    `✅ Proceso terminado. ${ev.exitosos} bloques exitosos` +
+                    (ev.errores.length > 0
+                        ? `, ${ev.errores.length} con error (ver detalle abajo).`
+                        : ', sin errores.')
+                )
+            } else if (ev.type === 'fatal') {
+                setEstado('error')
+                setMensajeFinal(`❌ Error fatal: ${ev.message}`)
+            }
+        }) : null;
+
         try {
-            const response = await fetch('/api/bloqueo-auto/stream', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            if (window.electronAPI) {
+                await window.electronAPI.invoke('bloqueo-masivo', {
                     fixed: { tipoPersona, idPersona, idMotivo, observaciones },
                     bloques,
-                }),
-            })
+                });
+            } else {
+                // Fallback a API para desarrollo web si no estamos en Electron
+                const response = await fetch('/api/bloqueo-auto/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fixed: { tipoPersona, idPersona, idMotivo, observaciones },
+                        bloques,
+                    }),
+                });
 
-            if (!response.ok || !response.body) {
-                throw new Error(`Error del servidor: ${response.status}`)
-            }
+                if (!response.ok || !response.body) {
+                    throw new Error(`Error del servidor: ${response.status}`)
+                }
 
-            const reader = response.body.getReader()
-            const decoder = new TextDecoder()
-            let buffer = ''
+                const reader = response.body.getReader()
+                const decoder = new TextDecoder()
+                let buffer = ''
 
-            while (true) {
-                const { done, value } = await reader.read()
-                if (done) break
+                while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) break
 
-                buffer += decoder.decode(value, { stream: true })
-                const lines = buffer.split('\n')
-                buffer = lines.pop() // la última línea puede estar incompleta
+                    buffer += decoder.decode(value, { stream: true })
+                    const lines = buffer.split('\n')
+                    buffer = lines.pop()
 
-                for (const line of lines) {
-                    if (!line.startsWith('data: ')) continue
-                    try {
-                        const event = JSON.parse(line.slice(6))
-
-                        if (event.type === 'progress') {
-                            setProgreso({
-                                index: event.index,
-                                total: event.total,
-                                exitosos: event.exitosos,
-                                erroresCount: event.erroresCount,
-                            })
-                        } else if (event.type === 'block_error') {
-                            setErroresList(prev => [...prev, { bloque: event.bloque, motivo: event.motivo }])
-                        } else if (event.type === 'done') {
-                            setEstado('ok')
-                            setMensajeFinal(
-                                `✅ Proceso terminado. ${event.exitosos} bloques exitosos` +
-                                (event.errores.length > 0
-                                    ? `, ${event.errores.length} con error (ver detalle abajo).`
-                                    : ', sin errores.')
-                            )
-                        } else if (event.type === 'fatal') {
-                            setEstado('error')
-                            setMensajeFinal(`❌ Error fatal: ${event.message}`)
-                        }
-                    } catch { /* línea malformada, ignorar */ }
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue
+                        try {
+                            const event = JSON.parse(line.slice(6))
+                            if (event.type === 'progress') {
+                                setProgreso({ index: event.index, total: event.total, exitosos: event.exitosos, erroresCount: event.erroresCount })
+                            } else if (event.type === 'block_error') {
+                                setErroresList(prev => [...prev, { bloque: event.bloque, motivo: event.motivo }])
+                            } else if (event.type === 'done') {
+                                setEstado('ok')
+                                setMensajeFinal(`✅ Proceso terminado. ${event.exitosos} exitosos` + (event.errores.length > 0 ? `, ${event.errores.length} con error.` : ', sin errores.'))
+                            } else if (event.type === 'fatal') {
+                                setEstado('error')
+                                setMensajeFinal(`❌ Error fatal: ${event.message}`)
+                            }
+                        } catch { }
+                    }
                 }
             }
-
-            // Si el stream terminó sin evento 'done' (ej: caída abrupta)
-            if (estado === 'loading') {
-                setEstado('error')
-                setMensajeFinal('⚠️ El stream terminó inesperadamente.')
-            }
-
         } catch (err) {
             setEstado('error')
             setMensajeFinal(`❌ Error al conectar: ${err.message}`)
+        } finally {
+            if (window.electronAPI) {
+                window.electronAPI.removeAllListeners('bloqueo-masivo-progress');
+            }
         }
     }
 

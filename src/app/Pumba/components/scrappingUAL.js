@@ -12,7 +12,7 @@ async function initBrowser() {
     browser = await puppeteer.launch({
         headless: false,
         executablePath: getBrowserPath(),
-        args: [`--window-size=${width},${height}`, '--no-sandbox', '--disable-setuid-sandbox'],
+        args: [`--window-size=${width},${height}`, '--no-sandbox', '--disable-setuid-sandbox', '--disable-quic'],
         defaultViewport: {
             width: width,
             height: height
@@ -255,7 +255,7 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
     const browserInstance = await puppeteer.launch({
         headless: true,
         executablePath: getBrowserPath(),
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-quic']
     });
 
     let pageInstance = (await browserInstance.pages())[0];

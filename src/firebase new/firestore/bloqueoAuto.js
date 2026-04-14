@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import { getBrowserPath } from "../../utils/browserPath.js";
 
 const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
 const FORM_URL = "http://10.107.1.184:8094/bloqueo-persona/create";
@@ -145,8 +146,9 @@ export async function bloqueoMasivoAuto(fixed, periodos, onEvent = null) {
 
     const browser = await puppeteer.launch({
         headless: false,
+        executablePath: getBrowserPath(),
         slowMo: 60,
-        args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox"],
+        args: ["--window-size=1280,720", "--no-sandbox", "--disable-setuid-sandbox", "--disable-quic"],
         defaultViewport: { width: 1280, height: 720 },
     });
     const page = (await browser.pages())[0] || await browser.newPage();

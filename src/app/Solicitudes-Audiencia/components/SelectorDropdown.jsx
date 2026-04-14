@@ -10,9 +10,14 @@ import styles from '../SolicitudesAudiencia.module.css';
  * @param {Function} onSelect - Callback al elegir una opción
  * @param {String} title - Título del dropdown
  */
-export default function SelectorDropdown({ options = [], onSelect, title = "Opciones" }) {
+export default function SelectorDropdown({ options = [], onSelect, title = "Opciones", onToggle }) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+
+    // Call onToggle when isOpen changes
+    useEffect(() => {
+        if (onToggle) onToggle(isOpen);
+    }, [isOpen, onToggle]);
 
     // Cerrar al hacer click fuera
     useEffect(() => {
@@ -30,7 +35,7 @@ export default function SelectorDropdown({ options = [], onSelect, title = "Opci
     }, [isOpen]);
 
     return (
-        <div className={styles.selectorWrapper} ref={dropdownRef}>
+        <div className={styles.selectorWrapper} ref={dropdownRef} style={{ zIndex: isOpen ? 500 : 10 }}>
             <button
                 className={styles.buttonExpand}
                 onClick={() => setIsOpen(!isOpen)}
