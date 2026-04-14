@@ -7,8 +7,8 @@ const FORM_URL = "http://10.107.1.184:8094/bloqueo-persona/create";
 // ── Login ─────────────────────────────────────────────────────────────────────
 async function login(page) {
     await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
-    await page.type("#loginform-username", "20423341980");
-    await page.type("#loginform-password", "Marzo24");
+    await page.$eval("#loginform-username", el => el.value = "20423341980");
+    await page.$eval("#loginform-password", el => el.value = "Marzo24");
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 15000 });
     console.log("   ✓ Login exitoso.");
@@ -20,27 +20,79 @@ async function llenarYEnviar(page, fixed, periodo, index, total) {
 
     await page.goto(FORM_URL, { waitUntil: "networkidle2" });
 
-    // 1. Tipo Persona (Select2)
-    await page.evaluate((val) => {
-        const sel = document.getElementById("bloqueopersona-tipo_persona");
-        sel.value = val;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
-    }, fixed.tipoPersona);
+    // Helper para clickear select2 fidedignamente (Sólo para Tipo Persona según solicitud)
+    const select2UiClick = async (selectId, value) => {
+        const arrowSel = `#${selectId} + span.select2 .select2-selection__arrow`;
+        await page.waitForSelector(arrowSel, { visible: true, timeout: 15000 });
+        await page.click(arrowSel);
+        
+        await page.waitForSelector('.select2-results__option', { visible: true, timeout: 10000 });
+        await page.evaluate((id, val) => {
+            const nativeOpt = document.querySelector(`#${id} option[value="${val}"]`);
+            if (!nativeOpt) return;
+            const textToFind = nativeOpt.textContent.trim().toLowerCase();
 
-    await new Promise(r => setTimeout(r, 900));
+            const lis = document.querySelectorAll('.select2-results__option');
+            for (const li of lis) {
+                if (li.textContent.trim().toLowerCase() === textToFind) {
+                    li.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+                    li.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+                    break;
+                }
+            }
 
-    // 2. Persona
+            const origSelect = document.getElementById(id);
+            if (origSelect) {
+                origSelect.value = val;
+                origSelect.dispatchEvent(new Event("change", { bubbles: true }));
+                if (typeof window.jQuery !== "undefined") {
+                    window.jQuery(`#${id}`).trigger("change");
+                }
+            }
+        }, selectId, value);
+    };
+
+    // 1. Tipo Persona (Manual click select)
+    await select2UiClick('bloqueopersona-tipo_persona', fixed.tipoPersona);
+
+    await new Promise(r => setTimeout(r, 600)); // Espera normal para Krajee AJAX
+
+    // Esperar a que desaparezca el "Loading..." y se inyecte la opción de Persona
+    await page.waitForFunction((val) => {
+        const el = document.getElementById("bloqueopersona-id_persona");
+        if (!el) return false;
+        const isLoading = Array.from(el.options).some(opt => opt.text.includes("Loading"));
+        return !isLoading && el.querySelector(`option[value="${val}"]`);
+    }, { timeout: 15000 }, fixed.idPersona);
+    await new Promise(r => setTimeout(r, 200));
+
+    // 2. Persona (Evaluate JS, como se venía haciendo)
     await page.evaluate((val) => {
         const sel = document.getElementById("bloqueopersona-id_persona");
-        sel.value = val;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        if (sel) {
+            sel.value = val;
+            sel.dispatchEvent(new Event("change", { bubbles: true }));
+        }
     }, fixed.idPersona);
 
-    // 3. Motivo Bloqueo
+    await new Promise(r => setTimeout(r, 600)); // Espera normal para Krajee AJAX
+
+    // Esperar a que el option del Motivo se cargue y desaparezca el "Loading..."
+    await page.waitForFunction((val) => {
+        const el = document.getElementById("bloqueopersona-id_motivo_bloqueo");
+        if (!el) return false;
+        const isLoading = Array.from(el.options).some(opt => opt.text.includes("Loading"));
+        return !isLoading && el.querySelector(`option[value="${val}"]`);
+    }, { timeout: 15000 }, fixed.idMotivo);
+    await new Promise(r => setTimeout(r, 200));
+
+    // 3. Motivo Bloqueo (Evaluate JS)
     await page.evaluate((val) => {
         const sel = document.getElementById("bloqueopersona-id_motivo_bloqueo");
-        sel.value = val;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        if (sel) {
+            sel.value = val;
+            sel.dispatchEvent(new Event("change", { bubbles: true }));
+        }
     }, fixed.idMotivo);
 
     // 4. Período — hidden inputs del daterangepicker
@@ -53,10 +105,14 @@ async function llenarYEnviar(page, fixed, periodo, index, total) {
         if (end) end.value = p.hasta;
     }, periodo);
 
-    // 5. Observaciones
-    const obsField = await page.$("#bloqueopersona-observaciones");
-    await obsField.click({ clickCount: 3 });
-    await obsField.type(fixed.observaciones || "");
+    // 5. Observaciones (Escritura instantánea)
+    await page.evaluate((obs) => {
+        const el = document.getElementById("bloqueopersona-observaciones");
+        if (el) {
+            el.value = obs;
+            el.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+    }, fixed.observaciones || "");
 
     // 6. Re-inyectar hora justo antes del submit por si el daterangepicker los pisó
     await page.evaluate((p) => {

@@ -461,18 +461,38 @@ export default function BloqueoMasivo() {
 
     // ── Agregar bloque ──────────────────────────────────────────────────────
     const handleAgregar = () => {
-        const val = nuevo.trim()
-        if (!BLOQUE_REGEX.test(val)) {
-            setNuevoError('Formato inválido. Usá: DD/MM/AAAA | HH:MM - HH:MM')
-            return
+        const text = nuevo.trim()
+        if (!text) return;
+
+        const lineas = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        let correctos = [];
+        let numErrores = 0;
+
+        for (const val of lineas) {
+            if (!BLOQUE_REGEX.test(val)) {
+                numErrores++;
+            } else if (bloques.includes(val) || correctos.includes(val)) {
+                numErrores++; // Duplicado
+            } else {
+                correctos.push(val);
+            }
         }
-        if (bloques.includes(val)) {
-            setNuevoError('Ese bloque ya está en la lista.')
-            return
+
+        if (correctos.length > 0) {
+            setBloques(prev => [...prev, ...correctos]);
         }
-        setBloques(prev => [...prev, val])
-        setNuevo('')
-        setNuevoError('')
+
+        if (numErrores > 0) {
+            if (correctos.length > 0) {
+                setNuevoError(`Se agregaron ${correctos.length} bloques. Se ignoraron ${numErrores} inválidos o duplicados.`);
+                setNuevo(''); // Limpia la caja ya que procesó lo posible
+            } else {
+                setNuevoError('No se encontraron bloques con formato válido (DD/MM/AAAA | HH:MM - HH:MM).');
+            }
+        } else {
+            setNuevoError('');
+            setNuevo('');
+        }
     }
 
     const handleEliminar = (idx) => {
@@ -655,20 +675,19 @@ export default function BloqueoMasivo() {
                     <span style={s.hint}> (DD/MM/AAAA | HH:MM - HH:MM)</span>
                 </label>
                 <div style={s.addRow}>
-                    <input
+                    <textarea
                         id="bm-nuevo-bloque"
-                        type="text"
                         value={nuevo}
                         onChange={e => { setNuevo(e.target.value); setNuevoError('') }}
-                        onKeyDown={e => e.key === 'Enter' && handleAgregar()}
-                        placeholder="09/03/2026 | 15:00 - 18:00"
-                        style={{ ...s.input, flex: 1 }}
+                        onKeyDown={e => e.key === 'Enter' && e.ctrlKey && handleAgregar()}
+                        placeholder="09/03/2026 | 15:00 - 18:00 (Pegá varias líneas y apretá + Agregar)"
+                        style={{ ...s.input, flex: 1, minHeight: '60px', resize: 'vertical', fontFamily: 'monospace' }}
                     />
-                    <button id="bm-agregar-btn" onClick={handleAgregar} style={s.btnAdd}>
+                    <button id="bm-agregar-btn" onClick={handleAgregar} style={{ ...s.btnAdd, alignSelf: 'stretch' }}>
                         + Agregar
                     </button>
                 </div>
-                {nuevoError && <span style={s.errorTxt}>{nuevoError}</span>}
+                {nuevoError && <span style={{ ...s.errorTxt, display: 'block', marginTop: '4px' }}>{nuevoError}</span>}
             </div>
 
             {/* ── Lista de bloques ──────────────────────────────────────── */}
