@@ -4,7 +4,7 @@ import { DataContext } from '@/context New/DataContext'
 import { ButtonSelection } from './ButtonSelection'
 
 export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, setTestigos, setJuicioInfo }) {
-    const { updateDesplegables, desplegables } = useContext(DataContext)
+    const { updateDesplegables, desplegables, feriados, updateFeriados } = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true)
     const [numeroLeg2, setNumeroLeg2] = useState(null)
@@ -153,17 +153,50 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
             navigator.clipboard.writeText(cells);
         }
     }
+    const isHoliday = (dateObj) => {
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const y = String(dateObj.getFullYear());
+        const dateStr = `${d}${m}${y}`;
+        const dayOfWeek = dateObj.getDay();
+
+        // Check weekend
+        if (dayOfWeek === 0 || dayOfWeek === 6) return true;
+
+        // Check business holidays (feriados.feriados is likely an array of DDMMYYYY)
+        if (feriados && feriados.feriados && Array.isArray(feriados.feriados)) {
+            return feriados.feriados.includes(dateStr);
+        }
+        return false;
+    };
+
     const handleGenerar = () => {
         const aux = []
         const aux2 = []
         if (checkCompletion()) {
+            // Use the "Fecha de inicio juicio" as the starting point
+            let currentDay = new Date(parseInt(fechaia), parseInt(fechaim) - 1, parseInt(fechaid));
+
             for (let i = 0; i < parseInt(cantBloques); i++) {
+                // Ensure currentDay is a valid business day
+                while (isHoliday(currentDay)) {
+                    currentDay.setDate(currentDay.getDate() + 1);
+                }
+
+                const d = String(currentDay.getDate()).padStart(2, '0');
+                const m = String(currentDay.getMonth() + 1).padStart(2, '0');
+                const y = String(currentDay.getFullYear());
+
                 aux.push({
+                    audId: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}-${crypto.randomUUID().slice(0, 4)}`,
                     hora: fechah + ':' + fechamm + ':' + fechas,
-                    fecha: fechad + '/' + fecham + '/' + fechaa,
+                    fecha: `${d}${m}${y}`,
                     estadoBloque: 'PROGRAMADO',
                     sala: '-'
-                })
+                });
+
+                // Move to the next day for the next block
+                currentDay.setDate(currentDay.getDate() + 1);
             }
             setBloquesArray(aux)
             for (let i = 0; i < parseInt(cantTestigos); i++) {
@@ -179,6 +212,7 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
     }
     useEffect(() => {
         updateDesplegables()
+        updateFeriados()
     }, []);
 
     useEffect(() => {
