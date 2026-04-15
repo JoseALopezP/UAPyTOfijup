@@ -134,78 +134,93 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setIsInitialized(true);
     };
     
-    const updateDataAud = async() =>{
-        setGuardando(true)
-        const handleRemove = async (itemList, removedList, field) => {
-            for (const item of removedList) {
-                if (itemList.includes(item)) {
-                    await updateData(dateToUse, item.id, field, itemList.filter(i => i !== item));
+    const updateDataAud = async() => {
+        setGuardando(true);
+        let retries = 3;
+        let success = false;
+        
+        while (retries > 0 && !success) {
+            try {
+                const handleRemove = async (itemList, removedList, field) => {
+                    for (const removedItem of removedList) {
+                        if (itemList.includes(removedItem)) {
+                            await updateData(dateToUse, item.id, field, itemList.filter(i => i !== removedItem));
+                        }
+                    }
+                };
+                await handleRemove(mpf, removedMpf, 'mpf');
+                await handleRemove(defensa, removedDefensa, 'defensa');
+                await handleRemove(imputado, removedImputado, 'imputado');
+                await handleRemove(partes, removedPartes, 'partes');
+                
+                if (!deepEqual(caratula2, caratula)) await updateData(dateToUse, item.id, 'caratula', caratula);
+                if (!deepEqual(mpf2, mpf)) await updateData(dateToUse, item.id, 'mpf', mpf); 
+                if (!deepEqual(defensa2, defensa)) await updateData(dateToUse, item.id, 'defensa', defensa);
+                if (!deepEqual(imputado2, imputado)) await updateData(dateToUse, item.id, 'imputado', imputado);
+                if (!deepEqual(partes2, partes)) await updateData(dateToUse, item.id, 'partes', partes);
+                if (!deepEqual(razonDemora2, razonDemora)) await updateData(dateToUse, item.id, 'razonDemora', razonDemora);
+                if (!deepEqual(ufi2, ufi)) await updateData(dateToUse, item.id, 'ufi', ufi);
+                if (!deepEqual(saeNum2, saeNum)) await updateData(dateToUse, item.id, 'saeNum', saeNum);
+                
+                if (showReconversion) {
+                    if (!deepEqual(tipo, tipoAux)) {
+                        if (!deepEqual(tipo2, tipo2Aux)) {
+                            if (!deepEqual(tipo3, tipo3Aux)) {
+                                await updateData(dateToUse, item.id, 'tipo', tipo);
+                                await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                                await updateData(dateToUse, item.id, 'tipo3', tipo3);
+                            } else {
+                                await updateData(dateToUse, item.id, 'tipo', tipo);
+                                await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                                await updateData(dateToUse, item.id, 'tipo3', '');
+                            }
+                        } else {
+                            await updateData(dateToUse, item.id, 'tipo', tipo);
+                            await updateData(dateToUse, item.id, 'tipo2', '');
+                            await updateData(dateToUse, item.id, 'tipo3', '');
+                        }
+                        await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
+                    }
                 }
-        }}
-        await handleRemove(mpf, removedMpf, 'mpf');
-        await handleRemove(defensa, removedDefensa, 'defensa');
-        await handleRemove(imputado, removedImputado, 'imputado');
-        await handleRemove(partes, removedPartes, 'partes');
-        setRemovedMpf([]);
-        setRemovedDefensa([]);
-        setRemovedImputado([]);
-        setRemovedPartes([]);
-        if (!deepEqual(caratula2, caratula)){
-            await updateData(dateToUse, item.id, 'caratula', caratula);
-            setCaratula2(caratula)}
-        if (!deepEqual(mpf2, mpf)){
-            await updateData(dateToUse, item.id, 'mpf', mpf);
-            setMpf2(mpf)} 
-        if (!deepEqual(defensa2, defensa)){
-            await updateData(dateToUse, item.id, 'defensa', defensa);
-            setDefensa2(defensa)}
-        if (!deepEqual(imputado2, imputado)){
-            await updateData(dateToUse, item.id, 'imputado', imputado);
-            setImputado2(imputado)}
-        if (!deepEqual(partes2, partes)){
-            await updateData(dateToUse, item.id, 'partes', partes);
-            setPartes2(partes)}
-        if (!deepEqual(razonDemora2, razonDemora)){
-            await updateData(dateToUse, item.id, 'razonDemora', razonDemora);
-            setRazonDemora2(razonDemora)}
-        if (!deepEqual(ufi2, ufi)){
-            await updateData(dateToUse, item.id, 'ufi', ufi);
-            setUfi2(ufi)}
-        if (!deepEqual(saeNum2, saeNum)){
-            await updateData(dateToUse, item.id, 'saeNum', saeNum);
-            setSaeNum2(saeNum)
-        }
-        if(showReconversion){
-        if (!deepEqual(tipo, tipoAux)){
-            if(!deepEqual(tipo2, tipo2Aux)){
-                if(!deepEqual(tipo3, tipo3Aux)){
-                    await updateData(dateToUse, item.id, 'tipo', tipo);
-                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
-                    await updateData(dateToUse, item.id, 'tipo3', tipo3);
-                }else{
-                    await updateData(dateToUse, item.id, 'tipo', tipo);
-                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
-                    await updateData(dateToUse, item.id, 'tipo3', '');
+                if (await checkForResuelvo(item)) {
+                    await updateRealTime();
+                    await updateData(dateToUse, item.id, 'horaResuelvo', realTime);
                 }
-            }else{
-                await updateData(dateToUse, item.id, 'tipo', tipo);
-                await updateData(dateToUse, item.id, 'tipo2', '');
-                await updateData(dateToUse, item.id, 'tipo3', '');
+                
+                await updateByDate(dateToUse);
+                
+                setRemovedMpf([]);
+                setRemovedDefensa([]);
+                setRemovedImputado([]);
+                setRemovedPartes([]);
+                setCaratula2(caratula);
+                setMpf2(mpf);
+                setDefensa2(defensa);
+                setImputado2(imputado);
+                setPartes2(partes);
+                setRazonDemora2(razonDemora);
+                setUfi2(ufi);
+                setSaeNum2(saeNum);
+                if (showReconversion) {
+                    setTipoAux(tipo);
+                    setTipo2Aux(tipo2);
+                    setTipo3Aux(tipo3);
+                }
+                setGuardarInc(false);
+                setNeedsSaving1(false);
+                success = true; // Succeeded!
+            } catch (error) {
+                console.error(`Error en updateDataAud. Retries left: ${retries - 1}`, error);
+                retries -= 1;
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1500)); // wait 1.5s
+                } else {
+                    alert("No se pudieron guardar los cambios de la izquierda después de varios intentos. Reintente por favor.");
+                }
             }
-            await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
-            setTipoAux(tipo)
-            setTipo2Aux(tipo2)
-            setTipo3Aux(tipo3)
         }
-        }
-        if (await checkForResuelvo(item)){
-            await updateRealTime();
-            await updateData(dateToUse, item.id, 'horaResuelvo', realTime);
-        }
-        await setGuardarInc(false)
-        await setGuardando(false)
-        await updateByDate(dateToUse)
-    }
+        setGuardando(false);
+    };
     const handleSubmit = async (event) => {
         if(event) event.preventDefault();
         updateDataAud()

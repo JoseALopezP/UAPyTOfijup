@@ -83,49 +83,60 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     const handleGlobalSave = async () => {
         if (!aud || isSaving) return;
         setIsSaving(true);
-        try {
-            // Guardar Minuta, Resuelvo, Cierre
-            if (minuta !== (aud.minuta || '') && removeHtmlTags(minuta) !== '') {
-                await updateDataOnly(dateToUse, aud.id, 'minuta', minuta);
-            }
-            if (resuelvo !== (aud.resuelvoText || '') && removeHtmlTags(resuelvo) !== '') {
-                await updateDataOnly(dateToUse, aud.id, 'resuelvoText', resuelvo);
-            }
-            if (cierre !== (aud.cierre || '') && removeHtmlTags(cierre) !== '') {
-                await updateDataOnly(dateToUse, aud.id, 'cierre', cierre);
-            }
-            
-            // Guardar Metadatos
-            if (caratula !== (aud.caratula || '')) await updateData(dateToUse, aud.id, 'caratula', caratula);
-            if (saeNum !== (aud.saeNum || '')) await updateData(dateToUse, aud.id, 'saeNum', saeNum);
-            if (razonDemora !== (aud.razonDemora || '')) await updateData(dateToUse, aud.id, 'razonDemora', razonDemora);
-            if (ufi !== (aud.ufi || '')) await updateData(dateToUse, aud.id, 'ufi', ufi);
-            if (estado !== (aud.estado || '')) await updateData(dateToUse, aud.id, 'estado', estado);
-            if (operadorAud !== (aud.operador || '')) await updateData(dateToUse, aud.id, 'operador', operadorAud);
-            if (sala !== (aud.sala || '')) await updateData(dateToUse, aud.id, 'sala', sala);
-            
-            if (!deepEqual(mpf, aud.mpf || [])) await updateData(dateToUse, aud.id, 'mpf', mpf);
-            if (!deepEqual(defensa, aud.defensa || [])) await updateData(dateToUse, aud.id, 'defensa', defensa);
-            if (!deepEqual(imputado, aud.imputado || [])) await updateData(dateToUse, aud.id, 'imputado', imputado);
-            if (!deepEqual(partes, aud.partes || [])) await updateData(dateToUse, aud.id, 'partes', partes);
-            
-            if (tipo !== (aud.tipo || '') || tipo2 !== (aud.tipo2 || '') || tipo3 !== (aud.tipo3 || '')) {
-                await updateData(dateToUse, aud.id, 'tipo', tipo);
-                await updateData(dateToUse, aud.id, 'tipo2', tipo2);
-                await updateData(dateToUse, aud.id, 'tipo3', tipo3);
-            }
+        
+        let retries = 3;
+        let success = false;
+        
+        while (retries > 0 && !success) {
+            try {
+                // Guardar Minuta, Resuelvo, Cierre
+                if (minuta !== (aud.minuta || '') && removeHtmlTags(minuta) !== '') {
+                    await updateDataOnly(dateToUse, aud.id, 'minuta', minuta);
+                }
+                if (resuelvo !== (aud.resuelvoText || '') && removeHtmlTags(resuelvo) !== '') {
+                    await updateDataOnly(dateToUse, aud.id, 'resuelvoText', resuelvo);
+                }
+                if (cierre !== (aud.cierre || '') && removeHtmlTags(cierre) !== '') {
+                    await updateDataOnly(dateToUse, aud.id, 'cierre', cierre);
+                }
+                
+                // Guardar Metadatos
+                if (caratula !== (aud.caratula || '')) await updateData(dateToUse, aud.id, 'caratula', caratula);
+                if (saeNum !== (aud.saeNum || '')) await updateData(dateToUse, aud.id, 'saeNum', saeNum);
+                if (razonDemora !== (aud.razonDemora || '')) await updateData(dateToUse, aud.id, 'razonDemora', razonDemora);
+                if (ufi !== (aud.ufi || '')) await updateData(dateToUse, aud.id, 'ufi', ufi);
+                if (estado !== (aud.estado || '')) await updateData(dateToUse, aud.id, 'estado', estado);
+                if (operadorAud !== (aud.operador || '')) await updateData(dateToUse, aud.id, 'operador', operadorAud);
+                if (sala !== (aud.sala || '')) await updateData(dateToUse, aud.id, 'sala', sala);
+                
+                if (!deepEqual(mpf, aud.mpf || [])) await updateData(dateToUse, aud.id, 'mpf', mpf);
+                if (!deepEqual(defensa, aud.defensa || [])) await updateData(dateToUse, aud.id, 'defensa', defensa);
+                if (!deepEqual(imputado, aud.imputado || [])) await updateData(dateToUse, aud.id, 'imputado', imputado);
+                if (!deepEqual(partes, aud.partes || [])) await updateData(dateToUse, aud.id, 'partes', partes);
+                
+                if (tipo !== (aud.tipo || '') || tipo2 !== (aud.tipo2 || '') || tipo3 !== (aud.tipo3 || '')) {
+                    await updateData(dateToUse, aud.id, 'tipo', tipo);
+                    await updateData(dateToUse, aud.id, 'tipo2', tipo2);
+                    await updateData(dateToUse, aud.id, 'tipo3', tipo3);
+                }
 
-            if (checkForResuelvo(aud)) {
-                await updateDataDeep(dateToUse, aud.id, 'horaResuelvo', updateRealTimeFunction());
-            }
+                if (checkForResuelvo(aud)) {
+                    await updateDataDeep(dateToUse, aud.id, 'horaResuelvo', updateRealTimeFunction());
+                }
 
-            await updateByDate(dateToUse);
-        } catch (error) {
-            console.error("Error saving all data:", error);
-            alert("Error al guardar los cambios");
-        } finally {
-            setIsSaving(false);
+                await updateByDate(dateToUse);
+                success = true; // Succeeded!
+            } catch (error) {
+                console.error(`Error saving all data. Retries left: ${retries - 1}`, error);
+                retries -= 1;
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1500)); // wait 1.5s
+                } else {
+                    alert("Error al guardar los cambios después de varios intentos. Verifique su conexión y reintente.");
+                }
+            }
         }
+        setIsSaving(false);
     };
 
     useEffect(() => {
