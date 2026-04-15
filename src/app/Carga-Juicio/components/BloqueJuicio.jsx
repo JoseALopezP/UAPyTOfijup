@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
 
-export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, index}){
+export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, index, removeBloque}){
     const [option, setOption] = useState(last ? 'LECTURA DE SENTENCIA' : 'DEBATE')
     const {desplegables} = useContext(DataContext)
     return(
@@ -41,6 +41,7 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
                     <option value={'DEBATE'}>DEBATE</option>
                     <option value={'LECTURA DE SENTENCIA'}>LECTURA DE SENTENCIA</option>
                 </select>
+                <button type="button" className={`${styles.deletButton}`} onClick={removeBloque} style={{marginLeft: '10px'}}>✖</button>
             </span>
         </div>
     )

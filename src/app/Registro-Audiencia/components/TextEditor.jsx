@@ -23,11 +23,6 @@ export default function TextEditor({ textValue, setTextValue }) {
       editor.root.setAttribute('lang', 'es');
     }
 
-    // Contenido inicial
-    if (textValue) {
-      editor.clipboard.dangerouslyPasteHTML(textValue);
-    }
-
     // Guardar selección y formatos activos
     editor.on('selection-change', (range) => {
       if (range) {
@@ -40,16 +35,6 @@ export default function TextEditor({ textValue, setTextValue }) {
       if (sel) setFormats(editor.getFormat(sel));
     });
   }, []);
-
-  // Update editor content when textValue prop changes externally
-  useEffect(() => {
-    if (editorRef.current && textValue !== undefined) {
-      const currentHtml = editorRef.current.root.innerHTML;
-      if (textValue !== currentHtml) {
-        editorRef.current.clipboard.dangerouslyPasteHTML(textValue || "");
-      }
-    }
-  }, [textValue]);
 
   const handleChange = (value) => {
     if (setTextValue) setTextValue(value);
@@ -164,6 +149,7 @@ export default function TextEditor({ textValue, setTextValue }) {
       <div className={styles.quillContainer}>
         <ReactQuill
           ref={quillRef}
+          value={textValue}
           onChange={handleChange}
           modules={QUILL_MODULES}
         />

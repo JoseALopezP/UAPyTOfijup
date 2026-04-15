@@ -5,7 +5,7 @@ const db = getFirestore(firebase_app);
 export const updateInternalFieldJuicio = async (date, juicioId, field, value) => {
   try {
     const docRef = doc(db, "juicios", date);
-    const fieldPath = `juicios.${juicioId}.${field}`;
+    const fieldPath = `${juicioId}.${field}`;
     await updateDoc(docRef, {
       [fieldPath]: value,
     });

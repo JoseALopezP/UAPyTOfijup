@@ -11,61 +11,33 @@ import { DataContext } from '@/context New/DataContext';
 import { ButtonSelection } from './ButtonSelection';
 
 export default function JuicioFrame() {
-  const { changeValueJuicio, desplegables, updateDesplegables, updateData } = useContext(DataContext)
+  const { changeValueJuicio, desplegables, updateDesplegables, updateData, addJuicio } = useContext(DataContext)
   const [previousVersion, setPreviousVersion] = useState({})
   const [newState, setNewState] = useState(true)
-  const [changesToSave, setChangesToSave] = useState(null)
+  const [changesToSave, setChangesToSave] = useState([])
   const [year, setYear] = useState(getCurrentYear())
-  const [bloquesArray, setBloquesArray] = useState([
-    {
-      audId: 101,
-      fecha: '17122025',
-      hora: '09:00',
-      sala: '1',
-      estadoBloque: 'PROGRAMADO'
-    },
-    {
-      audId: 102,
-      fecha: '18122025',
-      hora: '10:00',
-      sala: '2',
-      estadoBloque: 'FINALIZADO'
-    }
-  ])
-  const [testigos, setTestigos] = useState([
-    {
-      id: 1,
-      nombre: 'Juan Perez',
-      dni: '12345678',
-      fecha: [
-        {
-          audid: 101,
-          hora: '09:30',
-          fecha: '17122025 09:00',
-          asistencia: 'presente',
-          complete: false
-        }
-      ]
-    },
-    {
-      id: 2,
-      nombre: 'Maria Garcia',
-      dni: '87654321',
-      fecha: [
-        {
-          audid: 102,
-          hora: '10:30',
-          fecha: '18122025 10:00',
-          asistencia: 'ausente',
-          complete: true
-        }
-      ]
-    }
-  ])
+  const [bloquesArray, setBloquesArray] = useState(null)
+  const [testigos, setTestigos] = useState(null)
+  const [juicioInfo, setJuicioInfo] = useState({
+    numeroLeg: '',
+    ufi: '',
+    autoApertura: '',
+    inicioJuicio: '',
+    tipoDelito: '',
+    tipoTribunal: 'UNIPERSONAL',
+    fiscal: '',
+    defensa: '',
+    defensoria: '',
+    querella: '',
+    jueces: [],
+    estadoJuicio: 'PROGRAMADO'
+  })
   const testFunctionAux = (value) => {
-    if (!changesToSave.includes(value)) {
-      setChangesToSave([...changesToSave, value])
-    }
+    setChangesToSave(prev => {
+        if (!Array.isArray(prev)) return [value];
+        if (!prev.includes(value)) return [...prev, value];
+        return prev;
+    });
   }
   const updateAud = (attribute) => {
     bloquesArray.forEach(el => {
@@ -73,119 +45,163 @@ export default function JuicioFrame() {
     })
   }
   const saving = (aux) => {
-    changesToSave.forEach((value) => {
-      switch (value) {
-        case 'numeroLeg':
-          changeValueJuicio(year, aux.id, 'numeroLeg', aux.numeroLeg)
-          updateAud('numeroLeg')
-          break;
-        case 'auto':
-          changeValueJuicio(year, aux.id, 'auto', aux.auto)
-          break;
-        case 'inicio':
-          changeValueJuicio(year, aux.id, 'inicio', aux.inicio)
-          break;
-        case 'fiscal':
-          changeValueJuicio(year, aux.id, 'fiscal', aux.fiscal)
-          break;
-        case 'tipoDelito':
-          changeValueJuicio(year, aux.id, 'tipoDelito', aux.tipoDelito)
-          break;
-        case 'ufi':
-          changeValueJuicio(year, aux.id, 'ufi', aux.ufi)
-          updateAud('ufi')
-          break;
-        case 'defensa':
-          changeValueJuicio(year, aux.id, 'defensa', aux.defensa)
-          break;
-        case 'defensoria':
-          changeValueJuicio(year, aux.id, 'defensoria', aux.defensoria)
-          updateAud('defensoria')
-          break;
-        case 'querella':
-          changeValueJuicio(year, aux.id, 'querella', aux.querella)
-          break;
-        case 'jueces':
-          changeValueJuicio(year, aux.id, 'jueces', aux.jueces)
-          break;
-        case 'estadoJuicio':
-          changeValueJuicio(year, aux.id, 'estadoJuicio', aux.estadoJuicio)
-          break;
-        default:
-          break;
-      }
-    })
+    if (aux && aux.id && Array.isArray(changesToSave)) {
+        changesToSave.forEach((value) => {
+          switch (value) {
+            case 'numeroLeg':
+              changeValueJuicio(year, aux.id, 'numeroLeg', aux.numeroLeg)
+              updateAud('numeroLeg')
+              break;
+            case 'auto':
+              changeValueJuicio(year, aux.id, 'auto', aux.auto)
+              break;
+            case 'inicio':
+              changeValueJuicio(year, aux.id, 'inicio', aux.inicio)
+              break;
+            case 'fiscal':
+              changeValueJuicio(year, aux.id, 'fiscal', aux.fiscal)
+              break;
+            case 'tipoDelito':
+              changeValueJuicio(year, aux.id, 'tipoDelito', aux.tipoDelito)
+              break;
+            case 'ufi':
+              changeValueJuicio(year, aux.id, 'ufi', aux.ufi)
+              updateAud('ufi')
+              break;
+            case 'defensa':
+              changeValueJuicio(year, aux.id, 'defensa', aux.defensa)
+              break;
+            case 'defensoria':
+              changeValueJuicio(year, aux.id, 'defensoria', aux.defensoria)
+              updateAud('defensoria')
+              break;
+            case 'querella':
+              changeValueJuicio(year, aux.id, 'querella', aux.querella)
+              break;
+            case 'jueces':
+              changeValueJuicio(year, aux.id, 'jueces', aux.jueces)
+              break;
+            case 'estadoJuicio':
+              changeValueJuicio(year, aux.id, 'estadoJuicio', aux.estadoJuicio)
+              break;
+            case 'bloques':
+              changeValueJuicio(year, aux.id, 'bloques', bloquesArray)
+              break;
+            case 'testigos':
+              changeValueJuicio(year, aux.id, 'testigos', testigos)
+              break;
+            default:
+              break;
+          }
+        })
+    }
+    setChangesToSave([])
   }
+
+  const handleSave = async () => {
+    // Validate DNI duplicates
+    const dniList = (testigos || []).map(t => t.dni).filter(d => d);
+    const hasDuplicateDNI = new Set(dniList).size !== dniList.length;
+    if (hasDuplicateDNI) {
+      alert('Validación Fallida: Existen DNI duplicados entre los testigos.');
+      return;
+    }
+
+    if (newState) {
+      // NEW TRIAL (CARGAR)
+      const newJuicio = {
+          ...juicioInfo,
+          id: juicioInfo.numeroLeg + '-' + crypto.randomUUID().slice(0, 4), // Generar ID único basado en legajo
+          bloques: bloquesArray,
+          testigos: testigos,
+          añoCargo: year // Usar el año seleccionado en la UI
+      }
+      try {
+          // Note: using the year from autoApertura if available, or current 'year' state
+          const targetYear = juicioInfo.autoApertura ? juicioInfo.autoApertura.split('/')[2] : year;
+          await addJuicio(newJuicio, targetYear);
+          alert('Juicio guardado exitosamente en la colección juicios/' + targetYear);
+          setNewState(false);
+          setPreviousVersion(newJuicio);
+          setChangesToSave([]);
+      } catch (error) {
+          alert('Error al guardar: ' + error.message);
+      }
+    } else {
+      // EDIT TRIAL (EDITAR)
+      saving(previousVersion);
+      alert('Cambios actualizados en Firebase');
+    }
+  }
+
   const saveTesting = (aux) => {
     setChangesToSave([])
     if (previousVersion.numeroLeg !== aux.numeroLeg) {
-      setChangesToSave('numeroLeg')
+      testFunctionAux('numeroLeg')
     }
     if (previousVersion.auto !== aux.auto) {
-      setChangesToSave('auto')
+      testFunctionAux('auto')
     }
     if (previousVersion.inicio !== aux.inicio) {
-      setChangesToSave('inicio')
+      testFunctionAux('inicio')
     }
     if (previousVersion.fiscal !== aux.fiscal) {
-      setChangesToSave('fiscal')
+      testFunctionAux('fiscal')
     }
     if (previousVersion.tipoDelito !== aux.tipoDelito) {
-      setChangesToSave('tipoDelito')
+      testFunctionAux('tipoDelito')
     }
     if (previousVersion.ufi !== aux.ufi) {
-      setChangesToSave('ufi')
+      testFunctionAux('ufi')
     }
     if (previousVersion.defensa !== aux.defensa) {
-      setChangesToSave('defensa')
+      testFunctionAux('defensa')
     }
     if (previousVersion.defensoria !== aux.defensoria) {
-      setChangesToSave('defensoria')
+      testFunctionAux('defensoria')
     }
     if (previousVersion.querella !== aux.querella) {
-      setChangesToSave('querella')
+      testFunctionAux('querella')
     }
     if (previousVersion.jueces !== aux.jueces) {
-      setChangesToSave('jueces')
+      testFunctionAux('jueces')
     }
     if (previousVersion.estadoJuicio !== aux.estadoJuicio) {
-      setChangesToSave('estadoJuicio')
+      testFunctionAux('estadoJuicio')
     }
-    previousVersion.bloques.forEach((bloque) => {
-      if (bloque.fecha !== bloquesArray.find(el => bloque.audId === el.audId).fecha) {
-        testFunctionAux('fecha-' + bloque.audId)
-      }
-      if (bloque.hora !== bloquesArray.find(el => bloque.audId === el.audId).hora) {
-        testFunctionAux('hora-' + bloque.audId)
-      }
-      if (bloque.estadoBloque !== bloquesArray.find(el => bloque.audId === el.audId).estadoBloque) {
-        testFunctionAux('estado-' + bloque.audId)
-      }
-      if (bloque.tipo !== bloquesArray.find(el => bloque.audId === el.audId).tipo) {
-        testFunctionAux('tipo-' + bloque.audId)
-      }
-      if (bloque.sala !== bloquesArray.find(el => bloque.audId === el.audId).sala) {
-        testFunctionAux('sala-' + bloque.audId)
-      }
-    })
-    if (previousVersion.bloques.length !== bloquesArray.length) {
-      testFunctionAux('bloques')
+    if (previousVersion && previousVersion.bloques) {
+        previousVersion.bloques.forEach((bloque) => {
+          const matchingBlock = (bloquesArray || []).find(el => bloque.audId === el.audId);
+          if (matchingBlock) {
+            if (bloque.fecha !== matchingBlock.fecha) testFunctionAux('fecha-' + bloque.audId);
+            if (bloque.hora !== matchingBlock.hora) testFunctionAux('hora-' + bloque.audId);
+            if (bloque.estadoBloque !== matchingBlock.estadoBloque) testFunctionAux('estado-' + bloque.audId);
+            if (bloque.tipo !== matchingBlock.tipo) testFunctionAux('tipo-' + bloque.audId);
+            if (bloque.sala !== matchingBlock.sala) testFunctionAux('sala-' + bloque.audId);
+          }
+        })
+        if (previousVersion.bloques.length !== (bloquesArray || []).length) {
+          testFunctionAux('bloques')
+        }
     }
-    previousVersion.testigos.forEach((testigo) => {
-      if (testigo.nombre !== testigos.find(el => testigo.id === el.id).nombre) {
-        testFunctionAux('nombre-' + testigo.id)
-      }
-      if (testigo.dni !== testigos.find(el => testigo.id === el.id).dni) {
-        testFunctionAux('dni-' + testigo.id)
-      }
-    })
+    if (previousVersion && previousVersion.testigos) {
+        previousVersion.testigos.forEach((testigo) => {
+          const matchingTestigo = (testigos || []).find(el => testigo.id === el.id);
+          if (matchingTestigo) {
+            if (testigo.nombre !== matchingTestigo.nombre) testFunctionAux('nombre-' + testigo.id);
+            if (testigo.dni !== matchingTestigo.dni) testFunctionAux('dni-' + testigo.id);
+          }
+        })
+    }
   }
   useEffect(() => {
     updateDesplegables()
   }, [])
   const handleReset = () => {
-    setBloquesArray(previousVersion.bloques)
-    setTestigos(previousVersion.testigos)
+    if (window.confirm("¿Está seguro de que desea restablecer los cambios? Se perderán todas las modificaciones no guardadas.")) {
+      setBloquesArray(previousVersion.bloques || [])
+      setTestigos(previousVersion.testigos || [])
+    }
   }
   useEffect(() => {
     if (previousVersion.bloques && previousVersion.testigos) {
@@ -202,27 +218,36 @@ export default function JuicioFrame() {
   }, [previousVersion])
 
   useEffect(() => {
-    if (!newState && previousVersion.bloques && previousVersion.testigos && bloquesArray && testigos) {
-      const hasChanges = JSON.stringify(bloquesArray) !== JSON.stringify(previousVersion.bloques) ||
-        JSON.stringify(testigos) !== JSON.stringify(previousVersion.testigos)
-      setChangesToSave(hasChanges)
+    if (newState) {
+      if ((bloquesArray && bloquesArray.length > 0) || (testigos && testigos.length > 0)) {
+        setChangesToSave(['new-data'])
+      } else {
+        setChangesToSave([])
+      }
     } else {
-      setChangesToSave(false)
+      const changes = []
+      if (previousVersion.bloques && previousVersion.testigos && bloquesArray && testigos) {
+        if (JSON.stringify(bloquesArray) !== JSON.stringify(previousVersion.bloques)) changes.push('bloques');
+        if (JSON.stringify(testigos) !== JSON.stringify(previousVersion.testigos)) changes.push('testigos');
+        // Note: Field changes for info section (numeroLeg, etc) are handled by EditExisting component mostly
+        // but it's good to keep the detection here for blocks/testigos
+      }
+      setChangesToSave(changes)
     }
   }, [bloquesArray, testigos, previousVersion, newState])
   return (
     <div className={`${styles.globalBlock}`}><section className={`${styles.viewBlock}`}>
-      {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState} setTestigos={setTestigos} /> :
+      {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState} setTestigos={setTestigos} setJuicioInfo={setJuicioInfo} juicioInfo={juicioInfo} /> :
         <>{previousVersion.bloques ? <EditExisting newState={newState} setNewState={setNewState} previousVersion={previousVersion} setPreviousVersion={setPreviousVersion} /> :
           <><section className={`${styles.addJuicioSection}`}><ButtonSelection newState={newState} setNewState={setNewState} />No hay juicio seleccionado</section></>}</>}
-      <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray} testigos={testigos} />
+      <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray} testigos={testigos} setTestigos={setTestigos} />
       <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloquesArray={bloquesArray} />
       <JuicioSelection year={year} setYear={setYear} setPreviousVersion={setPreviousVersion} />
     </section>
       <div className={`${styles.saveResetBar}`}>
-        <button className={changesToSave ? `${styles.reestablecerButton} ${styles.reestablecerButtonActive}` : `${styles.reestablecerButton}`}
+        <button className={changesToSave.length > 0 ? `${styles.reestablecerButton} ${styles.reestablecerButtonActive}` : `${styles.reestablecerButton}`}
           onClick={() => handleReset()}>REESTABLECER</button>
-        <button onClick={() => handleSave()} className={changesToSave ? `${styles.guardarButton} ${styles.guardarButtonActive}` : `${styles.guardarButton}`}>GUARDAR</button>
+        <button onClick={handleSave} className={changesToSave.length > 0 ? `${styles.guardarButton} ${styles.guardarButtonActive}` : `${styles.guardarButton}`}>GUARDAR</button>
       </div></div>
   )
 }

@@ -3,7 +3,7 @@ import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
 import { ButtonSelection } from './ButtonSelection'
 
-export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, setTestigos }) {
+export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, setTestigos, setJuicioInfo }) {
     const { updateDesplegables, desplegables } = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true)
@@ -168,8 +168,10 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
             setBloquesArray(aux)
             for (let i = 0; i < parseInt(cantTestigos); i++) {
                 aux2.push({
+                    id: crypto.randomUUID(),
                     nombre: '',
                     dni: '',
+                    fecha: []
                 })
             }
             setTestigos(aux2)
@@ -178,6 +180,24 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
     useEffect(() => {
         updateDesplegables()
     }, []);
+
+    useEffect(() => {
+        // Sync local state to parent juicioInfo for saving
+        setJuicioInfo({
+            numeroLeg: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}`,
+            ufi: ufi,
+            autoApertura: `${fechad}/${fecham}/${fechaa} ${fechah}:${fechamm}:${fechas}`,
+            inicioJuicio: `${fechaid}/${fechaim}/${fechaia}`,
+            tipoDelito: tipoDelito,
+            tipoTribunal: tipoTribunal,
+            fiscal: fiscal,
+            defensa: defensa,
+            defensoria: defensaCargo,
+            querella: querella,
+            jueces: tipoTribunal === 'COLEGIADO' ? [juez1, juez2, juez3] : [juez1],
+            estadoJuicio: 'PROGRAMADO'
+        })
+    }, [numeroLeg1, numeroLeg2, numeroLeg3, ufi, fechad, fecham, fechaa, fechah, fechamm, fechas, fechaid, fechaim, fechaia, tipoDelito, tipoTribunal, fiscal, defensa, defensaCargo, querella, juez1, juez2, juez3])
     return (
         <section className={`${styles.addJuicioSection}`}>
             <ButtonSelection newState={newState} setNewState={setNewState} />

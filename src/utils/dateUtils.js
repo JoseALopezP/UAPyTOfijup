@@ -1,8 +1,11 @@
 export const todayFunction = () =>{
     return new Date().toLocaleDateString("es-AR",{day: "2-digit", month: "2-digit", year: "numeric"}).split('/').join('')
 }
-export const yearFunction = (date) =>{
-    return date.slice(4)
+export const yearFunction = (date) => {
+    if (!date) return "";
+    const dateStr = String(date);
+    if (dateStr.length === 4) return dateStr;
+    return dateStr.slice(-4);
 }
 export const getCurrentYear = () =>{
     const fecha = new Date();
