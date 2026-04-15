@@ -11,7 +11,7 @@ import { DataContext } from '@/context New/DataContext';
 import { ButtonSelection } from './ButtonSelection';
 
 export default function JuicioFrame() {
-  const { changeValueJuicio, desplegables, updateDesplegables, updateData, addJuicio } = useContext(DataContext)
+  const { changeValueJuicio, desplegables, updateDesplegables, updateData, addJuicio, updateJuicios } = useContext(DataContext)
   const [previousVersion, setPreviousVersion] = useState({})
   const [newState, setNewState] = useState(true)
   const [changesToSave, setChangesToSave] = useState([])
@@ -21,15 +21,15 @@ export default function JuicioFrame() {
   const [juicioInfo, setJuicioInfo] = useState({
     numeroLeg: '',
     ufi: '',
-    autoApertura: '',
-    inicioJuicio: '',
+    auto: '',
+    inicio: '',
     tipoDelito: '',
     tipoTribunal: 'UNIPERSONAL',
     fiscal: '',
     defensa: '',
     defensoria: '',
     querella: '',
-    jueces: [],
+    jueces: '',
     estadoJuicio: 'PROGRAMADO'
   })
   const testFunctionAux = (value) => {
@@ -109,18 +109,29 @@ export default function JuicioFrame() {
 
     if (newState) {
       // NEW TRIAL (CARGAR)
+      // Robust sequence calculation finding the MAX existing #N
+      const sameLegajoNumbers = (juiciosList || [])
+        .filter(j => j.id && j.id.startsWith(`${juicioInfo.numeroLeg}#`))
+        .map(j => parseInt(j.id.split('#')[1]) || 0);
+      
+      const nextNumber = sameLegajoNumbers.length > 0 ? Math.max(...sameLegajoNumbers) + 1 : 1;
+      const finalId = `${juicioInfo.numeroLeg}#${nextNumber}`;
+
       const newJuicio = {
           ...juicioInfo,
-          id: juicioInfo.numeroLeg + '-' + crypto.randomUUID().slice(0, 4), // Generar ID único basado en legajo
+          id: finalId,
           bloques: bloquesArray,
           testigos: testigos,
           añoCargo: year // Usar el año seleccionado en la UI
       }
       try {
-          // Note: using the year from autoApertura if available, or current 'year' state
-          const targetYear = juicioInfo.autoApertura ? juicioInfo.autoApertura.split('/')[2] : year;
+          // Extract only the Year (ignore time) from "DD/MM/YYYY HH:mm:ss"
+          const targetYearFromAuto = juicioInfo.auto ? juicioInfo.auto.split('/')[2]?.split(' ')[0] : null;
+          const targetYear = targetYearFromAuto || year;
           await addJuicio(newJuicio, targetYear);
+          await updateJuicios(targetYear);
           alert('Juicio guardado exitosamente en la colección juicios/' + targetYear);
+          
           setNewState(false);
           setPreviousVersion(newJuicio);
           setChangesToSave([]);
@@ -205,14 +216,29 @@ export default function JuicioFrame() {
   }
   useEffect(() => {
     if (previousVersion.bloques && previousVersion.testigos) {
+      // Ensure all witnesses have an ID if they don't (backwards compatibility)
+      const sanitizedTestigos = (previousVersion.testigos || []).map(t => ({
+        ...t,
+        id: t.id || `legacy-${crypto.randomUUID().slice(0, 8)}`
+      }));
+
+      // If we just came from newState (CARGAR), don't prompt, just update internal state
       if (bloquesArray !== null) {
-        if (confirm("¿Editar otra audiencia?")) {
+        // If it's a new trial being saved, newState is still true in this cycle or just changed.
+        // But a more reliable way is to check if previousVersion matches current state.
+        const isSameTrial = JSON.stringify(previousVersion.bloques) === JSON.stringify(bloquesArray);
+        
+        if (!isSameTrial && confirm("¿Editar otra audiencia?")) {
           setBloquesArray(previousVersion.bloques)
-          setTestigos(previousVersion.testigos)
+          setTestigos(sanitizedTestigos)
+        } else if (isSameTrial) {
+            // Already synced, no need to prompt
+            setBloquesArray(previousVersion.bloques)
+            setTestigos(sanitizedTestigos)
         }
       } else {
         setBloquesArray(previousVersion.bloques)
-        setTestigos(previousVersion.testigos)
+        setTestigos(sanitizedTestigos)
       }
     }
   }, [previousVersion])

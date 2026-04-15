@@ -186,15 +186,15 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
         setJuicioInfo({
             numeroLeg: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}`,
             ufi: ufi,
-            autoApertura: `${fechad}/${fecham}/${fechaa} ${fechah}:${fechamm}:${fechas}`,
-            inicioJuicio: `${fechaid}/${fechaim}/${fechaia}`,
+            auto: `${fechad}/${fecham}/${fechaa} ${fechah}:${fechamm}:${fechas}`,
+            inicio: `${fechaid}/${fechaim}/${fechaia}`,
             tipoDelito: tipoDelito,
             tipoTribunal: tipoTribunal,
             fiscal: fiscal,
             defensa: defensa,
             defensoria: defensaCargo,
             querella: querella,
-            jueces: tipoTribunal === 'COLEGIADO' ? [juez1, juez2, juez3] : [juez1],
+            jueces: tipoTribunal === 'COLEGIADO' ? `${juez1}+${juez2}+${juez3}` : juez1,
             estadoJuicio: 'PROGRAMADO'
         })
     }, [numeroLeg1, numeroLeg2, numeroLeg3, ufi, fechad, fecham, fechaa, fechah, fechamm, fechas, fechaid, fechaim, fechaia, tipoDelito, tipoTribunal, fiscal, defensa, defensaCargo, querella, juez1, juez2, juez3])

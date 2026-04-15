@@ -3,7 +3,7 @@ export const todayFunction = () =>{
 }
 export const yearFunction = (date) => {
     if (!date) return "";
-    const dateStr = String(date);
+    const dateStr = String(date).split(' ')[0]; // Take only the date part
     if (dateStr.length === 4) return dateStr;
     return dateStr.slice(-4);
 }

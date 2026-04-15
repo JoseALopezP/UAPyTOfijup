@@ -90,7 +90,11 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         const dateTransform = yearFunction(date)
         try {
             const data = await getDocument('juicios', dateTransform);
-            setJuiciosList(data)
+            if (data) {
+                setJuiciosList(Object.values(data))
+            } else {
+                setJuiciosList([])
+            }
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
@@ -102,6 +106,16 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateInternalFieldJuicio(dateTransform, juicioId, field, value);
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const deleteJuicio = async (date, juicioId) => {
+        const dateTransform = yearFunction(date)
+        try {
+            await removeObject("juicios", dateTransform, juicioId);
+            await updateJuicios(dateTransform);
+        } catch (error) {
+            console.error("Failed to delete object:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
@@ -434,7 +448,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
-        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
+        pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
         updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,

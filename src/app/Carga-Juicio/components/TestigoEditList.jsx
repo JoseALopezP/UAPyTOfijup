@@ -22,10 +22,17 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
     }
   };
   const handleDateToggle = useCallback((audId, id, fecha, horaBloque) => {
+    if (!id) return;
     setTestigos(prev => (prev || []).map(testigo => {
       if (testigo.id !== id) return testigo;
-      const yaExiste = testigo.fecha?.some(f => f.fecha === fecha);
-      return { ...testigo, fecha: yaExiste ? testigo.fecha.filter(f => f.fecha !== fecha) : [...(testigo.fecha || []), { fecha, hora: horaBloque, asistencia: false, complete: false, audid: audId }] };
+      const targetAudId = audId;
+      const yaExiste = testigo.fecha?.some(f => (f.audid || f.audId) === targetAudId);
+      return { 
+        ...testigo, 
+        fecha: yaExiste 
+          ? testigo.fecha.filter(f => (f.audid || f.audId) !== targetAudId) 
+          : [...(testigo.fecha || []), { fecha, hora: horaBloque, asistencia: false, complete: false, audid: targetAudId }] 
+      };
     }));
   }, [setTestigos]);
   const actualizarHora = (id, index, nuevaHora, nuevosMinutos) => {
@@ -49,40 +56,76 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
         const isExpanded = expandedId === testigo.id;
         const isEditing = editingId === testigo.id;
         return (
-          <div key={testigo.id} className={styles.testigoCard}>
-            <div className={styles.testigoHeader} style={{ cursor: 'pointer', alignItems: 'center' }} onClick={() => setExpandedId(isExpanded ? null : testigo.id)}>
-              <span className={styles.nombreTestigo} onClick={e => isEditing && e.stopPropagation()}>
-                {isEditing ? (
-                  <input type="text" value={testigo.nombre} onChange={(e) => {
-                    setTestigos(prev => prev.map(t => t.id === testigo.id ? { ...t, nombre: e.target.value } : t));
-                  }} autoFocus onClick={e => e.stopPropagation()} style={{ width: '120px', backgroundColor: '#2B2B2B', color: '#fff', outline: 'none', border: '1px solid #555', borderRadius: '4px', padding: '4px' }} />
-                ) : <span style={{ fontWeight: 600, color: '#fff' }}>{testigo.nombre || 'Sin nombre'}</span>}
-              </span>
-              <span className={styles.dniInputTestigo} onClick={e => e.stopPropagation()}>
-                <label style={{ color: '#aaa', fontSize: '12px' }}>DNI:</label>
-                <input type="text" value={testigo.dni || ''} onChange={(e) => handleDniChange(testigo.id, e.target.value)} placeholder="DNI" readOnly={!isEditing} style={{ backgroundColor: isEditing ? '#2B2B2B' : 'transparent', color: '#fff', border: isEditing ? '1px solid #555' : 'none' }} />
-              </span>
-              <span style={{ display: 'flex', gap: '8px', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
-                <span style={{ color: '#888', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', fontSize: '12px' }}>▼</span>
-                <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '16px', padding: 0 }} onClick={() => {
-                  if (isEditing) {
-                    setEditingId(null);
-                  } else {
-                    setEditingId(testigo.id);
-                  }
-                }}>
-                  {isEditing ? '✔' : '✏️'}
+          <div key={testigo.id} className={`${styles.testigoCard} ${isExpanded ? styles.testigoCardExpanded : ''}`}>
+            <div className={styles.testigoHeader} onClick={() => setExpandedId(isExpanded ? null : testigo.id)}>
+              <div className={styles.testigoInfoSummary}>
+                <span className={styles.testigoAvatar}>{testigo.nombre?.charAt(0) || '?'}</span>
+                <div className={styles.testigoIdentity}>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className={styles.editNombreInput}
+                      value={testigo.nombre}
+                      onChange={(e) => {
+                        setTestigos(prev => prev.map(t => t.id === testigo.id ? { ...t, nombre: e.target.value } : t));
+                      }}
+                      autoFocus
+                      onClick={e => e.stopPropagation()}
+                    />
+                  ) : (
+                    <span className={styles.testigoNameDisplay}>{testigo.nombre || 'Sin nombre'}</span>
+                  )}
+                  <div className={styles.testigoSubtext} onClick={e => e.stopPropagation()}>
+                    <span className={styles.dniLabel}>DNI:</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        className={styles.editDniInput}
+                        value={testigo.dni || ''}
+                        onChange={(e) => handleDniChange(testigo.id, e.target.value)}
+                        placeholder="DNI"
+                        onClick={e => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className={styles.dniValue}>{testigo.dni || '---'}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.testigoActions} onClick={e => e.stopPropagation()}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${isEditing ? styles.actionBtnActive : ''}`}
+                  onClick={() => setEditingId(isEditing ? null : testigo.id)}
+                  title={isEditing ? "Guardar" : "Editar"}
+                >
+                  {isEditing ? '💾' : '✏️'}
                 </button>
-                <button type="button" className={styles.deletButton} style={{ position: 'static', margin: 0, padding: '2px 6px' }} onClick={() => handleEliminarTestigo(testigo.id)}>✖</button>
-              </span>
+                <button
+                  type="button"
+                  className={styles.deleteActionBtn}
+                  onClick={() => handleEliminarTestigo(testigo.id)}
+                  title="Eliminar"
+                >
+                  ✖
+                </button>
+                <div 
+                  className={`${styles.expandChevron} ${isExpanded ? styles.expandChevronActive : ''}`}
+                  onClick={() => setExpandedId(isExpanded ? null : testigo.id)}
+                >
+                  ▼
+                </div>
+              </div>
             </div>
             {isExpanded && (
-              <div onClick={e => e.stopPropagation()}>
+              <div className={styles.testigoDetails} onClick={e => e.stopPropagation()}>
+                <div className={styles.sectionHeader}>Asignación de Bloques</div>
 
           <div className={styles.bloquesWrapper}>
             {bloquesArray && bloquesArray.map((bloque) => {
               const fecha = `${bloque.fecha}`; const horaBloque = bloque.hora;
-              const asignado = testigo.fecha?.some((f) => f.fecha === fecha);
+              const asignado = testigo.fecha?.some((f) => (f.audid || f.audId) === bloque.audId);
               return (
                 <button key={bloque.audId} type="button" className={asignado ? styles.asignado : styles.noAsignado} onClick={() => handleDateToggle(bloque.audId, testigo.id, fecha, horaBloque)}>
                   {bloque.fecha.slice(0, 2)}/{bloque.fecha.slice(2, 4)}/{bloque.fecha.slice(6, 8)} {bloque.hora}
@@ -90,46 +133,61 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
               );
             })}
           </div>
-          {testigo.fecha?.length > 0 && (
-            <div className={styles.fechasAsignadas}>
-              <table className={styles.tableFechas}>
-                <thead>
-                  <tr>
-                    <th>FECHA</th>
-                    <th>CITADO</th>
-                    <th>ASISTIÓ</th>
-                    <th>FINALIZÓ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {testigo.fecha.map((item, index) => {
-                    const [h, m] = item.hora?.split(':') || ['00', '00'];
-                    return (
-                      <tr key={index} className={styles.fechaItem}>
-                        <td className={`${styles.tableCell} ${styles.cellFecha}`}>{item.fecha.slice(0, 2)}/{item.fecha.slice(2, 4)}/{item.fecha.slice(6, 8)}</td>
-                        <td className={`${styles.tableCell} ${styles.cellCitaHora}`}>
-                          <input className={styles.inputHora} type="text" min="0" max="23" value={h} onChange={(e) => actualizarHora(testigo.id, index, e.target.value, m)} /> :
-                          <input className={styles.inputHora} type="text" min="0" max="59" value={m} onChange={(e) => actualizarHora(testigo.id, index, h, e.target.value)} />
-                        </td>
-                        <td className={`${styles.tableCell} ${styles.cellAsistencia}`}><input type="checkbox" checked={item.asistencia} onChange={(e) => {
-                          setTestigos(prev => (prev || []).map((t) => {
-                            if (t.id !== testigo.id) return t;
-                            return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, asistencia: e.target.checked } : f) };
-                          }));
-                        }} /></td>
-                        <td className={`${styles.tableCell} ${styles.cellFinished}`}><input type="checkbox" checked={item.complete} onChange={(e) => {
-                          setTestigos(prev => (prev || []).map((t) => {
-                            if (t.id !== testigo.id) return t;
-                            return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, complete: e.target.checked } : f) };
-                          }));
-                        }} /></td>
+                <div className={styles.sectionHeader}>Seguimiento y Asistencia</div>
+                <div className={styles.fechasAsignadas}>
+                  <table className={styles.tableFechas}>
+                    <thead>
+                      <tr>
+                        <th>FECHA</th>
+                        <th>CITADO</th>
+                        <th>ASISTIÓ</th>
+                        <th>FINALIZÓ</th>
                       </tr>
-                    );
-                  })}</tbody></table>
-            </div>
-          )}
+                    </thead>
+                    <tbody>
+                      {testigo.fecha.map((item, index) => {
+                        const [h, m] = item.hora?.split(':') || ['00', '00'];
+                        return (
+                          <tr key={index} className={styles.fechaItem}>
+                            <td className={styles.cellFecha}>
+                                {item.fecha.slice(0, 2)}/{item.fecha.slice(2, 4)}/{item.fecha.slice(6, 8)}
+                            </td>
+                            <td className={styles.cellCitaHora}>
+                              <div className={styles.timeInputPair}>
+                                <input className={styles.inputHora} type="text" value={h} onChange={(e) => actualizarHora(testigo.id, index, e.target.value, m)} />
+                                <span>:</span>
+                                <input className={styles.inputHora} type="text" value={m} onChange={(e) => actualizarHora(testigo.id, index, h, e.target.value)} />
+                              </div>
+                            </td>
+                            <td className={styles.cellAsistencia}>
+                                <div className={styles.customCheck}>
+                                    <input type="checkbox" checked={item.asistencia} onChange={(e) => {
+                                        setTestigos(prev => (prev || []).map((t) => {
+                                            if (t.id !== testigo.id) return t;
+                                            return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, asistencia: e.target.checked } : f) };
+                                        }));
+                                    }} />
+                                </div>
+                            </td>
+                            <td className={styles.cellFinished}>
+                                <div className={styles.customCheck}>
+                                    <input type="checkbox" checked={item.complete} onChange={(e) => {
+                                        setTestigos(prev => (prev || []).map((t) => {
+                                            if (t.id !== testigo.id) return t;
+                                            return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, complete: e.target.checked } : f) };
+                                        }));
+                                    }} />
+                                </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
+
           </div>
         );
       })}
