@@ -33,10 +33,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const [tipo3Aux, setTipo3Aux] = useState('');
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
-    const [removedMpf, setRemovedMpf] = useState([]);
-    const [removedDefensa, setRemovedDefensa] = useState([]);
-    const [removedImputado, setRemovedImputado] = useState([]);
-    const [removedPartes, setRemovedPartes] = useState([]);
     const [showEditHitos, setShowEditHitos] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const [sectionsVisible, setSectionsVisible] = useState({
@@ -45,10 +41,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         defensa: true,
         partes: false
     });
-    const mpfCounter = useRef(0);
-    const defensaCounter = useRef(0);
-    const imputadoCounter = useRef(0);
-    const partesCounter = useRef(0);
+
+    const generateId = (prefix) => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
     const checkUFI = () =>{
         if((ufi == '' || ufi == null) && mpf && mpf[0] && typeof mpf[0] === 'object' && mpf[0].nombre && mpf[0].nombre.includes(' - ')){
@@ -95,29 +89,25 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     return updated
     })};
 
-    const addNewInput = (setter, template, prefix, counter) => {
-    setter(prev => {
-        counter.current += 1;
-        const nextId = `${prefix}${counter.current}`;
-        return [...prev, { ...template, id: nextId }];
-    })};
+    const addNewInput = (setter, template, prefix) => {
+        setter(prev => [...prev, { ...template, id: generateId(prefix) }]);
+    };
     const removeImputado = (id) => {
-    setImputado(prev => prev.filter(p => p.id !== id));
-
-    setDefensa(prev =>
-        prev.map(def => ({
-        ...def,
-        imputado: Array.isArray(def.imputado)
-            ? def.imputado.filter(v => v !== id)
-            : def.imputado,
-        condenado: Array.isArray(def.condenado)
-            ? def.condenado.filter(v => v !== id)
-            : def.condenado
-        }))
-    )};
-    const removeInput = (setter, index, removedSetter, items) => {
+        setImputado(prev => prev.filter(p => p.id !== id));
+        setDefensa(prev =>
+            prev.map(def => ({
+            ...def,
+            imputado: Array.isArray(def.imputado)
+                ? def.imputado.filter(v => v !== id)
+                : def.imputado,
+            condenado: Array.isArray(def.condenado)
+                ? def.condenado.filter(v => v !== id)
+                : def.condenado
+            }))
+        );
+    };
+    const removeInput = (setter, index) => {
         setter(prev => prev.filter((_, i) => i !== index));
-        removedSetter(prev => [...prev, items[index]]);
     };
     const updateComparisson = () => {
         setMpf2(item.mpf ? deepCopy(item.mpf) : []);
@@ -141,18 +131,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         
         while (retries > 0 && !success) {
             try {
-                const handleRemove = async (itemList, removedList, field) => {
-                    for (const removedItem of removedList) {
-                        if (itemList.includes(removedItem)) {
-                            await updateData(dateToUse, item.id, field, itemList.filter(i => i !== removedItem));
-                        }
-                    }
-                };
-                await handleRemove(mpf, removedMpf, 'mpf');
-                await handleRemove(defensa, removedDefensa, 'defensa');
-                await handleRemove(imputado, removedImputado, 'imputado');
-                await handleRemove(partes, removedPartes, 'partes');
-                
                 if (!deepEqual(caratula2, caratula)) await updateData(dateToUse, item.id, 'caratula', caratula);
                 if (!deepEqual(mpf2, mpf)) await updateData(dateToUse, item.id, 'mpf', mpf); 
                 if (!deepEqual(defensa2, defensa)) await updateData(dateToUse, item.id, 'defensa', defensa);
@@ -189,10 +167,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 
                 await updateByDate(dateToUse);
                 
-                setRemovedMpf([]);
-                setRemovedDefensa([]);
-                setRemovedImputado([]);
-                setRemovedPartes([]);
                 setCaratula2(caratula);
                 setMpf2(mpf);
                 setDefensa2(defensa);
@@ -355,10 +329,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeft10}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setMpf, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FIS' : 'VIR'}
                             </button>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index, setRemovedMpf, mpf)}><DeleteSVGF/></button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setMpf, index)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true }, 'f', mpfCounter)}>+ FISCAL</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true }, 'f')}>+ FISCAL</button>
                 </span>
             )}
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
@@ -402,7 +376,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     ))}
                     <span className={styles.imputadoButtons}>
                         <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
+                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i')}
                             >+ IMPUTADO</button>
                     </span>
 
@@ -435,7 +409,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </div>
                     ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i', imputadoCounter)}
+                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i')}
                     >+ CONDENADO</button>
                 </span>
             )}
@@ -490,10 +464,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeft40}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FISICAMENTE' : 'VIRTUALMENTE'}
                             </button>
-                            <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index, setRemovedDefensa, defensa)}><DeleteSVGF/></button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true }, 'd', defensaCounter)}>+ DEFENSA</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true }, 'd')}>+ DEFENSA</button>
                 </span>
             )}
             <div className={styles.sectionHeader} onClick={() => toggleSection('partes')}>
@@ -524,10 +498,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ?  'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
                                 {input.presencial ?  'FIS' : 'VIR'}
                             </button>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index, setRemovedPartes, partes)}><DeleteSVGF/></button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p', partesCounter)}>+ PARTE</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p')}>+ PARTE</button>
                 </span>
             )}
             {(item.hora && item.hitos && checkHoraDiff() > 5) &&
