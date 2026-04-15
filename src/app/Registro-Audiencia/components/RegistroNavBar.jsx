@@ -56,7 +56,7 @@ export default function RegistroNavBar({ navbarList, selectedTab, setSelectedTab
         }
       >
         <span className={styles.saveIcon}>
-          {isSaving ? '⏳' : needsSaving ? '💾' : '✅'}
+          {isSaving ? '⏳' : needsSaving ? '' : '✅'}
         </span>
         <span className={styles.saveText}>
           {isSaving ? 'Guardando...' : needsSaving ? 'Guardar Cambios' : 'Guardado'}

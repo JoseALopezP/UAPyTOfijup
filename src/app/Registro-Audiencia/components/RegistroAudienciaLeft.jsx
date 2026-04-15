@@ -278,7 +278,18 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 </svg></span>
             }
             {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse}/>}
-            <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
+            <div className={styles.headerLeftConBoton}>
+                <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
+                {(guardarInc || guardando) && (
+                    <button 
+                        type="submit" 
+                        disabled={guardando} 
+                        className={guardando ? `${styles.saveButtonLeftSmall} ${styles.saving}` : `${styles.saveButtonLeftSmall} ${styles.unsaved}`}
+                    >
+                        {guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
+                    </button>
+                )}
+            </div>
             <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
                 <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>

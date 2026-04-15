@@ -907,7 +907,6 @@
     color: #fff;
     border-color: #d97706;
     box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-    animation: pulseSave 3s infinite;
 }
 
 .saveBtnUnsaved:hover {
@@ -1084,6 +1083,52 @@
     color: var(--text2);
     border: none;
     outline: none;
+}
+
+/* ── Save Button Left (Small) ─────────────────────────────────── */
+.headerLeftConBoton {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    margin-top: 10px;
+}
+
+.audControlTitle {
+    text-align: center;
+    margin: 0;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.saveButtonLeftSmall {
+    height: 24px;
+    font-size: 11px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0 10px;
+}
+
+.saveButtonLeftSmall.unsaved {
+    background-color: var(--guardar-bg);
+    color: white;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+}
+
+.saveButtonLeftSmall.unsaved:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.4);
+}
+
+.saveButtonLeftSmall.saving {
+    background-color: var(--surface3);
+    color: var(--text2);
+    cursor: wait;
 }
 
 /* ── Keyframes ───────────────────────────────────────────────── */
