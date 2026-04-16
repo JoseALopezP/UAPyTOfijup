@@ -16,9 +16,9 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
     });
     setNuevoTestigo(''); setNuevoDni('');
   };
-  const handleEliminarTestigo = (id) => { 
+  const handleEliminarTestigo = (id) => {
     if (window.confirm("¿Está seguro de que desea eliminar este testigo?")) {
-      setTestigos(prev => prev.filter(t => t.id !== id)); 
+      setTestigos(prev => prev.filter(t => t.id !== id));
     }
   };
   const handleDateToggle = useCallback((audId, id, fecha, horaBloque) => {
@@ -27,16 +27,16 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
       if (testigo.id !== id) return testigo;
       const targetAudId = audId;
       const yaExiste = testigo.fecha?.some(f => (f.audid || f.audId) === targetAudId);
-      return { 
-        ...testigo, 
-        fecha: yaExiste 
-          ? testigo.fecha.filter(f => (f.audid || f.audId) !== targetAudId) 
-          : [...(testigo.fecha || []), { fecha, hora: horaBloque, asistencia: false, complete: false, audid: targetAudId }] 
+      return {
+        ...testigo,
+        fecha: yaExiste
+          ? testigo.fecha.filter(f => (f.audid || f.audId) !== targetAudId)
+          : [...(testigo.fecha || []), { fecha, hora: horaBloque, asistencia: false, complete: false, audid: targetAudId }]
       };
     }));
   }, [setTestigos]);
   const actualizarHora = (id, index, nuevaHora, nuevosMinutos) => {
-    const horaFormateada = `${String(nuevaHora)}:${String(nuevosMinutos)}`;
+    const horaFormateada = `${String(nuevaHora).padStart(2, '0')}:${String(nuevosMinutos).padStart(2, '0')}`;
     setTestigos(prev => (prev || []).map(t => {
       if (t.id !== id) return t;
       return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, hora: horaFormateada } : f) };
@@ -110,7 +110,7 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
                 >
                   ✖
                 </button>
-                <div 
+                <div
                   className={`${styles.expandChevron} ${isExpanded ? styles.expandChevronActive : ''}`}
                   onClick={() => setExpandedId(isExpanded ? null : testigo.id)}
                 >
@@ -122,17 +122,17 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
               <div className={styles.testigoDetails} onClick={e => e.stopPropagation()}>
                 <div className={styles.sectionHeader}>Asignación de Bloques</div>
 
-          <div className={styles.bloquesWrapper}>
-            {bloquesArray && bloquesArray.map((bloque) => {
-              const fecha = `${bloque.fecha}`; const horaBloque = bloque.hora;
-              const asignado = testigo.fecha?.some((f) => (f.audid || f.audId) === bloque.audId);
-              return (
-                <button key={bloque.audId} type="button" className={asignado ? styles.asignado : styles.noAsignado} onClick={() => handleDateToggle(bloque.audId, testigo.id, fecha, horaBloque)}>
-                  {bloque.fecha.slice(0, 2)}/{bloque.fecha.slice(2, 4)}/{bloque.fecha.slice(6, 8)} {bloque.hora}
-                </button>
-              );
-            })}
-          </div>
+                <div className={styles.bloquesWrapper}>
+                  {bloquesArray && bloquesArray.map((bloque) => {
+                    const fecha = `${bloque.fecha}`; const horaBloque = bloque.hora;
+                    const asignado = testigo.fecha?.some((f) => (f.audid || f.audId) === bloque.audId);
+                    return (
+                      <button key={bloque.audId} type="button" className={asignado ? styles.asignado : styles.noAsignado} onClick={() => handleDateToggle(bloque.audId, testigo.id, fecha, horaBloque)}>
+                        {bloque.fecha.slice(0, 2)}/{bloque.fecha.slice(2, 4)}/{bloque.fecha.slice(4, 8)} {bloque.hora}
+                      </button>
+                    );
+                  })}
+                </div>
                 <div className={styles.sectionHeader}>Seguimiento y Asistencia</div>
                 <div className={styles.fechasAsignadas}>
                   <table className={styles.tableFechas}>
@@ -150,7 +150,7 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
                         return (
                           <tr key={index} className={styles.fechaItem}>
                             <td className={styles.cellFecha}>
-                                {item.fecha.slice(0, 2)}/{item.fecha.slice(2, 4)}/{item.fecha.slice(6, 8)}
+                              {item.fecha.slice(0, 2)}/{item.fecha.slice(2, 4)}/{item.fecha.slice(4, 8)}
                             </td>
                             <td className={styles.cellCitaHora}>
                               <div className={styles.timeInputPair}>
@@ -160,24 +160,24 @@ export function TestigoEditList({ setTestigos, testigos, bloquesArray }) {
                               </div>
                             </td>
                             <td className={styles.cellAsistencia}>
-                                <div className={styles.customCheck}>
-                                    <input type="checkbox" checked={item.asistencia} onChange={(e) => {
-                                        setTestigos(prev => (prev || []).map((t) => {
-                                            if (t.id !== testigo.id) return t;
-                                            return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, asistencia: e.target.checked } : f) };
-                                        }));
-                                    }} />
-                                </div>
+                              <div className={styles.customCheck}>
+                                <input type="checkbox" checked={item.asistencia} onChange={(e) => {
+                                  setTestigos(prev => (prev || []).map((t) => {
+                                    if (t.id !== testigo.id) return t;
+                                    return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, asistencia: e.target.checked } : f) };
+                                  }));
+                                }} />
+                              </div>
                             </td>
                             <td className={styles.cellFinished}>
-                                <div className={styles.customCheck}>
-                                    <input type="checkbox" checked={item.complete} onChange={(e) => {
-                                        setTestigos(prev => (prev || []).map((t) => {
-                                            if (t.id !== testigo.id) return t;
-                                            return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, complete: e.target.checked } : f) };
-                                        }));
-                                    }} />
-                                </div>
+                              <div className={styles.customCheck}>
+                                <input type="checkbox" checked={item.complete} onChange={(e) => {
+                                  setTestigos(prev => (prev || []).map((t) => {
+                                    if (t.id !== testigo.id) return t;
+                                    return { ...t, fecha: t.fecha.map((f, i) => i === index ? { ...f, complete: e.target.checked } : f) };
+                                  }));
+                                }} />
+                              </div>
                             </td>
                           </tr>
                         );

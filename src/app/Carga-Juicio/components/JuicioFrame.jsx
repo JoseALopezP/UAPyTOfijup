@@ -11,7 +11,7 @@ import { DataContext } from '@/context New/DataContext';
 import { ButtonSelection } from './ButtonSelection';
 
 export default function JuicioFrame() {
-  const { changeValueJuicio, desplegables, updateDesplegables, updateData, addJuicio, updateJuicios } = useContext(DataContext)
+  const { changeValueJuicio, desplegables, updateDesplegables, updateData, addJuicio, updateJuicios, juiciosList, addAudiencia, deleteAudiencia, getDocument, deleteJuicio } = useContext(DataContext)
   const [previousVersion, setPreviousVersion] = useState({})
   const [newState, setNewState] = useState(true)
   const [changesToSave, setChangesToSave] = useState([])
@@ -30,15 +30,83 @@ export default function JuicioFrame() {
     defensoria: '',
     querella: '',
     jueces: '',
-    estadoJuicio: 'PROGRAMADO'
+    estadoJuicio: 'PROGRAMADO',
+    generado: false
   })
   const testFunctionAux = (value) => {
     setChangesToSave(prev => {
-        if (!Array.isArray(prev)) return [value];
-        if (!prev.includes(value)) return [...prev, value];
-        return prev;
+      if (!Array.isArray(prev)) return [value];
+      if (!prev.includes(value)) return [...prev, value];
+      return prev;
     });
   }
+
+  const resetJuicioInfo = () => {
+    setJuicioInfo({
+      numeroLeg: '',
+      ufi: '',
+      auto: '',
+      inicio: '',
+      tipoDelito: '',
+      tipoTribunal: 'UNIPERSONAL',
+      fiscal: '',
+      defensa: '',
+      defensoria: '',
+      querella: '',
+      jueces: '',
+      estadoJuicio: 'PROGRAMADO',
+      generado: false
+    });
+    setBloquesArray(null);
+    setTestigos(null);
+    setPreviousVersion({});
+    setChangesToSave([]);
+  }
+
+  const toggleMode = (targetIsCargar) => {
+    if (targetIsCargar) { // Queremos ir a CARGAR
+      if (newState) return; // Ya estamos en CARGAR
+      if (window.confirm("¿Desea cargar un nuevo juicio? Se limpiarán los valores actuales.")) {
+        resetJuicioInfo();
+        setNewState(true);
+      }
+    } else { // Queremos ir a EDITAR
+      if (!newState) return; // Ya estamos en EDITAR
+      if (previousVersion.id) {
+        setNewState(false);
+      } else {
+        alert("Seleccione un juicio del listado para editar.");
+      }
+    }
+  }
+
+  const handleDeleteJuicio = async (juicio) => {
+    const legajo = juicio.numeroLeg || 'Sin Legajo';
+    const auto = juicio.auto || 'Sin Auto';
+    
+    const confirmation1 = window.confirm(`¿Está seguro de que desea eliminar el juicio ${legajo} (Auto: ${auto})?`);
+    if (!confirmation1) return;
+
+    const confirmation2 = window.confirm(`RE-VALIDACIÓN: ¿Realmente desea eliminar PERMANENTEMENTE el juicio ${legajo} con Auto de Apertura ${auto}? Esta acción no se puede deshacer.`);
+    if (!confirmation2) return;
+
+    try {
+      await deleteJuicio(year, juicio.id);
+      
+      // Si el juicio eliminado es el que está cargado actualmente
+      if (previousVersion.id === juicio.id) {
+        resetJuicioInfo();
+        setNewState(true);
+      }
+      
+      // Recargar la lista se hace automáticamente por el context al llamar deleteJuicio
+      // pero por seguridad nos aseguramos
+      await updateJuicios(String(year));
+    } catch (error) {
+      alert("Error al eliminar el juicio: " + error.message);
+    }
+  }
+
   const updateAud = (attribute) => {
     bloquesArray.forEach(el => {
       updateData(el.fecha, el.audId, attribute, el[attribute])
@@ -46,57 +114,156 @@ export default function JuicioFrame() {
   }
   const saving = (aux) => {
     if (aux && aux.id && Array.isArray(changesToSave)) {
-        changesToSave.forEach((value) => {
-          switch (value) {
-            case 'numeroLeg':
-              changeValueJuicio(year, aux.id, 'numeroLeg', aux.numeroLeg)
-              updateAud('numeroLeg')
-              break;
-            case 'auto':
-              changeValueJuicio(year, aux.id, 'auto', aux.auto)
-              break;
-            case 'inicio':
-              changeValueJuicio(year, aux.id, 'inicio', aux.inicio)
-              break;
-            case 'fiscal':
-              changeValueJuicio(year, aux.id, 'fiscal', aux.fiscal)
-              break;
-            case 'tipoDelito':
-              changeValueJuicio(year, aux.id, 'tipoDelito', aux.tipoDelito)
-              break;
-            case 'ufi':
-              changeValueJuicio(year, aux.id, 'ufi', aux.ufi)
-              updateAud('ufi')
-              break;
-            case 'defensa':
-              changeValueJuicio(year, aux.id, 'defensa', aux.defensa)
-              break;
-            case 'defensoria':
-              changeValueJuicio(year, aux.id, 'defensoria', aux.defensoria)
-              updateAud('defensoria')
-              break;
-            case 'querella':
-              changeValueJuicio(year, aux.id, 'querella', aux.querella)
-              break;
-            case 'jueces':
-              changeValueJuicio(year, aux.id, 'jueces', aux.jueces)
-              break;
-            case 'estadoJuicio':
-              changeValueJuicio(year, aux.id, 'estadoJuicio', aux.estadoJuicio)
-              break;
-            case 'bloques':
-              changeValueJuicio(year, aux.id, 'bloques', bloquesArray)
-              break;
-            case 'testigos':
-              changeValueJuicio(year, aux.id, 'testigos', testigos)
-              break;
-            default:
-              break;
-          }
-        })
+      changesToSave.forEach((value) => {
+        switch (value) {
+          case 'numeroLeg':
+            changeValueJuicio(year, aux.id, 'numeroLeg', aux.numeroLeg)
+            updateAud('numeroLeg')
+            break;
+          case 'auto':
+            changeValueJuicio(year, aux.id, 'auto', aux.auto)
+            break;
+          case 'inicio':
+            changeValueJuicio(year, aux.id, 'inicio', aux.inicio)
+            break;
+          case 'fiscal':
+            changeValueJuicio(year, aux.id, 'fiscal', aux.fiscal)
+            break;
+          case 'tipoDelito':
+            changeValueJuicio(year, aux.id, 'tipoDelito', aux.tipoDelito)
+            break;
+          case 'ufi':
+            changeValueJuicio(year, aux.id, 'ufi', aux.ufi)
+            updateAud('ufi')
+            break;
+          case 'defensa':
+            changeValueJuicio(year, aux.id, 'defensa', aux.defensa)
+            break;
+          case 'defensoria':
+            changeValueJuicio(year, aux.id, 'defensoria', aux.defensoria)
+            updateAud('defensoria')
+            break;
+          case 'querella':
+            changeValueJuicio(year, aux.id, 'querella', aux.querella)
+            break;
+          case 'jueces':
+            changeValueJuicio(year, aux.id, 'jueces', aux.jueces)
+            break;
+          case 'estadoJuicio':
+            changeValueJuicio(year, aux.id, 'estadoJuicio', aux.estadoJuicio)
+            break;
+          case 'bloques':
+            changeValueJuicio(year, aux.id, 'bloques', bloquesArray)
+            break;
+          case 'testigos':
+            changeValueJuicio(year, aux.id, 'testigos', testigos)
+            break;
+          default:
+            break;
+        }
+      })
     }
     setChangesToSave([])
   }
+
+  const handleGenerarActualizar = async () => {
+    const isNew = !previousVersion.generado;
+    const confirmMsg = isNew
+      ? "¿Está seguro de que desea GENERAR las audiencias para este juicio? Esto creará documentos en la agenda para cada bloque."
+      : "¿Desea ACTUALIZAR las audiencias vinculadas a este juicio?";
+
+    if (!window.confirm(confirmMsg)) return;
+
+    if (!bloquesArray || bloquesArray.length === 0) {
+      alert("No hay bloques para generar.");
+      return;
+    }
+
+    const logs = [];
+    const errores = [];
+    const bloquesActualizados = [...bloquesArray];
+
+    for (let i = 0; i < bloquesActualizados.length; i++) {
+        const block = bloquesActualizados[i];
+        
+        // Si es actualización, verificar si el bloque ya se realizó
+        if (!isNew) {
+            try {
+                const viewData = await getDocument('audienciasView', block.fecha);
+                const existingAud = viewData ? viewData[block.audId] : null;
+
+                if (existingAud && existingAud.estado !== 'PROGRAMADO') {
+                    logs.push(`BLOQUE ${i + 1} no presentará cambios debido a que la audiencia ha sido realizada.`);
+                    continue;
+                }
+            } catch (e) {
+                console.error("Error al verificar estado previo:", e);
+            }
+        }
+
+        // Preparar data de la audiencia
+        const hearingData = {
+            titulo: 'DEBATE',
+            numeroLeg: juicioInfo.numeroLeg,
+            juez: juicioInfo.jueces,
+            ufi: juicioInfo.ufi,
+            tipo: 'DEBATE',
+            caratula: `${juicioInfo.numeroLeg} - ${juicioInfo.tipoDelito}`,
+            mpf: [{ nombre: juicioInfo.fiscal, asistencia: true, presencial: true, id: 'mpf-1' }],
+            defensa: [{ 
+                tipo: juicioInfo.defensa && juicioInfo.defensa.includes('Particular') ? 'Particular' : 'Oficial', 
+                nombre: juicioInfo.defensa, 
+                asistencia: true, 
+                presencial: true, 
+                id: 'def-1' 
+            }],
+            partes: (testigos || [])
+                .filter(t => t.fecha?.some(f => (f.audid || f.audId) === block.audId))
+                .map(t => ({
+                    role: 'Testigo',
+                    name: t.nombre,
+                    dni: t.dni,
+                    asistencia: false,
+                    presencial: true,
+                    id: t.id
+                })),
+            estado: 'PROGRAMADO',
+            hora: block.hora,
+            sala: block.sala || ' -',
+            juicioReference: {
+                id: previousVersion.id || `${juicioInfo.numeroLeg}#pending`,
+                year: year
+            }
+        };
+
+        try {
+            // Manejar cambio de fecha: eliminar de la fecha vieja si cambió
+            const oldBlock = previousVersion.bloques?.find(b => b.audId === block.audId);
+            if (!isNew && oldBlock && oldBlock.fecha !== block.fecha) {
+                await deleteAudiencia(oldBlock.fecha, block.audId);
+            }
+
+            // Guardar o actualizar la audiencia usando el audId del bloque
+            await addAudiencia(hearingData, block.fecha, block.audId);
+            logs.push(`Bloque ${i + 1} ${isNew ? 'generado' : 'actualizado'} correctamente.`);
+        } catch (e) {
+            errores.push(`Error en Bloque ${i + 1}: ${e.message}`);
+        }
+    }
+
+    if (isNew) {
+        // Encontrar el ID real si era un juicio nuevo que no se había guardado aún
+        let targetId = previousVersion.id;
+        if (!targetId) {
+            alert("Por favor, guarde el juicio antes de generar las audiencias.");
+            return;
+        }
+        await changeValueJuicio(year, targetId, 'generado', true);
+        setPreviousVersion(prev => ({...prev, generado: true}));
+    }
+
+    alert(logs.join('\n') + (errores.length > 0 ? '\n\nErrores:\n' + errores.join('\n') : ''));
+  };
 
   const handleSave = async () => {
     // Validate DNI duplicates
@@ -113,30 +280,29 @@ export default function JuicioFrame() {
       const sameLegajoNumbers = (juiciosList || [])
         .filter(j => j.id && j.id.startsWith(`${juicioInfo.numeroLeg}#`))
         .map(j => parseInt(j.id.split('#')[1]) || 0);
-      
+
       const nextNumber = sameLegajoNumbers.length > 0 ? Math.max(...sameLegajoNumbers) + 1 : 1;
       const finalId = `${juicioInfo.numeroLeg}#${nextNumber}`;
 
       const newJuicio = {
-          ...juicioInfo,
-          id: finalId,
-          bloques: bloquesArray,
-          testigos: testigos,
-          añoCargo: year // Usar el año seleccionado en la UI
+        ...juicioInfo,
+        id: finalId,
+        bloques: bloquesArray,
+        testigos: testigos,
+        añoCargo: year
       }
       try {
-          // Extract only the Year (ignore time) from "DD/MM/YYYY HH:mm:ss"
-          const targetYearFromAuto = juicioInfo.auto ? juicioInfo.auto.split('/')[2]?.split(' ')[0] : null;
-          const targetYear = targetYearFromAuto || year;
-          await addJuicio(newJuicio, targetYear);
-          await updateJuicios(targetYear);
-          alert('Juicio guardado exitosamente en la colección juicios/' + targetYear);
-          
-          setNewState(false);
-          setPreviousVersion(newJuicio);
-          setChangesToSave([]);
+        const targetYearFromAuto = juicioInfo.auto ? juicioInfo.auto.split('/')[2]?.split(' ')[0] : null;
+        const targetYear = targetYearFromAuto || year;
+        await addJuicio(newJuicio, targetYear);
+        await updateJuicios(targetYear);
+        alert('Juicio guardado exitosamente');
+
+        setNewState(false);
+        setPreviousVersion(newJuicio);
+        setChangesToSave([]);
       } catch (error) {
-          alert('Error al guardar: ' + error.message);
+        alert('Error al guardar: ' + error.message);
       }
     } else {
       // EDIT TRIAL (EDITAR)
@@ -181,28 +347,28 @@ export default function JuicioFrame() {
       testFunctionAux('estadoJuicio')
     }
     if (previousVersion && previousVersion.bloques) {
-        previousVersion.bloques.forEach((bloque) => {
-          const matchingBlock = (bloquesArray || []).find(el => bloque.audId === el.audId);
-          if (matchingBlock) {
-            if (bloque.fecha !== matchingBlock.fecha) testFunctionAux('fecha-' + bloque.audId);
-            if (bloque.hora !== matchingBlock.hora) testFunctionAux('hora-' + bloque.audId);
-            if (bloque.estadoBloque !== matchingBlock.estadoBloque) testFunctionAux('estado-' + bloque.audId);
-            if (bloque.tipo !== matchingBlock.tipo) testFunctionAux('tipo-' + bloque.audId);
-            if (bloque.sala !== matchingBlock.sala) testFunctionAux('sala-' + bloque.audId);
-          }
-        })
-        if (previousVersion.bloques.length !== (bloquesArray || []).length) {
-          testFunctionAux('bloques')
+      previousVersion.bloques.forEach((bloque) => {
+        const matchingBlock = (bloquesArray || []).find(el => bloque.audId === el.audId);
+        if (matchingBlock) {
+          if (bloque.fecha !== matchingBlock.fecha) testFunctionAux('fecha-' + bloque.audId);
+          if (bloque.hora !== matchingBlock.hora) testFunctionAux('hora-' + bloque.audId);
+          if (bloque.estadoBloque !== matchingBlock.estadoBloque) testFunctionAux('estado-' + bloque.audId);
+          if (bloque.tipo !== matchingBlock.tipo) testFunctionAux('tipo-' + bloque.audId);
+          if (bloque.sala !== matchingBlock.sala) testFunctionAux('sala-' + bloque.audId);
         }
+      })
+      if (previousVersion.bloques.length !== (bloquesArray || []).length) {
+        testFunctionAux('bloques')
+      }
     }
     if (previousVersion && previousVersion.testigos) {
-        previousVersion.testigos.forEach((testigo) => {
-          const matchingTestigo = (testigos || []).find(el => testigo.id === el.id);
-          if (matchingTestigo) {
-            if (testigo.nombre !== matchingTestigo.nombre) testFunctionAux('nombre-' + testigo.id);
-            if (testigo.dni !== matchingTestigo.dni) testFunctionAux('dni-' + testigo.id);
-          }
-        })
+      previousVersion.testigos.forEach((testigo) => {
+        const matchingTestigo = (testigos || []).find(el => testigo.id === el.id);
+        if (matchingTestigo) {
+          if (testigo.nombre !== matchingTestigo.nombre) testFunctionAux('nombre-' + testigo.id);
+          if (testigo.dni !== matchingTestigo.dni) testFunctionAux('dni-' + testigo.id);
+        }
+      })
     }
   }
   useEffect(() => {
@@ -227,14 +393,14 @@ export default function JuicioFrame() {
         // If it's a new trial being saved, newState is still true in this cycle or just changed.
         // But a more reliable way is to check if previousVersion matches current state.
         const isSameTrial = JSON.stringify(previousVersion.bloques) === JSON.stringify(bloquesArray);
-        
+
         if (!isSameTrial && confirm("¿Editar otra audiencia?")) {
           setBloquesArray(previousVersion.bloques)
           setTestigos(sanitizedTestigos)
         } else if (isSameTrial) {
-            // Already synced, no need to prompt
-            setBloquesArray(previousVersion.bloques)
-            setTestigos(sanitizedTestigos)
+          // Already synced, no need to prompt
+          setBloquesArray(previousVersion.bloques)
+          setTestigos(sanitizedTestigos)
         }
       } else {
         setBloquesArray(previousVersion.bloques)
@@ -263,14 +429,21 @@ export default function JuicioFrame() {
   }, [bloquesArray, testigos, previousVersion, newState])
   return (
     <div className={`${styles.globalBlock}`}><section className={`${styles.viewBlock}`}>
-      {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} setNewState={setNewState} setTestigos={setTestigos} setJuicioInfo={setJuicioInfo} juicioInfo={juicioInfo} /> :
-        <>{previousVersion.bloques ? <EditExisting newState={newState} setNewState={setNewState} previousVersion={previousVersion} setPreviousVersion={setPreviousVersion} /> :
-          <><section className={`${styles.addJuicioSection}`}><ButtonSelection newState={newState} setNewState={setNewState} />No hay juicio seleccionado</section></>}</>}
+      {newState ? <AddJuicioInfo setBloquesArray={setBloquesArray} newState={newState} onToggle={toggleMode} setTestigos={setTestigos} setJuicioInfo={setJuicioInfo} juicioInfo={juicioInfo} /> :
+        <>{previousVersion.bloques ? <EditExisting newState={newState} onToggle={toggleMode} previousVersion={previousVersion} setPreviousVersion={setPreviousVersion} /> :
+          <><section className={`${styles.addJuicioSection}`}><ButtonSelection newState={newState} onToggle={toggleMode} />No hay juicio seleccionado</section></>}</>}
       <BloqueList setBloquesArray={setBloquesArray} bloquesArray={bloquesArray} testigos={testigos} setTestigos={setTestigos} />
       <TestigoEditList setTestigos={setTestigos} testigos={testigos} bloquesArray={bloquesArray} />
-      <JuicioSelection year={year} setYear={setYear} setPreviousVersion={setPreviousVersion} />
+      <JuicioSelection year={year} setYear={setYear} setPreviousVersion={(v) => { setPreviousVersion(v); setNewState(false); }} onDelete={handleDeleteJuicio} />
     </section>
       <div className={`${styles.saveResetBar}`}>
+        <button 
+          onClick={handleGenerarActualizar} 
+          className={!newState ? `${styles.generarButton} ${styles.generarButtonActive}` : `${styles.generarButton}`}
+          title="Genera o actualiza las audiencias en el calendario (audiencias y audienciasView) con toda la información cargada: jueces, defensa, fiscales y testigos distribuidos por día."
+        >
+          {previousVersion.generado ? 'ACTUALIZAR' : 'GENERAR'}
+        </button>
         <button className={changesToSave.length > 0 ? `${styles.reestablecerButton} ${styles.reestablecerButtonActive}` : `${styles.reestablecerButton}`}
           onClick={() => handleReset()}>REESTABLECER</button>
         <button onClick={handleSave} className={changesToSave.length > 0 ? `${styles.guardarButton} ${styles.guardarButtonActive}` : `${styles.guardarButton}`}>GUARDAR</button>

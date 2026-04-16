@@ -45,6 +45,30 @@
     opacity: 1;
 }
 
+.generarButton {
+    width: 150px;
+    margin-right: auto;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #3b3b3b;
+    color: #fff;
+    border: 1px solid #4b4b4b;
+    transition: all 0.2s;
+    margin-left: 10px;
+}
+
+.generarButtonActive {
+    background-color: #17a2b8;
+    border-color: #117a8b;
+    color: #fff;
+}
+
+.generarButton:hover {
+    background-color: #4b4b4b;
+    transform: translateY(-1px);
+}
+
 .addJuicioSection {
     width: 20%;
     height: 100%;

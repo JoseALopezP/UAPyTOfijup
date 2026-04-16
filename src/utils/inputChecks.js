@@ -1,10 +1,17 @@
 export const numberCheck = (value, setter, min, max) =>{
-        if(value >= min && value <= max){
+        if(value !== null && value !== '' && value >= min && value <= max){
             setter(true)
         }else{
             setter(false) 
         }
     }
+export const digitsCheck = (value, setter, count) => {
+    if (value !== null && String(value).length === count && !isNaN(value)) {
+        setter(true)
+    } else {
+        setter(false)
+    }
+}
 export const listCheck = (value, setter, list) =>{
     if(list.includes(value)){
         setter(true)

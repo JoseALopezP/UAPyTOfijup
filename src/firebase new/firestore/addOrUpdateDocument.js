@@ -3,14 +3,14 @@ import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);
 
-export default async function addOrUpdateDocument(collectionName, date, subCol, data) {
+export default async function addOrUpdateDocument(collectionName, date, subCol, data, customId = null) {
   try {
     const batch = writeBatch(db);
 
-    // Generar el ID antes de escribir (sin crear el doc)
+    // Generar el ID antes de escribir (o usar el provisto)
     const targetCollectionRef = collection(db, collectionName, date, subCol);
-    const newDocRef = doc(targetCollectionRef);
-    const audId = newDocRef.id;
+    const newDocRef = customId ? doc(targetCollectionRef, customId) : doc(targetCollectionRef);
+    const audId = customId || newDocRef.id;
 
     // Inyectar el ID dentro del propio data
     const dataWithId = { ...data, id: audId };

@@ -3,7 +3,7 @@ import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
 import { ButtonSelection } from './ButtonSelection'
 
-export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, setTestigos, setJuicioInfo }) {
+export default function AddJuicioInfo({ setBloquesArray, newState, onToggle, setTestigos, setJuicioInfo, juicioInfo }) {
     const { updateDesplegables, desplegables, feriados, updateFeriados } = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState('MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true)
@@ -56,8 +56,8 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
     const checkCompletion = () => {
         const aux = []
         listCheck(numeroLeg1, setNumeroLeg1Error, desplegables.legajosPrefijo)
-        numberCheck(numeroLeg2, setNumeroLeg2Error, 0, 99999)
-        numberCheck(numeroLeg3, setNumeroLeg3Error, 0, 2100)
+        digitsCheck(numeroLeg2, setNumeroLeg2Error, 5)
+        digitsCheck(numeroLeg3, setNumeroLeg3Error, 4)
         listCheck(ufi, setUfiError, desplegables.ufi)
         numberCheck(fechad, setFechadError, 1, 31)
         numberCheck(fecham, setFechamError, 1, 12)
@@ -111,7 +111,14 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
         }
     }
     const numberCheck = (value, setter, min, max) => {
-        if (value >= min && value <= max) {
+        if (value !== null && value !== '' && value >= min && value <= max) {
+            setter(true)
+        } else {
+            setter(false)
+        }
+    }
+    const digitsCheck = (value, setter, count) => {
+        if (value !== null && String(value).length === count && !isNaN(value)) {
             setter(true)
         } else {
             setter(false)
@@ -187,12 +194,16 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
                 const m = String(currentDay.getMonth() + 1).padStart(2, '0');
                 const y = String(currentDay.getFullYear());
 
+                const h = String(fechah || '00').padStart(2, '0');
+                const mm = String(fechamm || '00').padStart(2, '0');
+                const s = String(fechas || '00').padStart(2, '0');
+
                 aux.push({
                     audId: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}-${crypto.randomUUID().slice(0, 4)}`,
-                    hora: fechah + ':' + fechamm + ':' + fechas,
+                    hora: h + ':' + mm + ':' + s,
                     fecha: `${d}${m}${y}`,
                     estadoBloque: 'PROGRAMADO',
-                    sala: '-'
+                    sala: ' -'
                 });
 
                 // Move to the next day for the next block
@@ -220,8 +231,8 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
         setJuicioInfo({
             numeroLeg: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}`,
             ufi: ufi,
-            auto: `${fechad}/${fecham}/${fechaa} ${fechah}:${fechamm}:${fechas}`,
-            inicio: `${fechaid}/${fechaim}/${fechaia}`,
+            auto: `${String(fechad || '00').padStart(2, '0')}/${String(fecham || '00').padStart(2, '0')}/${String(fechaa || '0000').padStart(4, '0')} ${String(fechah || '00').padStart(2, '0')}:${String(fechamm || '00').padStart(2, '0')}:${String(fechas || '00').padStart(2, '0')}`,
+            inicio: `${String(fechaid || '00').padStart(2, '0')}/${String(fechaim || '00').padStart(2, '0')}/${String(fechaia || '0000').padStart(4, '0')}`,
             tipoDelito: tipoDelito,
             tipoTribunal: tipoTribunal,
             fiscal: fiscal,
@@ -234,16 +245,16 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
     }, [numeroLeg1, numeroLeg2, numeroLeg3, ufi, fechad, fecham, fechaa, fechah, fechamm, fechas, fechaid, fechaim, fechaia, tipoDelito, tipoTribunal, fiscal, defensa, defensaCargo, querella, juez1, juez2, juez3])
     return (
         <section className={`${styles.addJuicioSection}`}>
-            <ButtonSelection newState={newState} setNewState={setNewState} />
+            <ButtonSelection newState={newState} onToggle={onToggle} />
             <label className={`${styles.cargaLabel}`}>Número de Legajo</label>
             <span className={`${styles.multiInput}`}>
                 <input className={numeroLeg1Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
                     onChange={e => changeHandler(e.target.value, setNumeroLeg1, setNumeroLeg1Error, listCheck, desplegables.legajosPrefijo)} value={numeroLeg1} list='legajosPrefijo' />
                 <input className={numeroLeg2Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                    onChange={e => changeHandler(e.target.value, setNumeroLeg2, setNumeroLeg2Error, numberCheck, 0, 99999)}
+                    onChange={e => changeHandler(e.target.value, setNumeroLeg2, setNumeroLeg2Error, digitsCheck, 5)}
                     placeholder='00000' value={numeroLeg2} />
                 <input className={numeroLeg3Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                    placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, numberCheck, 0, 2100)} value={numeroLeg3} /></span>
+                    placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, digitsCheck, 4)} value={numeroLeg3} /></span>
             <label className={`${styles.cargaLabel}`}>Auto de Apertura</label>
             <span className={`${styles.multiInput}`}>
                 <input className={fechadError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
@@ -361,7 +372,7 @@ export default function AddJuicioInfo({ setBloquesArray, newState, setNewState, 
                     </option>))}
             </datalist>
             <span className={`${styles.multiInput}`}>
-                <button type='button' className={`${styles.juicioButton}`} onClick={() => handleGenerar()}>GENERAR</button>
+                <button type='button' className={`${styles.juicioButton}`} onClick={() => handleGenerar()} title="Calcula y sugiere la distribución de los bloques de audiencia basándose en la fecha de inicio y feriados.">PRE-GENERAR</button>
                 <button type='button' className={`${styles.juicioButton}`} onClick={() => handleCopiar()}>COPIAR</button>
             </span>
             <span className={`${styles.erroresList}`}>{erroresList}</span>

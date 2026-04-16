@@ -279,7 +279,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     </button>
                 )}
             </div>
-            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)}/>
+            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)} item={item}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
                 <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
                 <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>

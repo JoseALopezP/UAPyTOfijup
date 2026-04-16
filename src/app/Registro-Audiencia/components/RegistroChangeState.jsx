@@ -3,11 +3,11 @@ import { useContext, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context New/DataContext';
 
-export default function RegistroChangeState({estado, dateToUse, audId, estadoFunction}) {
+export default function RegistroChangeState({estado, dateToUse, audId, estadoFunction, item}) {
     const [changeToMake, setChangeToMake] = useState('')
     const [tiempoPedido, setTiempoPedido] = useState(false)
     const [pidiente, setPidiente] = useState(false)
-    const {updateData, updateRealTime, realTime, pushToAudienciaArray} = useContext(DataContext)
+    const {updateData, updateRealTime, realTime, pushToAudienciaArray, changeStatusBlockJuicio} = useContext(DataContext)
     const states = {
         'FINALIZADA': ['REINICIAR', 'RESUELVO'],
         'CUARTO_INTERMEDIO': ['CONTINUAR'],
@@ -35,11 +35,19 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
             setChangeToMake('')
         }
         if(changeToMake && changeToMake!=='RESUELVO'){
-            await updateData(dateToUse, audId, 'estado', translate[changeToMake])
+            const newEstado = translate[changeToMake];
+            await updateData(dateToUse, audId, 'estado', newEstado)
+            
+            // Sincronizar con Juicio si es un debate
+            if (item && item.titulo === 'DEBATE' && item.juicioReference) {
+                const { id, year } = item.juicioReference;
+                await changeStatusBlockJuicio(year, id, audId, newEstado);
+            }
+
             if(changeToMake == 'CUARTO INTERMEDIO'){
-                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${translate[changeToMake]} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
+                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
             }else{
-                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${translate[changeToMake]}`)
+                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${newEstado}`)
             }
         }
         await estadoFunction(translate[changeToMake])

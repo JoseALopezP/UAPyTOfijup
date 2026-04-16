@@ -17,6 +17,7 @@ import { yearFunction } from "@/utils/dateUtils";
 import { updateInternalFieldJuicio } from "@/firebase new/firestore/updateInternalFieldJuicio";
 import replaceDocument from "@/firebase new/firestore/replaceDocument";
 import { updateInternalUALData } from "@/firebase new/firestore/updateInternalUALData";
+import { updateJuicioBlockStatus } from "@/firebase new/firestore/updateJuicioBlockStatus";
 import { updateDocumentOnly } from "@/firebase new/firestore/updateDocumentOnly";
 
 export const DataContext = createContext({});
@@ -69,9 +70,9 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
-    const addAudiencia = async (data, date) => {
+    const addAudiencia = async (data, date, customId = null) => {
         try {
-            await addOrUpdateDocument("audiencias", date, 'audiencias', data);
+            await addOrUpdateDocument("audiencias", date, 'audiencias', data, customId);
         } catch (error) {
             console.error("Failed to add document:", error.message);
             setErrorMessage(`${error.message}`);
@@ -106,6 +107,14 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateInternalFieldJuicio(dateTransform, juicioId, field, value);
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
+    const changeStatusBlockJuicio = async (year, juicioId, audId, newStatus) => {
+        try {
+            await updateJuicioBlockStatus(year, juicioId, audId, newStatus);
+        } catch (error) {
+            console.error("An error occurred during status update:", error.message);
             setErrorMessage(`${error.message}`);
         }
     }
@@ -450,7 +459,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
-        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly,
+        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes
     };

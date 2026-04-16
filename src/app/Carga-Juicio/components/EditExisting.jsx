@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
 import { DataContext } from '@/context New/DataContext'
 import { ButtonSelection } from './ButtonSelection'
-import { numberCheck, listCheck, typeCheck, changeHandler, changeHandlerSplitter } from '@/utils/inputChecks'
+import { numberCheck, listCheck, typeCheck, changeHandler, changeHandlerSplitter, digitsCheck } from '@/utils/inputChecks'
 
-export default function EditExisting({ original, newState, setNewState, previousVersion, setPreviousVersion }) {
+export default function EditExisting({ original, newState, onToggle, previousVersion, setPreviousVersion }) {
     const { updateDesplegables, desplegables, changeValueJuicio, updateData } = useContext(DataContext)
     const [numeroLeg1, setNumeroLeg1] = useState(previousVersion.numeroLeg1 || 'MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true)
@@ -59,8 +59,8 @@ export default function EditExisting({ original, newState, setNewState, previous
     const checkCompletion = () => {
         const aux = []
         listCheck(numeroLeg1, setNumeroLeg1Error, desplegables.legajosPrefijo)
-        numberCheck(numeroLeg2, setNumeroLeg2Error, 0, 99999)
-        numberCheck(numeroLeg3, setNumeroLeg3Error, 0, 2100)
+        digitsCheck(numeroLeg2, setNumeroLeg2Error, 5)
+        digitsCheck(numeroLeg3, setNumeroLeg3Error, 4)
         listCheck(ufi, setUfiError, desplegables.ufi)
         numberCheck(fechad, setFechadError, 1, 31)
         numberCheck(fecham, setFechamError, 1, 12)
@@ -134,7 +134,7 @@ export default function EditExisting({ original, newState, setNewState, previous
                 setChanges(true)
             }
         }
-        const newAuto = (`${fechad}${fecham}${fechaa} ${fechah}:${fechamm}:${fechas}`)
+        const newAuto = (`${String(fechad || '00').padStart(2, '0')}/${String(fecham || '00').padStart(2, '0')}/${String(fechaa || '0000').padStart(4, '0')} ${String(fechah || '00').padStart(2, '0')}:${String(fechamm || '00').padStart(2, '0')}:${String(fechas || '00').padStart(2, '0')}`)
         if (newAuto !== original.auto) {
             if (saving) {
                 changeValueJuicio(fechaI, original.id, 'auto', newAuto)
@@ -142,7 +142,7 @@ export default function EditExisting({ original, newState, setNewState, previous
                 setChanges(true)
             }
         }
-        const newInicio = (`${fechaid}${fechaim}${fechaia}`)
+        const newInicio = (`${String(fechaid || '00').padStart(2, '0')}/${String(fechaim || '00').padStart(2, '0')}/${String(fechaia || '0000').padStart(4, '0')}`)
         if (newInicio !== original.inicio) {
             if (saving) {
                 changeValueJuicio(fechaI, original.id, 'inicio', newInicio)
@@ -199,16 +199,16 @@ export default function EditExisting({ original, newState, setNewState, previous
     }, []);
     return (
         <section className={`${styles.addJuicioSection}`}>
-            <ButtonSelection newState={newState} setNewState={setNewState} />
+            <ButtonSelection newState={newState} onToggle={onToggle} />
             <label className={`${styles.cargaLabel}`}>Número de Legajo</label>
             <span className={`${styles.multiInput}`}>
                 <input className={numeroLeg1Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
                     onChange={e => changeHandler(e.target.value, setNumeroLeg1, setNumeroLeg1Error, listCheck, desplegables.legajosPrefijo)} value={numeroLeg1} list='legajosPrefijo' />
                 <input className={numeroLeg2Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                    onChange={e => changeHandler(e.target.value, setNumeroLeg2, setNumeroLeg2Error, numberCheck, 0, 99999)}
+                    onChange={e => changeHandler(e.target.value, setNumeroLeg2, setNumeroLeg2Error, digitsCheck, 5)}
                     placeholder='00000' value={numeroLeg2} />
                 <input className={numeroLeg3Error ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
-                    placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, numberCheck, 0, 2100)} value={numeroLeg3} /></span>
+                    placeholder='2025' onChange={e => changeHandler(e.target.value, setNumeroLeg3, setNumeroLeg3Error, digitsCheck, 4)} value={numeroLeg3} /></span>
             <label className={`${styles.cargaLabel}`}>Auto de Apertura</label>
             <span className={`${styles.multiInput}`}>
                 <input className={fechadError ? `${styles.multiJuicioInput}` : `${styles.multiJuicioInput} ${styles.multiJuicioInputWrong}`}
