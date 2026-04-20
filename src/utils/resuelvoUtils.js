@@ -8,7 +8,7 @@ import { todayFunction } from "./dateUtils";
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 1 ? '' : 'Ministerio Público Fiscal: '}${el.nombre?.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
+        aux += `${i > 0 ? '' : 'Ministerio Público Fiscal: '}${el.nombre?.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
@@ -144,18 +144,14 @@ export function generateResuelvoSection(item, date) {
         sections.push({ title: isMale ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez?.toLowerCase() || '') });
     }
     if (item.mpf && item.mpf.length > 0) {
-        let fiscales = [];
-        listFiscal(item.mpf, item.ufi)
-            .split('\n')
-            .forEach((f, indexF) => {
-                if (f.includes('Fiscal:')) {
-                    fiscales.push(`${f.split('Fiscal:')[1].split('UFI:')[0]}${item.mpf[indexF]?.asistencia ? '' : ' (ausente)'}`);
-                }
-            });
+        let fiscales = item.mpf.map(el => {
+            const nombre = el.nombre?.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre;
+            return `${nombre}${el.asistencia ? '' : ' (ausente)'}`;
+        });
         let ufiText = item.ufi === "EJECUCIÓN" ? '' : `UFI: ${item.ufi}`;
         sections.push({
             title: 'Ministerio Público Fiscal:',
-            text: `${fiscales.join('\n')}${ufiText ? ('\n' + ufiText) : ''}`
+            text: ` ${fiscales.join('\n ')}${ufiText ? ('\n ' + ufiText) : ''}`
         });
     }
     if (item.defensa) {
