@@ -123,7 +123,7 @@ export default function EditExisting({ original, newState, onToggle, previousVer
     const checkDifferenceSave = (saving) => {
         const fechaI = fechaid + fechaim + fechaia;
         setChanges(false)
-        const newNumeroLeg = (numeroLeg1 + '-' + numeroLeg2 + '-' + numeroLeg3)
+        const newNumeroLeg = (numeroLeg1 + '-' + String(numeroLeg2).padStart(5, "0") + '-' + numeroLeg3)
         if (newNumeroLeg !== original.numeroLeg) {
             if (saving) {
                 changeValueJuicio(fechaI, original.Id,)

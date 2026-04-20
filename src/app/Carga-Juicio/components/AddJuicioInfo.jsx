@@ -198,12 +198,22 @@ export default function AddJuicioInfo({ setBloquesArray, newState, onToggle, set
                 const mm = String(fechamm || '00').padStart(2, '0');
                 const s = String(fechas || '00').padStart(2, '0');
 
+                const formattedLegajo = `${numeroLeg1}-${String(numeroLeg2).padStart(5, "0")}-${numeroLeg3}`;
                 aux.push({
-                    audId: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}-${crypto.randomUUID().slice(0, 4)}`,
-                    hora: h + ':' + mm + ':' + s,
+                    aId: `${h}${mm}${formattedLegajo}`,
+                    audId: `${formattedLegajo}-${crypto.randomUUID().slice(0, 4)}`,
+                    hora: `${h}:${mm}`,
+                    horaProgramada: 45,
+                    sala: " -",
+                    numeroLeg: formattedLegajo,
+                    tipo: "DEBATE",
+                    tipo2: "",
+                    tipo3: "",
+                    juez: tipoTribunal === "COLEGIADO" ? `${juez1}+${juez2}+${juez3}` : juez1,
+                    estado: "PROGRAMADA",
+                    estadoBloque: "PROGRAMADO",
+                    situacion: "",
                     fecha: `${d}${m}${y}`,
-                    estadoBloque: 'PROGRAMADO',
-                    sala: ' -'
                 });
 
                 // Move to the next day for the next block
@@ -229,7 +239,7 @@ export default function AddJuicioInfo({ setBloquesArray, newState, onToggle, set
     useEffect(() => {
         // Sync local state to parent juicioInfo for saving
         setJuicioInfo({
-            numeroLeg: `${numeroLeg1}-${numeroLeg2}-${numeroLeg3}`,
+            numeroLeg: `${numeroLeg1}-${String(numeroLeg2).padStart(5, "0")}-${numeroLeg3}`,
             ufi: ufi,
             auto: `${String(fechad || '00').padStart(2, '0')}/${String(fecham || '00').padStart(2, '0')}/${String(fechaa || '0000').padStart(4, '0')} ${String(fechah || '00').padStart(2, '0')}:${String(fechamm || '00').padStart(2, '0')}:${String(fechas || '00').padStart(2, '0')}`,
             inicio: `${String(fechaid || '00').padStart(2, '0')}/${String(fechaim || '00').padStart(2, '0')}/${String(fechaia || '0000').padStart(4, '0')}`,

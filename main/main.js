@@ -97,6 +97,12 @@ const createWindow = () => {
   } else {
     mainWindow.loadURL("http://localhost:3000");
     mainWindow.webContents.openDevTools();
+    
+    // Pipe renderer logs to the terminal
+    mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+      console.log(`[RENDERER] ${message}`);
+    });
+
     mainWindow.webContents.on("did-fail-load", (e, code, desc) => {
       mainWindow.webContents.reloadIgnoringCache();
     });

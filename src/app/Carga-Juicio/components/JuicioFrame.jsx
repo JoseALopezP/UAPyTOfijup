@@ -91,6 +91,17 @@ export default function JuicioFrame() {
     if (!confirmation2) return;
 
     try {
+      // 1. Eliminar todas las audiencias vinculadas al juicio antes de borrar el juicio en sí
+      if (juicio.bloques && Array.isArray(juicio.bloques)) {
+        for (const block of juicio.bloques) {
+          try {
+            await deleteAudiencia(block.fecha, block.audId);
+          } catch (e) {
+            console.error(`Error eliminando audiencia vinculada (${block.audId}):`, e);
+          }
+        }
+      }
+
       await deleteJuicio(year, juicio.id);
       
       // Si el juicio eliminado es el que está cargado actualmente
@@ -174,14 +185,26 @@ export default function JuicioFrame() {
 
     if (!window.confirm(confirmMsg)) return;
 
-    if (!bloquesArray || bloquesArray.length === 0) {
-      alert("No hay bloques para generar.");
-      return;
-    }
-
     const logs = [];
     const errores = [];
-    const bloquesActualizados = [...bloquesArray];
+    const bloquesActualizados = bloquesArray ? [...bloquesArray] : [];
+
+    // 1. Detectar y eliminar bloques que han sido borrados de la lista
+    if (!isNew && previousVersion.bloques) {
+        const deletedBlocks = previousVersion.bloques.filter(oldB => 
+            !bloquesActualizados.some(newB => newB.audId === oldB.audId)
+        );
+
+        for (const oldBlock of deletedBlocks) {
+            try {
+                await deleteAudiencia(oldBlock.fecha, oldBlock.audId);
+                logs.push(`Audiencia eliminada: El bloque con ID ${oldBlock.audId} ha sido removido.`);
+            } catch (e) {
+                errores.push(`Error al eliminar audiencia de bloque borrado (${oldBlock.audId}): ${e.message}`);
+                console.error(e);
+            }
+        }
+    }
 
     for (let i = 0; i < bloquesActualizados.length; i++) {
         const block = bloquesActualizados[i];
@@ -203,11 +226,16 @@ export default function JuicioFrame() {
 
         // Preparar data de la audiencia
         const hearingData = {
+            aId: block.aId || `${block.hora.replace(/:/g, "")}${juicioInfo.numeroLeg}`,
             titulo: 'DEBATE',
             numeroLeg: juicioInfo.numeroLeg,
             juez: juicioInfo.jueces,
             ufi: juicioInfo.ufi,
             tipo: 'DEBATE',
+            tipo2: block.tipo2 || '',
+            tipo3: block.tipo3 || '',
+            horaProgramada: block.horaProgramada || 45,
+            situacion: block.situacion || '',
             caratula: `${juicioInfo.numeroLeg} - ${juicioInfo.tipoDelito}`,
             mpf: [{ nombre: juicioInfo.fiscal, asistencia: true, presencial: true, id: 'mpf-1' }],
             defensa: [{ 
@@ -227,7 +255,7 @@ export default function JuicioFrame() {
                     presencial: true,
                     id: t.id
                 })),
-            estado: 'PROGRAMADO',
+            estado: 'PROGRAMADA',
             hora: block.hora,
             sala: block.sala || ' -',
             juicioReference: {
