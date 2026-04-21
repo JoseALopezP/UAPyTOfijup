@@ -23,7 +23,9 @@ export default function NavBar() {
             <span className={[styles.subcontainer]}>
                 <IconNavBar iconRoute={'Administracion-Logistica'} />
                 <IconNavBar iconRoute={'Pumba'} />
+                <IconNavBar iconRoute={'Abogados'} />
                 <IconNavBar iconRoute={'Listas-Desplegables'} />
+
                 <IconNavBar iconRoute={'Manual'} /></span>
         </div>
     );

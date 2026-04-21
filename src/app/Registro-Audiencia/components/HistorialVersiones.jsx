@@ -1,28 +1,35 @@
 import { useState, useEffect } from "react";
-import { obtenerHistorialAudiencia } from "@/utils/localBackup";
+import { getLocalVersions } from "@/utils/localBackup";
 import styles from '../RegistroAudiencia.module.css'
 
-export default function HistorialDeVersiones({ fecha, legajo, hora, onSeleccionar, reloadTrigger }) {
+export default function HistorialDeVersiones({ id_audiencia, onSeleccionar, reloadTrigger }) {
   const [versiones, setVersiones] = useState([]);
 
   useEffect(() => {
-    async function fetchHistorial() {
-      const historial = await obtenerHistorialAudiencia(fecha, legajo, hora);
+    function fetchHistorial() {
+      const historial = getLocalVersions(id_audiencia);
       setVersiones(historial);
     }
     fetchHistorial();
-  }, [fecha, legajo, hora, reloadTrigger]);
+  }, [id_audiencia, reloadTrigger]);
 
   if (versiones.length === 0) return null;
 
   return (
     <select className={`${styles.backupList}`} onChange={(e) => {
         const seleccion = versiones[e.target.value];
-        if (seleccion) onSeleccionar(seleccion.cambios);
+        if (seleccion) {
+            onSeleccionar(seleccion);
+            e.target.value = ""; // reset
+        }
     }}>
-        {versiones.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map((v, i) => (
+        <option value="">Restaurar versión local...</option>
+        {versiones.map((v, i) => (
             <option key={i} value={i}>
-                {new Date(v.timestamp).toLocaleString("es-AR", { hour12: false })}
+                Local - {new Date(v.timestamp).toLocaleString("es-AR", { 
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                })}
             </option>
         ))}
     </select>

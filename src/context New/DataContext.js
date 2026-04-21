@@ -19,6 +19,10 @@ import replaceDocument from "@/firebase new/firestore/replaceDocument";
 import { updateInternalUALData } from "@/firebase new/firestore/updateInternalUALData";
 import { updateJuicioBlockStatus } from "@/firebase new/firestore/updateJuicioBlockStatus";
 import { updateDocumentOnly } from "@/firebase new/firestore/updateDocumentOnly";
+import getCollection from "@/firebase new/firestore/getCollection";
+import { setDocument, deleteDocument } from "@/firebase new/firestore/basicDocs";
+import { batchWrite } from "@/firebase new/firestore/batchWrite";
+
 
 export const DataContext = createContext({});
 
@@ -42,6 +46,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [solicitudesCompletadas, setSolicitudesCompletadas] = useState(defaultValue);
     const [solicitudesData, setSolicitudesData] = useState(defaultValue);
     const [solicitudesPendientes, setSolicitudesPendientes] = useState(defaultValue);
+    const [abogados, setAbogados] = useState(defaultValue);
+
 
     const updateByDate = async (date) => {
         try {
@@ -454,14 +460,61 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         await addObjectToDocument("users", "listaUsuarios", data);
     };
 
+    const updateAbogados = async () => {
+        try {
+            const data = await getDocument('abogados', 'listaAbogados');
+            if (data && data.list) {
+                setAbogados(data.list);
+            } else {
+                setAbogados([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const saveAbogadosList = async (newList) => {
+        try {
+            await replaceDocument('abogados', 'listaAbogados', { list: newList });
+            setAbogados(newList);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const addAbogado = async (newLawyer) => {
+        const newList = [newLawyer, ...abogados];
+        await saveAbogadosList(newList);
+    };
+
+    const updateAbogadoData = async (updatedLawyer) => {
+        const newList = abogados.map(a => 
+            (a.m === updatedLawyer.m) ? updatedLawyer : a
+        );
+        await saveAbogadosList(newList);
+    };
+
+    const deleteAbogado = async (nroMatricula) => {
+        const newList = abogados.filter(a => a.m !== nroMatricula);
+        await saveAbogadosList(newList);
+    };
+
+    const importAbogados = async (dataList) => {
+        await saveAbogadosList(dataList);
+    };
+
+
+
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
         updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
+        updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
-        solicitudesCompletadas, solicitudesData, solicitudesPendientes
+        solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados
+
     };
     return <Provider value={context}>{children}</Provider>;
 };

@@ -118,7 +118,11 @@ export default function IconNavBar({ iconRoute }) {
                     </g>
                 </svg>
             )}
+            {iconRoute === 'Abogados' && <svg viewBox="0 0 24 24" fill={('/' + iconRoute) === currentRoute ? '#d7d7d7' : (hovering ? '#d7d7d7' : '#868686')}>
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>}
             {iconRoute === 'Solicitudes-Audiencia' && (
+
                 <svg stroke={('/' + iconRoute) === currentRoute ? '#d7d7d7' : (hovering ? '#d7d7d7' : '#868686')} fill="#000000" viewBox="0 0 24 24">
                     <path d="M12,14a1,1,0,1,0-1-1A1,1,0,0,0,12,14Zm5,0a1,1,0,1,0-1-1A1,1,0,0,0,17,14Zm-5,4a1,1,0,1,0-1-1A1,1,0,0,0,12,18Zm5,0a1,1,0,1,0-1-1A1,1,0,0,0,17,18ZM7,14a1,1,0,1,0-1-1A1,1,0,0,0,7,14ZM19,4H18V3a1,1,0,0,0-2,0V4H8V3A1,1,0,0,0,6,3V4H5A3,3,0,0,0,2,7V19a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V7A3,3,0,0,0,19,4Zm1,15a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V10H20ZM20,8H4V7A1,1,0,0,1,5,6H19a1,1,0,0,1,1,1ZM7,18a1,1,0,1,0-1-1A1,1,0,0,0,7,18Z" />
                 </svg>

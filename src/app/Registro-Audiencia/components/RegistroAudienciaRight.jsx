@@ -1,6 +1,6 @@
 'use client'
 import { useContext, useState, useCallback, useEffect } from 'react';
-import { guardarBackup } from '@/utils/localBackup';
+import { saveLocalVersion } from '@/utils/localBackup';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context New/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
@@ -117,24 +117,30 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         }
     }
     useEffect(() => {
-    const interval = setInterval(() => {
-        const cambios = {};
-        if (resuelvo && removeHtmlTags(resuelvo) !== '') { 
-        cambios.resuelvoText = resuelvo;
-        }
-        if (minuta && removeHtmlTags(minuta) !== '') {
-        cambios.minuta = minuta;
-        }
-        if (cierre && removeHtmlTags(cierre) !== '') {
-        cambios.cierre = cierre;
-        }
-        if (Object.keys(cambios).length > 0) {
-        guardarBackup(dateToUse, item.numeroLeg, item.hora, cambios);
-        setReloadHistorial(prev => prev + 1);
-        }
-    }, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-    }, [resuelvo, minuta, cierre, dateToUse, item.numeroLeg, item.hora]);
+        const timeout = setTimeout(() => {
+            const cambios = {};
+            if (resuelvo && removeHtmlTags(resuelvo) !== '') {
+                cambios.resuelvoText = resuelvo;
+            }
+            if (minuta && removeHtmlTags(minuta) !== '') {
+                cambios.minuta = minuta;
+            }
+            if (cierre && removeHtmlTags(cierre) !== '') {
+                cambios.cierre = cierre;
+            }
+            if (Object.keys(cambios).length > 0) {
+                saveLocalVersion({
+                    id_audiencia: item.id,
+                    minuta: cambios.minuta,
+                    resuelvo: cambios.resuelvoText,
+                    cierre: cambios.cierre
+                });
+                setReloadHistorial(prev => prev + 1);
+            }
+        }, 3000); // 3 seconds debounce
+        
+        return () => clearTimeout(timeout);
+    }, [resuelvo, minuta, cierre, item.id]);
     useEffect(() => {
         if (isInitialized) {
             checkGuardar();
@@ -163,13 +169,11 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
                 </select>
                 <button type='button' onClick={() => insertarModelo()} className={`${styles.inputLeft} ${styles.insertarButton}`}>INSERTAR MODELO</button></span>
                 <HistorialDeVersiones
-                fecha={dateToUse}
-                legajo={item.numeroLeg}
-                hora={item.hora}
+                id_audiencia={item.id}
                 onSeleccionar={(cambios) => {
                     if (confirm("¿Seguro que querés cargar esta versión anterior?")) {
                     if (cambios.minuta) setMinuta(cambios.minuta);
-                    if (cambios.resuelvoText) setResuelvo(cambios.resuelvoText);
+                    if (cambios.resuelvo) setResuelvo(cambios.resuelvo);
                     if (cambios.cierre) setCierre(cambios.cierre);
                     }
                 }}

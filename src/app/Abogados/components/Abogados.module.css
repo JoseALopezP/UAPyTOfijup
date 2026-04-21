@@ -1,0 +1,592 @@
+/* =============================================
+   ABOGADOS MANAGER — PREMIUM DARK THEME
+   ============================================= */
+
+.container {
+    display: flex;
+    height: 100vh;
+    background: #141414;
+    color: #e0e0e0;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    overflow: hidden;
+    width: 97.8vw;
+    margin-left: 2.2vw;
+}
+
+/* ==== SIDEBAR ==== */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    border-right: 1px solid #262626;
+    display: flex;
+    flex-direction: column;
+    background: #171717;
+    overflow: hidden;
+}
+
+.sidebarHeader {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid #262626;
+}
+
+.sidebarTitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #666;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+}
+
+.cargoFilters {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+/* Filtros de cargo */
+.cargoLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: transparent;
+    border-radius: 8px;
+    color: #868686;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.1s;
+    user-select: none;
+}
+
+.cargoLabel:hover {
+    background: #222;
+}
+
+.cargoLabelActive {
+    background: #1e2a3a10;
+    color: #d7d7d7;
+}
+
+.checkboxCustom {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+}
+
+.cargoText {
+    flex: 1;
+}
+
+.cargoBadge {
+    background: #252525;
+    color: #666;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    transition: color 0.1s;
+}
+
+.cargoLabelActive .cargoBadge {
+    color: #aaa;
+}
+
+
+/* Search */
+.searchContainer {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.searchInput {
+    width: 100%;
+    box-sizing: border-box;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    color: #d4d4d4;
+    font-size: 13px;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.searchInput::placeholder {
+    color: #444;
+}
+
+.searchInput:focus {
+    border-color: #3c5a7a;
+}
+
+/* Lista lateral */
+.abogadosList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 8px;
+}
+
+.abogadosList::-webkit-scrollbar {
+    width: 4px;
+}
+
+.abogadosList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.abogadosList::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.abogadoItem {
+    padding: 9px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+    margin-bottom: 1px;
+}
+
+.abogadoItem:hover {
+    background: #1e1e1e;
+}
+
+.abogadoItemActive {
+    background: #1a2535 !important;
+    border-left: 2px solid #4a7fa5;
+}
+
+.abogadoItemName {
+    font-size: 12.5px;
+    color: #c8c8c8;
+    line-height: 1.3;
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.abogadoItemSub {
+    font-size: 10.5px;
+    color: #555;
+    margin: 0;
+}
+
+.emptyList {
+    text-align: center;
+    color: #3a3a3a;
+    font-size: 12px;
+    padding: 24px 8px;
+}
+
+/* ==== MAIN CONTENT ==== */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #1e1e1e;
+    background: #141414;
+}
+
+.toolbarTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #c0c0c0;
+    flex: 1;
+}
+
+.toolbarSubtitle {
+    font-size: 12px;
+    color: #444;
+    margin-left: 8px;
+}
+
+.btnPrimary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #1e3a5f;
+    color: #7bb3e0;
+    border: 1px solid #2a5080;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.btnPrimary:hover {
+    background: #264a72;
+    transform: translateY(-1px);
+}
+
+.btnDanger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #3a1a1a;
+    color: #e07b7b;
+    border: 1px solid #6a2020;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btnDanger:hover {
+    background: #4a2020;
+}
+
+.btnSecondary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: transparent;
+    color: #868686;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btnSecondary:hover {
+    background: #1e1e1e;
+    color: #c0c0c0;
+}
+
+.btnImport {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #1a3a1a;
+    color: #7bcf7b;
+    border: 1px solid #2a6a2a;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btnImport:hover {
+    background: #204a20;
+}
+
+/* ==== TABLE ==== */
+.tableWrapper {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+}
+
+.tableWrapper::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+    background: #282828;
+    border-radius: 4px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.table thead tr {
+    background: #171717;
+    border-bottom: 2px solid #222;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.1s;
+}
+
+.sortableHeader:hover {
+    color: #888;
+}
+
+.sortIcon {
+    margin-left: 4px;
+    font-size: 11px;
+    display: inline-block;
+    width: 10px;
+    color: #444;
+}
+
+.sortableHeader:hover .sortIcon {
+    color: #666;
+}
+
+
+.table tbody tr {
+    border-bottom: 1px solid #1a1a1a;
+    transition: background 0.1s;
+}
+
+.table tbody tr:hover {
+    background: #1c1c1c;
+}
+
+.table tbody tr.rowSelected {
+    background: #151f2a !important;
+    border-left: 2px solid #4a7fa5;
+}
+
+.table td {
+    padding: 8px 14px;
+    color: #b8b8b8;
+    vertical-align: middle;
+}
+
+/* Campos editables dentro de la tabla */
+.editInput {
+    width: 100%;
+    background: #1e1e1e;
+    border: 1px solid #2e2e2e;
+    border-radius: 4px;
+    color: #d4d4d4;
+    font-size: 12.5px;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.editInput:focus {
+    border-color: #4a7fa5;
+    background: #1a2535;
+}
+
+.editSelect {
+    width: 100%;
+    background: #1e1e1e;
+    border: 1px solid #2e2e2e;
+    border-radius: 4px;
+    color: #d4d4d4;
+    font-size: 12.5px;
+    padding: 5px 8px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.editSelect:focus {
+    border-color: #4a7fa5;
+}
+
+/* Chip de cargo */
+.cargoPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Botones de acción en filas */
+.rowActions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.iconBtn:hover {
+    background: #222;
+    color: #c0c0c0;
+}
+
+.iconBtnDanger:hover {
+    background: #3a1a1a;
+    color: #e07b7b;
+}
+
+/* ==== EMPTY STATE ==== */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+    color: #333;
+    gap: 12px;
+}
+
+.emptyState svg {
+    opacity: 0.3;
+}
+
+.emptyState p {
+    font-size: 13px;
+    color: #444;
+    margin: 0;
+}
+
+/* ==== IMPORT MODAL ==== */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 28px;
+    width: 460px;
+    max-width: 90vw;
+    animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modalTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #d4d4d4;
+    margin: 0 0 6px;
+}
+
+.modalSubtitle {
+    font-size: 12.5px;
+    color: #555;
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.modalWarning {
+    background: #2a2010;
+    border: 1px solid #5a4010;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #c8a060;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modalActions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* ==== TOAST ==== */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1e3a1e;
+    border: 1px solid #2a5a2a;
+    color: #7bcf7b;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 200;
+    animation: slideUp 0.2s ease;
+}
+
+.toastError {
+    background: #3a1e1e;
+    border-color: #6a2a2a;
+    color: #cf7b7b;
+}
+
+/* Loading row */
+.loadingRow td {
+    text-align: center;
+    color: #3a3a3a;
+    padding: 32px;
+    font-size: 13px;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+.loadingDot {
+    display: inline-block;
+    animation: pulse 1.2s infinite;
+}
+
+.loadingDot:nth-child(2) { animation-delay: 0.2s; }
+.loadingDot:nth-child(3) { animation-delay: 0.4s; }

@@ -1,144 +1,89 @@
 // utils/localBackup.js
-const DB_NAME = "BackupAudiencias";
-const STORE_NAME = "dias";
-const DB_VERSION = 1;
+const MAX_VERSIONS = 20;
+let hasCleanedUp = false;
 
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "fecha" });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+export const saveLocalVersion = (data) => {
+  if (typeof window !== "undefined" && !hasCleanedUp) {
+      hasCleanedUp = true;
+      try { limpiarBackupsAntiguos(7); } catch (e) { console.error(e); }
+  }
 
-function formatFechaDDMMAAAA(fechaStr) {
-  const fecha = new Date(fechaStr);
-  const dd = String(fecha.getDate()).padStart(2, '0');
-  const mm = String(fecha.getMonth() + 1).padStart(2, '0');
-  const yyyy = fecha.getFullYear();
-  return `${dd}${mm}${yyyy}`;
-}
+  if (!data || !data.id_audiencia) return;
 
-function deepSortedStringify(obj) {
-  return JSON.stringify(obj, (key, value) => {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      return Object.keys(value)
-        .sort()
-        .reduce((acc, k) => {
-          acc[k] = value[k];
-          return acc;
-        }, {});
-    }
-    return value;
-  });
-}
+  const storageKey = `audiencia_${data.id_audiencia}_history`;
 
-function isEqual(obj1, obj2) {
-  return deepSortedStringify(obj1) === deepSortedStringify(obj2);
-}
+  // 1. Obtener historial previo o crear uno nuevo
+  let history = JSON.parse(localStorage.getItem(storageKey)) || [];
 
-function normalizeCambios(cambios) {
-  return JSON.parse(JSON.stringify(cambios));
-}
+  // Verificamos que el último guardado no sea exactamente el mismo 
+  const ultimo = history[0];
+  if (
+    ultimo &&
+    ultimo.minuta === data.minuta &&
+    ultimo.resuelvo === data.resuelvo &&
+    ultimo.cierre === data.cierre
+  ) {
+    return; // No guardamos si es idéntico
+  }
 
-export async function guardarBackup(fecha, legajo, hora, cambios) {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  const store = tx.objectStore(STORE_NAME);
-
-  const fechaFormateada = formatFechaDDMMAAAA(fecha);
-  const request = store.get(fechaFormateada);
-
-  request.onsuccess = () => {
-    const data = request.result || { fecha: fechaFormateada, audiencias: [] };
-    const existente = data.audiencias.find(
-      (a) => a.legajo === legajo && a.hora === hora
-    );
-
-    const timestamp = new Date().toISOString();
-    const entrada = { cambios: normalizeCambios(cambios), timestamp };
-
-    if (existente) {
-      existente.historial = existente.historial || [];
-      const ultimo = existente.historial[existente.historial.length - 1];
-      if (!ultimo || !isEqual(ultimo.cambios, entrada.cambios)) {
-        console.log("🔄 Guardando nueva versión: cambios detectados");
-        console.log("Último:", JSON.stringify(ultimo?.cambios));
-        console.log("Nuevo :", JSON.stringify(entrada.cambios));
-        existente.historial.push(entrada);
-      } else {
-        console.log("✅ Cambios idénticos, no se guarda una nueva versión.");
-      }
-    } else {
-      console.log("➕ Nueva audiencia, guardando primer versión");
-      data.audiencias.push({ legajo, hora, historial: [entrada] });
-    }
-
-    store.put(data);
+  // 2. Añadir la nueva versión con timestamp
+  const newEntry = {
+    ...data,
+    timestamp: new Date().toISOString(),
   };
 
-  request.onerror = () => {
-    console.error("Error al obtener el backup local del día", fechaFormateada);
-  };
+  history.unshift(newEntry); // Agregar al inicio
 
-  tx.oncomplete = () => db.close();
-}
+  // 3. Mantener solo las últimas N versiones
+  if (history.length > MAX_VERSIONS) {
+    history = history.slice(0, MAX_VERSIONS);
+  }
 
-export async function limpiarBackupsAntiguos(dias = 7) {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  const store = tx.objectStore(STORE_NAME);
+  // 4. Guardar en LocalStorage
+  localStorage.setItem(storageKey, JSON.stringify(history));
+};
 
+export const getLocalVersions = (id_audiencia) => {
+  if (!id_audiencia) return [];
+  const storageKey = `audiencia_${id_audiencia}_history`;
+  try {
+    return JSON.parse(localStorage.getItem(storageKey)) || [];
+  } catch (error) {
+    console.error("Error reading localStorage", error);
+    return [];
+  }
+};
+
+export const clearLocalVersions = (id_audiencia) => {
+  if (!id_audiencia) return;
+  const storageKey = `audiencia_${id_audiencia}_history`;
+  localStorage.removeItem(storageKey);
+};
+
+export function limpiarBackupsAntiguos(dias = 7) {
+  // Recorrer localStorage para limpiar keys antiguos (7 dias)
+  const prefix = "audiencia_";
+  const suffix = "_history";
   const hoy = new Date();
-  const request = store.getAll();
 
-  request.onsuccess = () => {
-    request.result.forEach((registro) => {
-      const fechaStr = registro.fecha;
-      const dd = parseInt(fechaStr.substring(0, 2), 10);
-      const mm = parseInt(fechaStr.substring(2, 4), 10) - 1;
-      const yyyy = parseInt(fechaStr.substring(4, 8), 10);
-      const fecha = new Date(yyyy, mm, dd);
-
-      const diff = (hoy - fecha) / (1000 * 60 * 60 * 24);
-      if (diff > dias) {
-        store.delete(fechaStr);
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix) && key.endsWith(suffix)) {
+      try {
+        const history = JSON.parse(localStorage.getItem(key)) || [];
+        if (history.length > 0) {
+          const firstTimestamp = new Date(history[history.length - 1].timestamp);
+          const diff = (hoy - firstTimestamp) / (1000 * 60 * 60 * 24);
+          if (diff > dias) {
+            localStorage.removeItem(key);
+          }
+        } else {
+            localStorage.removeItem(key);
+        }
+      } catch (e) {
+          // Si algo falla leyendo la historia, la borramos por seguridad.
+          localStorage.removeItem(key);
       }
-    });
-  };
-
-  request.onerror = () => console.error("Error al limpiar backups antiguos");
-  tx.oncomplete = () => db.close();
-}
-
-export async function obtenerHistorialAudiencia(fecha, legajo, hora) {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, "readonly");
-  const store = tx.objectStore(STORE_NAME);
-
-  const fechaFormateada = formatFechaDDMMAAAA(fecha);
-  const request = store.get(fechaFormateada);
-
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => {
-      const data = request.result;
-      if (!data) return resolve([]);
-
-      const audiencia = data.audiencias.find(
-        (a) => a.legajo === legajo && a.hora === hora
-      );
-
-      const historial = audiencia?.historial || [];
-      historial.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-      resolve(historial);
-    };
-    request.onerror = () => reject("Error al obtener historial del backup");
-  });
-}
+    }
+  }
+}
