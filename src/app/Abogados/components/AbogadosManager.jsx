@@ -62,8 +62,17 @@ function CargoPill({ cargo }) {
     );
 }
 
+function GeneroPill({ s }) {
+    if (s === undefined) return <span style={{ color: '#666', fontSize: 11 }}>?</span>;
+    return s ? (
+        <span style={{ background: '#d55b9b18', color: '#d55b9b', padding: '2px 6px', borderRadius: 4, fontSize: 11, border: '1px solid #d55b9b33' }}>F</span>
+    ) : (
+        <span style={{ background: '#5b9bd518', color: '#5b9bd5', padding: '2px 6px', borderRadius: 4, fontSize: 11, border: '1px solid #5b9bd533' }}>M</span>
+    );
+}
+
 function NuevoAbogadoRow({ onSave, onCancel }) {
-    const [form, setForm] = useState({ n: '', m: '', t: '', c: 'fiscal', l: '' });
+    const [form, setForm] = useState({ n: '', m: '', t: '', c: 'fiscal', l: '', s: false });
     const set = (field, val) => setForm(prev => ({ ...prev, [field]: val }));
 
     return (
@@ -99,6 +108,12 @@ function NuevoAbogadoRow({ onSave, onCancel }) {
                     value={form.c}
                     onChange={e => set('c', e.target.value)}
                 />
+            </td>
+            <td>
+                <select className={styles.editInput} value={form.s ? 'true' : 'false'} onChange={e => set('s', e.target.value === 'true')}>
+                    <option value="false">M</option>
+                    <option value="true">F</option>
+                </select>
             </td>
             <td>
                 <div className={styles.rowActions}>
@@ -164,6 +179,15 @@ function AbogadoRow({ abogado, isSelected, onSelect, onSave, onDelete }) {
                     : <CargoPill cargo={abogado.c} />
                 }
             </td>
+            <td style={{ width: 60, textAlign: 'center' }}>
+                {editing
+                    ? <select className={styles.editInput} value={form.s ? 'true' : 'false'} onChange={e => set('s', e.target.value === 'true')} style={{ padding: '2px 4px' }}>
+                        <option value="false">M</option>
+                        <option value="true">F</option>
+                      </select>
+                    : <GeneroPill s={abogado.s} />
+                }
+            </td>
             <td style={{ width: 110 }}>
                 <div className={styles.rowActions}>
                     {editing ? (
@@ -204,7 +228,7 @@ function ImportModal({ onConfirm, onCancel, loading }) {
 }
 
 export default function AbogadosManager() {
-    const { abogados, updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados } = useContext(DataContext);
+    const { abogados, updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados, updateDesplegables } = useContext(DataContext);
 
     const [selectedCargos, setSelectedCargos] = useState(['juez', 'fiscal', 'aFiscal', 'defensor', 'aDefensor']);
     const [search, setSearch] = useState('');
@@ -216,11 +240,13 @@ export default function AbogadosManager() {
     const [importLoading, setImportLoading] = useState(false);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
+    const { desplegables } = useContext(DataContext);
 
     useEffect(() => {
         const load = async () => {
             setLoading(true);
             await updateAbogados();
+            await updateDesplegables();
             setLoading(false);
         };
         load();
@@ -315,6 +341,62 @@ export default function AbogadosManager() {
         }
     };
 
+    const handleMigrateGenders = async () => {
+        if (!confirm('¿Atrapar información de género desde las listas Legacy (Dra./Dr.) a la base nueva?')) return;
+        setImportLoading(true);
+        try {
+            const legacyGroup = desplegables?.desplegables || {};
+            const allLegacy = [
+                ...(legacyGroup.jueces || []),
+                ...(legacyGroup.fiscal || []),
+                ...(legacyGroup.defensa || []),
+                ...(legacyGroup.defensaParticular || [])
+            ];
+
+            const femaleNames = [];
+            const maleNames = [];
+
+            allLegacy.forEach(name => {
+                const isFemale = /(Dra\.|Jueza|Sra\.)/i.test(name);
+                const isMale = /(Dr\.|Sr\.)/i.test(name) && !isFemale;
+                
+                let cleanName = name.replace(/(^|\s)(Dr\.|Dra\.|Sr\.|Sra\.|El|La|Juez(?:a)?|Fiscal|Defensor(?:a)?)(\s|$)/gi, ' ');
+                cleanName = cleanName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+                
+                if (isFemale) femaleNames.push(cleanName);
+                if (isMale) maleNames.push(cleanName);
+            });
+
+            const newAbogados = abogados.map(abg => {
+                const nClean = abg.n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(',', '');
+                
+                const checkMatch = (legacyList) => {
+                    return legacyList.some(legacyStr => {
+                        const words = legacyStr.split(' ').filter(w => w.length > 2);
+                        if (words.length === 0) return false;
+                        return words.every(w => nClean.includes(w));
+                    });
+                };
+
+                // Asignar prop s: verdadera(mujer), falsa(hombre)
+                if (checkMatch(femaleNames)) {
+                    return { ...abg, s: true }; 
+                } else if (checkMatch(maleNames)) {
+                    return { ...abg, s: false };
+                }
+                return abg; // Si no lo encuentra no toca
+            });
+
+            await importAbogados(newAbogados);
+            showToast('Géneros mapeados correctamente desde Legacy.');
+        } catch (e) {
+            console.error(e);
+            showToast('Error al migrar géneros.', true);
+        } finally {
+            setImportLoading(false);
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.sidebar}>
@@ -354,6 +436,7 @@ export default function AbogadosManager() {
             <div className={styles.main}>
                 <div className={styles.toolbar}>
                     <span className={styles.toolbarTitle}>Gestión de Abogados <span className={styles.toolbarSubtitle}>{list.length} registros</span></span>
+                    <button className={styles.btnSecondary} onClick={handleMigrateGenders} disabled={importLoading}>🔌 Migrar Géneros</button>
                     <button className={styles.btnImport} onClick={() => setShowImport(true)}>⬆ Importar Datos</button>
                     <button className={styles.btnPrimary} onClick={() => setShowNuevo(true)}>+ Nuevo</button>
                 </div>
@@ -373,6 +456,7 @@ export default function AbogadosManager() {
                                 <th onClick={() => requestSort('c')} className={styles.sortableHeader}>
                                     Cargo PJ <span className={styles.sortIcon}>{getSortIcon('c')}</span>
                                 </th>
+                                <th style={{ textAlign: 'center' }}>Género</th>
                                 <th style={{ textAlign: 'right' }}>Acciones</th>
                             </tr>
                         </thead>

@@ -10,7 +10,7 @@
     font-family: 'Inter', 'Segoe UI', sans-serif;
     overflow: hidden;
     width: 97.8vw;
-    margin-left: 2.2vw;
+    margin-left: 2vw;
 }
 
 /* ==== SIDEBAR ==== */
@@ -134,7 +134,7 @@
 }
 
 .abogadosList::-webkit-scrollbar {
-    width: 4px;
+    width: 8px;
 }
 
 .abogadosList::-webkit-scrollbar-track {
@@ -143,7 +143,7 @@
 
 .abogadosList::-webkit-scrollbar-thumb {
     background: #2a2a2a;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .abogadoItem {
@@ -306,8 +306,8 @@
 }
 
 .tableWrapper::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
 }
 
 .tableWrapper::-webkit-scrollbar-track {
@@ -316,7 +316,7 @@
 
 .tableWrapper::-webkit-scrollbar-thumb {
     background: #282828;
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .table {
