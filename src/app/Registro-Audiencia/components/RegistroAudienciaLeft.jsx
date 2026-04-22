@@ -18,7 +18,7 @@ const deepCopy = (obj) => {
 };
 
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta }) {
-    const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate} = useContext(DataContext)
+    const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -70,24 +70,34 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     )};
 
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
-    setter(prev => {
-    const updated = [...prev];
-    const current = updated[index] || {};
+        setter(prev => {
+            const updated = [...prev];
+            const current = updated[index] || {};
 
-    if (toggleArray) {
-      const arr = Array.isArray(current[key]) ? [...current[key]] : [];
-      const exists = arr.some(item => item.id === valueObj.id);
-      updated[index] = {
-        ...current,
-        [key]: exists
-          ? arr.filter(item => item.id !== valueObj.id)
-          : [...arr, valueObj]
-      };
-    } else {
-      updated[index] = { ...current, [key]: valueObj };
-    }
-    return updated
-    })};
+            if (toggleArray) {
+                const arr = Array.isArray(current[key]) ? [...current[key]] : [];
+                const exists = arr.some(item => item.id === valueObj.id);
+                updated[index] = {
+                    ...current,
+                    [key]: exists
+                        ? arr.filter(item => item.id !== valueObj.id)
+                        : [...arr, valueObj]
+                };
+            } else {
+                updated[index] = { ...current, [key]: valueObj };
+
+                // Auto-poblar defensoria y matricula si se selecciona un nombre y es Oficial
+                if (key === 'nombre' && setter === setDefensa && current.tipo === 'Oficial') {
+                    const abog = abogados.find(a => a.n === valueObj);
+                    if (abog) {
+                        if (abog.l) updated[index].defensoria = abog.l;
+                        if (abog.m) updated[index].matricula = abog.m;
+                    }
+                }
+            }
+            return updated
+        })
+    };
 
     const addNewInput = (setter, template, prefix) => {
         setter(prev => [...prev, { ...template, id: generateId(prefix) }]);
@@ -255,9 +265,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setSala(item.sala);
         setShowEditHitos(false)
     }, [item]);
-    useEffect(() => {
-        updateDesplegables()
-    }, [])
+
     return (
         <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
             
@@ -311,13 +319,13 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     {mpf.map((input, index) => (
                         <div key={input.id} className={`${styles.inputRow}`}>
                             <input
-                                list='mpf'
+                                list={`mpf-${index}`}
                                 className={`${styles.inputLeft} ${styles.inputTyped70}`}
                                 value={input.nombre}
                                 onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
                             />
-                            <datalist id='mpf'>
-                                {desplegables.fiscal && desplegables.fiscal.map(option => (
+                            <datalist id={`mpf-${index}`}>
+                                {fiscalesList && fiscalesList.map(option => (
                                     <option key={option} value={option}>
                                         {option}
                                     </option>
@@ -338,7 +346,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>UFI:</label>
                 <input list='ufi' className={`${styles.inputLeftDRow} ${styles.inputLeft} ${styles.inputTyped50}`} value={ufi}
                     onChange={(e) => setUfi(e.target.value)}/>
-                <datalist id='ufi'>{desplegables.fiscal && desplegables.ufi.map(option => (
+                <datalist id='ufi'>{desplegables.ufi && desplegables.ufi.map(option => (
                         <option key={option} value={option}>{option}</option>
                     ))}</datalist></span>
             <div className={styles.sectionHeader} onClick={() => toggleSection('imputados')}>
@@ -429,24 +437,32 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 <option value="Particular">Particular</option>
                             </select>
                             {input.tipo && (input.tipo === 'Oficial' ? (
-                                    <><input list='oficial'
+                                    <><input list={`oficial-${index}`}
                                         className={`${styles.inputLeft} ${styles.inputTyped50}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}/>
-                                    <datalist id='oficial'>
-                                        {desplegables.defensa && desplegables.defensa.map(option => (
+                                    <datalist id={`oficial-${index}`}>
+                                        {defensoresOficialesList && defensoresOficialesList.map(option => (
                                             <option key={option} value={option}>
                                                 {option}
                                             </option>))}
-                                    </datalist></>
+                                    </datalist>
+                                    <input 
+                                        className={`${styles.inputLeft} ${styles.inputTyped20}`} 
+                                        value={input.defensoria || ''} 
+                                        onChange={(e) => handleInputChange(setDefensa, index, 'defensoria', e.target.value)}
+                                        placeholder="Def. N°"
+                                        title="Número de Defensoría"
+                                    />
+                                    </>
                                 ) : (
-                                    <><input list='particular'
-                                        className={`${styles.inputLeft} ${styles.inputTyped50}`}
+                                    <><input list={`particular-${index}`}
+                                        className={`${styles.inputLeft} ${styles.inputTyped70}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
                                         placeholder="Nombre"/>
-                                    <datalist id='particular'>
-                                        {desplegables.defensaParticular && desplegables.defensaParticular.map(option => (
+                                    <datalist id={`particular-${index}`}>
+                                        {defensoresParticularesList && defensoresParticularesList.map(option => (
                                             <option key={option} value={option}>
                                                 {option}
                                             </option>

@@ -11,6 +11,7 @@ const formatLongDate = () => {
 
 export async function descargarPdfNotificacion(opcion, datos, returnBuffer = false) {
     const { PDFGenerator } = await import('./pdfUtils.js');
+    const { inferGender } = await import('./genderUtils.js');
 
     const {
         destinatarioNombre = '',
@@ -82,7 +83,8 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
         const p3 = `Sirva la presente de comunicación y solicito, por este mismo medio, confirmación de recepción correcta de la misma.`;
         sections.push({ text: p3, size: 10, bold: false, spacing: 3, align: 'justify' });
 
-        const p4 = `Conforme Acuerdo de Superintendencia 05/2024 y 34/2024, se informa que la presente audiencia se asignó al Juez ${juez}`;
+        const { labelJuez } = inferGender(juez);
+        const p4 = `Conforme Acuerdo de Superintendencia 05/2024 y 34/2024, se informa que la presente audiencia se asignó al ${labelJuez} ${juez}`;
         sections.push({ text: p4, size: 10, bold: false, spacing: 3, align: 'justify' });
 
         const contactBlock = `Ante cualquier duda o consulta comunicarse al teléfono 2646 61-3638 o al correo electrónico notificacionofijup@jussanjuan.gov.ar`;
@@ -125,7 +127,8 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
 
     // 4. Juez común y cierre de cuerpo (no en rechazo ni cancelación)
     if (!isPolice && !isRechazo && opcion !== 'cancelarAudienciaImputadoEnLibertad') {
-        const juezText = `Se informa que la presente audiencia se asignó al Juez ${juez}.`;
+        const { labelJuez } = inferGender(juez);
+        const juezText = `Se informa que la presente audiencia se asignó al ${labelJuez} ${juez}.`;
         sections.push({ text: juezText, size: 10, bold: true, spacing: 3, align: 'justify' });
     }
 

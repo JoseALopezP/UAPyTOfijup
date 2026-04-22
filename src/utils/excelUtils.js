@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import excelTranslate from './uploadTranslates';
+import { formatDefensa } from './genderUtils';
 
 export function formatDate(date) {
   const day = String(date.getDate()).padStart(2, '0');
@@ -90,7 +91,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
         , sala: `${item.sala}`
         , operador: excelTranslate(`${item.operador}`, 'operador')
         , fiscal: excelTranslate(item?.mpf?.[0]?.nombre ? `${item.mpf?.[0]?.nombre}` : '', 'fiscal')
-        , defensor: excelTranslate(item?.defensa?.[0]?.nombre ? `${item.defensa?.[0]?.nombre}` : '', 'defensa')
+        , defensor: excelTranslate(item?.defensa?.[0] ? formatDefensa(item.defensa[0]) : '', 'defensa')
         , juez: excelTranslate(`${item.juez.split('. ')[1]}`, 'juez')
       });
     });

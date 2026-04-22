@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from 'react'
 import { DataContext } from '@/context New/DataContext'
 import TableRow from './TableRow';
 import { calculateCuartos, calculateCuartosOtros } from '@/utils/calculators';
+import { formatDefensa } from '@/utils/genderUtils';
 
 export default function BodyPumba({ dateToUse }) {
     const { updateByDate, updateDesplegables, updatePumaData, updateUALData, pumaData, UALData, bydate } = useContext(DataContext);
@@ -80,7 +81,7 @@ export default function BodyPumba({ dateToUse }) {
                 saved.ufi && saved.ufi || tabItem.ufi || '',
                 saved.dyhsolicitud || audData.dyhsolicitud || '',
                 saved.dyhagendamiento || audData.dyhagendamiento || '',
-                calculateDiffHHMMSS(saved.dyhsolicitud || audData.dyhsolicitud || '', saved.dyhagendamiento || audData.dyhagendamiento || ''),
+                '',//calculateDiffHHMMSS(saved.dyhsolicitud || audData.dyhsolicitud || '', saved.dyhagendamiento || audData.dyhagendamiento || ''),
                 saved.dyhnotificacion || audData.fechaNotificacion || '',
                 saved.dyhprogramada || (audData.inicioProgramada && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioProgramada)) || '',
                 saved.dyhreal || (audData.inicioReal && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.inicioReal)) || '',
@@ -95,13 +96,13 @@ export default function BodyPumba({ dateToUse }) {
                 saved.dyhfinalizacion || (audData.finReal && (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + audData.finReal)) || '',
                 saved.entregaResuelvo || tabItem.resuelvo || '',
                 saved.finalizadaMinuta || (audData.finalizadaMinuta && audData.finalizadaMinuta.split(' ')[0]) || '',
-                calculateDiffHHMMSS(saved.dyhfinalizacion || audData.finReal, (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + saved.finalizadaMinuta) || audData.finalizadaMinuta),
+                '', //calculateDiffHHMMSS(saved.dyhfinalizacion || audData.finReal, (dateToUse.slice(0, 2) + '/' + dateToUse.slice(2, 4) + '/' + dateToUse.slice(6, 8) + ' ' + saved.finalizadaMinuta) || audData.finalizadaMinuta),
                 saved.cantImputados ?? (audData.intervinientes ? audData.intervinientes.filter(el => el.includes('IMPUTADO')).length : ''),
                 saved.tipoVictima || audData.tipoVictima || '',
                 saved.sala || audData.sala || '',
                 saved.operador || audData.operador || '',
                 saved.fiscal || (tabItem.mpf ? tabItem.mpf[0].nombre : ''),
-                saved.defensa || (tabItem.defensa && tabItem.defensa.length > 0 ? tabItem.defensa[0].nombre : ''),
+                saved.defensa || (tabItem.defensa && tabItem.defensa.length > 0 ? formatDefensa(tabItem.defensa[0]) : ''),
                 saved.juez || audData.juez || '',
                 saved.finAudiencia || audData.finAudiencia || '',
                 saved.resolucion || audData.resolucion || '',

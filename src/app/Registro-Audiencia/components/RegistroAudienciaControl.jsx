@@ -139,9 +139,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         setIsSaving(false);
     };
 
-    useEffect(() => {
-        updateDesplegables()
-    }, [])
+
     return (
         <div className={`${styles.controlBlock}`}>
             {aud && <><RegistroAudienciaLeft item={aud} dateToUse={dateToUse} isHovered={isHovered}

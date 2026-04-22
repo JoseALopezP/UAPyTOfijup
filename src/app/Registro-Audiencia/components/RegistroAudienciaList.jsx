@@ -10,9 +10,12 @@ import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunct
 
 export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered, needsSaving1, needsSaving2}) {
     const router = useRouter()
-    const {updateByDateView, bydateView} = useContext(DataContext)
+    const {updateByDateView, bydateView, updateDesplegables} = useContext(DataContext)
     const { user } = useAuthContext()
-    updateRealTimeFunction()
+    
+    useEffect(() => {
+        updateDesplegables();
+    }, []);
     useEffect(() => {
         updateByDateView(date)
     }, [date]);

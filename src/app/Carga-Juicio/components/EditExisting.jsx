@@ -5,7 +5,8 @@ import { ButtonSelection } from './ButtonSelection'
 import { numberCheck, listCheck, typeCheck, changeHandler, changeHandlerSplitter, digitsCheck } from '@/utils/inputChecks'
 
 export default function EditExisting({ original, newState, onToggle, previousVersion, setPreviousVersion }) {
-    const { updateDesplegables, desplegables, changeValueJuicio, updateData } = useContext(DataContext)
+    const { updateDesplegables, desplegables, changeValueJuicio, updateData, fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList } = useContext(DataContext)
+    const defensoresCombinados = [...(defensoresOficialesList || []), ...(defensoresParticularesList || [])].sort();
     const [numeroLeg1, setNumeroLeg1] = useState(previousVersion.numeroLeg1 || 'MPF-SJ')
     const [numeroLeg1Error, setNumeroLeg1Error] = useState(true)
     const [numeroLeg2, setNumeroLeg2] = useState(previousVersion.numeroLeg2 || null)
@@ -71,14 +72,14 @@ export default function EditExisting({ original, newState, onToggle, previousVer
         numberCheck(cantBloques, setCantBloquesError, 0, 100)
         numberCheck(cantTestigos, setCantTestigosError, 0, 999)
         listCheck(tipoDelito, setTipoDelitoError, desplegables.delitosTipos)
-        listCheck(fiscal, setFiscalError, desplegables.fiscal)
-        listCheck(defensa, setDefensaError, desplegables.defensa)
+        listCheck(fiscal, setFiscalError, fiscalesList)
+        listCheck(defensa, setDefensaError, defensoresCombinados)
         listCheck(defensaCargo, setDefensaCargoError, desplegables.defensorias)
         typeCheck(querella, setQuerellaError, 'string')
-        listCheck(juez1, setJuez1Error, desplegables.jueces)
+        listCheck(juez1, setJuez1Error, juecesList)
         if (tipoTribunal === "COLEGIADO") {
-            listCheck(juez2, setJuez2Error, desplegables.jueces)
-            listCheck(juez3, setJuez3Error, desplegables.jueces)
+            listCheck(juez2, setJuez2Error, juecesList)
+            listCheck(juez3, setJuez3Error, juecesList)
         } else {
             setJuez2Error(true)
             setJuez3Error(true)
@@ -251,7 +252,7 @@ export default function EditExisting({ original, newState, onToggle, previousVer
             </select>
             <label className={`${styles.cargaLabel}`}>Fiscal</label>
             <input className={fiscalError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                onChange={e => changeHandlerSplitter(e.target.value, setFiscal, setFiscalError, listCheck, desplegables.fiscal, desplegables.ufi, setUfi, setUfiError)} value={fiscal} list='fiscal' />
+                onChange={e => changeHandler(e.target.value, setFiscal, setFiscalError, listCheck, fiscalesList)} value={fiscal} list='fiscal' />
             <label className={`${styles.cargaLabel}`}>UFI</label>
             <input className={ufiError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
                 onChange={e => changeHandler(e.target.value, setUfi, setUfiError, listCheck, desplegables.ufi)} value={ufi} list='ufi' />
@@ -260,7 +261,7 @@ export default function EditExisting({ original, newState, onToggle, previousVer
                 onChange={e => changeHandler(e.target.value, setCantTestigos, setCantTestigosError, numberCheck, 0, 999)} value={cantTestigos} />
             <label className={`${styles.cargaLabel}`}>Defensa</label>
             <input className={defensaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                onChange={e => changeHandlerSplitter(e.target.value, setDefensa, setDefensaError, listCheck, desplegables.defensa, desplegables.defensorias, setDefensaCargo, setDefensaCargoError)} value={defensa} list='defensa' />
+                onChange={e => changeHandler(e.target.value, setDefensa, setDefensaError, listCheck, defensoresCombinados)} value={defensa} list='defensa' />
             <label className={`${styles.cargaLabel}`}>Defensoria</label>
             <input className={defensaCargoError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
                 onChange={e => changeHandler(e.target.value, setDefensaCargo, setDefensaCargoError, listCheck, desplegables.defensaCargo)} value={defensaCargo} list='defensorias' />
@@ -269,14 +270,14 @@ export default function EditExisting({ original, newState, onToggle, previousVer
                 onChange={e => changeHandler(e.target.value, setQuerella, setQuerellaError, typeCheck, 'string')} value={querella} />
             <label className={`${styles.cargaLabel}`}>Jueces</label>
             <input className={juez1Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                onChange={e => changeHandler(e.target.value, setJuez1, setJuez1Error, listCheck, desplegables.jueces)}
+                onChange={e => changeHandler(e.target.value, setJuez1, setJuez1Error, listCheck, juecesList)}
                 value={juez1} list='jueces' placeholder={tipoTribunal === "COLEGIADO" ? 'presidente' : 'juez'} />
             {tipoTribunal === "COLEGIADO" &&
                 <>
                     <input className={juez2Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setJuez2, setJuez2Error, listCheck, desplegables.jueces)} value={juez2} list='jueces' />
+                        onChange={e => changeHandler(e.target.value, setJuez2, setJuez2Error, listCheck, juecesList)} value={juez2} list='jueces' />
                     <input className={juez3Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setJuez3, setJuez3Error, listCheck, desplegables.jueces)} value={juez3} list='jueces' />
+                        onChange={e => changeHandler(e.target.value, setJuez3, setJuez3Error, listCheck, juecesList)} value={juez3} list='jueces' />
                 </>}
             <datalist id="delitosTipos" className={`${styles.tableCellInput}`}>
                 {desplegables.delitosTipos && desplegables.delitosTipos.map((el) => (
@@ -285,11 +286,7 @@ export default function EditExisting({ original, newState, onToggle, previousVer
                     </option>))}
             </datalist>
             <datalist id="defensa" className={`${styles.tableCellInput}`}>
-                {desplegables.defensa && desplegables.defensa.map((el) => (
-                    <option key={el} value={el}>
-                        {el}
-                    </option>))}
-                {desplegables.defensaParticular && desplegables.defensaParticular.map((el) => (
+                {defensoresCombinados && defensoresCombinados.map((el) => (
                     <option key={el} value={el}>
                         {el}
                     </option>))}
@@ -302,15 +299,15 @@ export default function EditExisting({ original, newState, onToggle, previousVer
                 <option key={''} value={''}></option>
             </datalist>
             <datalist id="jueces" className={`${styles.tableCellInput}`}>
-                {desplegables.jueces && desplegables.jueces.map((el) => (
+                {juecesList && juecesList.map((el) => (
                     <option key={el} value={el}>
                         {el}
                     </option>))}
             </datalist>
             <datalist id="fiscal" className={`${styles.tableCellInput}`}>
-                {desplegables.fiscal && desplegables.fiscal.map((el) => (
+                {fiscalesList && fiscalesList.map((el) => (
                     <option key={el} value={el}>
-                        {el.split(' - ')[0]}
+                        {el}
                     </option>))}
             </datalist>
             <datalist id="ufi" className={`${styles.tableCellInput}`}>

@@ -48,6 +48,37 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [solicitudesPendientes, setSolicitudesPendientes] = useState(defaultValue);
     const [abogados, setAbogados] = useState(defaultValue);
 
+    const fiscalesList = React.useMemo(() => {
+        if (!abogados || !Array.isArray(abogados)) return [];
+        return abogados
+            .filter(a => a.c && a.c.toLowerCase().includes('fiscal'))
+            .map(a => a.n)
+            .sort((a, b) => a.localeCompare(b));
+    }, [abogados]);
+
+    const defensoresOficialesList = React.useMemo(() => {
+        if (!abogados || !Array.isArray(abogados)) return [];
+        return abogados
+            .filter(a => a.c && a.c.toLowerCase().includes('defens') && a.c.toLowerCase().includes('oficial'))
+            .map(a => a.n)
+            .sort((a, b) => a.localeCompare(b));
+    }, [abogados]);
+
+    const juecesList = React.useMemo(() => {
+        if (!abogados || !Array.isArray(abogados)) return [];
+        return abogados
+            .filter(a => a.c && a.c.toLowerCase().includes('juez'))
+            .map(a => a.n)
+            .sort((a, b) => a.localeCompare(b));
+    }, [abogados]);
+
+    const defensoresParticularesList = React.useMemo(() => {
+        if (!abogados || !Array.isArray(abogados)) return [];
+        return abogados
+            .filter(a => !a.c || (!a.c.toLowerCase().includes('fiscal') && !a.c.toLowerCase().includes('juez') && !a.c.toLowerCase().includes('oficial')))
+            .map(a => `${a.n} (#${a.m})`)
+            .sort((a, b) => a.localeCompare(b));
+    }, [abogados]);
 
     const updateByDate = async (date) => {
         try {
@@ -224,6 +255,10 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
                 setDesplegables(data);
             } else {
                 setDesplegables({});
+            }
+            const abgData = await getDocument('abogados', 'listaAbogados');
+            if (abgData && abgData.list) {
+                setAbogados(abgData.list);
             }
         } catch (error) {
             setErrorMessage(`${error.message}`);
@@ -513,7 +548,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
-        solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados
+        solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados,
+        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList
 
     };
     return <Provider value={context}>{children}</Provider>;

@@ -11,6 +11,7 @@ export function AddAudienciaForm({ dateFunction, date }) {
     addAudiencia,
     bydate,
     desplegables,
+    juecesList,
   } = useContext(DataContext);
 
   const [formData, setFormData] = useState({
@@ -54,14 +55,14 @@ export function AddAudienciaForm({ dateFunction, date }) {
 
     if (data.colegiado) {
       if (
-        !desplegables.jueces?.includes(data.juez) ||
-        !desplegables.jueces?.includes(data.juez2) ||
-        !desplegables.jueces?.includes(data.juez3)
+        !juecesList?.includes(data.juez) ||
+        !juecesList?.includes(data.juez2) ||
+        !juecesList?.includes(data.juez3)
       ) {
         errs.juez = "Todos los jueces deben ser válidos";
       }
     } else {
-      if (!desplegables.jueces?.includes(data.juez)) {
+      if (!juecesList?.includes(data.juez)) {
         errs.juez = "Juez inválido o no seleccionado";
       }
     }
@@ -387,8 +388,8 @@ export function AddAudienciaForm({ dateFunction, date }) {
             </>
           )}
           <datalist id="jueces" className={`${styles.tableCellInput}`}>
-            {desplegables.jueces &&
-              desplegables.jueces.map((el) => (
+            {juecesList &&
+              juecesList.map((el) => (
                 <option key={el} value={el}>
                   {el}
                 </option>

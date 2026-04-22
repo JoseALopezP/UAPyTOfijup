@@ -4,7 +4,7 @@ import { DataContext } from '@/context New/DataContext';
 import InputReloj from '@/app/components/InputReloj';
 
 export function AddAudienciaIndiv({date, element}) {
-    const { desplegables, updateData, deleteAudiencia, updateDesplegables, updateByDate} = useContext(DataContext);
+    const { desplegables, updateData, deleteAudiencia, updateDesplegables, updateByDate, juecesList} = useContext(DataContext);
     const [cambios, setCambios] = useState(false)
     const [del, setDel] = useState(false)
     const [hora, setHora] = useState(element.hora.split(':')[0] || '')
@@ -132,14 +132,14 @@ export function AddAudienciaIndiv({date, element}) {
                 setTipo3Bis(tipo3)}
             if((juez1 !== juez1Bis || juez2 !== juez2Bis || juez3 !== juez3Bis) && juez !== ''){
                 if(juez.includes('+')){
-                    (desplegables.jueces.includes(juez1) && (desplegables.jueces.includes(juez2)) && (desplegables.jueces.includes(juez3))) && 
+                    (juecesList.includes(juez1) && (juecesList.includes(juez2)) && (juecesList.includes(juez3))) && 
                     await updateData(date, element.id, 'juez', `${juez1}+${juez2}+${juez3}`);
                     setJuez1Bis(juez1)
                     setJuez2Bis(juez2)
                     setJuez3Bis(juez3)
                     setJuezBis(juez)
                 }else{
-                    desplegables.jueces.includes(juez1) && 
+                    juecesList.includes(juez1) && 
                     await updateData(date, element.id, 'juez', juez1);
                     setJuez1Bis(juez1)
                 }}
@@ -215,8 +215,8 @@ export function AddAudienciaIndiv({date, element}) {
                             </>
                           )}
                           <datalist id="jueces" className={`${styles.tableCellInput}`}>
-                            {desplegables.jueces &&
-                              desplegables.jueces.map((el) => (
+                            {juecesList &&
+                              juecesList.map((el) => (
                                 <option key={el} value={el}>
                                   {el}
                                 </option>

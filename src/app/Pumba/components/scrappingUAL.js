@@ -251,7 +251,7 @@ async function goToAgenda(fechaStr, pageInstance) {
 
 
 
-async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLinks, onProgressChunk) {
+async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks, onProgressChunk) {
     const browserInstance = await puppeteer.launch({
         headless: true,
         executablePath: getBrowserPath(),
@@ -275,22 +275,22 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
         await goToAgenda(fechaStr, pageInstance);
 
         await pageInstance.waitForSelector(selectorLinks, { visible: true });
-        console.log(`[Chunk ${startIndex}-${endIndex}] Iniciando procesamiento de audiencias (Indices ${startIndex} a ${endIndex - 1})...`);
+        console.log(`[Chunk] Iniciando procesamiento de audiencias (${indicesParaProcesar.length} items)...`);
 
-        for (let i = startIndex; i < endIndex; i++) {
-            const globalIndex = i;
+        for (let idxDentroChunk = 0; idxDentroChunk < indicesParaProcesar.length; idxDentroChunk++) {
+            const globalIndex = indicesParaProcesar[idxDentroChunk];
             try {
                 // Capturar links actuales
                 const currentLinks = await pageInstance.$$(selectorLinks);
                 const link = currentLinks[i];
 
                 if (!link) {
-                    console.log(`[Chunk ${startIndex}-${endIndex}] ❌ Link en índice ${i} NO DISPONIBLE.`);
+                    console.log(`[Chunk] ❌ Link en índice ${globalIndex} NO DISPONIBLE.`);
                     continue;
                 }
 
                 const linkText = await pageInstance.evaluate(el => el.textContent.trim(), link);
-                console.log(`[Chunk ${startIndex}-${endIndex}] [Paso 1] Navegando a item ${globalIndex} - Texto: "${linkText}"`);
+                console.log(`[Chunk] [Paso 1] Navegando a item ${globalIndex} - Texto: "${linkText}"`);
 
                 await link.scrollIntoView({ block: 'center', behavior: 'instant' });
                 await new Promise(r => setTimeout(r, 300));
@@ -302,7 +302,7 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                 const linkAudiencia = pageInstance.url();
                 let datosAudiencia = {};
                 try {
-                    console.log(`[Chunk ${startIndex}-${endIndex}] [Paso 2] Extrayendo datos de: ${linkAudiencia}`);
+                    console.log(`[Chunk] [Paso 2] Extrayendo datos de: ${linkAudiencia}`);
                     const rawDatos = await pageInstance.evaluate(() => {
                         const datos = {};
                         const textOf = (selector) => document.querySelector(selector)?.textContent.trim() ?? '';
@@ -376,13 +376,34 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                     });
                     datosAudiencia = JSON.parse(JSON.stringify(rawDatos || {}));
                 } catch (err) {
-                    console.error(`[Chunk ${startIndex}-${endIndex}] ❌ FALLO Paso 2: ${err.message}`);
+                    console.error(`[Chunk] ❌ FALLO Paso 2: ${err.message}`);
                     throw err;
                 }
 
                 try {
                     await pageInstance.click('a[href="#notificaciones"]');
                     await pageInstance.waitForSelector('#view-grid-notificaciones-container table tbody tr', { timeout: 5000 });
+
+                    // Ir a la última página de notificaciones si existe para obtener la última fecha
+                    const lastPageClicked = await pageInstance.evaluate(() => {
+                        const notificacionesTab = document.querySelector('#notificaciones');
+                        if (notificacionesTab) {
+                            const lastLi = notificacionesTab.querySelector('.pagination li.last');
+                            if (lastLi && !lastLi.classList.contains('disabled')) {
+                                const link = lastLi.querySelector('a');
+                                if (link) {
+                                    link.click();
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    });
+
+                    if (lastPageClicked) {
+                        await new Promise(r => setTimeout(r, 2000)); // Esperar recarga de tabla
+                    }
+
                     const fechaNotif = await pageInstance.evaluate(() => {
                         const lastRow = document.querySelector('#view-grid-notificaciones-container table tbody tr:last-child');
                         if (!lastRow) return '';
@@ -464,13 +485,13 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
                     resultadosChunk.push({ index: globalIndex, linkAudiencia, ...datosAudiencia, ...emptyFields });
                 }
 
-                console.log(`[Chunk ${startIndex}-${endIndex}] Item ${globalIndex} completado.`);
-                console.log(`[Chunk ${startIndex}-${endIndex}] Re-estableciendo estado de la agenda para el siguiente item...`);
+                console.log(`[Chunk] Item ${globalIndex} completado.`);
+                console.log(`[Chunk] Re-estableciendo estado de la agenda para el siguiente item...`);
 
                 await goToAgenda(fechaStr, pageInstance);
                 await pageInstance.waitForSelector(selectorLinks, { visible: true });
             } catch (error) {
-                console.warn(`[Chunk ${startIndex}-${endIndex}] ⚠️ Error crítico en índice ${globalIndex}: ${error.message}`);
+                console.warn(`[Chunk] ⚠️ Error crítico en índice ${globalIndex}: ${error.message}`);
                 resultadosChunk.push({ index: globalIndex, data: null, status: 'error' });
                 try { await goToAgenda(fechaStr, pageInstance); } catch (e) { }
             } finally {
@@ -480,7 +501,7 @@ async function procesarChunkAudiencias(fechaStr, startIndex, endIndex, totalLink
             await new Promise(r => setTimeout(r, 10));
         }
     } catch (error) {
-        console.error(`[Chunk ${startIndex}-${endIndex}] Error general de chunk:`, error);
+        console.error(`[Chunk] Error general de chunk:`, error);
     } finally {
         await browserInstance.close();
     }
@@ -501,15 +522,23 @@ export async function getInfoAudiencia(fechaStr = "26012026", onProgress) {
     await new Promise(r => setTimeout(r, 1000));
 
     const linksInfo = await page.$$eval(selectorLinks, elements =>
-        elements.map((el, i) => ({
-            index: i,
-            text: el.textContent.trim(),
-            href: el.href
-        }))
+        elements.map((el, i) => {
+            const titleEl = el.querySelector('.fc-title');
+            const titleText = titleEl ? titleEl.textContent : el.textContent;
+            return {
+                index: i,
+                text: titleText ? titleText.trim() : '',
+                href: el.href
+            };
+        })
     );
 
-    const totalLinks = linksInfo.length;
-    console.log(`[getInfoAudiencia] Fecha: ${fechaStr}, Total elementos encontrados: ${totalLinks}`);
+    const validIndices = linksInfo
+        .filter(l => !l.text.toLowerCase().includes('flagrancia'))
+        .map(l => l.index);
+
+    const totalLinks = validIndices.length;
+    console.log(`[getInfoAudiencia] Fecha: ${fechaStr}, Total elementos en la UI: ${linksInfo.length}, Elementos válidos a procesar (sin Flagrancia): ${totalLinks}`);
 
     if (onProgress) {
         onProgress(0, 0, totalLinks);
@@ -523,24 +552,23 @@ export async function getInfoAudiencia(fechaStr = "26012026", onProgress) {
         const startIndex = i * chunkSize;
         const endIndex = Math.min(startIndex + chunkSize, totalLinks);
         if (startIndex < totalLinks) {
-            chunks.push({ startIndex, endIndex });
+            chunks.push(validIndices.slice(startIndex, endIndex));
         }
     }
 
     console.log(`Dividiendo ${totalLinks} audiencias en ${chunks.length} chunks para procesamiento paralelo`);
     chunks.forEach((chunk, idx) => {
-        console.log(`Chunk ${idx + 1}: índices ${chunk.startIndex}-${chunk.endIndex - 1}`);
+        console.log(`Chunk ${idx + 1}: ${chunk.length} items asignados`);
     });
 
     let completadas = 0;
     const resultados = [];
 
     const resultadosChunks = await Promise.all(
-        chunks.map((chunk, idx) => {
+        chunks.map((chunkIndices, idx) => {
             return procesarChunkAudiencias(
                 fechaStr,
-                chunk.startIndex,
-                chunk.endIndex,
+                chunkIndices,
                 totalLinks,
                 (indexCompletado) => {
                     completadas++;

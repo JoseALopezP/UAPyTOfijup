@@ -4,29 +4,36 @@ import { getMonthName } from "./caratulaUtils";
 import { removeHtmlTags } from "./removeHtmlTags";
 import { minutaPrep } from "./minutaPrep";
 import { todayFunction } from "./dateUtils";
+import { inferGender } from "./genderUtils";
 
 export function listFiscal(arr, ufi) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${i > 0 ? '' : 'Ministerio Público Fiscal: '}${el.nombre?.includes(' - ') ? el.nombre.split(' - ')[0] : el.nombre}${ufi === "EJECUCIÓN" ? '' : ` UFI:${ufi}`}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
+        const { title, cleanName } = inferGender(el.nombre);
+        const ufiText = (ufi && ufi !== "EJECUCIÓN") ? ` UFI:${ufi}` : '';
+        aux += `${i > 0 ? '' : 'Ministerio Público Fiscal: '}${title} ${cleanName}${ufiText}${el.asistencia ? '' : ' (ausente)'}${el.presencial ? '' : '(virtual)'}` + (arr.length !== i + 1 ? '\n' : '');
     });
     return aux;
 }
 
 export function listDefensa(arr) {
-    console.log(arr)
     let aux = '';
     arr && arr.forEach((el, i) => {
         const imputados = (el.imputado && el.imputado.length > 0)
             ? el.imputado
                 .map((p, idx) => {
-                    if (idx === 0) return p.nombre?.split(',').join('') || '';
-                    if (idx === el.imputado.length - 1) return ` y ${p.nombre?.split(',').join('') || ''}`;
-                    return `, ${p.nombre?.split(',').join('') || ''}`;
+                    const pName = p.nombre || p.name || '';
+                    if (idx === 0) return pName?.split(',').join('') || '';
+                    if (idx === el.imputado.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
+                    return `, ${pName?.split(',').join('') || ''}`;
                 })
                 .join('')
             : '';
-        aux += `Defensa ${el.tipo}: ${el.nombre} ${imputados ? `(En representación de ${imputados})` : ''
+
+        const { title, cleanName } = inferGender(el.nombre);
+        const defensoriaStr = (el.tipo === 'Oficial' && el.defensoria) ? ` - Defensoría Oficial N°${el.defensoria}` : '';
+
+        aux += `Defensa ${el.tipo}: ${title} ${cleanName}${defensoriaStr} ${imputados ? `(En representación de ${imputados})` : ''
             } ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'
             }${arr.length !== i + 1 ? '\n' : ''}`;
     });
@@ -140,8 +147,8 @@ export function generateResuelvoSection(item, date) {
     if (item.juez?.split('+').length > 1) {
         sections.push({ title: 'Tribunal Colegiado:', text: item.juez.split('+').map(j => capitalizeFirst(j.toLowerCase())).join('\n') });
     } else {
-        const isMale = (item.juez?.toUpperCase().includes('DR.') || item.juez?.toUpperCase().startsWith('DR ')) && !item.juez?.toUpperCase().includes('DRA');
-        sections.push({ title: isMale ? 'Juez:' : 'Jueza:', text: capitalizeFirst(item.juez?.toLowerCase() || '') });
+        const { labelJuez } = inferGender(item.juez);
+        sections.push({ title: labelJuez + ':', text: capitalizeFirst(item.juez?.toLowerCase() || '') });
     }
     if (item.mpf && item.mpf.length > 0) {
         let fiscales = item.mpf.map(el => {
@@ -191,9 +198,8 @@ function juecesPart(jueces) {
     const judgesList = jueces?.split('+') || [];
     
     const formatJudge = (name) => {
-        const up = name.toUpperCase().trim();
-        const isMale = (up.startsWith('DR.') || up.startsWith('DR ')) && !up.startsWith('DRA');
-        return isMale ? `Sr. Juez ${capitalizeFirst(name.toLowerCase())}` : `Sra. Jueza ${capitalizeFirst(name.toLowerCase())}`;
+        const { titleJuez } = inferGender(name);
+        return `${titleJuez} ${capitalizeFirst(name.toLowerCase())}`;
     };
 
     if (judgesList.length > 1) {

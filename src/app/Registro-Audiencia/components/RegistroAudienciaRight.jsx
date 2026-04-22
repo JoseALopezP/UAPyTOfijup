@@ -15,6 +15,8 @@ import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunct
 import HistorialDeVersiones from './HistorialVersiones';
 import normalizeHtml from '@/utils/normalizeHtml';
 
+import { inferGender } from '@/utils/genderUtils';
+
 function extractNames(obj) {
     return Object.keys(obj);
 }
@@ -42,8 +44,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         if (minuta.replace(/<[^>]*>/g, '').trim() !== '' || resuelvo.replace(/<[^>]*>/g, '').trim() !== '') {
             alert("Borre el contenido ya incluído antes de insertar un modelo")
         } else {
-            const up = item.juez.toUpperCase().trim();
-            const isMale = (up.includes('DR.') || up.startsWith('DR ')) && !up.includes('DRA');
+            const { isMale } = inferGender(item.juez);
 
             let cuerpo = modelosMinuta[modeloSelector].cuerpo;
             let resuelvoText = modelosMinuta[modeloSelector].resuelvo;
@@ -56,8 +57,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
                     .replace(/Sr\. Juez/g, isMale ? "Sr. Juez" : "Sra. Jueza")
                     .replace(/La Sra\. Jueza/g, !isMale ? "La Sra. Jueza" : "El Sr. Juez")
                     .replace(/Sra\. Jueza/g, !isMale ? "Sra. Jueza" : "Sr. Juez")
-                    .replace(/La Sra\. Juez/g, !isMale ? "La Sra. Jueza" : "El Sr. Juez") // Manejar variante detectada en Tramite_de_ejecucion
-                    .replace(/La Sra\. Jueza/g, isMale ? "El Sr. Juez" : "La Sra. Jueza"); // Doble check por si acaso
+                    .replace(/La Sra\. Juez/g, !isMale ? "La Sra. Jueza" : "El Sr. Juez");
             };
 
             setCierre(cierreModelo);

@@ -1,4 +1,5 @@
 import { removeHtmlTags } from "./removeHtmlTags";
+import { inferGender } from "./genderUtils";
 
 function extractTimestamp(text) {
     const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/i;
@@ -77,15 +78,14 @@ function splitNormalBold(text) {
     }).filter(Boolean);
 }
 function resuelvoStructure(juez) {
-    const up = juez.toUpperCase().trim();
-    const isMale = (up.includes('DR.') || up.startsWith('DR ')) && !up.includes('DRA');
+    if (!juez) return "<strong><br/>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
+    
     if (juez.includes('+')) {
         return "<strong><br/>Fundamentos y Resolución:</strong> El Tribunal Colegiado <strong>MOTIVA y RESUELVE</strong>";
-    } else if (isMale) {
-        return "<strong><br/>Fundamentos y Resolución:</strong> El Sr. Juez <strong>MOTIVA Y RESUELVE</strong>";
-    } else {
-        return "<strong><br/>Fundamentos y Resolución:</strong> La Sra. Jueza <strong>MOTIVA Y RESUELVE</strong>";
     }
+
+    const { titleJuez } = inferGender(juez);
+    return `<strong><br/>Fundamentos y Resolución:</strong> ${titleJuez} <strong>MOTIVA Y RESUELVE</strong>`;
 }
 function extractFundamento(text) {
     const regex = new RegExp(
