@@ -4,6 +4,10 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 const db = getFirestore(firebase_app);
 
 export default async function getDocument(collectionName, date) {
+    if (!collectionName || !date || (typeof date === 'string' && !date.trim())) {
+        // console.warn(`getDocument called with missing or invalid parameters: collectionName=${collectionName}, date=${date}`);
+        return null;
+    }
     try {
         const docRef = doc(db, collectionName, date);
         const docSnap = await getDoc(docRef);

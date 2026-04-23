@@ -5,11 +5,13 @@ const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.1
 const BROWSER_COUNT = 4;
 
 async function login(page) {
+    page.setDefaultTimeout(60000);
+    page.setDefaultNavigationTimeout(60000);
     await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
     await page.type("#loginform-username", "20423341980");
     await page.type("#loginform-password", "Marzo24");
     await page.click('button[name="login-button"]');
-    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 15000 });
+    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
 
 function chunkArray(arr, n) {

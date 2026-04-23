@@ -81,6 +81,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     }, [abogados]);
 
     const updateByDate = async (date) => {
+        if (!date) return;
         try {
             const data = await getListCollection('audiencias', date, 'audiencias');
             setBydate(data)
@@ -90,6 +91,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const getByDate = async (date) => {
+        if (!date) return [];
         try {
             const data = await getListCollection('audiencias', date, 'audiencias');
             return data
@@ -99,6 +101,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const updateByDateView = async (date) => {
+        if (!date) return;
         try {
             const data = await getDocument('audienciasView', date);
             setBydateView(data)
@@ -125,6 +128,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const updateJuicios = async (date) => {
+        if (!date) return;
         const dateTransform = yearFunction(date)
         try {
             const data = await getDocument('juicios', dateTransform);
@@ -190,6 +194,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const getSorteoList = async (date) => {
+        if (!date) return;
         try {
             const data = await getDocument('sorteos', date);
             if (data) {
@@ -336,11 +341,16 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const moveBetween = async (date) => {
-        const data = await getList("audiencias", date);
-        await data.forEach(el => {
-            addOrUpdateDocument("audiencias", date, 'audiencias', data);
-        })
-        const amount = await countDocs('audiencias/' + date + '/audiencias')
+        if (!date) return;
+        try {
+            const data = await getListCollection("audiencias", date, 'audiencias');
+            await data.forEach(el => {
+                addOrUpdateDocument("audiencias", date, 'audiencias', el);
+            })
+            const amount = await countDocs('audiencias/' + date + '/audiencias')
+        } catch (error) {
+            console.error("Error in moveBetween:", error);
+        }
     }
     const addReleaseNote = async (name, data) => {
         try {
@@ -358,6 +368,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const updatePumaData = async (date) => {
+        if (!date) return;
         try {
             const data = await getDocument('informeUAL', date);
             if (data) {
@@ -370,6 +381,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const addPumaData = async (date, pumaData) => {
+        if (!date) return;
         try {
             await addOrUpdateObject('informeUAL', date, 'audiencias', pumaData);
         } catch (error) {
@@ -377,6 +389,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const updateUALData = async (date) => {
+        if (!date) return;
         try {
             const data = await getDocument('informeUALData', date);
             if (data && data.audiencias) {
@@ -389,6 +402,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         }
     }
     const addUALData = async (date, rowKey, data) => {
+        if (!date) return;
         try {
             await updateInternalUALData(date, rowKey, data);
             setUALData(prev => {

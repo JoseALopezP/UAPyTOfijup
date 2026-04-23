@@ -7,6 +7,10 @@ const db = getFirestore(firebase_app);
  * Uses setDoc with merge: true to handle cases where the document doesn't exist yet.
  */
 export const updateInternalUALData = async (date, rowKey, data) => {
+    if (!date) {
+        console.warn("updateInternalUALData called without date");
+        return;
+    }
     try {
         const docRef = doc(db, "informeUALData", date);
         await setDoc(docRef, {

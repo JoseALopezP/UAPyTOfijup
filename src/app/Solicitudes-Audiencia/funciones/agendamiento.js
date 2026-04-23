@@ -4,11 +4,13 @@ import { getBrowserPath } from '../../../utils/browserPath.js';
 const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
 
 async function login(page) {
+    page.setDefaultTimeout(60000);
+    page.setDefaultNavigationTimeout(60000);
     await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded" });
     await page.type("#loginform-username", "20423341980");
     await page.type("#loginform-password", "Marzo24");
     await page.click('button[name="login-button"]');
-    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 15000 });
+    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -110,7 +112,7 @@ async function agregarPartesAlLegajo(page, linkLeg, partes, log) {
     await page.goto(linkLeg, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // El tab "Partes" es el activo por defecto — verificar que esté cargado
-    await page.waitForSelector('.modalButtonAgregarParte', { visible: true, timeout: 15000 });
+    await page.waitForSelector('.modalButtonAgregarParte', { visible: true, timeout: 60000 });
 
     for (const { motivo, nombre } of partes) {
         log(`  → Agregando parte: motivo="${motivo}" | nombre="${nombre}"`);
@@ -202,13 +204,13 @@ async function subirDocumentosLegajo(page, linkLeg, documentos, log) {
 
     log(`  → Abriendo pestaña Documentos`);
     await page.click('a[href="#documentos"][data-toggle="tab"]');
-    await page.waitForSelector('.modalButtonAgregarDocumento', { visible: true, timeout: 15000 });
+    await page.waitForSelector('.modalButtonAgregarDocumento', { visible: true, timeout: 60000 });
 
     for (const doc of documentos) {
         log(`  → Subiendo: ${doc.descripcion}`);
         await page.click('.modalButtonAgregarDocumento');
         
-        await page.waitForSelector('#documento-form-id', { visible: true, timeout: 15000 });
+        await page.waitForSelector('#documento-form-id', { visible: true, timeout: 60000 });
         await new Promise(r => setTimeout(r, 600));
 
         log(`     Cargando archivo en input...`);
@@ -318,14 +320,14 @@ export async function agendarAudiencia({
             await page.goto(urlCancel, { waitUntil: "domcontentloaded", timeout: 30000 });
 
             log("Buscando botón Cancelar (fa-times)...");
-            await page.waitForSelector('a[title="Cancelar"]', { visible: true, timeout: 15000 });
+            await page.waitForSelector('a[title="Cancelar"]', { visible: true, timeout: 60000 });
             await Promise.all([
                 page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('a[title="Cancelar"]'),
             ]);
 
             log("Formulario de cancelación cargado.");
-            await page.waitForSelector('#historialestadoaudiencia-id_motivo_cambio_estado', { timeout: 15000 });
+            await page.waitForSelector('#historialestadoaudiencia-id_motivo_cambio_estado', { timeout: 60000 });
 
             log(`Seleccionando motivo: ${solicitud.motivCancel}`);
             await page.click('#select2-historialestadoaudiencia-id_motivo_cambio_estado-container');
@@ -349,14 +351,14 @@ export async function agendarAudiencia({
             await page.goto(urlRepro, { waitUntil: "domcontentloaded", timeout: 30000 });
             
             log("Buscando botón Reprogramar (glyphicon-time)...");
-            await page.waitForSelector('a[title="Reprogramar"]', { visible: true, timeout: 15000 });
+            await page.waitForSelector('a[title="Reprogramar"]', { visible: true, timeout: 60000 });
             await Promise.all([
                 page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('a[title="Reprogramar"]'),
             ]);
 
             log("Formulario de reprogramación cargado.");
-            await page.waitForSelector('#dynamic-form', { visible: true, timeout: 15000 });
+            await page.waitForSelector('#dynamic-form', { visible: true, timeout: 60000 });
 
             log(`Cambiando tiempos — inicio: ${horaInicioStr} | fin: ${horaFinStr}`);
             await setTimepicker(page, 'bloque-0-hora_inicio_programada', horaInicioStr);
@@ -381,7 +383,7 @@ export async function agendarAudiencia({
             log("Solicitud cargada.");
 
             log("Buscando botón Agendar...");
-            await page.waitForSelector('a[title="Agendar"]', { visible: true, timeout: 15000 });
+            await page.waitForSelector('a[title="Agendar"]', { visible: true, timeout: 60000 });
             await Promise.all([
                 page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('a[title="Agendar"]'),
@@ -389,13 +391,13 @@ export async function agendarAudiencia({
             log("Calendario cargado.");
 
             log("Clickeando en el primer día del calendario...");
-            await page.waitForSelector('thead tr td.fc-day-top', { visible: true, timeout: 15000 });
+            await page.waitForSelector('thead tr td.fc-day-top', { visible: true, timeout: 60000 });
             await Promise.all([
                 page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                 page.click('thead tr td.fc-day-top'),
             ]);
             log("Formulario de agendamiento cargado.");
-            await page.waitForSelector('#dynamic-form', { visible: true, timeout: 15000 });
+            await page.waitForSelector('#dynamic-form', { visible: true, timeout: 60000 });
         }
 
         // Section 3: Shared Form Filling for Agendar/Reprogramar
@@ -533,7 +535,7 @@ export async function agendarAudiencia({
         // ── 5. Crear la Notificación posterior a la agenda ──────────────────
         if (documentos && documentos.length > 0) {
             log(`Navegando a Pestaña Notificaciones...`);
-            await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+            await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 60000 });
             await page.click('a[href="#notificaciones"][data-toggle="tab"]');
             await new Promise(r => setTimeout(r, 600));
             
@@ -542,7 +544,7 @@ export async function agendarAudiencia({
                 const doc = documentos[i];
                 log(`Creando Notificación para: ${doc.descripcion}`);
                 
-                await page.waitForSelector('.btn-success[href^="/notificacion/create/"]', { visible: true, timeout: 15000 });
+                await page.waitForSelector('.btn-success[href^="/notificacion/create/"]', { visible: true, timeout: 60000 });
                 await Promise.all([
                     page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }),
                     page.click('.btn-success[href^="/notificacion/create/"]'),
@@ -552,7 +554,7 @@ export async function agendarAudiencia({
                 const templateName = isTemplateOnly ? doc.templateName : 'MODELO';
 
                 log(`  → Cargando Plantilla ${templateName}...`);
-                await page.waitForSelector('#notificacion-id_tipo_notificacion_template + span .select2-selection--single', { visible: true, timeout: 15000 });
+                await page.waitForSelector('#notificacion-id_tipo_notificacion_template + span .select2-selection--single', { visible: true, timeout: 60000 });
                 await page.click('#notificacion-id_tipo_notificacion_template + span .select2-selection--single');
                 await page.waitForSelector('.select2-dropdown .select2-search__field', { visible: true, timeout: 5000 });
                 await page.type('.select2-dropdown .select2-search__field', templateName, { delay: 40 });
@@ -641,7 +643,7 @@ export async function agendarAudiencia({
                         await page.click('button[title="Generar Texto del Modelo"]');
                         
                         log(`  → Esperando diálogo de generación...`);
-                        await page.waitForSelector('.tox-dialog iframe', { visible: true, timeout: 15000 });
+                        await page.waitForSelector('.tox-dialog iframe', { visible: true, timeout: 60000 });
                         const dialogIframeHandle = await page.$('.tox-dialog iframe');
                         const dialogFrame = await dialogIframeHandle.contentFrame();
 
@@ -713,7 +715,7 @@ export async function agendarAudiencia({
                 
                 // Si todavía quedan documentos por notificar, debemos reactivar la pestaña de Notificaciones
                 if (i < documentos.length - 1) {
-                    await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 15000 });
+                    await page.waitForSelector('a[href="#notificaciones"][data-toggle="tab"]', { visible: true, timeout: 60000 });
                     await page.click('a[href="#notificaciones"][data-toggle="tab"]');
                     await new Promise(r => setTimeout(r, 600));
                 }

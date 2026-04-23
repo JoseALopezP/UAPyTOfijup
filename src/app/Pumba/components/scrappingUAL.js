@@ -125,11 +125,13 @@ function filterAudiencias(arr) {
 
 async function login() {
     await initBrowser();
+    page.setDefaultTimeout(60000);
+    page.setDefaultNavigationTimeout(60000);
     await page.goto('http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F')
     await page.type('#loginform-username', '20423341980');
     await page.type('#loginform-password', 'Marzo24');
     await page.click('button[name="login-button"]');
-    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true });
+    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
 
 async function goToAgenda(fechaStr, pageInstance) {
@@ -244,7 +246,7 @@ async function goToAgenda(fechaStr, pageInstance) {
 
     // 5. Esperar a que todo el contenido (agenda) termine de cargar tras seleccionar el día
     console.log(`[goToAgenda] Esperando que la página termine de cargar el contenido final (red)...`);
-    await pageInstance.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 }).catch(() => { });
+    await pageInstance.waitForNetworkIdle({ idleTime: 1000, timeout: 30000 });
     await new Promise(r => setTimeout(r, 800));
     console.log(`[goToAgenda] ✅ Navegación completada con éxito.`);
 }
@@ -270,7 +272,7 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
         await pageInstance.type('#loginform-username', '20423341980');
         await pageInstance.type('#loginform-password', 'Marzo24');
         await pageInstance.click('button[name="login-button"]');
-        await pageInstance.waitForSelector('a[href="/audiencia/agenda"]', { visible: true });
+        await pageInstance.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 
         await goToAgenda(fechaStr, pageInstance);
 
@@ -282,7 +284,7 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
             try {
                 // Capturar links actuales
                 const currentLinks = await pageInstance.$$(selectorLinks);
-                const link = currentLinks[i];
+                const link = currentLinks[globalIndex];
 
                 if (!link) {
                     console.log(`[Chunk] ❌ Link en índice ${globalIndex} NO DISPONIBLE.`);
@@ -382,7 +384,7 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
 
                 try {
                     await pageInstance.click('a[href="#notificaciones"]');
-                    await pageInstance.waitForSelector('#view-grid-notificaciones-container table tbody tr', { timeout: 5000 });
+                    await pageInstance.waitForSelector('#view-grid-notificaciones-container table tbody tr', { timeout: 30000 });
 
                     // Ir a la última página de notificaciones si existe para obtener la última fecha
                     const lastPageClicked = await pageInstance.evaluate(() => {
@@ -401,14 +403,20 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
                     });
 
                     if (lastPageClicked) {
-                        await new Promise(r => setTimeout(r, 2000)); // Esperar recarga de tabla
+                        // Esperar a que el PJAX termine de cargar la nueva página
+                        await pageInstance.waitForFunction(() => {
+                            const loader = document.querySelector('#view-grid-notificaciones-pjax .kv-loader-overlay');
+                            return !loader || loader.style.display === 'none' || loader.classList.contains('hide');
+                        }, { timeout: 10000 }).catch(() => null);
+                        await new Promise(r => setTimeout(r, 1500)); 
                     }
 
                     const fechaNotif = await pageInstance.evaluate(() => {
                         const lastRow = document.querySelector('#view-grid-notificaciones-container table tbody tr:last-child');
                         if (!lastRow) return '';
-                        const cells = lastRow.querySelectorAll('td');
-                        return cells.length >= 7 ? cells[6].textContent.trim() : '';
+                        // La fecha está en la columna data-col-seq="6" (7ma columna)
+                        const cell = lastRow.querySelector('td[data-col-seq="6"]');
+                        return cell ? cell.textContent.trim() : '';
                     });
                     datosAudiencia.fechaNotificacion = fechaNotif;
                 } catch (e) {
@@ -417,7 +425,7 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
 
                 try {
                     await pageInstance.click('a[href="#historialEstado"]');
-                    await pageInstance.waitForSelector('#view-grid-historial-estados-container table tbody tr', { timeout: 5000 });
+                    await pageInstance.waitForSelector('#view-grid-historial-estados-container table tbody tr', { timeout: 30000 });
                     const fechaFin = await pageInstance.evaluate(() => {
                         const rows = Array.from(document.querySelectorAll('#view-grid-historial-estados-container table tbody tr'));
                         const finalizadaRow = rows.find(row => {

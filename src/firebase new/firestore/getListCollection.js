@@ -4,6 +4,10 @@ import { getFirestore, collection, getDocs} from "firebase/firestore";
 const db = getFirestore(firebase_app);
 
 export default async function getListCollection(collectionName, date, subcol) {
+  if (!collectionName || !date || !subcol || (typeof date === 'string' && !date.trim())) {
+    // console.warn(`getListCollection called with missing or invalid parameters: ${collectionName}/${date}/${subcol}`);
+    return [];
+  }
   try {
     const subcolRef = collection(db, collectionName, date, subcol);
     const snapshot = await getDocs(subcolRef);

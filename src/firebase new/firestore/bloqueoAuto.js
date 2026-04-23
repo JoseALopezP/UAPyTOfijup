@@ -6,11 +6,13 @@ const FORM_URL = "http://10.107.1.184:8094/bloqueo-persona/create";
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 async function login(page) {
+    page.setDefaultTimeout(60000);
+    page.setDefaultNavigationTimeout(60000);
     await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
     await page.$eval("#loginform-username", el => el.value = "20423341980");
     await page.$eval("#loginform-password", el => el.value = "Marzo24");
     await page.click('button[name="login-button"]');
-    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 15000 });
+    await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
     console.log("   ✓ Login exitoso.");
 }
 

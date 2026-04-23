@@ -4,6 +4,10 @@ import firebase_app from "../config";
 const db = getFirestore(firebase_app);
 
 export async function countDocs(path) {
+    if (!path || (typeof path === 'string' && !path.trim()) || path.includes('//')) {
+        // console.warn(`countDocs called with invalid path: ${path}`);
+        return 0;
+    }
     try {
         const colRef = collection(db, path);
         const snapshot = await getCountFromServer(colRef);

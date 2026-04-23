@@ -4,6 +4,10 @@ import firebase_app from "../config";
 const db = getFirestore(firebase_app);
 
 export default async function addOrUpdateDocument(collectionName, date, subCol, data, customId = null) {
+  if (!collectionName || !date || !subCol) {
+    // console.warn(`addOrUpdateDocument called with missing parameters: ${collectionName}/${date}/${subCol}`);
+    return null;
+  }
   try {
     const batch = writeBatch(db);
 
