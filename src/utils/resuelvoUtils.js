@@ -11,10 +11,13 @@ export function formatAbogadoName(rawName) {
     let noMatricula = rawName.replace(/\s*\(\s*#.*?\s*\)/g, '');
     let noDash = noMatricula.includes(' - ') ? noMatricula.split(' - ')[0] : noMatricula;
     const { title, cleanName } = inferGender(noDash);
-    const titleCased = cleanName
+    
+    const safeCleanName = cleanName || noDash || '';
+    
+    const titleCased = safeCleanName
         .toLowerCase()
         .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1) : '')
         .join(' ');
     return `${title} ${titleCased.trim()}`;
 }
