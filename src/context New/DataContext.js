@@ -380,10 +380,29 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
-    const addPumaData = async (date, pumaData) => {
+    const addPumaData = async (date, newScrapedData) => {
         if (!date) return;
         try {
-            await addOrUpdateObject('informeUAL', date, 'audiencias', pumaData);
+            const docData = await getDocument('informeUAL', date);
+            const existingAudiencias = docData?.audiencias || [];
+
+            const mergedAudiencias = [...existingAudiencias];
+
+            newScrapedData.forEach(newAud => {
+                const index = mergedAudiencias.findIndex(oldAud => 
+                    oldAud.numeroLeg === newAud.numeroLeg && 
+                    oldAud.inicioProgramada === newAud.inicioProgramada
+                );
+
+                if (index !== -1) {
+                    mergedAudiencias[index] = { ...mergedAudiencias[index], ...newAud };
+                } else {
+                    mergedAudiencias.push(newAud);
+                }
+            });
+
+            await addOrUpdateObject('informeUAL', date, 'audiencias', mergedAudiencias);
+            setPumaData(mergedAudiencias);
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
