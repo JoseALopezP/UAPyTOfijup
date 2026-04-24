@@ -435,8 +435,10 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
 
     return (
         <tr className={styles.tableRow} style={rowStyle} title={savedData.agendadaError ? `Error de agendamiento: ${savedData.agendadaError}` : (savedData.agendada ? '¡Audiencia Agendada con Éxito!' : '')}>
-            <td className={`${styles.cellBodyFixed}${data.urgente ? ` ${styles.urgenteCell}` : ''}`}>
+            <td className={`${styles.cellBodyFixed}${data.urgente ? ` ${styles.urgenteCell}` : ''}`} style={{position: 'relative'}}>
+                {data.noEncontrada && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(239, 68, 68, 0.2)', zIndex: 10, pointerEvents: 'none', border: '2px dashed #ef4444' }} title="No se encuentra actualmente" />}
                 {data.urgente && <span className={styles.urgenteLabel}>⚠ Urgente</span>}
+                {data.noEncontrada && <span style={{ background: '#ef4444', color: 'white', padding: '2px 4px', fontSize: '9px', borderRadius: '4px', position: 'absolute', top: '2px', right: '2px', zIndex: 11 }}>No Encontrada</span>}
                 {savedData.agendada && <span className={styles.agendadaSuccessDot} title="Agendada en PUMA"></span>}
                 {savedData.agendadaError && <span className={styles.agendadaErrorDot} title="Error en PUMA"></span>}
                 {data.numeroLeg}
@@ -970,7 +972,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     </optgroup>
                                     <optgroup label="Plantillas PUMA (Sin PDF)">
                                         {(Array.isArray(desplegables?.plantillasPuma) ? desplegables.plantillasPuma : []).map((t, idx) => (
-                                            <option key={idx} value={t} />
+                                            <option key={idx} value={t}>{t}</option>
                                         ))}
                                     </optgroup>
                                 </select>
@@ -1068,12 +1070,16 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                                         hora: horaAudiencia || '[HORA]'
                                                                     }
                                                                 })
-                                                            };
+                                                            if ((Array.isArray(desplegables?.plantillasPuma) ? desplegables.plantillasPuma : []).includes(n.option)) {
+                                                                const textoGenerado = `PLANTILLA SIN PDF\n\nOpción: ${n.option}\nDestinatarios: ${datosList.destinatarioNombre}\nCarátula: ${datosList.caratula}\n\n* Esta es una plantilla del sistema PUMA que no genera un archivo PDF físico.`;
+                                                                alert(textoGenerado);
+                                                                return;
+                                                            }
                                                             descargarPdfNotificacion(n.option, datosList);
                                                         }}
                                                         title="Descargar esta notificación"
                                                     >
-                                                        💾 PDF
+                                                        {(Array.isArray(desplegables?.plantillasPuma) ? desplegables.plantillasPuma : []).includes(n.option) ? '👁 Ver Texto' : '💾 PDF'}
                                                     </button>
                                                     <button style={{ background: 'transparent', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center' }} onClick={() => { setNotificaciones(prev => prev.filter(x => x.id !== n.id)); setToSave(true); }} title="Quitar">✕</button>
                                                 </div>
@@ -1328,7 +1334,8 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     if (activeImputados.length > 0) {
                                         const algunoConSituacion = activeImputados.some(imp => imp.situacionCorporal);
                                         if (!algunoConSituacion) {
-                                            return alert("¡No podés agendar! Al menos un imputado debe tener cargada la situación corporal (Libertad/Detenido).");
+                                            const confirm = window.confirm("¡Atención! Ningún imputado tiene cargada la situación corporal (Libertad/Detenido). ¿Desea agendar de todos modos?");
+                                            if (!confirm) return;
                                         }
                                     }
                                 }

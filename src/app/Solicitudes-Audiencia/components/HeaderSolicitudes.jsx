@@ -119,6 +119,85 @@ export default function HeaderSolicitudes() {
         }
     }
 
+    const revisarSolicitudesHandler = async () => {
+        try {
+            console.log("[ui] Iniciando revisión masiva (todas las solicitudes)...");
+            setIsSyncing(true);
+            setSyncStatus('Iniciando Revisión...');
+
+            const bodyData = { existingData: [], tiposAudiencia: desplegables?.tiposPuma || [], forceReviewAll: true };
+
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                window.electronAPI.removeAllListeners('extraer-solicitudes-progress');
+                window.electronAPI.on('extraer-solicitudes-progress', (event, parsed) => {
+                    if (parsed.type === 'progress') setSyncStatus(parsed.message);
+                    else if (parsed.type === 'error') setSyncStatus(`Error: ${parsed.error}`);
+                });
+
+                const result = await window.electronAPI.invoke('extraer-solicitudes', bodyData);
+                if (!result.success) throw new Error(result.error);
+
+                const newItems = result.data || [];
+                setSyncStatus(`Revisando y fusionando ${newItems.length} solicitudes...`);
+                
+                const existingDataArr = Array.isArray(solicitudesPendientes) ? solicitudesPendientes : [];
+                
+                // Marcar como noEncontrada = true a las que no están en newItems
+                for (const oldItem of existingDataArr) {
+                    const found = newItems.find(n => n.numeroLeg === oldItem.numeroLeg && n.fyhcreacion === oldItem.fyhcreacion);
+                    if (!found) {
+                        if (!oldItem.noEncontrada && !oldItem.agendada) { // Solo marcar si no estaba agendada
+                            await addSolicitudData(oldItem.rowKey, { ...oldItem, noEncontrada: true });
+                        }
+                    } else if (oldItem.noEncontrada) {
+                        await addSolicitudData(oldItem.rowKey, { ...oldItem, noEncontrada: false });
+                    }
+                }
+
+                // Actualizar las existentes y agregar las nuevas
+                for (const item of newItems) {
+                    const rowKey = item.linkSol
+                        ? item.linkSol.replace(/[^a-zA-Z0-9]/g, '_')
+                        : `${item.numeroLeg}_${item.fyhcreacion}`;
+                    
+                    const existing = existingDataArr.find(e => e.rowKey === rowKey);
+                    
+                    if (existing) {
+                        let newPartesLegajo = [...(existing.partesLegajo || [])];
+                        if (item.partesLegajo) {
+                            newPartesLegajo = newPartesLegajo.filter(p => p.agregadaOriginalmente === false);
+                            for (const np of item.partesLegajo) {
+                                newPartesLegajo.push({...np, agregadaOriginalmente: true});
+                            }
+                        }
+                        
+                        await addSolicitudData(rowKey, {
+                            ...existing,
+                            intervinientes: item.intervinientes,
+                            documentos: item.documentos,
+                            partesLegajo: newPartesLegajo,
+                            solicitante: item.solicitante,
+                            jueces: item.jueces,
+                            delitos: item.delitos,
+                            noEncontrada: false
+                        });
+                    } else {
+                        await addSolicitudData(rowKey, item);
+                    }
+                }
+
+                setSyncStatus(`✓ Revisión completada.`);
+            } else {
+                 setSyncStatus(`Error: Revisión solo disponible en app de escritorio.`);
+            }
+        } catch (error) {
+            console.error("Error de revisión:", error);
+            setSyncStatus(`Error: ${error.message}`);
+        } finally {
+            setIsSyncing(false);
+        }
+    }
+
     const agendarMasivoHandler = async () => {
         try {
             console.log("[ui] Iniciando agendamiento masivo...");
@@ -131,7 +210,8 @@ export default function HeaderSolicitudes() {
                 (s.agendar === true && !s.agendada) || 
                 (s.reprogramar === true) || 
                 (s.cancelar === true) ||
-                (s.convertirJurisdiccional === true)
+                (s.convertirJurisdiccional === true) ||
+                (s.agendada && s.notificaciones && s.notificaciones.some(n => !n.notificada))
             );
             // Reconversiones: agendar=true y tiene tiposOriginales distintos de tipos actuales
             const aReconvertir = (solicitudesPendientes || []).filter(s =>
@@ -148,7 +228,7 @@ export default function HeaderSolicitudes() {
             for (let i = 0; i < aProcesar.length; i++) {
                 const item = aProcesar[i];
                 try {
-                    const action = item.convertirJurisdiccional ? 'Convirtiendo a Jurisdiccional' : (item.cancelar ? 'Cancelando' : (item.reprogramar ? 'Reprogramando' : 'Agendando'));
+                    const action = item.convertirJurisdiccional ? 'Convirtiendo a Jurisdiccional' : (item.cancelar ? 'Cancelando' : (item.reprogramar ? 'Reprogramando' : (item.agendada ? 'Notificando' : 'Agendando')));
                     setSyncStatus(`${action} ${i+1}/${aProcesar.length}: ${item.numeroLeg}...`);
                     
                     // Reconstruir availablePartsList (lógica idéntica a RowSol.jsx)
@@ -267,7 +347,7 @@ export default function HeaderSolicitudes() {
                     const bodyData = {
                         solicitud: item,
                         documentosBase64: documentosBase64,
-                        action: item.convertirJurisdiccional ? 'convertir-jurisdiccional' : (item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : 'agendar')),
+                        action: item.convertirJurisdiccional ? 'convertir-jurisdiccional' : (item.cancelar ? 'cancelar' : (item.reprogramar ? 'reprogramar' : (item.agendada ? 'notificar-solo' : 'agendar'))),
                         convertirJurisdiccionalTipo: item.convertirJurisdiccionalTipo || '',
                         convertirJurisdiccionalMotivo: item.convertirJurisdiccionalMotivo || '',
                         reconversionMotivo: item.reconversionMotivo || ''
@@ -523,12 +603,21 @@ export default function HeaderSolicitudes() {
             <span className={styles.headerSection}>
                 <button
                     className={styles.syncButton}
-                    title="Sincronizar Solicitudes"
+                    title="Sincronizar Solicitudes (Rápido)"
                     onClick={syncSolicitudesHandler}
                     disabled={isSyncing}
                 >
                     <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-refresh'}`}></i>
                     {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
+                </button>
+                <button
+                    className={styles.syncButton}
+                    title="Revisar Todo (Lento, actualiza y busca borrados)"
+                    onClick={revisarSolicitudesHandler}
+                    disabled={isSyncing}
+                >
+                    <i className={`fa ${isSyncing ? 'fa-spinner fa-spin' : 'fa-search'}`}></i>
+                    {isSyncing ? 'Revisando...' : 'Revisar'}
                 </button>
 
                 {/* Botón Procesar (ex-Agendar) */}
@@ -541,7 +630,8 @@ export default function HeaderSolicitudes() {
                     const countReprog = pendientes.filter(s => s.reprogramar).length
                     const countCancelar = pendientes.filter(s => s.cancelar).length
                     const totalProcesar = pendientes.filter(s =>
-                        (s.agendar && !s.agendada) || s.reprogramar || s.cancelar || s.convertirJurisdiccional || s.marcarBorrar
+                        (s.agendar && !s.agendada) || s.reprogramar || s.cancelar || s.convertirJurisdiccional || s.marcarBorrar ||
+                        (s.agendada && s.notificaciones && s.notificaciones.some(n => !n.notificada))
                     ).length
 
                     const tooltipLines = [

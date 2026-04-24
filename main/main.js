@@ -176,10 +176,10 @@ app.on("ready", () => {
     };
 
     try {
-      const { existingData, tiposAudiencia } = body;
+      const { existingData, tiposAudiencia, forceReviewAll } = body;
       sendEvent({ type: 'progress', message: 'Extraer: Inicializando Puppeteer...' });
       
-      const result = await extraerSolicitudes(existingData || [], onProgress, tiposAudiencia || []);
+      const result = await extraerSolicitudes(existingData || [], onProgress, tiposAudiencia || [], forceReviewAll);
       
       sendEvent({ type: 'done', data: result });
       return { success: true, data: result };

@@ -17,7 +17,7 @@ async function login(page) {
     console.log("[extraccion-solicitudes] Login exitoso.");
 }
 
-export async function extraerSolicitudes(existingData = [], onProgress, tiposAudiencia = []) {
+export async function extraerSolicitudes(existingData = [], onProgress, tiposAudiencia = [], forceReviewAll = false) {
     // onProgress lo usamos internamente solo al final para no hacer ruido
     // en la primera fase, que es rápida
     const notify = (msg) => {
@@ -140,7 +140,7 @@ export async function extraerSolicitudes(existingData = [], onProgress, tiposAud
                 const alreadyExists = existingData.some(
                     d => d.numeroLeg === row.numeroLeg && d.fyhcreacion === row.fyhcreacion
                 );
-                if (alreadyExists) {
+                if (alreadyExists && !forceReviewAll) {
                     notify(`Match encontrado: ${row.numeroLeg}. Deteniendo.`);
                     stopFound = true;
                     break;
