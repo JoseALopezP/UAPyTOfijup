@@ -276,7 +276,12 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             }
             {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse}/>}
             <div className={styles.headerLeftConBoton}>
-                <h2 className={`${styles.audControlTitle}`}>{item.numeroLeg} - {item.hora}</h2>
+                <h2 className={`${styles.audControlTitle}`}>
+                    {item.numeroLeg} - {item.hora}
+                    <span style={{ opacity: 0.6, fontSize: '0.65em', marginLeft: '12px', fontWeight: '400' }}>
+                        {tipo}{tipo2 ? ` - ${tipo2}` : ''}{tipo3 ? ` - ${tipo3}` : ''}
+                    </span>
+                </h2>
                 {(guardarInc || guardando) && (
                     <button 
                         type="submit" 
@@ -323,6 +328,12 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 className={`${styles.inputLeft} ${styles.inputTyped70}`}
                                 value={input.nombre}
                                 onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
+                                onBlur={(e) => {
+                                    if (e.target.value && fiscalesList && !fiscalesList.includes(e.target.value)) {
+                                        alert("Por favor, selecciona un nombre de la lista.");
+                                        handleInputChange(setMpf, index, 'nombre', '');
+                                    }
+                                }}
                             />
                             <datalist id={`mpf-${index}`}>
                                 {fiscalesList && fiscalesList.map(option => (
@@ -440,7 +451,13 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                     <><input list={`oficial-${index}`}
                                         className={`${styles.inputLeft} ${styles.inputTyped50}`}
                                         value={input.nombre}
-                                        onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}/>
+                                        onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
+                                        onBlur={(e) => {
+                                            if (e.target.value && defensoresOficialesList && !defensoresOficialesList.includes(e.target.value)) {
+                                                alert("Por favor, selecciona un nombre de la lista.");
+                                                handleInputChange(setDefensa, index, 'nombre', '');
+                                            }
+                                        }}/>
                                     <datalist id={`oficial-${index}`}>
                                         {defensoresOficialesList && defensoresOficialesList.map(option => (
                                             <option key={option} value={option}>
@@ -460,7 +477,13 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                         className={`${styles.inputLeft} ${styles.inputTyped70}`}
                                         value={input.nombre}
                                         onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
-                                        placeholder="Nombre"/>
+                                        placeholder="Nombre"
+                                        onBlur={(e) => {
+                                            if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
+                                                alert("Por favor, selecciona un nombre de la lista.");
+                                                handleInputChange(setDefensa, index, 'nombre', '');
+                                            }
+                                        }}/>
                                     <datalist id={`particular-${index}`}>
                                         {defensoresParticularesList && defensoresParticularesList.map(option => (
                                             <option key={option} value={option}>

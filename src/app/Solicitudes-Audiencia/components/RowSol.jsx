@@ -1070,6 +1070,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                                                         hora: horaAudiencia || '[HORA]'
                                                                     }
                                                                 })
+                                                            };
                                                             if ((Array.isArray(desplegables?.plantillasPuma) ? desplegables.plantillasPuma : []).includes(n.option)) {
                                                                 const textoGenerado = `PLANTILLA SIN PDF\n\nOpción: ${n.option}\nDestinatarios: ${datosList.destinatarioNombre}\nCarátula: ${datosList.caratula}\n\n* Esta es una plantilla del sistema PUMA que no genera un archivo PDF físico.`;
                                                                 alert(textoGenerado);

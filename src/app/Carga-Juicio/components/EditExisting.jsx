@@ -252,7 +252,9 @@ export default function EditExisting({ original, newState, onToggle, previousVer
             </select>
             <label className={`${styles.cargaLabel}`}>Fiscal</label>
             <input className={fiscalError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                onChange={e => changeHandler(e.target.value, setFiscal, setFiscalError, listCheck, fiscalesList)} value={fiscal} list='fiscal' />
+                onChange={e => changeHandler(e.target.value, setFiscal, setFiscalError, listCheck, fiscalesList)} value={fiscal} list='fiscal'
+                onBlur={(e) => { if (e.target.value && fiscalesList && !fiscalesList.includes(e.target.value)) { alert("Por favor, selecciona un nombre de la lista."); setFiscal('') } }}
+            />
             <label className={`${styles.cargaLabel}`}>UFI</label>
             <input className={ufiError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
                 onChange={e => changeHandler(e.target.value, setUfi, setUfiError, listCheck, desplegables.ufi)} value={ufi} list='ufi' />
@@ -261,7 +263,9 @@ export default function EditExisting({ original, newState, onToggle, previousVer
                 onChange={e => changeHandler(e.target.value, setCantTestigos, setCantTestigosError, numberCheck, 0, 999)} value={cantTestigos} />
             <label className={`${styles.cargaLabel}`}>Defensa</label>
             <input className={defensaError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                onChange={e => changeHandler(e.target.value, setDefensa, setDefensaError, listCheck, defensoresCombinados)} value={defensa} list='defensa' />
+                onChange={e => changeHandler(e.target.value, setDefensa, setDefensaError, listCheck, defensoresCombinados)} value={defensa} list='defensa'
+                onBlur={(e) => { if (e.target.value && defensoresCombinados && !defensoresCombinados.includes(e.target.value)) { alert("Por favor, selecciona un nombre de la lista."); setDefensa('') } }}
+            />
             <label className={`${styles.cargaLabel}`}>Defensoria</label>
             <input className={defensaCargoError ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
                 onChange={e => changeHandler(e.target.value, setDefensaCargo, setDefensaCargoError, listCheck, desplegables.defensaCargo)} value={defensaCargo} list='defensorias' />
@@ -271,13 +275,19 @@ export default function EditExisting({ original, newState, onToggle, previousVer
             <label className={`${styles.cargaLabel}`}>Jueces</label>
             <input className={juez1Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
                 onChange={e => changeHandler(e.target.value, setJuez1, setJuez1Error, listCheck, juecesList)}
-                value={juez1} list='jueces' placeholder={tipoTribunal === "COLEGIADO" ? 'presidente' : 'juez'} />
+                value={juez1} list='jueces' placeholder={tipoTribunal === "COLEGIADO" ? 'presidente' : 'juez'}
+                onBlur={(e) => { if (e.target.value && juecesList && !juecesList.includes(e.target.value)) { alert("Por favor, selecciona un nombre de la lista."); setJuez1('') } }}
+            />
             {tipoTribunal === "COLEGIADO" &&
                 <>
                     <input className={juez2Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setJuez2, setJuez2Error, listCheck, juecesList)} value={juez2} list='jueces' />
+                        onChange={e => changeHandler(e.target.value, setJuez2, setJuez2Error, listCheck, juecesList)} value={juez2} list='jueces'
+                        onBlur={(e) => { if (e.target.value && juecesList && !juecesList.includes(e.target.value)) { alert("Por favor, selecciona un nombre de la lista."); setJuez2('') } }}
+                    />
                     <input className={juez3Error ? `${styles.juicioInput}` : `${styles.juicioInput} ${styles.juicioInputWrong}`}
-                        onChange={e => changeHandler(e.target.value, setJuez3, setJuez3Error, listCheck, juecesList)} value={juez3} list='jueces' />
+                        onChange={e => changeHandler(e.target.value, setJuez3, setJuez3Error, listCheck, juecesList)} value={juez3} list='jueces'
+                        onBlur={(e) => { if (e.target.value && juecesList && !juecesList.includes(e.target.value)) { alert("Por favor, selecciona un nombre de la lista."); setJuez3('') } }}
+                    />
                 </>}
             <datalist id="delitosTipos" className={`${styles.tableCellInput}`}>
                 {desplegables.delitosTipos && desplegables.delitosTipos.map((el) => (
