@@ -8,6 +8,7 @@ import os from 'os';
 // Dynamically import required puppeteer modules from the Next.js src folder
 import { agendarAudiencia, rechazarSolicitud } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
 import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
+import { extraerDetalles } from '../src/app/Solicitudes-Audiencia/funciones/extraccionDetalles.js';
 import { getInfoAudiencia } from '../src/app/Pumba/components/scrappingUAL.js';
 import { bloqueoMasivoAuto, parsearBloques } from '../src/firebase new/firestore/bloqueoAuto.js';
 
@@ -186,6 +187,20 @@ app.on("ready", () => {
     } catch (error) {
       console.error('Error in extraer-solicitudes IPC:', error);
       sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('extraer-solicitud-individual', async (event, body) => {
+    try {
+      const { solicitud, tiposAudiencia } = body;
+      const result = await extraerDetalles([solicitud], null, tiposAudiencia || []);
+      if (result && result.length > 0) {
+        return { success: true, data: result[0] };
+      }
+      return { success: false, error: "No se devolvieron datos." };
+    } catch (error) {
+      console.error('Error in extraer-solicitud-individual IPC:', error);
       return { success: false, error: error.message };
     }
   });

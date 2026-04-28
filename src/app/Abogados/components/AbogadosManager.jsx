@@ -5,7 +5,6 @@ import styles from './Abogados.module.css';
 import { LISTA_ABOGADOS_INICIAL } from './listaAbogadosData';
 
 /**
- * MAPEO DE CLAVES CORTAS (Optimización de tamaño para Firebase):
  * m: nroMatricula
  * n: ayn (Apellido y Nombre)
  * t: tel
@@ -14,13 +13,13 @@ import { LISTA_ABOGADOS_INICIAL } from './listaAbogadosData';
  */
 
 const CARGOS = [
-    { value: 'todos',     label: 'Todos',              color: '#868686' },
-    { value: 'juez',      label: 'Juez',               color: '#5b9bd5' },
-    { value: 'fiscal',    label: 'Fiscal',             color: '#d57b5b' },
-    { value: 'aFiscal',   label: 'Ayudante Fiscal',    color: '#d5a05b' },
-    { value: 'defensor',  label: 'Defensor',           color: '#5bd579' },
-    { value: 'aDefensor', label: 'Ayudante Defensor',  color: '#8a5bd5' },
-    { value: 'otros',     label: 'Otros / Sin Cargo',  color: '#a0a0a0' },
+    { value: 'todos', label: 'Todos', color: '#868686' },
+    { value: 'juez', label: 'Juez', color: '#5b9bd5' },
+    { value: 'fiscal', label: 'Fiscal', color: '#d57b5b' },
+    { value: 'aFiscal', label: 'Ayudante Fiscal', color: '#d5a05b' },
+    { value: 'defensor', label: 'Defensor', color: '#5bd579' },
+    { value: 'aDefensor', label: 'Ayudante Defensor', color: '#8a5bd5' },
+    { value: 'otros', label: 'Otros / Sin Cargo', color: '#a0a0a0' },
 ];
 
 const CARGO_COLORS = Object.fromEntries(CARGOS.map(c => [c.value, c.color]));
@@ -200,7 +199,7 @@ function AbogadoRow({ abogado, isSelected, onSelect, onSave, onDelete }) {
                     ? <select className={styles.editInput} value={form.s ? 'true' : 'false'} onChange={e => set('s', e.target.value === 'true')} style={{ padding: '2px 4px' }}>
                         <option value="false">M</option>
                         <option value="true">F</option>
-                      </select>
+                    </select>
                     : <GeneroPill s={abogado.s} />
                 }
             </td>
@@ -283,7 +282,7 @@ export default function AbogadosManager() {
         return matchCargo && matchLugar && matchSearch;
     }).sort((a, b) => {
         if (!sortConfig.key) return 0;
-        
+
         let valA = a[sortConfig.key] || '';
         let valB = b[sortConfig.key] || '';
 
@@ -319,7 +318,7 @@ export default function AbogadosManager() {
 
 
     const toggleCargo = (val) => {
-        setSelectedCargos(prev => 
+        setSelectedCargos(prev =>
             prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]
         );
     };
@@ -329,7 +328,7 @@ export default function AbogadosManager() {
     }, [abogados]);
 
     const toggleLugar = (val) => {
-        setSelectedLugares(prev => 
+        setSelectedLugares(prev =>
             prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]
         );
     };
@@ -388,17 +387,17 @@ export default function AbogadosManager() {
             allLegacy.forEach(name => {
                 const isFemale = /(Dra\.|Jueza|Sra\.)/i.test(name);
                 const isMale = /(Dr\.|Sr\.)/i.test(name) && !isFemale;
-                
+
                 let cleanName = name.replace(/(^|\s)(Dr\.|Dra\.|Sr\.|Sra\.|El|La|Juez(?:a)?|Fiscal|Defensor(?:a)?)(\s|$)/gi, ' ');
                 cleanName = cleanName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
-                
+
                 if (isFemale) femaleNames.push(cleanName);
                 if (isMale) maleNames.push(cleanName);
             });
 
             const newAbogados = abogados.map(abg => {
                 const nClean = abg.n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(',', '');
-                
+
                 const checkMatch = (legacyList) => {
                     return legacyList.some(legacyStr => {
                         const words = legacyStr.split(' ').filter(w => w.length > 2);
@@ -409,7 +408,7 @@ export default function AbogadosManager() {
 
                 // Asignar prop s: verdadera(mujer), falsa(hombre)
                 if (checkMatch(femaleNames)) {
-                    return { ...abg, s: true }; 
+                    return { ...abg, s: true };
                 } else if (checkMatch(maleNames)) {
                     return { ...abg, s: false };
                 }
@@ -434,10 +433,10 @@ export default function AbogadosManager() {
                     <div className={styles.cargoFilters}>
                         {CARGOS.filter(c => c.value !== 'todos').map(c => (
                             <label key={c.value} className={`${styles.cargoLabel} ${selectedCargos.includes(c.value) ? styles.cargoLabelActive : ''}`}>
-                                <input 
-                                    type="checkbox" 
-                                    checked={selectedCargos.includes(c.value)} 
-                                    onChange={() => toggleCargo(c.value)} 
+                                <input
+                                    type="checkbox"
+                                    checked={selectedCargos.includes(c.value)}
+                                    onChange={() => toggleCargo(c.value)}
                                     style={{ display: 'none' }}
                                 />
                                 <div className={styles.checkboxCustom} style={{ borderColor: c.color }}>
@@ -455,10 +454,10 @@ export default function AbogadosManager() {
                     <div className={styles.cargoFilters}>
                         {lugaresUnicos.map(l => (
                             <label key={l} className={`${styles.cargoLabel} ${selectedLugares.includes(l) ? styles.cargoLabelActive : ''}`}>
-                                <input 
-                                    type="checkbox" 
-                                    checked={selectedLugares.includes(l)} 
-                                    onChange={() => toggleLugar(l)} 
+                                <input
+                                    type="checkbox"
+                                    checked={selectedLugares.includes(l)}
+                                    onChange={() => toggleLugar(l)}
                                     style={{ display: 'none' }}
                                 />
                                 <div className={styles.checkboxCustom} style={{ borderColor: '#868686' }}>
@@ -516,8 +515,8 @@ export default function AbogadosManager() {
 
                         <tbody>
                             {showNuevo && <NuevoAbogadoRow onSave={handleAdd} onCancel={() => setShowNuevo(false)} />}
-                            {loading ? <tr><td colSpan={7} style={{textAlign:'center', padding:40, color:'#444'}}>Cargando...</td></tr> : 
-                             list.map(a => <AbogadoRow key={a.m} abogado={a} isSelected={selectedId === a.m} onSelect={setSelectedId} onSave={handleUpdate} onDelete={handleDelete} />)}
+                            {loading ? <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#444' }}>Cargando...</td></tr> :
+                                list.map(a => <AbogadoRow key={a.m} abogado={a} isSelected={selectedId === a.m} onSelect={setSelectedId} onSave={handleUpdate} onDelete={handleDelete} />)}
                         </tbody>
                     </table>
                 </div>

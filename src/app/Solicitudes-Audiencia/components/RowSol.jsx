@@ -125,6 +125,54 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const [solicitanteRechazo, setSolicitanteRechazo] = useState('MPF') // 'MPF' | 'Defensa'
     const [isRechazando, setIsRechazando] = useState(false)
     const [rechazarStatus, setRechazarStatus] = useState('')
+    const [isActualizando, setIsActualizando] = useState(false);
+
+    const actualizarIndividualHandler = async () => {
+        try {
+            setIsActualizando(true);
+            const bodyData = { 
+                solicitud: { ...data, ...savedData }, 
+                tiposAudiencia: desplegables?.tiposPuma || [] 
+            };
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                const result = await window.electronAPI.invoke('extraer-solicitud-individual', bodyData);
+                if (result && result.success && result.data) {
+                    const newData = result.data;
+                    
+                    let newPartesLegajo = [...(savedData.partesLegajo || data.partesLegajo || [])];
+                    if (newData.partesLegajo) {
+                        newPartesLegajo = newPartesLegajo.filter(p => p.agregadaOriginalmente === false);
+                        for (const np of newData.partesLegajo) {
+                            newPartesLegajo.push({...np, agregadaOriginalmente: true});
+                        }
+                    }
+
+                    await addSolicitudData(rowKey, {
+                        ...data,
+                        ...savedData,
+                        intervinientes: newData.intervinientes || savedData.intervinientes || data.intervinientes,
+                        documentos: newData.documentos || savedData.documentos || data.documentos,
+                        partesLegajo: newPartesLegajo,
+                        solicitante: newData.solicitante || savedData.solicitante || data.solicitante,
+                        jueces: newData.jueces || savedData.jueces || data.jueces,
+                        delitos: newData.delitos || savedData.delitos || data.delitos,
+                        noEncontrada: false
+                    });
+                    console.log(`[ui] Solicitud ${data.numeroLeg} actualizada exitosamente.`);
+                } else {
+                    console.error("Error al actualizar la solicitud:", result?.error || 'Sin respuesta');
+                    alert(`Error al actualizar: ${result?.error || 'Sin respuesta'}`);
+                }
+            } else {
+                console.error("electronAPI no está disponible.");
+            }
+        } catch (err) {
+            console.error("Error en actualizarIndividualHandler:", err);
+            alert(`Error al actualizar: ${err.message}`);
+        } finally {
+            setIsActualizando(false);
+        }
+    };
 
     const handleCloseRepro = () => {
         if (!motivRepro || !obsRepro) {
@@ -442,6 +490,14 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 {savedData.agendada && <span className={styles.agendadaSuccessDot} title="Agendada en PUMA"></span>}
                 {savedData.agendadaError && <span className={styles.agendadaErrorDot} title="Error en PUMA"></span>}
                 {data.numeroLeg}
+                <button 
+                    onClick={(e) => { e.stopPropagation(); actualizarIndividualHandler(); }} 
+                    disabled={isActualizando}
+                    style={{ position: 'absolute', top: '2px', right: data.noEncontrada ? '80px' : '2px', fontSize: '11px', padding: '3px 6px', cursor: 'pointer', background: 'var(--accent)', color: '#ffffff', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.15)' }}
+                    title="Actualizar"
+                >
+                    <i className={`fa ${isActualizando ? 'fa-spinner fa-spin' : 'fa-refresh'}`}></i>
+                </button>
             </td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.fyhcreacion}</div></td>
             <td className={`${styles.cellBodyFixed}`}><div className={styles.scrollCell}>{data.solicitante}</div></td>

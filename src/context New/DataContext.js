@@ -388,6 +388,10 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
 
             const mergedAudiencias = [...existingAudiencias];
 
+            const ualDocData = await getDocument('informeUALData', date);
+            const updatedUalDataObj = ualDocData?.audiencias || {};
+            let ualDataChanged = false;
+
             newScrapedData.forEach(newAud => {
                 const index = mergedAudiencias.findIndex(oldAud => 
                     oldAud.numeroLeg === newAud.numeroLeg && 
@@ -399,10 +403,71 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
                 } else {
                     mergedAudiencias.push(newAud);
                 }
+
+                const rowKey = `${newAud.numeroLeg}_${newAud.inicioProgramada}`;
+                const savedData = updatedUalDataObj[rowKey] || {};
+                let changesMade = false;
+                const dataToSave = { ...savedData };
+
+                if (!savedData.legajo && newAud.numeroLeg) { dataToSave.legajo = newAud.numeroLeg; changesMade = true; }
+                
+                const audTipoExtracted = newAud.tipo ? (newAud.tipo + (newAud.tipo2 ? ' ' + newAud.tipo2 : '') + (newAud.tipo3 ? ' ' + newAud.tipo3 : '')) : '';
+                if (!savedData.audTipo && audTipoExtracted) { dataToSave.audTipo = audTipoExtracted; changesMade = true; }
+
+                if (!savedData.dyhsolicitud && newAud.dyhsolicitud) { dataToSave.dyhsolicitud = newAud.dyhsolicitud; changesMade = true; }
+                if (!savedData.dyhagendamiento && newAud.dyhagendamiento) { dataToSave.dyhagendamiento = newAud.dyhagendamiento; changesMade = true; }
+                if (!savedData.dyhnotificacion && newAud.fechaNotificacion) { dataToSave.dyhnotificacion = newAud.fechaNotificacion; changesMade = true; }
+                
+                const formattedDate = date.slice(0, 2) + '/' + date.slice(2, 4) + '/' + date.slice(6, 8);
+                if (!savedData.dyhprogramada && newAud.inicioProgramada) { dataToSave.dyhprogramada = formattedDate + ' ' + newAud.inicioProgramada; changesMade = true; }
+                if (!savedData.dyhreal && newAud.inicioReal) { dataToSave.dyhreal = formattedDate + ' ' + newAud.inicioReal; changesMade = true; }
+                
+                if ((savedData.demora === undefined || savedData.demora === '') && newAud.inicioReal && newAud.inicioProgramada) {
+                    const dem = (parseInt(newAud.inicioReal.split(':')[0]) * 60 + parseInt(newAud.inicioReal.split(':')[1])) - (parseInt(newAud.inicioProgramada.split(':')[0]) * 60 + parseInt(newAud.inicioProgramada.split(':')[1]));
+                    dataToSave.demora = dem; changesMade = true;
+                }
+                
+                if ((savedData.duracionProgramada === undefined || savedData.duracionProgramada === '') && newAud.inicioProgramada && newAud.finProgramada) {
+                    const durP = (parseInt(newAud.finProgramada.split(':')[0]) * 60 + parseInt(newAud.finProgramada.split(':')[1])) - (parseInt(newAud.inicioProgramada.split(':')[0]) * 60 + parseInt(newAud.inicioProgramada.split(':')[1]));
+                    dataToSave.duracionProgramada = durP; changesMade = true;
+                }
+                
+                if ((savedData.durReal === undefined || savedData.durReal === '') && newAud.finReal && newAud.inicioReal) {
+                    const durR = (parseInt(newAud.finReal.split(':')[0]) * 60 + parseInt(newAud.finReal.split(':')[1])) - (parseInt(newAud.inicioReal.split(':')[0]) * 60 + parseInt(newAud.inicioReal.split(':')[1]));
+                    dataToSave.durReal = durR; changesMade = true;
+                }
+                
+                if (!savedData.dyhfinalizacion && newAud.finReal) { dataToSave.dyhfinalizacion = formattedDate + ' ' + newAud.finReal; changesMade = true; }
+                if (!savedData.finalizadaMinuta && newAud.finalizadaMinuta) { dataToSave.finalizadaMinuta = newAud.finalizadaMinuta.split(' ')[1]; changesMade = true; }
+                
+                if ((savedData.cantImputados === undefined || savedData.cantImputados === '') && newAud.intervinientes) {
+                    const cImp = newAud.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length;
+                    dataToSave.cantImputados = cImp; changesMade = true;
+                }
+
+                if (!savedData.sala && newAud.sala) { dataToSave.sala = newAud.sala; changesMade = true; }
+                if (!savedData.operador && newAud.operador) { dataToSave.operador = newAud.operador; changesMade = true; }
+                if (!savedData.finAudiencia && newAud.finAudiencia) { dataToSave.finAudiencia = newAud.finAudiencia; changesMade = true; }
+
+                if (changesMade) {
+                    dataToSave.numeroLeg = newAud.numeroLeg;
+                    dataToSave.inicioProgramada = newAud.inicioProgramada;
+                    updatedUalDataObj[rowKey] = dataToSave;
+                    ualDataChanged = true;
+                }
             });
 
             await addOrUpdateObject('informeUAL', date, 'audiencias', mergedAudiencias);
             setPumaData(mergedAudiencias);
+
+            if (ualDataChanged) {
+                const updatePromises = [];
+                for (const rowKey in updatedUalDataObj) {
+                    updatePromises.push(updateInternalUALData(date, rowKey, updatedUalDataObj[rowKey]));
+                }
+                await Promise.all(updatePromises);
+                setUALData(Object.values(updatedUalDataObj));
+            }
         } catch (error) {
             setErrorMessage(`${error.message}`);
         }
