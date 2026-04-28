@@ -20,6 +20,7 @@ const CARGOS = [
     { value: 'aFiscal',   label: 'Ayudante Fiscal',    color: '#d5a05b' },
     { value: 'defensor',  label: 'Defensor',           color: '#5bd579' },
     { value: 'aDefensor', label: 'Ayudante Defensor',  color: '#8a5bd5' },
+    { value: 'otros',     label: 'Otros / Sin Cargo',  color: '#a0a0a0' },
 ];
 
 const CARGO_COLORS = Object.fromEntries(CARGOS.map(c => [c.value, c.color]));
@@ -30,18 +31,19 @@ const CARGO_LABELS = {
     aFiscal: 'Ay. Fiscal',
     defensor: 'Defensor',
     aDefensor: 'Ay. Defensor',
+    otros: 'Otros / Sin Cargo',
 };
 
 // Intenta mapear el cargo string original a uno de los keys permitidos
 const mapCargo = (cargoStr) => {
-    if (!cargoStr) return 'fiscal';
+    if (!cargoStr) return 'otros';
     const c = cargoStr.toLowerCase();
     if (c.includes('juez')) return 'juez';
     if (c.includes('ayudante fiscal')) return 'aFiscal';
     if (c.includes('fiscal')) return 'fiscal';
     if (c.includes('ayudante defensor')) return 'aDefensor';
     if (c.includes('defensor')) return 'defensor';
-    return 'fiscal';
+    return 'otros';
 };
 
 function CargoPill({ cargo }) {
@@ -107,6 +109,14 @@ function NuevoAbogadoRow({ onSave, onCancel }) {
                     placeholder="Cargo original / PJ"
                     value={form.c}
                     onChange={e => set('c', e.target.value)}
+                />
+            </td>
+            <td>
+                <input
+                    className={styles.editInput}
+                    placeholder="Lugar"
+                    value={form.l}
+                    onChange={e => set('l', e.target.value)}
                 />
             </td>
             <td>
@@ -179,6 +189,12 @@ function AbogadoRow({ abogado, isSelected, onSelect, onSave, onDelete }) {
                     : <CargoPill cargo={abogado.c} />
                 }
             </td>
+            <td style={{ width: 140 }}>
+                {editing
+                    ? <input className={styles.editInput} value={form.l || ''} onChange={e => set('l', e.target.value)} />
+                    : <span style={{ fontSize: 12 }}>{abogado.l || '—'}</span>
+                }
+            </td>
             <td style={{ width: 60, textAlign: 'center' }}>
                 {editing
                     ? <select className={styles.editInput} value={form.s ? 'true' : 'false'} onChange={e => set('s', e.target.value === 'true')} style={{ padding: '2px 4px' }}>
@@ -230,7 +246,8 @@ function ImportModal({ onConfirm, onCancel, loading }) {
 export default function AbogadosManager() {
     const { abogados, updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados, updateDesplegables } = useContext(DataContext);
 
-    const [selectedCargos, setSelectedCargos] = useState(['juez', 'fiscal', 'aFiscal', 'defensor', 'aDefensor']);
+    const [selectedCargos, setSelectedCargos] = useState(['juez', 'fiscal', 'aFiscal', 'defensor', 'aDefensor', 'otros']);
+    const [selectedLugares, setSelectedLugares] = useState([]);
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'm', direction: 'asc' });
     const [selectedId, setSelectedId] = useState(null);
@@ -260,9 +277,10 @@ export default function AbogadosManager() {
     const list = (abogados || []).filter(a => {
         const mappedCargo = mapCargo(a.c);
         const matchCargo = selectedCargos.includes(mappedCargo);
+        const matchLugar = selectedLugares.length === 0 || selectedLugares.includes(a.l);
         const q = search.toLowerCase();
         const matchSearch = !q || a.n?.toLowerCase().includes(q) || a.m?.toString().includes(q);
-        return matchCargo && matchSearch;
+        return matchCargo && matchLugar && matchSearch;
     }).sort((a, b) => {
         if (!sortConfig.key) return 0;
         
@@ -310,6 +328,17 @@ export default function AbogadosManager() {
         return (abogados || []).filter(a => mapCargo(a.c) === cargoKey).length;
     }, [abogados]);
 
+    const toggleLugar = (val) => {
+        setSelectedLugares(prev => 
+            prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]
+        );
+    };
+
+    const countByLugar = useCallback((lugarKey) => {
+        return (abogados || []).filter(a => a.l === lugarKey).length;
+    }, [abogados]);
+
+    const lugaresUnicos = Array.from(new Set((abogados || []).map(a => a.l).filter(Boolean))).sort();
 
     const handleAdd = async (form) => {
         await addAbogado(form);
@@ -421,6 +450,27 @@ export default function AbogadosManager() {
                     </div>
                 </div>
 
+                <div className={styles.sidebarHeader} style={{ marginTop: 20 }}>
+                    <p className={styles.sidebarTitle}>Filtros de Lugar</p>
+                    <div className={styles.cargoFilters}>
+                        {lugaresUnicos.map(l => (
+                            <label key={l} className={`${styles.cargoLabel} ${selectedLugares.includes(l) ? styles.cargoLabelActive : ''}`}>
+                                <input 
+                                    type="checkbox" 
+                                    checked={selectedLugares.includes(l)} 
+                                    onChange={() => toggleLugar(l)} 
+                                    style={{ display: 'none' }}
+                                />
+                                <div className={styles.checkboxCustom} style={{ borderColor: '#868686' }}>
+                                    {selectedLugares.includes(l) && <div style={{ background: '#868686', width: 8, height: 8, borderRadius: 1 }} />}
+                                </div>
+                                <span className={styles.cargoText}>{l}</span>
+                                <span className={styles.cargoBadge}>{countByLugar(l)}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
                 <div className={styles.searchContainer}>
                     <input className={styles.searchInput} placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
@@ -456,6 +506,9 @@ export default function AbogadosManager() {
                                 <th onClick={() => requestSort('c')} className={styles.sortableHeader}>
                                     Cargo PJ <span className={styles.sortIcon}>{getSortIcon('c')}</span>
                                 </th>
+                                <th onClick={() => requestSort('l')} className={styles.sortableHeader}>
+                                    Lugar <span className={styles.sortIcon}>{getSortIcon('l')}</span>
+                                </th>
                                 <th style={{ textAlign: 'center' }}>Género</th>
                                 <th style={{ textAlign: 'right' }}>Acciones</th>
                             </tr>
@@ -463,7 +516,7 @@ export default function AbogadosManager() {
 
                         <tbody>
                             {showNuevo && <NuevoAbogadoRow onSave={handleAdd} onCancel={() => setShowNuevo(false)} />}
-                            {loading ? <tr><td colSpan={5} style={{textAlign:'center', padding:40, color:'#444'}}>Cargando...</td></tr> : 
+                            {loading ? <tr><td colSpan={7} style={{textAlign:'center', padding:40, color:'#444'}}>Cargando...</td></tr> : 
                              list.map(a => <AbogadoRow key={a.m} abogado={a} isSelected={selectedId === a.m} onSelect={setSelectedId} onSave={handleUpdate} onDelete={handleDelete} />)}
                         </tbody>
                     </table>

@@ -45,8 +45,13 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const generateId = (prefix) => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
     const checkUFI = () =>{
-        if((ufi == '' || ufi == null) && mpf && mpf[0] && typeof mpf[0] === 'object' && mpf[0].nombre && mpf[0].nombre.includes(' - ')){
-            setUfi(mpf[0].nombre.split(' - ')[1])
+        if((ufi == '' || ufi == null) && mpf && mpf[0] && typeof mpf[0] === 'object' && mpf[0].nombre){
+            const abog = abogados.find(a => a.n === mpf[0].nombre);
+            if (abog && abog.l) {
+                setUfi(abog.l);
+            } else if (mpf[0].nombre.includes(' - ')) {
+                setUfi(mpf[0].nombre.split(' - ')[1]);
+            }
         }
     }
     const updateImputado = (id, newData) => {
@@ -90,8 +95,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 if (key === 'nombre' && setter === setDefensa && current.tipo === 'Oficial') {
                     const abog = abogados.find(a => a.n === valueObj);
                     if (abog) {
-                        if (abog.l) updated[index].defensoria = abog.l;
-                        if (abog.m) updated[index].matricula = abog.m;
+                        if (abog.l && (!current.defensoria || current.defensoria === '')) updated[index].defensoria = abog.l;
+                        if (abog.m && (!current.matricula || current.matricula === '')) updated[index].matricula = abog.m;
                     }
                 }
             }
