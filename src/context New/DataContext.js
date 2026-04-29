@@ -589,6 +589,50 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     };
+
+    const archiveOldSolicitudes = async (pendientesList) => {
+        const now = new Date();
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(now.getDate() - 7);
+        
+        // Función para parsear DD/MM/YYYY
+        const parseDate = (dateStr) => {
+            if (!dateStr) return null;
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            return null;
+        };
+
+        let archivedCount = 0;
+
+        for (const solicitud of pendientesList) {
+            if (solicitud.fechaAudiencia) {
+                const fAud = parseDate(solicitud.fechaAudiencia);
+                if (fAud && fAud < oneWeekAgo) {
+                    try {
+                        const numeroLeg = solicitud.numeroLeg || 'LEGAJO_DESCONOCIDO';
+                        const idSolicitud = solicitud.rowKey || (solicitud.linkSol ? solicitud.linkSol.replace(/[^a-zA-Z0-9]/g, '_') : `${numeroLeg}_${solicitud.fyhcreacion}`);
+                        
+                        // Guardar en legacy
+                        await addOrUpdateObject('solicitudesLegacy', numeroLeg, idSolicitud, solicitud);
+                        // Remover de pendientes
+                        await removeObject('solicitudes', 'pendientes', solicitud.rowKey);
+                        archivedCount++;
+                    } catch (error) {
+                        console.error("Error archivando solicitud:", error);
+                    }
+                }
+            }
+        }
+        
+        if (archivedCount > 0) {
+            updateSolicitudesPendientes();
+        }
+        return archivedCount;
+    };
+
     const addUser = async (data) => {
         await addObjectToDocument("users", "listaUsuarios", data);
     };
@@ -642,7 +686,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
-        updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada,
+        updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada, archiveOldSolicitudes,
         updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,

@@ -1,8 +1,31 @@
 'use client'
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import IconNavBar from './IconNavBar';
 import styles from './NavBar.module.css'
 
 export default function NavBar() {
+    const pathname = usePathname();
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            if (isMobile && pathname !== '/celular') {
+                router.push('/celular');
+            }
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, [pathname, router]);
+
+    if (pathname === '/celular') {
+        return null;
+    }
+
     return (
         <div className={[styles.container]}>
             <span className={[styles.subcontainer]}>

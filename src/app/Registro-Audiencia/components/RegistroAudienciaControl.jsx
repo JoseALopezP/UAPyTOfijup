@@ -158,7 +158,8 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 tipo3={tipo3} setTipo3={setTipo3} 
                 partes={partes} setPartes={setPartes}
                 setNeedsSaving1={setNeedsSaving1}
-                minuta={minuta} setMinuta={setMinuta}/>
+                minuta={minuta} setMinuta={setMinuta}
+                cierre={cierre} setCierre={setCierre}/>
             <RegistroAudienciaRight item={aud} dateToUse={dateToUse}
                 setNeedsSaving2={setNeedsSaving2}
                 resuelvo={resuelvo} setResuelvo={setResuelvo}

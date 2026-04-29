@@ -15,7 +15,7 @@ const translateColor = {
     'RESUELVO': '#1F572B'
 };
 
-export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinuta }) {
+export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinuta, cierre, setCierre }) {
     const { updateData, updateDataOnly, pushToAudienciaArray, updateByDate } = useContext(DataContext);
 
     const formatJudges = (j) => {
@@ -160,6 +160,27 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
                     updatedMinuta += text;
                     setMinuta(updatedMinuta);
                     await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
+                } else if (currentState === 'FINALIZADA') {
+                    const currentHora = updateRealTimeFunction();
+                    let updatedCierre = cierre || item.cierre || "";
+                    const closureModel = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`;
+
+                    if (!updatedCierre || updatedCierre.replace(/<[^>]*>/g, '').trim() === "") {
+                        updatedCierre = closureModel.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                    } else {
+                        // Reemplazar el patrón de la hora en el texto existente
+                        if (updatedCierre.includes("siendo las  horas")) {
+                            updatedCierre = updatedCierre.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                        } else {
+                            // Intento de reemplazo por regex si ya tiene una hora o espacios distintos
+                            const regex = /siendo las\s*(\d{2}:\d{2})?\s*horas/;
+                            if (regex.test(updatedCierre)) {
+                                updatedCierre = updatedCierre.replace(regex, `siendo las ${currentHora} horas`);
+                            }
+                        }
+                    }
+                    setCierre(updatedCierre);
+                    await withRetry(() => updateDataOnly(dateToUse, item.id, 'cierre', updatedCierre));
                 }
             }
 

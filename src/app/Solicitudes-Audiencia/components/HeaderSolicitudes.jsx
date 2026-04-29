@@ -6,7 +6,7 @@ import styles from '../SolicitudesAudiencia.module.css'
 const STORAGE_KEY = 'app-theme'
 
 export default function HeaderSolicitudes() {
-    const { solicitudesPendientes, addSolicitudData, addAudiencia, desplegables } = useContext(DataContext);
+    const { solicitudesPendientes, addSolicitudData, addAudiencia, desplegables, archiveOldSolicitudes } = useContext(DataContext);
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
     const [isLight, setIsLight] = useState(false);
@@ -111,6 +111,16 @@ export default function HeaderSolicitudes() {
                     }
                 }
             }
+
+            // Archivar solicitudes viejas (> 1 semana) después de la sincronización
+            setSyncStatus('Archivando solicitudes antiguas...');
+            const archivedCount = await archiveOldSolicitudes(Array.isArray(solicitudesPendientes) ? solicitudesPendientes : []);
+            if (archivedCount > 0) {
+                setSyncStatus(`✓ Sincronizado. ${archivedCount} archivadas.`);
+            } else {
+                setSyncStatus(`✓ Sincronizado correctamente.`);
+            }
+
         } catch (error) {
             console.error("Error de red:", error);
             setSyncStatus(`Error de red: ${error.message}`);
@@ -186,7 +196,15 @@ export default function HeaderSolicitudes() {
                     }
                 }
 
-                setSyncStatus(`✓ Revisión completada.`);
+                // Archivar solicitudes viejas (> 1 semana)
+                setSyncStatus('Archivando solicitudes antiguas...');
+                const archivedCount = await archiveOldSolicitudes(existingDataArr);
+                if (archivedCount > 0) {
+                    setSyncStatus(`✓ Revisión completada. ${archivedCount} archivadas.`);
+                } else {
+                    setSyncStatus(`✓ Revisión completada.`);
+                }
+
             } else {
                  setSyncStatus(`Error: Revisión solo disponible en app de escritorio.`);
             }

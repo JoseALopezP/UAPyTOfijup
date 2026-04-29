@@ -17,7 +17,7 @@ const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj));
 };
 
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta }) {
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre }) {
     const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
@@ -558,7 +558,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 </>
             }
             <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
-            <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered} minuta={minuta} setMinuta={setMinuta}/>
+            <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered} minuta={minuta} setMinuta={setMinuta} cierre={cierre} setCierre={setCierre}/>
         </form>
     );
 }
