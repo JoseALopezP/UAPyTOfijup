@@ -1,6 +1,7 @@
 'use client'
 import { useContext, useEffect, useState } from 'react';
 import { DataContext } from '@/context New/DataContext';
+import { useAuthContext } from '@/context New/AuthContext';
 import { todayFunction } from '@/utils/dateUtils';
 import { generateMinutaSection } from '@/utils/resuelvoUtils';
 import { useRouter } from 'next/navigation';
@@ -8,10 +9,17 @@ import styles from './MobileBoard.module.css';
 
 export default function MobileBoard() {
     const { updateByDateView, bydateView, realTime, getByDate } = useContext(DataContext);
+    const { user } = useAuthContext();
     const [selectedAud, setSelectedAud] = useState(null);
     const [validationError, setValidationError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (user === null) {
+            router.push("/signin");
+        }
+    }, [user, router]);
 
     const [filterValue, setFilterValue] = useState('');
 
