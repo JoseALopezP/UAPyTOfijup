@@ -11,7 +11,9 @@ export default function NavBar() {
     useEffect(() => {
         const checkMobile = () => {
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            if (isMobile && pathname !== '/celular') {
+            const isPublicPage = pathname === '/signin' || pathname === '/signup';
+            
+            if (isMobile && pathname !== '/celular' && !isPublicPage) {
                 router.push('/celular');
             }
         };
