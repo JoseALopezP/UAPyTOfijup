@@ -2,12 +2,13 @@
 import { useContext, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context New/DataContext';
+import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
 
-export default function RegistroChangeState({estado, dateToUse, audId, estadoFunction, item}) {
+export default function RegistroChangeState({estado, dateToUse, audId, estadoFunction, item, refreshAud}) {
     const [changeToMake, setChangeToMake] = useState('')
     const [tiempoPedido, setTiempoPedido] = useState(false)
     const [pidiente, setPidiente] = useState(false)
-    const {updateData, updateRealTime, realTime, pushToAudienciaArray, changeStatusBlockJuicio} = useContext(DataContext)
+    const {updateData, pushToAudienciaArray, changeStatusBlockJuicio, updateByDate} = useContext(DataContext)
     const states = {
         'FINALIZADA': ['REINICIAR', 'RESUELVO'],
         'CUARTO_INTERMEDIO': ['CONTINUAR'],
@@ -28,10 +29,10 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
         'REPROGRAMAR': 'REPROGRAMADA'
     }
     const handleSubmit = async() =>{
-        await updateRealTime()
+        const currentTime = updateRealTimeFunction();
         if(changeToMake==='RESUELVO'){
-            await updateData(dateToUse, audId, 'resuelvo', realTime)
-            await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${translate[changeToMake]}`)
+            await updateData(dateToUse, audId, 'resuelvo', currentTime)
+            await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${translate[changeToMake]}`)
             setChangeToMake('')
         }
         if(changeToMake && changeToMake!=='RESUELVO'){
@@ -45,12 +46,14 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
             }
 
             if(changeToMake == 'CUARTO INTERMEDIO'){
-                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
+                await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
             }else{
-                await pushToAudienciaArray(dateToUse, audId, `${realTime} | ${newEstado}`)
+                await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado}`)
             }
         }
         await estadoFunction(translate[changeToMake])
+        await updateByDate(dateToUse)
+        if (refreshAud) await refreshAud()
     }
     return (
         <div className={`${styles.controlChangeStateButtonBlock}`} >

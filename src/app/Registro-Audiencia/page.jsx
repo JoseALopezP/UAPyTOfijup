@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import RegistroAudienciaList from './components/RegistroAudienciaList';
 import { todayFunction } from '@/utils/dateUtils';
 import styles from './RegistroAudiencia.module.css'
@@ -33,6 +33,20 @@ export default function Page() {
         }
     }, []);
 
+    const refreshAud = useCallback(async () => {
+        if (selectedAud && selectedAud.id && date) {
+            try {
+                const audDocRef = doc(db, 'audiencias', date, 'audiencias', selectedAud.id);
+                const audSnap = await getDoc(audDocRef);
+                if (audSnap.exists()) {
+                    setFullSelectedAud({ ...selectedAud, ...audSnap.data() });
+                }
+            } catch (error) {
+                console.error("Error refreshing audiencia:", error);
+            }
+        }
+    }, [selectedAud, date]);
+
     useEffect(() => {
         const fetchFullAudience = async () => {
             if (selectedAud && selectedAud.id && date) {
@@ -61,7 +75,7 @@ export default function Page() {
         <AuthContextProvider><DataContextProvider>
         <div className={[styles.container]}>
             {date && <RegistroAudienciaList key={`list-${date}`} needsSaving1={needsSaving1} needsSaving2={needsSaving2} dateFunction={handleSave} date={date} audFunction={setSelectedAud} selectedAud={selectedAud && (selectedAud.id || selectedAud.numeroLeg+selectedAud.hora)} setIsHovered={setIsHovered} isHovered={isHovered}/>}
-            {fullSelectedAud && <RegistroAudienciaControl key={`control-${fullSelectedAud.id || fullSelectedAud.numeroLeg+fullSelectedAud.hora}`} aud={fullSelectedAud} dateToUse={date} isHovered={isHovered} setNeedsSaving1={setNeedsSaving1} setNeedsSaving2={setNeedsSaving2} needsSaving1={needsSaving1} needsSaving2={needsSaving2}/>}
+            {fullSelectedAud && <RegistroAudienciaControl key={`control-${fullSelectedAud.id || fullSelectedAud.numeroLeg+fullSelectedAud.hora}`} aud={fullSelectedAud} dateToUse={date} isHovered={isHovered} setNeedsSaving1={setNeedsSaving1} setNeedsSaving2={setNeedsSaving2} needsSaving1={needsSaving1} needsSaving2={needsSaving2} refreshAud={refreshAud}/>}
         </div>
         </DataContextProvider></AuthContextProvider>
     );

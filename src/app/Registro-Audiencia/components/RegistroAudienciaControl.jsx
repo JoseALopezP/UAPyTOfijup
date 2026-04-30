@@ -1,15 +1,14 @@
-import { useContext, useEffect, useState, useCallback } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
 import { DataContext } from '@/context New/DataContext';
 import RegistroAudienciaLeft from './RegistroAudienciaLeft';
 import RegistroAudienciaRight from './RegistroAudienciaRight';
 import deepEqual from '@/utils/deepEqual';
-import normalizeHtml from '@/utils/normalizeHtml';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 
-export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, setNeedsSaving1, setNeedsSaving2, needsSaving1, needsSaving2}) {
+export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, setNeedsSaving1, setNeedsSaving2, needsSaving1, needsSaving2, refreshAud}) {
     const {updateDesplegables, updateDataOnly, updateDataDeep, updateByDate, updateData} = useContext(DataContext)
     const [isSaving, setIsSaving] = useState(false);
     const [resuelvo, setResuelvo] = useState('');
@@ -51,34 +50,9 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         }
     }, [aud]);
 
-    const hasChanges = useCallback(() => {
-        if (!aud) return false;
-        return (
-            !deepEqual(normalizeHtml(minuta), normalizeHtml(aud.minuta || '')) ||
-            !deepEqual(normalizeHtml(resuelvo), normalizeHtml(aud.resuelvoText || '')) ||
-            !deepEqual(normalizeHtml(cierre), normalizeHtml(aud.cierre || '')) ||
-            (caratula !== (aud.caratula || '')) ||
-            (saeNum !== (aud.saeNum || '')) ||
-            (razonDemora !== (aud.razonDemora || '')) ||
-            (ufi !== (aud.ufi || '')) ||
-            (estado !== (aud.estado || '')) ||
-            !deepEqual(mpf, aud.mpf || []) ||
-            !deepEqual(defensa, aud.defensa || []) ||
-            !deepEqual(imputado, aud.imputado || []) ||
-            !deepEqual(partes, aud.partes || []) ||
-            (tipo !== (aud.tipo || '')) ||
-            (tipo2 !== (aud.tipo2 || '')) ||
-            (tipo3 !== (aud.tipo3 || '')) ||
-            (operadorAud !== (aud.operador || '')) ||
-            (sala !== (aud.sala || ''))
-        );
-    }, [aud, minuta, resuelvo, cierre, caratula, saeNum, razonDemora, ufi, estado, mpf, defensa, imputado, partes, tipo, tipo2, tipo3, operadorAud, sala]);
-
-    useEffect(() => {
-        const changed = hasChanges();
-        setNeedsSaving1(changed);
-        setNeedsSaving2(changed);
-    }, [hasChanges, setNeedsSaving1, setNeedsSaving2]);
+    // needsSaving1 es manejado por RegistroAudienciaLeft
+    // needsSaving2 es manejado por RegistroAudienciaRight
+    // El estado de sala/operador se guarda inmediatamente, no necesita tracking
 
     const handleGlobalSave = async () => {
         if (!aud || isSaving) return;
@@ -125,6 +99,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 }
 
                 await updateByDate(dateToUse);
+                if (refreshAud) await refreshAud();
                 success = true; // Succeeded!
             } catch (error) {
                 console.error(`Error saving all data. Retries left: ${retries - 1}`, error);
@@ -159,7 +134,8 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 partes={partes} setPartes={setPartes}
                 setNeedsSaving1={setNeedsSaving1}
                 minuta={minuta} setMinuta={setMinuta}
-                cierre={cierre} setCierre={setCierre}/>
+                cierre={cierre} setCierre={setCierre}
+                refreshAud={refreshAud}/>
             <RegistroAudienciaRight item={aud} dateToUse={dateToUse}
                 setNeedsSaving2={setNeedsSaving2}
                 resuelvo={resuelvo} setResuelvo={setResuelvo}

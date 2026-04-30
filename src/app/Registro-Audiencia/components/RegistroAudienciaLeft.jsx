@@ -11,14 +11,15 @@ import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
 import { nameTranslate } from '@/utils/traductorNombres';
 import { RepresentationSelector } from './RepresentationSelector';
+import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
 
 const deepCopy = (obj) => {
     if (obj === null || typeof obj !== 'object') return obj;
     return JSON.parse(JSON.stringify(obj));
 };
 
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre }) {
-    const {updateDesplegables, desplegables, updateRealTime, realTime, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados} = useContext(DataContext)
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, refreshAud }) {
+    const {updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados} = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -176,8 +177,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     }
                 }
                 if (await checkForResuelvo(item)) {
-                    await updateRealTime();
-                    await updateData(dateToUse, item.id, 'horaResuelvo', realTime);
+                    const currentTime = updateRealTimeFunction();
+                    await updateData(dateToUse, item.id, 'horaResuelvo', currentTime);
                 }
                 
                 await updateByDate(dateToUse);
@@ -197,6 +198,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 }
                 setGuardarInc(false);
                 setNeedsSaving1(false);
+                if (refreshAud) await refreshAud();
                 success = true; // Succeeded!
             } catch (error) {
                 console.error(`Error en updateDataAud. Retries left: ${retries - 1}`, error);
@@ -261,7 +263,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     if (isInitialized) {
         checkGuardar();
     }
-    }, [caratula, mpf, defensa, imputado, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3, isInitialized]);
+    }, [caratula, saeNum, mpf, defensa, imputado, partes, razonDemora, ufi, checkGuardar, tipo, tipo2, tipo3, isInitialized]);
     useEffect(() => {
         updateComparisson();
         setShowReconversion(false)
@@ -297,7 +299,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     </button>
                 )}
             </div>
-            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)} item={item}/>
+            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)} item={item} refreshAud={refreshAud}/>
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
                 <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)}/>
                 <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>
@@ -511,7 +513,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <button className={`${styles.inputLeft} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF/></button>
                         </div>
                     ))}
-                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: '', asistencia: true, presencial: true }, 'd')}>+ DEFENSA</button>
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: '', nombre: '', imputado: [], asistencia: true, presencial: true }, 'd')}>+ DEFENSA</button>
                 </span>
             )}
             <div className={styles.sectionHeader} onClick={() => toggleSection('partes')}>
