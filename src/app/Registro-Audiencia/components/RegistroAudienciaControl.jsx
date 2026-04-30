@@ -28,6 +28,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     const [tipo2, setTipo2] = useState('');
     const [tipo3, setTipo3] = useState('');
     const [partes, setPartes] = useState([]);
+    const [defensoria, setDefensoria] = useState('');
     useEffect(() => {
         if (aud) {
             setResuelvo(aud.resuelvoText || '');
@@ -44,6 +45,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
             setDefensa(aud.defensa ? JSON.parse(JSON.stringify(aud.defensa)) : []);
             setImputado(aud.imputado ? JSON.parse(JSON.stringify(aud.imputado)) : []);
             setPartes(aud.partes ? JSON.parse(JSON.stringify(aud.partes)) : []);
+            setDefensoria(aud.defensoria || '');
             setTipo(aud.tipo || '');
             setTipo2(aud.tipo2 || '');
             setTipo3(aud.tipo3 || '');
@@ -80,6 +82,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 if (razonDemora !== (aud.razonDemora || '')) await updateData(dateToUse, aud.id, 'razonDemora', razonDemora);
                 if (ufi !== (aud.ufi || '')) await updateData(dateToUse, aud.id, 'ufi', ufi);
                 if (estado !== (aud.estado || '')) await updateData(dateToUse, aud.id, 'estado', estado);
+                if (defensoria !== (aud.defensoria || '')) await updateData(dateToUse, aud.id, 'defensoria', defensoria);
                 if (operadorAud !== (aud.operador || '')) await updateData(dateToUse, aud.id, 'operador', operadorAud);
                 if (sala !== (aud.sala || '')) await updateData(dateToUse, aud.id, 'sala', sala);
                 
@@ -127,6 +130,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 ufi={ufi} setUfi={setUfi} 
                 estado={estado} setEstado={setEstado} 
                 defensa={defensa} setDefensa={setDefensa} 
+                defensoria={defensoria} setDefensoria={setDefensoria}
                 imputado={imputado} setImputado={setImputado} 
                 tipo={tipo} setTipo={setTipo} 
                 tipo2={tipo2} setTipo2={setTipo2} 
@@ -141,7 +145,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 resuelvo={resuelvo} setResuelvo={setResuelvo}
                 minuta={minuta} setMinuta={setMinuta}
                 cierre={cierre} setCierre={setCierre}
-                sala={sala} saeNum={saeNum} caratula={caratula} razonDemora={razonDemora} mpf={mpf} ufi={ufi} estado={estado} defensa={defensa} imputado={imputado} tipo={tipo} tipo2={tipo2} tipo3={tipo3} partes={partes}
+                sala={sala} saeNum={saeNum} caratula={caratula} razonDemora={razonDemora} mpf={mpf} ufi={ufi} defensoria={defensoria} estado={estado} defensa={defensa} imputado={imputado} tipo={tipo} tipo2={tipo2} tipo3={tipo3} partes={partes}
                 needsSaving={needsSaving1 || needsSaving2} onGlobalSave={handleGlobalSave} isSaving={isSaving}
             /></>}
         </div>

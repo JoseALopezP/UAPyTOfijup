@@ -21,7 +21,7 @@ function extractNames(obj) {
     return Object.keys(obj);
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
-export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, estado, defensa, imputado, tipo, tipo2, tipo3, partes, needsSaving, onGlobalSave, isSaving }) {
+export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, defensoria, estado, defensa, imputado, tipo, tipo2, tipo3, partes, needsSaving, onGlobalSave, isSaving }) {
     const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
@@ -106,7 +106,12 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     const handleDescargar = () =>{
         const aux = {
                 resuelvoText: resuelvo, minuta: minuta, cierre: cierre, sala: sala, saeNum: saeNum, caratula: caratula, razonDemora: razonDemora,
-                mpf: mpf, ufi: ufi, estado: estado, defensa: defensa, imputado: imputado, tipo: tipo, tipo2: tipo2, tipo3: tipo3, partes: partes,
+                mpf: mpf.map(f => f.subrogando ? { ...f, nombre: `${f.nombre} (subrogando a ${ufi})` } : f), 
+                ufi: ufi, 
+                defensoria: defensoria,
+                estado: estado, 
+                defensa: defensa.map(d => d.subrogando ? { ...d, nombre: `${d.nombre} (subrogando a ${defensoria})` } : d), 
+                imputado: imputado, tipo: tipo, tipo2: tipo2, tipo3: tipo3, partes: partes,
                 numeroLeg: item.numeroLeg, operador: item.operador, hora: item.hora, hitos: item.hitos, juez: item.juez
             };
         const aux2 = checkCompletion(aux)
