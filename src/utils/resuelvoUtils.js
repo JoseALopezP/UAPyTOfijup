@@ -1,5 +1,5 @@
 import { PDFGenerator } from "./pdfUtils";
-import { capitalizeFirst } from "./caratulaUtils";
+import { capitalizeFirst, normalizeName } from "./caratulaUtils";
 import { getMonthName } from "./caratulaUtils";
 import { removeHtmlTags } from "./removeHtmlTags";
 import { minutaPrep } from "./minutaPrep";
@@ -13,12 +13,8 @@ export function formatAbogadoName(rawName) {
     const { title, cleanName } = inferGender(noDash);
     
     const safeCleanName = cleanName || noDash || '';
+    const titleCased = normalizeName(safeCleanName);
     
-    const titleCased = safeCleanName
-        .toLowerCase()
-        .split(' ')
-        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1) : '')
-        .join(' ');
     return `${title} ${titleCased.trim()}`;
 }
 
@@ -38,7 +34,7 @@ export function listDefensa(arr) {
         const imputados = (el.imputado && el.imputado.length > 0)
             ? el.imputado
                 .map((p, idx) => {
-                    const pName = p.nombre || p.name || '';
+                    const pName = normalizeName(p.nombre || p.name || '');
                     if (idx === 0) return pName?.split(',').join('') || '';
                     if (idx === el.imputado.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                     return `, ${pName?.split(',').join('') || ''}`;
@@ -47,9 +43,10 @@ export function listDefensa(arr) {
             : '';
 
         const formattedName = formatAbogadoName(el.nombre);
-        const defensoriaStr = (el.tipo === 'Oficial' && el.defensoria) ? ` - Defensoría Oficial N°${el.defensoria}` : '';
+        const prefix = (el.tipo === 'Oficial' && el.defensoria) ? `Defensa Oficial N°${el.defensoria}` : `Defensa ${el.tipo}`;
+        const subrogandoText = (el.tipo === 'Oficial' && el.subrogando && el.defensoria) ? ` (subrogando a la Defensoría Oficial N°${el.defensoria})` : '';
 
-        aux += `Defensa ${el.tipo}: ${formattedName}${defensoriaStr} ${imputados ? `(En representación de ${imputados})` : ''
+        aux += `${prefix}: ${formattedName}${subrogandoText} ${imputados ? `(En representación de ${imputados})` : ''
             } ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'
             }${arr.length !== i + 1 ? '\n' : ''}`;
     });
@@ -62,15 +59,16 @@ export function listRepresentantes(arr, rolText) {
         const representados = (el.representa && el.representa.length > 0)
             ? el.representa
                 .map((p, idx) => {
-                    if (idx === 0) return p.nombre?.split(',').join('') || '';
-                    if (idx === el.representa.length - 1) return ` y ${p.nombre?.split(',').join('') || ''}`;
-                    return `, ${p.nombre?.split(',').join('') || ''}`;
+                    const pName = normalizeName(p.nombre || p.name || '');
+                    if (idx === 0) return pName?.split(',').join('') || '';
+                    if (idx === el.representa.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
+                    return `, ${pName?.split(',').join('') || ''}`;
                 })
                 .join('')
             : '';
             
-        const rol = rolText || el.role || el.tipo || 'Parte'; 
-        const name = el.name || el.nombre || '';
+        const rol = normalizeName(rolText || el.role || el.tipo || 'Parte'); 
+        const name = normalizeName(el.name || el.nombre || '');
         
         aux += `${rol}: ${name} ${representados ? `(En representación de ${representados})` : ''
             } ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'
@@ -82,7 +80,9 @@ export function listRepresentantes(arr, rolText) {
 export function listImputado(arr) {
     let aux = '';
     arr && arr.forEach((el, i) => {
-        aux += `${el.condenado ? 'Condenado' : 'Imputado'}: ${el.nombre}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}`;
+        const label = el.condenado ? 'Condenado' : 'Imputado';
+        const name = normalizeName(el.nombre);
+        aux += `${label}: ${name}  D.N.I. N.°: ${el.dni} ${el.asistencia ? '' : '(ausente)'} ${el.presencial ? '' : '(virtual)'}`;
         if (el.detenido && el.detenido !== '') {
             aux += `\nFecha de detención: ${el.detenido}`;
         }
@@ -94,7 +94,7 @@ export function listImputado(arr) {
 export function listPartes(arr) {
     let groupedRoles = {};
     arr?.forEach(el => {
-        const roleName = el.role || 'Parte';
+        const roleName = normalizeName(el.role || 'Parte');
         if (!groupedRoles[roleName]) {
             groupedRoles[roleName] = [];
         }
@@ -102,7 +102,7 @@ export function listPartes(arr) {
         const representados = (el.representa && el.representa.length > 0)
             ? el.representa
                 .map((p, idx) => {
-                    const pName = p.nombre || p.name || '';
+                    const pName = normalizeName(p.nombre || p.name || '');
                     if (idx === 0) return pName?.split(',').join('') || '';
                     if (idx === el.representa.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                     return `, ${pName?.split(',').join('') || ''}`;
@@ -110,7 +110,7 @@ export function listPartes(arr) {
                 .join('')
             : '';
 
-        let personInfo = el.name ? el.name : (el.nombre ? el.nombre : '');
+        let personInfo = normalizeName(el.name ? el.name : (el.nombre ? el.nombre : ''));
         
         if (representados) {
             personInfo += ` (En representación de ${representados})`;
@@ -204,7 +204,7 @@ export function generateResuelvoSection(item, date) {
             }
         });
     }
-    sections.push({ title: 'Operador:', text: item.operador });
+    sections.push({ title: 'Operador:', text: normalizeName(item.operador) });
     sections.push({ title: '' });
     return sections;
 }
@@ -244,7 +244,7 @@ export async function generateOficioSection(item, date, traslado = '', oficiados
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
-    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${formatAbogadoName(el.nombre)}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${formatAbogadoName(el.nombre)}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${el.nombre} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${item.operador}. ${traslado !== '' ? `
+    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${formatAbogadoName(el.nombre)}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${formatAbogadoName(el.nombre)}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${normalizeName(el.nombre)} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${normalizeName(item.operador)}. ${traslado !== '' ? `
         `+ traslado : ''}
     Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);

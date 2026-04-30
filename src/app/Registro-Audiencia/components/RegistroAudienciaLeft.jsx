@@ -478,6 +478,14 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                         placeholder="Def. N°"
                                         title="Número de Defensoría"
                                     />
+                                    <label className={`${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`}>
+                                        <input 
+                                            type="checkbox" 
+                                            checked={input.subrogando || false} 
+                                            onChange={(e) => handleInputChange(setDefensa, index, 'subrogando', e.target.checked)}
+                                        />
+                                        Subrogando
+                                    </label>
                                     </>
                                 ) : (
                                     <><input list={`particular-${index}`}

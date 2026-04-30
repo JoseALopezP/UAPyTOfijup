@@ -467,6 +467,41 @@
     vertical-align: bottom;
 }
 
+.subrogandoLabel {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 4px;
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 6px;
+    user-select: none;
+}
+
+.subrogandoLabel:hover {
+    background: var(--btn-hover);
+    color: var(--text2);
+}
+
+.subrogandoActive {
+    background: var(--accent) !important;
+    color: #fff !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 10px rgba(0, 120, 212, 0.3);
+}
+
+.subrogandoLabel input {
+    display: none;
+}
+
 .inputLeftSelected,
 .inputLeftDeSelected {
     cursor: pointer;

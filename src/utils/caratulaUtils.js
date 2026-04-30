@@ -6,7 +6,14 @@ import React from "react";
 
 export function capitalizeFirst(sentence) {
     if (!sentence) return sentence;
-    return sentence.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return sentence.split(' ').map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '').join(' ');
+}
+export function normalizeName(name) {
+    if (!name) return '';
+    return name
+        .split(' ')
+        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
+        .join(' ');
 }
 export function getMonthName(number) {
     const date = new Date(0, number - 1);

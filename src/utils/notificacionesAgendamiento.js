@@ -1,6 +1,7 @@
+import { normalizeName } from './caratulaUtils';
 const formatName = (str) => {
     if (!str) return '';
-    return str.trim();
+    return normalizeName(str.trim());
 };
 
 const formatLongDate = () => {
@@ -72,7 +73,8 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
                 const hInicio = p.hora || horaAudiencia;
                 const hFin = p.horaFin || horaFinAudiencia;
                 const horaStr = hFin ? `${hInicio} a ${hFin}` : hInicio;
-                return `- ${p.nombre.toUpperCase()}${p.dni ? ` (DNI ${p.dni})` : ''}${p.telefono ? ` - Cel: ${p.telefono}` : ''}, para que se presente el dia ${p.fecha || fechaAudiencia} a las ${horaStr}hs,`;
+                const name = normalizeName(p.nombre).toUpperCase();
+                return `- ${name}${p.dni ? ` (DNI ${p.dni})` : ''}${p.telefono ? ` - Cel: ${p.telefono}` : ''}, para que se presente el dia ${p.fecha || fechaAudiencia} a las ${horaStr}hs,`;
             }).join('\n')
             : `- ${formattedName.toUpperCase()}${destinatarioTelefono ? ` - Cel: ${destinatarioTelefono}` : ''}, para que se presente el dia ${fechaAudiencia} a las ${horaFinAudiencia ? `${horaAudiencia} a ${horaFinAudiencia}` : horaAudiencia}hs,`;
         sections.push({ text: listaPersonas, size: 10, bold: true, spacing: 2 });
@@ -128,7 +130,7 @@ export async function descargarPdfNotificacion(opcion, datos, returnBuffer = fal
     // 4. Juez común y cierre de cuerpo (no en rechazo ni cancelación)
     if (!isPolice && !isRechazo && opcion !== 'cancelarAudienciaImputadoEnLibertad') {
         const { labelJuez } = inferGender(juez);
-        const juezText = `Se informa que la presente audiencia se asignó al ${labelJuez} ${juez}.`;
+        const juezText = `Se informa que la presente audiencia se asignó al ${labelJuez} ${normalizeName(juez)}.`;
         sections.push({ text: juezText, size: 10, bold: true, spacing: 3, align: 'justify' });
     }
 
