@@ -525,6 +525,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                     />
                                     SUB
                                 </label>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
                             </div>
                             {(imputado && imputado.length > 1) && (
                                 <div className={styles.inputRowFlexible}>
