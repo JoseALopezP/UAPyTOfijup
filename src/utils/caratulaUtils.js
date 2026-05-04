@@ -4,16 +4,13 @@ import { listImputado } from "./resuelvoUtils";
 import { listPartes } from "./resuelvoUtils";
 import React from "react";
 
-export function capitalizeFirst(sentence) {
-    if (!sentence) return sentence;
-    return sentence.split(' ').map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '').join(' ');
-}
 export function normalizeName(name) {
     if (!name) return '';
-    return name
-        .split(' ')
-        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
-        .join(' ');
+    return name.toLowerCase().replace(/(^|[ \t\n,])([a-z\u00C0-\u017F])/g, (match, p1, p2) => p1 + p2.toUpperCase());
+}
+
+export function capitalizeFirst(sentence) {
+    return normalizeName(sentence);
 }
 export function getMonthName(number) {
     const date = new Date(0, number - 1);
@@ -36,7 +33,7 @@ export const caratulaGenerator = (item, date) =>{
         Sala de Audiencias: {item.sala}.<br/>
         Hora programada: {item.hora} horas.<br/>
         Hora real de inicio: {item.hitos && item.hitos[0].split(' | ')[0]} horas.<br/>
-        Juez Interviniente: {item.juez}<br/>
+        Juez Interviniente: {normalizeName(item.juez)}<br/>
         {safeRender(listFiscal(item.mpf, item.ufi))}<br/>
         {safeRender(listDefensa(item.defensa))}<br/>
         {safeRender(listImputado(item.imputado))}<br/>

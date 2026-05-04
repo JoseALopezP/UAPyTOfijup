@@ -145,7 +145,7 @@ ${item.mpf && listFiscal(item.mpf, item.ufi)}
 ${listDefensa(item.defensa, item.defensoria)}
 ${listImputado(item.imputado)}
 ${Object.entries(listPartes(item.partes)).map(([role, people]) => `${role}: ${people.join(', ')}`).join('\n')}
-Operador: ${item.operador}
+Operador: ${normalizeName(item.operador)}
 
 Fundamentos y Resolución: ${removeHtmlTags(item.resuelvoText)}
     `;
