@@ -186,6 +186,22 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             setErrorMessage(`${error.message}`);
         }
     }
+    const saveAudienciaDebate = async (aud) => {
+        try {
+            const legajoDoc = await getDocument('legajos', aud.numeroLeg);
+            let audiencias = legajoDoc?.audiencias || [];
+            const index = audiencias.findIndex(a => a.id === aud.id);
+            if (index !== -1) {
+                audiencias[index] = aud;
+            } else {
+                audiencias.push(aud);
+            }
+            await addOrUpdateObject("legajos", aud.numeroLeg, "audiencias", audiencias);
+        } catch (error) {
+            console.error("Failed to save audiencia debate:", error.message);
+            setErrorMessage(`${error.message}`);
+        }
+    }
     const addSorteo = async (data, date) => {
         try {
             await addOrUpdateObject("sorteos", date, data.title, data);
@@ -683,7 +699,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
 
 
     const context = {
-        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
+        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, saveAudienciaDebate, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada, archiveOldSolicitudes,

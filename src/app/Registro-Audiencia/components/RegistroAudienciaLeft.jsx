@@ -78,6 +78,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     };
 
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
+        let updateDefensoriaStr = undefined;
         setter(prev => {
             const updated = [...prev];
             const current = updated[index] || {};
@@ -94,17 +95,22 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             } else {
                 updated[index] = { ...current, [key]: valueObj };
 
-                // Auto-poblar defensoria y matricula si se selecciona un nombre y es Oficial
-                if (key === 'nombre' && setter === setDefensa && current.tipo === 'Oficial') {
+                // Auto-poblar defensoria si se selecciona un nombre y es Oficial
+                if (key === 'nombre' && setter === setDefensa && (!current.tipo || current.tipo === 'Oficial')) {
                     const abog = abogados.find(a => a.n === valueObj);
-                    if (abog) {
-                        if (abog.l && (!current.defensoria || current.defensoria === '')) updated[index].defensoria = abog.l;
-                        if (abog.m && (!current.matricula || current.matricula === '')) updated[index].matricula = abog.m;
+                    if (abog && abog.l && abog.l.toLowerCase().includes('defensor')) {
+                        updateDefensoriaStr = abog.l;
+                    } else {
+                        updateDefensoriaStr = '';
                     }
                 }
             }
             return updated
-        })
+        });
+
+        if (updateDefensoriaStr !== undefined) {
+            setDefensoria(updateDefensoriaStr);
+        }
     };
 
     const addNewInput = (setter, template, prefix) => {
@@ -517,14 +523,16 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 </div>
                                 <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
                                 <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.presencial ? 'PRESENCIALMENTE' : 'VIRTUALMENTE'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>{input.presencial ? 'FIS' : 'VIR'}</button>
-                                <label className={`${styles.btnControl} ${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`} title="SUBROGANDO">
-                                    <input
-                                        type="checkbox"
-                                        checked={input.subrogando || false}
-                                        onChange={(e) => handleInputChange(setDefensa, index, 'subrogando', e.target.checked)}
-                                    />
-                                    SUB
-                                </label>
+                                {(!input.tipo || input.tipo === 'Oficial') && (
+                                    <label className={`${styles.btnControl} ${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`} title="SUBROGANDO">
+                                        <input
+                                            type="checkbox"
+                                            checked={input.subrogando || false}
+                                            onChange={(e) => handleInputChange(setDefensa, index, 'subrogando', e.target.checked)}
+                                        />
+                                        SUB
+                                    </label>
+                                )}
                                 <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
                             </div>
                             {(imputado && imputado.length > 1) && (
@@ -541,15 +549,17 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </div>
                     ))}
                     <button className={`${styles.btnControl} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: 'Oficial', nombre: '', imputado: [], asistencia: true, presencial: true, subrogando: false }, 'd')}>+ DEFENSA</button>
-                    <div className={styles.inputRow} style={{ marginTop: '10px' }}>
-                        <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>DEFENSORÍA:</label>
-                        <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                            value={defensoria || ''}
-                            onChange={(e) => setDefensoria(e.target.value)}
-                            placeholder="Defensoría"
-                            title="Número de Defensoría"
-                        />
-                    </div>
+                    {defensa.some(d => !d.tipo || d.tipo === 'Oficial') && (
+                        <div className={styles.inputRow} style={{ marginTop: '10px' }}>
+                            <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>DEFENSORÍA:</label>
+                            <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                                value={defensoria || ''}
+                                onChange={(e) => setDefensoria(e.target.value)}
+                                placeholder="Defensoría"
+                                title="Número de Defensoría"
+                            />
+                        </div>
+                    )}
                 </span>
             )}
             <div className={styles.sectionHeader} onClick={() => toggleSection('partes')}>

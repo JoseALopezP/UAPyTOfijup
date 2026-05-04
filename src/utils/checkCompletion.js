@@ -33,12 +33,16 @@ export const checkCompletion = (aud) => {
   if (!aud.minuta) {
     missingFields.push('completar minuta');
   }
-  if (!aud.cierre) {
-    missingFields.push('completar cierre');
+  
+  if (aud.tipo !== "DEBATE DEL JUICIO ORAL") {
+    if (!aud.cierre) {
+      missingFields.push('completar cierre');
+    }
+    if (!aud.resuelvoText) {
+      missingFields.push('completar resuelvo');
+    }
   }
-  if (!aud.resuelvoText) {
-    missingFields.push('completar resuelvo');
-  }
+
   if (missingFields.length === 0) {
     return 'completo';
   } else {

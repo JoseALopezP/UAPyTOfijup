@@ -24,7 +24,7 @@ export default function AudList({list, setSelected, selectedList}) {
             </span>
         ) : (
             list.map(el => (
-                <span className={selectedList.indexOf(el) ? `${styles.audListIndiv} ${styles.audListIndivSelected}` : `${styles.audListIndiv}`} onClick={() => processSelected(el)}>
+                <span className={selectedList.includes(el) ? `${styles.audListIndiv} ${styles.audListIndivSelected}` : `${styles.audListIndiv}`} onClick={() => processSelected(el)}>
                     <p>{el.hora} - {el.fecha.split('').slice(0,2)}/{el.fecha.split('').slice(2,4)}/{el.fecha.split('').slice(4,8)}</p>
                     <p>{el.tipo}</p>
                 </span>

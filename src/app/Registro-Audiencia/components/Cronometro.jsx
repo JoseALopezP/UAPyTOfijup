@@ -16,7 +16,7 @@ const translateColor = {
 };
 
 export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinuta, cierre, setCierre }) {
-    const { updateData, updateDataOnly, pushToAudienciaArray, updateByDate } = useContext(DataContext);
+    const { updateData, updateDataOnly, pushToAudienciaArray, updateByDate, saveAudienciaDebate } = useContext(DataContext);
 
     const formatJudges = (j) => {
         if (!j) return "";
@@ -126,6 +126,9 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
             if (currentState === 'RESUELVO') {
                 await withRetry(() => updateData(dateToUse, item.id, 'resuelvo', updateRealTimeFunction()));
                 await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', `${updateRealTimeFunction()} | ${currentState}`));
+                if (item.tipo === "DEBATE DEL JUICIO ORAL") {
+                    await withRetry(() => saveAudienciaDebate(item));
+                }
             } else {
                 if (currentState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
                 if (estadoActual === 'EN_CURSO' && currentState !== 'EN_CURSO' && stopwatchRunning) await stopwatch();
@@ -162,25 +165,35 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
                     await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
                 } else if (currentState === 'FINALIZADA') {
                     const currentHora = updateRealTimeFunction();
-                    let updatedCierre = cierre || item.cierre || "";
-                    const closureModel = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`;
-
-                    if (!updatedCierre || updatedCierre.replace(/<[^>]*>/g, '').trim() === "") {
-                        updatedCierre = closureModel.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                    if (item.tipo === "DEBATE DEL JUICIO ORAL") {
+                        const text = `<br><b>Sr. Juez dispone CUARTO INTERMEDIO para el día DD/MM/AAAA a las HH:MM horas</b>`;
+                        updatedMinuta += text;
+                        setMinuta(updatedMinuta);
+                        await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
+                        
+                        setCierre("");
+                        await withRetry(() => updateDataOnly(dateToUse, item.id, 'cierre', ""));
                     } else {
-                        // Reemplazar el patrón de la hora en el texto existente
-                        if (updatedCierre.includes("siendo las  horas")) {
-                            updatedCierre = updatedCierre.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                        let updatedCierre = cierre || item.cierre || "";
+                        const closureModel = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`;
+
+                        if (!updatedCierre || updatedCierre.replace(/<[^>]*>/g, '').trim() === "") {
+                            updatedCierre = closureModel.replace("siendo las  horas", `siendo las ${currentHora} horas`);
                         } else {
-                            // Intento de reemplazo por regex si ya tiene una hora o espacios distintos
-                            const regex = /siendo las\s*(\d{2}:\d{2})?\s*horas/;
-                            if (regex.test(updatedCierre)) {
-                                updatedCierre = updatedCierre.replace(regex, `siendo las ${currentHora} horas`);
+                            // Reemplazar el patrón de la hora en el texto existente
+                            if (updatedCierre.includes("siendo las  horas")) {
+                                updatedCierre = updatedCierre.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                            } else {
+                                // Intento de reemplazo por regex si ya tiene una hora o espacios distintos
+                                const regex = /siendo las\s*(\d{2}:\d{2})?\s*horas/;
+                                if (regex.test(updatedCierre)) {
+                                    updatedCierre = updatedCierre.replace(regex, `siendo las ${currentHora} horas`);
+                                }
                             }
                         }
+                        setCierre(updatedCierre);
+                        await withRetry(() => updateDataOnly(dateToUse, item.id, 'cierre', updatedCierre));
                     }
-                    setCierre(updatedCierre);
-                    await withRetry(() => updateDataOnly(dateToUse, item.id, 'cierre', updatedCierre));
                 }
             }
 

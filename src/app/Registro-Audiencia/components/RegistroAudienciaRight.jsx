@@ -185,7 +185,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
                 reloadTrigger={reloadHistorial}
                 />
 
-                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
+                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo || item.tipo === "DEBATE DEL JUICIO ORAL" ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
             <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab} needsSaving={needsSaving} onSave={onGlobalSave} isSaving={isSaving}/>
             {selectedTab === 'Cuerpo minuta' &&
