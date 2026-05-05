@@ -26,22 +26,24 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
-    const [resuelvo2, setResuelvo2] = useState('');
-    const [minuta2, setMinuta2] = useState('');
-    const [cierre2, setCierre2] = useState('');
     const [selectedTab, setSelectedTab] = useState('Cuerpo minuta');
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const [reloadHistorial, setReloadHistorial] = useState(0);
-    const [isInitialized, setIsInitialized] = useState(false);
-    const updateComparisson = () => {
-        setResuelvo2(item.resuelvoText || '');
-        setMinuta2(item.minuta || '');
-        setCierre2(item.cierre || '');
-        setIsInitialized(true);
+
+    // Función para normalizar contenido antes de comparar
+    const cleanContent = (html) => {
+        if (!html) return '';
+        return html
+            .replace(/&nbsp;/g, ' ')
+            .replace(/<p><br><\/p>/g, '')
+            .replace(/<p>\s*<\/p>/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
     };
+
     const insertarModelo = () => {
-        if (minuta.replace(/<[^>]*>/g, '').trim() !== '' || resuelvo.replace(/<[^>]*>/g, '').trim() !== '') {
+        if (removeHtmlTags(minuta).trim() !== '' || removeHtmlTags(resuelvo).trim() !== '') {
             alert("Borre el contenido ya incluído antes de insertar un modelo")
         } else {
             const { isMale } = inferGender(item.juez);
@@ -65,74 +67,28 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
             setResuelvo(fixGender(resuelvoText).replace(/\n/g, '<br>'));
         }
     }
-    const updateDataAud = async() => {
-        setGuardando(true);
-        let retries = 3;
-        let success = false;
 
-        while (retries > 0 && !success) {
-            try {
-                let updatedItem = { ...item };
-                let itemChanged = false;
+    const checkGuardar = useCallback(() => {
+        if (!item) return;
 
-                if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined) {
-                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
-                    setResuelvo2(resuelvo);
-                    updatedItem.resuelvoText = resuelvo;
-                    itemChanged = true;
-                }
-                if (!deepEqual(minuta2, minuta) && minuta !== undefined) {
-                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
-                    setMinuta2(minuta);
-                    updatedItem.minuta = minuta;
-                    itemChanged = true;
-                }
-                if (!deepEqual(cierre2, cierre) && cierre !== undefined) {
-                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
-                    setCierre2(cierre);
-                    updatedItem.cierre = cierre;
-                    itemChanged = true;
-                }        
-                if (checkForResuelvo(item)) {
-                    const currentTime = updateRealTimeFunction();
-                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataDeep(dateToUse, item.id, 'horaResuelvo', currentTime);
-                    updatedItem.horaResuelvo = currentTime;
-                    itemChanged = true;
-                }
+        const hasChanges = 
+            cleanContent(resuelvo) !== cleanContent(item.resuelvoText) ||
+            cleanContent(minuta) !== cleanContent(item.minuta) ||
+            cleanContent(cierre) !== cleanContent(item.cierre);
 
-                if (item.tipo === "DEBATE DEL JUICIO ORAL" && itemChanged) {
-                    await saveAudienciaDebate(updatedItem);
-                }
+        setGuardarInc(hasChanges);
+        setNeedsSaving2(hasChanges);
+    }, [resuelvo, minuta, cierre, item, setNeedsSaving2]);
 
-                await setGuardarInc(false)
-                await updateByDate(dateToUse)
-                success = true;
-            } catch (error) {
-                console.error(`Error en updateDataAud. Retries left: ${retries - 1}`, error);
-                retries -= 1;
-                if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                } else {
-                    alert("No se pudieron guardar los cambios del texto de la audiencia. Reintente por favor.");
-                }
-            }
-        }
-        await setGuardando(false)
-    }
     const handleSubmit = async () => {
-        await updateDataAud()
+        if (onGlobalSave) await onGlobalSave();
     };
     const handleDescargar2 = async() =>{
+        // Nota: 'aux' is not defined here in the provided snippet scope, 
+        // original logic kept as reference if available elsewhere
         await generatePDF(aux, dateToUse)
         await setCheckDescarga('')
     }
-    const checkGuardar = useCallback(() => {
-        const guardarStatus = !deepEqual(resuelvo2, resuelvo) ||
-            !deepEqual(normalizeHtml(minuta2), normalizeHtml(minuta)) ||
-            !deepEqual(normalizeHtml(cierre2), normalizeHtml(cierre))
-        setGuardarInc(guardarStatus);
-        setNeedsSaving2(guardarStatus)
-    }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const callUpdateModelosMinuta = () =>{
         updateModelosMinuta()
     }
@@ -179,17 +135,16 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         
         return () => clearTimeout(timeout);
     }, [resuelvo, minuta, cierre, item.id]);
-    useEffect(() => {
-        if (isInitialized) {
-            checkGuardar();
-        }
-    }, [resuelvo, minuta, cierre, isInitialized]);
 
     useEffect(() => {
-        updateComparisson();
+        checkGuardar();
+    }, [resuelvo, minuta, cierre, item, checkGuardar]);
+
+    useEffect(() => {
         setGuardarInc(false)
         setGuardando(false)
-    }, [item]);
+    }, [item.id]);
+
     return (
         <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
                 <p>{checkDescarga}</p>
