@@ -22,6 +22,7 @@ import { updateDocumentOnly } from "@/firebase new/firestore/updateDocumentOnly"
 import getCollection from "@/firebase new/firestore/getCollection";
 import { setDocument, deleteDocument } from "@/firebase new/firestore/basicDocs";
 import { batchWrite } from "@/firebase new/firestore/batchWrite";
+import { updateAudienciaBulk } from "@/firebase new/firestore/updateAudienciaBulk";
 
 
 export const DataContext = createContext({});
@@ -253,6 +254,14 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const updateDataOnly = async (date, audId, property, newValue) => {
         try {
             await updateDocumentOnly(date, audId, property, newValue)
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+            throw error;
+        }
+    }
+    const updateDataBulk = async (date, audId, metadataChanges, bodyChanges) => {
+        try {
+            await updateAudienciaBulk(date, audId, metadataChanges, bodyChanges);
         } catch (error) {
             setErrorMessage(`${error.message}`);
             throw error;
@@ -710,7 +719,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada, archiveOldSolicitudes,
-        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
+        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, updateDataBulk, changeStatusBlockJuicio,
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados,
