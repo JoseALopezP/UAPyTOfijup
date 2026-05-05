@@ -7,10 +7,9 @@ import deepEqual from '@/utils/deepEqual';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
-import { useCallback } from 'react';
 
 export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, setNeedsSaving1, setNeedsSaving2, needsSaving1, needsSaving2, refreshAud}) {
-    const {updateDesplegables, updateDataOnly, updateDataDeep, updateByDate, updateData, updateDataBulk} = useContext(DataContext)
+    const {updateDesplegables, updateDataOnly, updateDataDeep, updateByDate, updateData} = useContext(DataContext)
     const [isSaving, setIsSaving] = useState(false);
     const [resuelvo, setResuelvo] = useState('');
     const [minuta, setMinuta] = useState('');
@@ -57,7 +56,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     // needsSaving2 es manejado por RegistroAudienciaRight
     // El estado de sala/operador se guarda inmediatamente, no necesita tracking
 
-    const handleGlobalSave = useCallback(async () => {
+    const handleGlobalSave = async () => {
         if (!aud || isSaving) return;
         setIsSaving(true);
         
@@ -66,75 +65,57 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         
         while (retries > 0 && !success) {
             try {
-                const metadataChanges = {};
-                const bodyChanges = {};
-
-                // 1. Recolectar cambios de texto pesado (bodyChanges - solo van a audiencias)
-                if (minuta !== (aud.minuta || '') && removeHtmlTags(minuta) !== '') bodyChanges.minuta = minuta;
-                if (resuelvo !== (aud.resuelvoText || '') && removeHtmlTags(resuelvo) !== '') bodyChanges.resuelvoText = resuelvo;
-                if (cierre !== (aud.cierre || '') && removeHtmlTags(cierre) !== '') bodyChanges.cierre = cierre;
-
-                // 2. Recolectar metadatos (metadataChanges - van a audiencias y audienciasView)
-                if (caratula !== (aud.caratula || '')) metadataChanges.caratula = caratula;
-                if (saeNum !== (aud.saeNum || '')) metadataChanges.saeNum = saeNum;
-                if (razonDemora !== (aud.razonDemora || '')) metadataChanges.razonDemora = razonDemora;
-                if (ufi !== (aud.ufi || '')) metadataChanges.ufi = ufi;
-                if (estado !== (aud.estado || '')) metadataChanges.estado = estado;
-                if (defensoria !== (aud.defensoria || '')) metadataChanges.defensoria = defensoria;
-                if (operadorAud !== (aud.operador || '')) metadataChanges.operador = operadorAud;
-                if (sala !== (aud.sala || '')) metadataChanges.sala = sala;
-
-                if (!deepEqual(mpf, aud.mpf || [])) metadataChanges.mpf = mpf;
-                if (!deepEqual(defensa, aud.defensa || [])) metadataChanges.defensa = defensa;
-                if (!deepEqual(imputado, aud.imputado || [])) metadataChanges.imputado = imputado;
-                if (!deepEqual(partes, aud.partes || [])) metadataChanges.partes = partes;
-
+                // Guardar Minuta, Resuelvo, Cierre
+                if (minuta !== (aud.minuta || '') && removeHtmlTags(minuta) !== '') {
+                    await updateDataOnly(dateToUse, aud.id, 'minuta', minuta);
+                }
+                if (resuelvo !== (aud.resuelvoText || '') && removeHtmlTags(resuelvo) !== '') {
+                    await updateDataOnly(dateToUse, aud.id, 'resuelvoText', resuelvo);
+                }
+                if (cierre !== (aud.cierre || '') && removeHtmlTags(cierre) !== '') {
+                    await updateDataOnly(dateToUse, aud.id, 'cierre', cierre);
+                }
+                
+                // Guardar Metadatos
+                if (caratula !== (aud.caratula || '')) await updateData(dateToUse, aud.id, 'caratula', caratula);
+                if (saeNum !== (aud.saeNum || '')) await updateData(dateToUse, aud.id, 'saeNum', saeNum);
+                if (razonDemora !== (aud.razonDemora || '')) await updateData(dateToUse, aud.id, 'razonDemora', razonDemora);
+                if (ufi !== (aud.ufi || '')) await updateData(dateToUse, aud.id, 'ufi', ufi);
+                if (estado !== (aud.estado || '')) await updateData(dateToUse, aud.id, 'estado', estado);
+                if (defensoria !== (aud.defensoria || '')) await updateData(dateToUse, aud.id, 'defensoria', defensoria);
+                if (operadorAud !== (aud.operador || '')) await updateData(dateToUse, aud.id, 'operador', operadorAud);
+                if (sala !== (aud.sala || '')) await updateData(dateToUse, aud.id, 'sala', sala);
+                
+                if (!deepEqual(mpf, aud.mpf || [])) await updateData(dateToUse, aud.id, 'mpf', mpf);
+                if (!deepEqual(defensa, aud.defensa || [])) await updateData(dateToUse, aud.id, 'defensa', defensa);
+                if (!deepEqual(imputado, aud.imputado || [])) await updateData(dateToUse, aud.id, 'imputado', imputado);
+                if (!deepEqual(partes, aud.partes || [])) await updateData(dateToUse, aud.id, 'partes', partes);
+                
                 if (tipo !== (aud.tipo || '') || tipo2 !== (aud.tipo2 || '') || tipo3 !== (aud.tipo3 || '')) {
-                    metadataChanges.tipo = tipo;
-                    metadataChanges.tipo2 = tipo2;
-                    metadataChanges.tipo3 = tipo3;
+                    await updateData(dateToUse, aud.id, 'tipo', tipo);
+                    await updateData(dateToUse, aud.id, 'tipo2', tipo2);
+                    await updateData(dateToUse, aud.id, 'tipo3', tipo3);
                 }
 
                 if (checkForResuelvo(aud)) {
-                    metadataChanges.horaResuelvo = updateRealTimeFunction();
+                    await updateDataDeep(dateToUse, aud.id, 'horaResuelvo', updateRealTimeFunction());
                 }
 
-                // 3. Ejecutar actualización en bloque si hay cambios
-                if (Object.keys(metadataChanges).length > 0 || Object.keys(bodyChanges).length > 0) {
-                    await updateDataBulk(dateToUse, aud.id, metadataChanges, bodyChanges);
-                }
-
-                // 4. Actualizar estado local
                 await updateByDate(dateToUse);
                 if (refreshAud) await refreshAud();
-                
-                success = true; // Todo salió bien
+                success = true; // Succeeded!
             } catch (error) {
-                console.error(`Error en guardado atómico. Reintentos restantes: ${retries - 1}`, error);
+                console.error(`Error saving all data. Retries left: ${retries - 1}`, error);
                 retries -= 1;
                 if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, 60000)); // espera 1m
+                    await new Promise(resolve => setTimeout(resolve, 1500)); // wait 1.5s
                 } else {
                     alert("Error al guardar los cambios después de varios intentos. Verifique su conexión y reintente.");
                 }
             }
         }
         setIsSaving(false);
-    }, [aud, dateToUse, isSaving, minuta, resuelvo, cierre, caratula, saeNum, razonDemora, ufi, estado, defensoria, operadorAud, sala, mpf, defensa, imputado, partes, tipo, tipo2, tipo3, updateDataBulk, updateByDate, refreshAud]);
-
-    // Sistema de Auto-guardado al salir de la pestaña
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'hidden' && (needsSaving1 || needsSaving2) && !isSaving) {
-                handleGlobalSave();
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [handleGlobalSave, needsSaving1, needsSaving2, isSaving]);
+    };
 
 
     return (

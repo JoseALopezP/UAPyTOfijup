@@ -22,7 +22,6 @@ import { updateDocumentOnly } from "@/firebase new/firestore/updateDocumentOnly"
 import getCollection from "@/firebase new/firestore/getCollection";
 import { setDocument, deleteDocument } from "@/firebase new/firestore/basicDocs";
 import { batchWrite } from "@/firebase new/firestore/batchWrite";
-import { updateAudienciaBulk } from "@/firebase new/firestore/updateAudienciaBulk";
 
 
 export const DataContext = createContext({});
@@ -117,7 +116,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         } catch (error) {
             console.error("Failed to add document:", error.message);
             setErrorMessage(`${error.message}`);
-            throw error;
         }
     };
     const addJuicio = async (data, date) => {
@@ -159,7 +157,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         } catch (error) {
             console.error("An error occurred during status update:", error.message);
             setErrorMessage(`${error.message}`);
-            throw error;
         }
     }
     const deleteJuicio = async (date, juicioId) => {
@@ -187,23 +184,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         } catch (error) {
             console.error("An error occurred during data loading:", error.message);
             setErrorMessage(`${error.message}`);
-        }
-    }
-    const saveAudienciaDebate = async (aud) => {
-        try {
-            const legajoDoc = await getDocument('legajos', aud.numeroLeg);
-            let audiencias = legajoDoc?.audiencias || [];
-            const index = audiencias.findIndex(a => a.id === aud.id);
-            if (index !== -1) {
-                audiencias[index] = aud;
-            } else {
-                audiencias.push(aud);
-            }
-            await addOrUpdateObject("legajos", aud.numeroLeg, "audiencias", audiencias);
-        } catch (error) {
-            console.error("Failed to save audiencia debate:", error.message);
-            setErrorMessage(`${error.message}`);
-            throw error;
         }
     }
     const addSorteo = async (data, date) => {
@@ -238,7 +218,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateDocumentAndObjectField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
-            throw error;
         }
     }
     const updateDataDeep = async (date, audId, property, newValue) => {
@@ -246,7 +225,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateDocumentField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
-            throw error;
         }
     }
     // Solo escribe en audiencias, NO sincroniza con audienciasView
@@ -256,15 +234,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateDocumentOnly(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
-            throw error;
-        }
-    }
-    const updateDataBulk = async (date, audId, metadataChanges, bodyChanges) => {
-        try {
-            await updateAudienciaBulk(date, audId, metadataChanges, bodyChanges);
-        } catch (error) {
-            setErrorMessage(`${error.message}`);
-            throw error;
         }
     }
     const pushToAudienciaArray = async (date, audId, property, newValue) => {
@@ -272,7 +241,6 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await pushItemToDocumentAndObjectField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
-            throw error;
         }
     }
     const addDesplegable = async (type, data) => {
@@ -715,11 +683,11 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
 
 
     const context = {
-        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, saveAudienciaDebate, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
+        updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
         pushToAudienciaArray, updateRealTime, updateDataDeep, addUser, addJuicio, updateJuicios, deleteJuicio, changeValueJuicio, saveImportantDatesList, updatePumaData, addPumaData, updateUALData, addUALData,
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada, archiveOldSolicitudes,
-        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, updateDataBulk, changeStatusBlockJuicio,
+        updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados,

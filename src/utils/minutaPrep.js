@@ -2,20 +2,19 @@ import { removeHtmlTags } from "./removeHtmlTags";
 import { inferGender } from "./genderUtils";
 
 function extractTimestamp(text) {
-    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)(?:\s+d[ií]a\s+(\d{2}\/\d{2}\/\d{4}))?\)?/i;
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/i;
     const match = text.match(timestampRegex);
     if (!match) return null;
 
     return {
         video: match[7] || "0",
         start: `${match[1]}:${match[2]}:${match[3]}`,
-        end: match[4] ? `${match[4]}:${match[5]}:${match[6]}` : null,
-        dia: match[8] || null
+        end: match[4] ? `${match[4]}:${match[5]}:${match[6]}` : null
     };
 }
 
 function splitByTimestamps(text) {
-    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)(?:\s+d[ií]a\s+(\d{2}\/\d{2}\/\d{4}))?\)?/gi;
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/gi;
     let matches, lastIndex = 0;
     let result = [];
 
@@ -100,25 +99,15 @@ function extractFundamento(text) {
   
 
 export const minutaPrep = (item) => {
-    const processText = (text, resBool = false) => splitByTimestamps(text).map(el => {
-        let prefix = "";
-        if (resBool && el.timestamp) {
-            if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
-                prefix = resuelvoStructure(item.juez) + "\n";
-            }
-        }
-        return {
-            text: splitNormalBold(prefix + el.text),
-            timestamp: el.timestamp,
-        };
-    });
+    const processText = (text, resBool = false) => splitByTimestamps(text).map(el => ({
+    text: splitNormalBold(
+        (resBool && el.timestamp ? resuelvoStructure(item.juez) + "\n" : "") + el.text
+    ),
+    timestamp: el.timestamp,
+    }));
 
     const auxMin = processText(item.minuta);
-    let resuelvoTextToUse = item.resuelvoText;
-    if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
-        resuelvoTextToUse = extractFundamento(item.resuelvoText);
-    }
-    const auxRes = processText(resuelvoTextToUse, true);
+    const auxRes = processText(extractFundamento(item.resuelvoText), true);
     const auxCie = processText(item.cierre);
     const sortedItems = [
         ...auxMin.filter(el => !el.timestamp),
@@ -126,21 +115,12 @@ export const minutaPrep = (item) => {
         ...[...auxMin, ...auxRes]
             .filter(el => el.timestamp)
             .sort((a, b) => {
-                if (a.timestamp.dia && b.timestamp.dia && a.timestamp.dia !== b.timestamp.dia) {
-                    const [d1, m1, y1] = a.timestamp.dia.split('/');
-                    const [d2, m2, y2] = b.timestamp.dia.split('/');
-                    const dateA = new Date(`${y1}-${m1}-${d1}`);
-                    const dateB = new Date(`${y2}-${m2}-${d2}`);
-                    if (dateA.getTime() !== dateB.getTime()) {
-                        return dateA.getTime() - dateB.getTime();
-                    }
-                }
                 const videoA = parseInt(a.timestamp.video, 10);
                 const videoB = parseInt(b.timestamp.video, 10);
                 if (videoA !== videoB) return videoA - videoB;
                 return a.timestamp.start.localeCompare(b.timestamp.start);
             }),
         ...auxCie
-    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video}${el.timestamp.dia ? ` DÍA ${el.timestamp.dia}` : ''})`, bold: false},...el.text]} : {text:[...el.text]});
+    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
     return sortedItems
 };

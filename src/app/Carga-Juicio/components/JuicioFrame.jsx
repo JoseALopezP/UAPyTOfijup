@@ -257,7 +257,6 @@ export default function JuicioFrame() {
                 })),
             estado: 'PROGRAMADA',
             hora: block.hora,
-            fecha: block.fecha,
             sala: block.sala || ' -',
             juicioReference: {
                 id: previousVersion.id || `${juicioInfo.numeroLeg}#pending`,

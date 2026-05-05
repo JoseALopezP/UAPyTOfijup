@@ -19,7 +19,7 @@ const deepCopy = (obj) => {
 };
 
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, refreshAud }) {
-    const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados, saveAudienciaDebate } = useContext(DataContext)
+    const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -78,7 +78,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     };
 
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
-        let updateDefensoriaStr = undefined;
         setter(prev => {
             const updated = [...prev];
             const current = updated[index] || {};
@@ -95,22 +94,17 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             } else {
                 updated[index] = { ...current, [key]: valueObj };
 
-                // Auto-poblar defensoria si se selecciona un nombre y es Oficial
-                if (key === 'nombre' && setter === setDefensa && (!current.tipo || current.tipo === 'Oficial')) {
+                // Auto-poblar defensoria y matricula si se selecciona un nombre y es Oficial
+                if (key === 'nombre' && setter === setDefensa && current.tipo === 'Oficial') {
                     const abog = abogados.find(a => a.n === valueObj);
-                    if (abog && abog.l && abog.l.toLowerCase().includes('defensor')) {
-                        updateDefensoriaStr = abog.l;
-                    } else {
-                        updateDefensoriaStr = '';
+                    if (abog) {
+                        if (abog.l && (!current.defensoria || current.defensoria === '')) updated[index].defensoria = abog.l;
+                        if (abog.m && (!current.matricula || current.matricula === '')) updated[index].matricula = abog.m;
                     }
                 }
             }
             return updated
-        });
-
-        if (updateDefensoriaStr !== undefined) {
-            setDefensoria(updateDefensoriaStr);
-        }
+        })
     };
 
     const addNewInput = (setter, template, prefix) => {
@@ -156,57 +150,39 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
         while (retries > 0 && !success) {
             try {
-                let updatedItem = { ...item };
-                let itemChanged = false;
-
-                if (!deepEqual(caratula2, caratula)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'caratula', caratula); updatedItem.caratula = caratula; itemChanged = true; }
-                if (!deepEqual(mpf2, mpf)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'mpf', mpf); updatedItem.mpf = mpf; itemChanged = true; }
-                if (!deepEqual(defensa2, defensa)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'defensa', defensa); updatedItem.defensa = defensa; itemChanged = true; }
-                if (!deepEqual(imputado2, imputado)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'imputado', imputado); updatedItem.imputado = imputado; itemChanged = true; }
-                if (!deepEqual(partes2, partes)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'partes', partes); updatedItem.partes = partes; itemChanged = true; }
-                if (!deepEqual(razonDemora2, razonDemora)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'razonDemora', razonDemora); updatedItem.razonDemora = razonDemora; itemChanged = true; }
-                if (!deepEqual(ufi2, ufi)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'ufi', ufi); updatedItem.ufi = ufi; itemChanged = true; }
-                if (!deepEqual(defensoria2, defensoria)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'defensoria', defensoria); updatedItem.defensoria = defensoria; itemChanged = true; }
-                if (!deepEqual(saeNum2, saeNum)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'saeNum', saeNum); updatedItem.saeNum = saeNum; itemChanged = true; }
+                if (!deepEqual(caratula2, caratula)) await updateData(dateToUse, item.id, 'caratula', caratula);
+                if (!deepEqual(mpf2, mpf)) await updateData(dateToUse, item.id, 'mpf', mpf);
+                if (!deepEqual(defensa2, defensa)) await updateData(dateToUse, item.id, 'defensa', defensa);
+                if (!deepEqual(imputado2, imputado)) await updateData(dateToUse, item.id, 'imputado', imputado);
+                if (!deepEqual(partes2, partes)) await updateData(dateToUse, item.id, 'partes', partes);
+                if (!deepEqual(razonDemora2, razonDemora)) await updateData(dateToUse, item.id, 'razonDemora', razonDemora);
+                if (!deepEqual(ufi2, ufi)) await updateData(dateToUse, item.id, 'ufi', ufi);
+                if (!deepEqual(defensoria2, defensoria)) await updateData(dateToUse, item.id, 'defensoria', defensoria);
+                if (!deepEqual(saeNum2, saeNum)) await updateData(dateToUse, item.id, 'saeNum', saeNum);
 
                 if (showReconversion) {
                     if (!deepEqual(tipo, tipoAux)) {
                         if (!deepEqual(tipo2, tipo2Aux)) {
                             if (!deepEqual(tipo3, tipo3Aux)) {
-                                if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
-                                    await updateData(dateToUse, item.id, 'tipo', tipo);
-                                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
-                                    await updateData(dateToUse, item.id, 'tipo3', tipo3);
-                                }
-                                updatedItem.tipo = tipo; updatedItem.tipo2 = tipo2; updatedItem.tipo3 = tipo3; itemChanged = true;
-                            } else {
-                                if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
-                                    await updateData(dateToUse, item.id, 'tipo', tipo);
-                                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
-                                    await updateData(dateToUse, item.id, 'tipo3', '');
-                                }
-                                updatedItem.tipo = tipo; updatedItem.tipo2 = tipo2; updatedItem.tipo3 = ''; itemChanged = true;
-                            }
-                        } else {
-                            if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
                                 await updateData(dateToUse, item.id, 'tipo', tipo);
-                                await updateData(dateToUse, item.id, 'tipo2', '');
+                                await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                                await updateData(dateToUse, item.id, 'tipo3', tipo3);
+                            } else {
+                                await updateData(dateToUse, item.id, 'tipo', tipo);
+                                await updateData(dateToUse, item.id, 'tipo2', tipo2);
                                 await updateData(dateToUse, item.id, 'tipo3', '');
                             }
-                            updatedItem.tipo = tipo; updatedItem.tipo2 = ''; updatedItem.tipo3 = ''; itemChanged = true;
+                        } else {
+                            await updateData(dateToUse, item.id, 'tipo', tipo);
+                            await updateData(dateToUse, item.id, 'tipo2', '');
+                            await updateData(dateToUse, item.id, 'tipo3', '');
                         }
-                        if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
-                        updatedItem.reconvertida = `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`; itemChanged = true;
+                        await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
                     }
                 }
                 if (await checkForResuelvo(item)) {
                     const currentTime = updateRealTimeFunction();
-                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'horaResuelvo', currentTime);
-                    updatedItem.horaResuelvo = currentTime; itemChanged = true;
-                }
-
-                if (item.tipo === "DEBATE DEL JUICIO ORAL" && itemChanged) {
-                    await saveAudienciaDebate(updatedItem);
+                    await updateData(dateToUse, item.id, 'horaResuelvo', currentTime);
                 }
 
                 await updateByDate(dateToUse);
@@ -305,326 +281,321 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
     return (
         <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
-            <div className={styles.scrollArea}>
-                {item.hitos &&
-                    <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
-                        <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg></span>
-                }
-                {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse} />}
-                <div className={styles.headerLeftConBoton}>
-                    <h2 className={`${styles.audControlTitle}`}>
-                        {item.numeroLeg} - {item.hora}
-                        <span style={{ opacity: 0.6, fontSize: '0.65em', marginLeft: '12px', fontWeight: '400' }}>
-                            {tipo}{tipo2 ? ` - ${tipo2}` : ''}{tipo3 ? ` - ${tipo3}` : ''}
-                        </span>
-                    </h2>
-                    {(guardarInc || guardando) && (
-                        <button
-                            type="submit"
-                            disabled={guardando}
-                            className={guardando ? `${styles.saveButtonLeftSmall} ${styles.saving}` : `${styles.saveButtonLeftSmall} ${styles.unsaved}`}
-                        >
-                            {guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
-                        </button>
-                    )}
-                </div>
-                <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)} item={item} refreshAud={refreshAud} />
-                <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
-                    <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)} />
-                    <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>
-                        {desplegables.salas && desplegables.salas.map(el => (
-                            <option key={el} value={el}>SALA {el}</option>
-                        ))}</datalist>
-                    <select value={nameTranslate(operadorAud)} className={`${styles.inputLeft} ${styles.inputLeft35} ${styles.selectOperador}`}
-                        onChange={e => operadorChange(e.target.value)}>
-                        <><option key={operadorAud + "selected"} value={operadorAud} selected>{nameTranslate(operadorAud)}</option></>
-                        {desplegables.operador && desplegables.operador.map(el => (
-                            <><option key={el} value={el} selected>{nameTranslate(el)}</option></>
-                        ))}
-                    </select>
-                </span>
-                {item.tipo === "TRÁMITES DE EJECUCIÓN" &&
-                    <><span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>SAE:</label>
-                        <input className={`${styles.inputTyped100} ${styles.inputLeft}`} value={saeNum} onChange={(e) => setSaeNum(e.target.value)} /></span></>}
-                <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Carátula</label>
-                    <input className={`${styles.inputLeft} ${styles.inputLeft100} ${styles.inputTyped100}`}
-                        type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)} /></span>
-                <button className={showReconversion ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButtonClicked}` : `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
-                {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux} /> : ''}
-                <div className={styles.sectionHeader} onClick={() => toggleSection('mpf')}>
-                    <label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
-                    <span className={`${styles.chevron} ${sectionsVisible.mpf ? styles.chevronOpen : ''}`}>▼</span>
-                </div>
-                {sectionsVisible.mpf && (
-                    <span className={`${styles.inputLeftColumn}`}>
-                        {mpf.map((input, index) => (
-                            <div key={input.id} style={{ marginBottom: '4px' }}>
-                                <div className={styles.inputRow}>
-                                    <input
-                                        list={`mpf-${index}`}
-                                        className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                                        value={input.nombre}
-                                        onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
-                                        onBlur={(e) => {
-                                            if (e.target.value && fiscalesList && !fiscalesList.includes(e.target.value)) {
-                                                alert("Por favor, selecciona un nombre de la lista.");
-                                                handleInputChange(setMpf, index, 'nombre', '');
-                                            }
-                                        }}
-                                    />
-                                    <datalist id={`mpf-${index}`}>
-                                        {fiscalesList && fiscalesList.map(option => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </datalist>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
-                                        {input.asistencia ? 'PRE' : 'AUS'}
-                                    </button>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.presencial ? 'PRESENCIALMENTE' : 'VIRTUALMENTE'} type="button" onClick={() => handleInputChange(setMpf, index, 'presencial', (!input.presencial))}>
-                                        {input.presencial ? 'FIS' : 'VIR'}
-                                    </button>
-                                    <label className={`${styles.btnControl} ${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`} title="SUBROGANDO">
-                                        <input
-                                            type="checkbox"
-                                            checked={input.subrogando || false}
-                                            onChange={(e) => handleInputChange(setMpf, index, 'subrogando', e.target.checked)}
-                                        />
-                                        SUB
-                                    </label>
-                                    <button className={`${styles.btnControl} ${styles.btnDelete} ${styles.deleteNarrow}`} title="ELIMINAR" type="button" onClick={() => removeInput(setMpf, index)}><DeleteSVGF /></button>
-                                </div>
-                            </div>
-                        ))}
-                        <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true, subrogando: false }, 'f')}>+ FISCAL</button>
-                        <div className={styles.inputRow} style={{ marginTop: '10px' }}>
-                            <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>UFI:</label>
-                            <input list='ufi' className={`${styles.inputLeft} ${styles.inputLeft100}`} value={ufi}
-                                onChange={(e) => setUfi(e.target.value)} placeholder="UFI" />
-                            <datalist id='ufi'>{desplegables.ufi && desplegables.ufi.map(option => (
-                                <option key={option} value={option}>{option}</option>
-                            ))}</datalist>
-                        </div>
-                    </span>
-                )}
-                <div className={styles.sectionHeader} onClick={() => toggleSection('imputados')}>
-                    <label className={`${styles.inputLeftNameDColumn}`}>Imputados y Condenados</label>
-                    <span className={`${styles.chevron} ${sectionsVisible.imputados ? styles.chevronOpen : ''}`}>▼</span>
-                </div>
-                {sectionsVisible.imputados && (
-                    <span className={`${styles.inputLeftColumn}`}>
-                        {imputado.map((input, realIndex) => input.condenado ? null : (
-                            <div key={input.id}>
-                                <div className={`${styles.imputadoInput} ${styles.inputRow}`}>
-                                    <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                                        type="text"
-                                        value={input.nombre}
-                                        onChange={(e) => updateImputado(input.id, { nombre: e.target.value })}
-                                        placeholder="Nombre" />
-                                    <input className={`${styles.inputLeft} ${styles.inputTyped20}`}
-                                        type="text"
-                                        value={input.dni}
-                                        onChange={(e) => updateImputado(input.id, { dni: e.target.value })}
-                                        placeholder="DNI" />
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
-                                        {input.presencial ? 'FIS' : 'VIR'}
-                                    </button>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
-                                </div>
-                                {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
-                                    <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
-                                        type="text"
-                                        value={input.detenido}
-                                        onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
-                                        placeholder="detenido en... 00/00/00" />}
-                            </div>
-                        ))}
-                        <span className={styles.imputadoButtons}>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                                onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i')}
-                            >+ IMPUTADO</button>
-                        </span>
 
-                        <label className={`${styles.inputLeftNameDColumn}`} style={{ marginTop: '10px' }}>Condenados</label>
-                        {imputado.map((input, realIndex) => !input.condenado ? null : (
-                            <div key={input.id}>
-                                <div className={`${styles.condenadoInput} ${styles.inputRow}`}>
-                                    <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                                        type="text"
-                                        value={input.nombre}
-                                        onChange={(e) => handleInputChange(setImputado, realIndex, 'nombre', e.target.value)}
-                                        placeholder="Nombre" />
-                                    <input className={`${styles.inputLeft} ${styles.inputTyped20}`}
-                                        type="text"
-                                        value={input.dni}
-                                        onChange={(e) => handleInputChange(setImputado, realIndex, 'dni', e.target.value)}
-                                        placeholder="DNI" />
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
-                                        {input.presencial ? 'FIS' : 'VIR'}
-                                    </button>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
-                                </div>
-                                {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
-                                    <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
-                                        type="text"
-                                        value={input.detenido}
-                                        onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
-                                        placeholder="detenido en... 00/00/00" />}
-                            </div>
-                        ))}
-                        <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                            onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i')}
-                        >+ CONDENADO</button>
+            {item.hitos &&
+                <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
+                    <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg></span>
+            }
+            {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse} />}
+            <div className={styles.headerLeftConBoton}>
+                <h2 className={`${styles.audControlTitle}`}>
+                    {item.numeroLeg} - {item.hora}
+                    <span style={{ opacity: 0.6, fontSize: '0.65em', marginLeft: '12px', fontWeight: '400' }}>
+                        {tipo}{tipo2 ? ` - ${tipo2}` : ''}{tipo3 ? ` - ${tipo3}` : ''}
                     </span>
+                </h2>
+                {(guardarInc || guardando) && (
+                    <button
+                        type="submit"
+                        disabled={guardando}
+                        className={guardando ? `${styles.saveButtonLeftSmall} ${styles.saving}` : `${styles.saveButtonLeftSmall} ${styles.unsaved}`}
+                    >
+                        {guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
+                    </button>
                 )}
-                <div className={styles.sectionHeader} onClick={() => toggleSection('defensa')}>
-                    <label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
-                    <span className={`${styles.chevron} ${sectionsVisible.defensa ? styles.chevronOpen : ''}`}>▼</span>
-                </div>
-                {sectionsVisible.defensa && (
-                    <span className={`${styles.inputLeftColumn}`}>
-                        {defensa.map((input, index) => (
-                            <div key={input.id} className={`${styles.defenseRow}`}>
-                                <div className={styles.inputRow}>
-                                    <button
-                                        className={`${styles.btnControl} ${styles.btnCompact}`}
-                                        title="TIPO DE DEFENSA"
-                                        type="button"
-                                        onClick={() => handleInputChange(setDefensa, index, 'tipo', input.tipo === 'Particular' ? 'Oficial' : 'Particular')}
-                                    >
-                                        {input.tipo === 'Particular' ? 'PAR' : 'OFI'}
-                                    </button>
-                                    <div style={{ flex: 1, minWidth: 0, display: 'flex' }}>
-                                        {(!input.tipo || input.tipo === 'Oficial') ? (
-                                            <>
-                                                <input list={`oficial-${index}`}
-                                                    className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                                                    value={input.nombre}
-                                                    onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
-                                                    placeholder="Nombre"
-                                                    onBlur={(e) => {
-                                                        if (e.target.value && defensoresOficialesList && !defensoresOficialesList.includes(e.target.value)) {
-                                                            alert("Por favor, selecciona un nombre de la lista.");
-                                                            handleInputChange(setDefensa, index, 'nombre', '');
-                                                        }
-                                                    }} />
-                                                <datalist id={`oficial-${index}`}>
-                                                    {defensoresOficialesList && defensoresOficialesList.map(option => (
-                                                        <option key={option} value={option}>{option}</option>
-                                                    ))}
-                                                </datalist>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <input list={`particular-${index}`}
-                                                    className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                                                    value={input.nombre}
-                                                    onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
-                                                    placeholder="Nombre"
-                                                    onBlur={(e) => {
-                                                        if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
-                                                            alert("Por favor, selecciona un nombre de la lista.");
-                                                            handleInputChange(setDefensa, index, 'nombre', '');
-                                                        }
-                                                    }} />
-                                                <datalist id={`particular-${index}`}>
-                                                    {defensoresParticularesList && defensoresParticularesList.map(option => (
-                                                        <option key={option} value={option}>{option}</option>
-                                                    ))}
-                                                </datalist>
-                                            </>
-                                        )}
-                                    </div>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                                    <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.presencial ? 'PRESENCIALMENTE' : 'VIRTUALMENTE'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>{input.presencial ? 'FIS' : 'VIR'}</button>
-                                    {(!input.tipo || input.tipo === 'Oficial') && (
-                                        <label className={`${styles.btnControl} ${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`} title="SUBROGANDO">
-                                            <input
-                                                type="checkbox"
-                                                checked={input.subrogando || false}
-                                                onChange={(e) => handleInputChange(setDefensa, index, 'subrogando', e.target.checked)}
-                                            />
-                                            SUB
-                                        </label>
-                                    )}
-                                    <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
-                                </div>
-                                {(imputado && imputado.length > 1) && (
-                                    <div className={styles.inputRowFlexible}>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <RepresentationSelector
-                                                selectedItems={defensa[index].imputado}
-                                                availableItems={Array.isArray(imputado) ? imputado : []}
-                                                onUpdate={(newItems) => handleInputChange(setDefensa, index, "imputado", newItems)}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        <button className={`${styles.btnControl} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: 'Oficial', nombre: '', imputado: [], asistencia: true, presencial: true, subrogando: false }, 'd')}>+ DEFENSA</button>
-                        {defensa.some(d => !d.tipo || d.tipo === 'Oficial') && (
-                            <div className={styles.inputRow} style={{ marginTop: '10px' }}>
-                                <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>DEFENSORÍA:</label>
-                                <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
-                                    value={defensoria || ''}
-                                    onChange={(e) => setDefensoria(e.target.value)}
-                                    placeholder="Defensoría"
-                                    title="Número de Defensoría"
+            </div>
+            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)} item={item} refreshAud={refreshAud} />
+            <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
+                <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)} />
+                <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>
+                    {desplegables.salas && desplegables.salas.map(el => (
+                        <option key={el} value={el}>SALA {el}</option>
+                    ))}</datalist>
+                <select value={nameTranslate(operadorAud)} className={`${styles.inputLeft} ${styles.inputLeft35} ${styles.selectOperador}`}
+                    onChange={e => operadorChange(e.target.value)}>
+                    <><option key={operadorAud + "selected"} value={operadorAud} selected>{nameTranslate(operadorAud)}</option></>
+                    {desplegables.operador && desplegables.operador.map(el => (
+                        <><option key={el} value={el} selected>{nameTranslate(el)}</option></>
+                    ))}
+                </select>
+            </span>
+            {item.tipo === "TRÁMITES DE EJECUCIÓN" &&
+                <><span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>SAE:</label>
+                    <input className={`${styles.inputTyped100} ${styles.inputLeft}`} value={saeNum} onChange={(e) => setSaeNum(e.target.value)} /></span></>}
+            <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Carátula</label>
+                <input className={`${styles.inputLeft} ${styles.inputLeft100} ${styles.inputTyped100}`}
+                    type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)} /></span>
+            <button className={showReconversion ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButtonClicked}` : `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
+            {showReconversion ? <Reconversion item={item} setTipo={setTipo} setTipo2={setTipo2} setTipo3={setTipo3} tipo={tipo} tipo2={tipo2} tipoAux={tipoAux} tipo2Aux={tipo2Aux} /> : ''}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('mpf')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Ministerio Público Fiscal</label>
+                <span className={`${styles.chevron} ${sectionsVisible.mpf ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.mpf && (
+                <span className={`${styles.inputLeftColumn}`}>
+                    {mpf.map((input, index) => (
+                        <div key={input.id} style={{ marginBottom: '4px' }}>
+                            <div className={styles.inputRow}>
+                                <input
+                                    list={`mpf-${index}`}
+                                    className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                                    value={input.nombre}
+                                    onChange={(e) => handleInputChange(setMpf, index, 'nombre', e.target.value)}
+                                    onBlur={(e) => {
+                                        if (e.target.value && fiscalesList && !fiscalesList.includes(e.target.value)) {
+                                            alert("Por favor, selecciona un nombre de la lista.");
+                                            handleInputChange(setMpf, index, 'nombre', '');
+                                        }
+                                    }}
                                 />
-                            </div>
-                        )}
-                    </span>
-                )}
-                <div className={styles.sectionHeader} onClick={() => toggleSection('partes')}>
-                    <label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
-                    <span className={`${styles.chevron} ${sectionsVisible.partes ? styles.chevronOpen : ''}`}>▼</span>
-                </div>
-                {sectionsVisible.partes && (
-                    <span className={`${styles.inputLeftColumn}`}>
-                        {partes.map((input, index) => (
-                            <div key={input.id}>
-                                <input list='partesVarias'
-                                    className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`}
-                                    value={input.role}
-                                    onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
-                                    placeholder="tipo" />
-                                <datalist id='partesVarias'>
-                                    {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte => (
-                                        <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
+                                <datalist id={`mpf-${index}`}>
+                                    {fiscalesList && fiscalesList.map(option => (
+                                        <option key={option} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
                                 </datalist>
-                                <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre" />
-                                <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni" />
-                                <RepresentationSelector
-                                    selectedItems={partes[index].representa}
-                                    availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
-                                    onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
-                                />
-                                <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                                <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setMpf, index, 'asistencia', (!input.asistencia))}>
+                                    {input.asistencia ? 'PRE' : 'AUS'}
+                                </button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.presencial ? 'PRESENCIALMENTE' : 'VIRTUALMENTE'} type="button" onClick={() => handleInputChange(setMpf, index, 'presencial', (!input.presencial))}>
                                     {input.presencial ? 'FIS' : 'VIR'}
                                 </button>
-                                <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index)}><DeleteSVGF /></button>
+                                <label className={`${styles.btnControl} ${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`} title="SUBROGANDO">
+                                    <input
+                                        type="checkbox"
+                                        checked={input.subrogando || false}
+                                        onChange={(e) => handleInputChange(setMpf, index, 'subrogando', e.target.checked)}
+                                    />
+                                    SUB
+                                </label>
+                                <button className={`${styles.btnControl} ${styles.btnDelete} ${styles.deleteNarrow}`} title="ELIMINAR" type="button" onClick={() => removeInput(setMpf, index)}><DeleteSVGF /></button>
                             </div>
-                        ))}
-                        <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p')}>+ PARTE</button>
-                    </span>
-                )}
-                {(item.hora && item.hitos && checkHoraDiff() > 5) &&
-                    <>
-                        <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
-                            <select className={`${styles.inputLeft} ${styles.inputLeft100}  ${styles.inputLeftSelect}`} onChange={(e) => setRazonDemora(e.target.value)}>
-                                <option value={razonDemora}>{razonDemora}</option>
-                                {desplegables.motivoDemora && desplegables.motivoDemora.map(el => <option key={el} value={el}>{el}</option>)}
-                            </select></span>
-                    </>
-                }
-                <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
+                        </div>
+                    ))}
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true, subrogando: false }, 'f')}>+ FISCAL</button>
+                    <div className={styles.inputRow} style={{ marginTop: '10px' }}>
+                        <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>UFI:</label>
+                        <input list='ufi' className={`${styles.inputLeft} ${styles.inputLeft100}`} value={ufi}
+                            onChange={(e) => setUfi(e.target.value)} placeholder="UFI" />
+                        <datalist id='ufi'>{desplegables.ufi && desplegables.ufi.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                        ))}</datalist>
+                    </div>
+                </span>
+            )}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('imputados')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Imputados y Condenados</label>
+                <span className={`${styles.chevron} ${sectionsVisible.imputados ? styles.chevronOpen : ''}`}>▼</span>
             </div>
+            {sectionsVisible.imputados && (
+                <span className={`${styles.inputLeftColumn}`}>
+                    {imputado.map((input, realIndex) => input.condenado ? null : (
+                        <div key={input.id}>
+                            <div className={`${styles.imputadoInput} ${styles.inputRow}`}>
+                                <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                                    type="text"
+                                    value={input.nombre}
+                                    onChange={(e) => updateImputado(input.id, { nombre: e.target.value })}
+                                    placeholder="Nombre" />
+                                <input className={`${styles.inputLeft} ${styles.inputTyped20}`}
+                                    type="text"
+                                    value={input.dni}
+                                    onChange={(e) => updateImputado(input.id, { dni: e.target.value })}
+                                    placeholder="DNI" />
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
+                                    {input.presencial ? 'FIS' : 'VIR'}
+                                </button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
+                            </div>
+                            {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
+                                <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
+                                    type="text"
+                                    value={input.detenido}
+                                    onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
+                                    placeholder="detenido en... 00/00/00" />}
+                        </div>
+                    ))}
+                    <span className={styles.imputadoButtons}>
+                        <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
+                            onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i')}
+                        >+ IMPUTADO</button>
+                    </span>
+
+                    <label className={`${styles.inputLeftNameDColumn}`} style={{ marginTop: '10px' }}>Condenados</label>
+                    {imputado.map((input, realIndex) => !input.condenado ? null : (
+                        <div key={input.id}>
+                            <div className={`${styles.condenadoInput} ${styles.inputRow}`}>
+                                <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                                    type="text"
+                                    value={input.nombre}
+                                    onChange={(e) => handleInputChange(setImputado, realIndex, 'nombre', e.target.value)}
+                                    placeholder="Nombre" />
+                                <input className={`${styles.inputLeft} ${styles.inputTyped20}`}
+                                    type="text"
+                                    value={input.dni}
+                                    onChange={(e) => handleInputChange(setImputado, realIndex, 'dni', e.target.value)}
+                                    placeholder="DNI" />
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
+                                    {input.presencial ? 'FIS' : 'VIR'}
+                                </button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
+                            </div>
+                            {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
+                                <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
+                                    type="text"
+                                    value={input.detenido}
+                                    onChange={(e) => handleInputChange(setImputado, realIndex, 'detenido', e.target.value)}
+                                    placeholder="detenido en... 00/00/00" />}
+                        </div>
+                    ))}
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
+                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i')}
+                    >+ CONDENADO</button>
+                </span>
+            )}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('defensa')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Defensa</label>
+                <span className={`${styles.chevron} ${sectionsVisible.defensa ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.defensa && (
+                <span className={`${styles.inputLeftColumn}`}>
+                    {defensa.map((input, index) => (
+                        <div key={input.id} className={`${styles.defenseRow}`}>
+                            <div className={styles.inputRow}>
+                                <button
+                                    className={`${styles.btnControl} ${styles.btnCompact}`}
+                                    title="TIPO DE DEFENSA"
+                                    type="button"
+                                    onClick={() => handleInputChange(setDefensa, index, 'tipo', input.tipo === 'Particular' ? 'Oficial' : 'Particular')}
+                                >
+                                    {input.tipo === 'Particular' ? 'PAR' : 'OFI'}
+                                </button>
+                                <div style={{ flex: 1, minWidth: 0, display: 'flex' }}>
+                                    {(!input.tipo || input.tipo === 'Oficial') ? (
+                                        <>
+                                            <input list={`oficial-${index}`}
+                                                className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                                                value={input.nombre}
+                                                onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
+                                                placeholder="Nombre"
+                                                onBlur={(e) => {
+                                                    if (e.target.value && defensoresOficialesList && !defensoresOficialesList.includes(e.target.value)) {
+                                                        alert("Por favor, selecciona un nombre de la lista.");
+                                                        handleInputChange(setDefensa, index, 'nombre', '');
+                                                    }
+                                                }} />
+                                            <datalist id={`oficial-${index}`}>
+                                                {defensoresOficialesList && defensoresOficialesList.map(option => (
+                                                    <option key={option} value={option}>{option}</option>
+                                                ))}
+                                            </datalist>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <input list={`particular-${index}`}
+                                                className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                                                value={input.nombre}
+                                                onChange={(e) => handleInputChange(setDefensa, index, 'nombre', e.target.value)}
+                                                placeholder="Nombre"
+                                                onBlur={(e) => {
+                                                    if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
+                                                        alert("Por favor, selecciona un nombre de la lista.");
+                                                        handleInputChange(setDefensa, index, 'nombre', '');
+                                                    }
+                                                }} />
+                                            <datalist id={`particular-${index}`}>
+                                                {defensoresParticularesList && defensoresParticularesList.map(option => (
+                                                    <option key={option} value={option}>{option}</option>
+                                                ))}
+                                            </datalist>
+                                        </>
+                                    )}
+                                </div>
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setDefensa, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact}`} title={input.presencial ? 'PRESENCIALMENTE' : 'VIRTUALMENTE'} type="button" onClick={() => handleInputChange(setDefensa, index, 'presencial', (!input.presencial))}>{input.presencial ? 'FIS' : 'VIR'}</button>
+                                <label className={`${styles.btnControl} ${styles.subrogandoLabel} ${input.subrogando ? styles.subrogandoActive : ''}`} title="SUBROGANDO">
+                                    <input
+                                        type="checkbox"
+                                        checked={input.subrogando || false}
+                                        onChange={(e) => handleInputChange(setDefensa, index, 'subrogando', e.target.checked)}
+                                    />
+                                    SUB
+                                </label>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
+                            </div>
+                            {(imputado && imputado.length > 1) && (
+                                <div className={styles.inputRowFlexible}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <RepresentationSelector
+                                            selectedItems={defensa[index].imputado}
+                                            availableItems={Array.isArray(imputado) ? imputado : []}
+                                            onUpdate={(newItems) => handleInputChange(setDefensa, index, "imputado", newItems)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                    <button className={`${styles.btnControl} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: 'Oficial', nombre: '', imputado: [], asistencia: true, presencial: true, subrogando: false }, 'd')}>+ DEFENSA</button>
+                    <div className={styles.inputRow} style={{ marginTop: '10px' }}>
+                        <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>DEFENSORÍA:</label>
+                        <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
+                            value={defensoria || ''}
+                            onChange={(e) => setDefensoria(e.target.value)}
+                            placeholder="Defensoría"
+                            title="Número de Defensoría"
+                        />
+                    </div>
+                </span>
+            )}
+            <div className={styles.sectionHeader} onClick={() => toggleSection('partes')}>
+                <label className={`${styles.inputLeftNameDColumn}`}>Otras Partes</label>
+                <span className={`${styles.chevron} ${sectionsVisible.partes ? styles.chevronOpen : ''}`}>▼</span>
+            </div>
+            {sectionsVisible.partes && (
+                <span className={`${styles.inputLeftColumn}`}>
+                    {partes.map((input, index) => (
+                        <div key={input.id}>
+                            <input list='partesVarias'
+                                className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`}
+                                value={input.role}
+                                onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
+                                placeholder="tipo" />
+                            <datalist id='partesVarias'>
+                                {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte => (
+                                    <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
+                            </datalist>
+                            <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre" />
+                            <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni" />
+                            <RepresentationSelector
+                                selectedItems={partes[index].representa}
+                                availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
+                                onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
+                            />
+                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
+                                {input.presencial ? 'FIS' : 'VIR'}
+                            </button>
+                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index)}><DeleteSVGF /></button>
+                        </div>
+                    ))}
+                    <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p')}>+ PARTE</button>
+                </span>
+            )}
+            {(item.hora && item.hitos && checkHoraDiff() > 5) &&
+                <>
+                    <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>MOTIVO DEMORA ({checkHoraDiff()}min)</label>
+                        <select className={`${styles.inputLeft} ${styles.inputLeft100}  ${styles.inputLeftSelect}`} onChange={(e) => setRazonDemora(e.target.value)}>
+                            <option value={razonDemora}>{razonDemora}</option>
+                            {desplegables.motivoDemora && desplegables.motivoDemora.map(el => <option key={el} value={el}>{el}</option>)}
+                        </select></span>
+                </>
+            }
+            <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
             <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered} minuta={minuta} setMinuta={setMinuta} cierre={cierre} setCierre={setCierre} />
         </form>
     );

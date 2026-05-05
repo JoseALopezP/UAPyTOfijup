@@ -22,28 +22,26 @@ function extractNames(obj) {
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, defensoria, estado, defensa, imputado, tipo, tipo2, tipo3, partes, needsSaving, onGlobalSave, isSaving }) {
-    const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta, saveAudienciaDebate} = useContext(DataContext)
+    const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
+    const [resuelvo2, setResuelvo2] = useState('');
+    const [minuta2, setMinuta2] = useState('');
+    const [cierre2, setCierre2] = useState('');
     const [selectedTab, setSelectedTab] = useState('Cuerpo minuta');
     const [errorDescarga, setErrorDescarga] = useState(false)
     const [checkDescarga, setCheckDescarga] = useState('')
     const [reloadHistorial, setReloadHistorial] = useState(0);
-
-    // Función para normalizar contenido antes de comparar
-    const cleanContent = (html) => {
-        if (!html) return '';
-        return html
-            .replace(/&nbsp;/g, ' ')
-            .replace(/<p><br><\/p>/g, '')
-            .replace(/<p>\s*<\/p>/g, '')
-            .replace(/\s+/g, ' ')
-            .trim();
+    const [isInitialized, setIsInitialized] = useState(false);
+    const updateComparisson = () => {
+        setResuelvo2(item.resuelvoText || '');
+        setMinuta2(item.minuta || '');
+        setCierre2(item.cierre || '');
+        setIsInitialized(true);
     };
-
     const insertarModelo = () => {
-        if (removeHtmlTags(minuta).trim() !== '' || removeHtmlTags(resuelvo).trim() !== '') {
+        if (minuta.replace(/<[^>]*>/g, '').trim() !== '' || resuelvo.replace(/<[^>]*>/g, '').trim() !== '') {
             alert("Borre el contenido ya incluído antes de insertar un modelo")
         } else {
             const { isMale } = inferGender(item.juez);
@@ -67,28 +65,41 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
             setResuelvo(fixGender(resuelvoText).replace(/\n/g, '<br>'));
         }
     }
-
-    const checkGuardar = useCallback(() => {
-        if (!item) return;
-
-        const hasChanges = 
-            cleanContent(resuelvo) !== cleanContent(item.resuelvoText) ||
-            cleanContent(minuta) !== cleanContent(item.minuta) ||
-            cleanContent(cierre) !== cleanContent(item.cierre);
-
-        setGuardarInc(hasChanges);
-        setNeedsSaving2(hasChanges);
-    }, [resuelvo, minuta, cierre, item, setNeedsSaving2]);
-
+    const updateDataAud = async() => {
+        setGuardando(true)
+        if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
+            await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
+            setResuelvo2(resuelvo);
+        }
+        if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
+            await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
+            setMinuta2(minuta);
+        }
+        if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
+            await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
+            setCierre2(cierre);
+        }        
+        if (checkForResuelvo(item)) {
+            await updateDataDeep(dateToUse, item.id, 'horaResuelvo', updateRealTimeFunction());
+        }
+        await setGuardarInc(false)
+        await setGuardando(false)
+        await updateByDate(dateToUse)
+    }
     const handleSubmit = async () => {
-        if (onGlobalSave) await onGlobalSave();
+        await updateDataAud()
     };
     const handleDescargar2 = async() =>{
-        // Nota: 'aux' is not defined here in the provided snippet scope, 
-        // original logic kept as reference if available elsewhere
         await generatePDF(aux, dateToUse)
         await setCheckDescarga('')
     }
+    const checkGuardar = useCallback(() => {
+        const guardarStatus = !deepEqual(resuelvo2, resuelvo) ||
+            !deepEqual(normalizeHtml(minuta2), normalizeHtml(minuta)) ||
+            !deepEqual(normalizeHtml(cierre2), normalizeHtml(cierre))
+        setGuardarInc(guardarStatus);
+        setNeedsSaving2(guardarStatus)
+    }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
     const callUpdateModelosMinuta = () =>{
         updateModelosMinuta()
     }
@@ -135,16 +146,17 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         
         return () => clearTimeout(timeout);
     }, [resuelvo, minuta, cierre, item.id]);
+    useEffect(() => {
+        if (isInitialized) {
+            checkGuardar();
+        }
+    }, [resuelvo, minuta, cierre, isInitialized]);
 
     useEffect(() => {
-        checkGuardar();
-    }, [resuelvo, minuta, cierre, item, checkGuardar]);
-
-    useEffect(() => {
+        updateComparisson();
         setGuardarInc(false)
         setGuardando(false)
-    }, [item.id]);
-
+    }, [item]);
     return (
         <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
                 <p>{checkDescarga}</p>
@@ -173,7 +185,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
                 reloadTrigger={reloadHistorial}
                 />
 
-                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo || item.tipo === "DEBATE DEL JUICIO ORAL" ? 'DESCARGAR MINUTA' : '-'}</button>
+                <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
             <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab} needsSaving={needsSaving} onSave={onGlobalSave} isSaving={isSaving}/>
             {selectedTab === 'Cuerpo minuta' &&
