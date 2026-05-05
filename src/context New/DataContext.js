@@ -116,6 +116,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         } catch (error) {
             console.error("Failed to add document:", error.message);
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     };
     const addJuicio = async (data, date) => {
@@ -157,6 +158,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         } catch (error) {
             console.error("An error occurred during status update:", error.message);
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     }
     const deleteJuicio = async (date, juicioId) => {
@@ -200,6 +202,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         } catch (error) {
             console.error("Failed to save audiencia debate:", error.message);
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     }
     const addSorteo = async (data, date) => {
@@ -234,6 +237,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateDocumentAndObjectField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     }
     const updateDataDeep = async (date, audId, property, newValue) => {
@@ -241,6 +245,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateDocumentField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     }
     // Solo escribe en audiencias, NO sincroniza con audienciasView
@@ -250,6 +255,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await updateDocumentOnly(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     }
     const pushToAudienciaArray = async (date, audId, property, newValue) => {
@@ -257,6 +263,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             await pushItemToDocumentAndObjectField(date, audId, property, newValue)
         } catch (error) {
             setErrorMessage(`${error.message}`);
+            throw error;
         }
     }
     const addDesplegable = async (type, data) => {

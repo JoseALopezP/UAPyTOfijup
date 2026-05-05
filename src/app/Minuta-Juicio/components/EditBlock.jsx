@@ -1,6 +1,6 @@
 'use client'
 import styles from '../MinutaJuicio.module.css'
-import { generatePDF } from '@/utils/resuelvoUtils';
+import { generatePDF } from '@/utils/pdfUtils';
 
 export default function EditBlock({ selectedList }) {
     
@@ -12,8 +12,10 @@ export default function EditBlock({ selectedList }) {
 
         // Ordenar por fecha y hora
         const sortedList = [...selectedList].sort((a, b) => {
-            const dateA = new Date(a.fecha.split('').slice(4,8).join('') + '-' + a.fecha.split('').slice(2,4).join('') + '-' + a.fecha.split('').slice(0,2).join('') + 'T' + a.hora);
-            const dateB = new Date(b.fecha.split('').slice(4,8).join('') + '-' + b.fecha.split('').slice(2,4).join('') + '-' + b.fecha.split('').slice(0,2).join('') + 'T' + b.hora);
+            const fA = String(a.fecha || "00000000");
+            const fB = String(b.fecha || "00000000");
+            const dateA = new Date(fA.substring(4,8) + '-' + fA.substring(2,4) + '-' + fA.substring(0,2) + 'T' + a.hora);
+            const dateB = new Date(fB.substring(4,8) + '-' + fB.substring(2,4) + '-' + fB.substring(0,2) + 'T' + b.hora);
             return dateA.getTime() - dateB.getTime();
         });
 

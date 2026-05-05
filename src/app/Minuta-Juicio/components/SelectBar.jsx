@@ -10,7 +10,7 @@ export default function SelectBar({selectedList, setSelectedList}) {
     const [legajo2, setLegajo2] = useState('')
     const [legajo3, setLegajo3] = useState('')
     const updateLegajo = () => {
-        updateByLegajo(legajo1+'-'+legajo2+'-'+legajo3)
+        updateByLegajo(legajo1+'-'+String(legajo2).padStart(5, '0')+'-'+legajo3)
     }
     useEffect(() => {
         updateDesplegables()

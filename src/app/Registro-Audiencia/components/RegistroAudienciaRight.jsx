@@ -66,25 +66,41 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         }
     }
     const updateDataAud = async() => {
-        setGuardando(true)
-        if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-            await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
-            setResuelvo2(resuelvo);
+        setGuardando(true);
+        let retries = 3;
+        let success = false;
+
+        while (retries > 0 && !success) {
+            try {
+                if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
+                    await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
+                    setResuelvo2(resuelvo);
+                }
+                if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
+                    await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
+                    setMinuta2(minuta);
+                }
+                if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
+                    await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
+                    setCierre2(cierre);
+                }        
+                if (checkForResuelvo(item)) {
+                    await updateDataDeep(dateToUse, item.id, 'horaResuelvo', updateRealTimeFunction());
+                }
+                await setGuardarInc(false)
+                await updateByDate(dateToUse)
+                success = true;
+            } catch (error) {
+                console.error(`Error en updateDataAud. Retries left: ${retries - 1}`, error);
+                retries -= 1;
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                } else {
+                    alert("No se pudieron guardar los cambios del texto de la audiencia. Reintente por favor.");
+                }
+            }
         }
-        if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-            await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
-            setMinuta2(minuta);
-        }
-        if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
-            await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
-            setCierre2(cierre);
-        }        
-        if (checkForResuelvo(item)) {
-            await updateDataDeep(dateToUse, item.id, 'horaResuelvo', updateRealTimeFunction());
-        }
-        await setGuardarInc(false)
         await setGuardando(false)
-        await updateByDate(dateToUse)
     }
     const handleSubmit = async () => {
         await updateDataAud()

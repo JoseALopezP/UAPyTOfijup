@@ -30,30 +30,35 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
     }
     const handleSubmit = async() =>{
         const currentTime = updateRealTimeFunction();
-        if(changeToMake==='RESUELVO'){
-            await updateData(dateToUse, audId, 'resuelvo', currentTime)
-            await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${translate[changeToMake]}`)
-            setChangeToMake('')
-        }
-        if(changeToMake && changeToMake!=='RESUELVO'){
-            const newEstado = translate[changeToMake];
-            await updateData(dateToUse, audId, 'estado', newEstado)
-            
-            // Sincronizar con Juicio si es un debate
-            if (item && item.titulo === 'DEBATE' && item.juicioReference) {
-                const { id, year } = item.juicioReference;
-                await changeStatusBlockJuicio(year, id, audId, newEstado);
+        try {
+            if(changeToMake==='RESUELVO'){
+                await updateData(dateToUse, audId, 'resuelvo', currentTime)
+                await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${translate[changeToMake]}`)
+                setChangeToMake('')
             }
+            if(changeToMake && changeToMake!=='RESUELVO'){
+                const newEstado = translate[changeToMake];
+                await updateData(dateToUse, audId, 'estado', newEstado)
+                
+                // Sincronizar con Juicio si es un debate
+                if (item && item.titulo === 'DEBATE' && item.juicioReference) {
+                    const { id, year } = item.juicioReference;
+                    await changeStatusBlockJuicio(year, id, audId, newEstado);
+                }
 
-            if(changeToMake == 'CUARTO INTERMEDIO'){
-                await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
-            }else{
-                await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado}`)
+                if(changeToMake == 'CUARTO INTERMEDIO'){
+                    await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
+                }else{
+                    await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado}`)
+                }
             }
+            await estadoFunction(translate[changeToMake])
+            await updateByDate(dateToUse)
+            if (refreshAud) await refreshAud()
+        } catch (error) {
+            console.error("Error cambiando estado:", error);
+            alert("Hubo un error al guardar el nuevo estado. Verifique su conexión y vuelva a intentarlo.");
         }
-        await estadoFunction(translate[changeToMake])
-        await updateByDate(dateToUse)
-        if (refreshAud) await refreshAud()
     }
     return (
         <div className={`${styles.controlChangeStateButtonBlock}`} >

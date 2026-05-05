@@ -23,12 +23,15 @@ export default function AudList({list, setSelected, selectedList}) {
                 <p>NO SE ENCUENTRAN BLOQUES</p>
             </span>
         ) : (
-            list.map(el => (
-                <span className={selectedList.includes(el) ? `${styles.audListIndiv} ${styles.audListIndivSelected}` : `${styles.audListIndiv}`} onClick={() => processSelected(el)}>
-                    <p>{el.hora} - {el.fecha.split('').slice(0,2)}/{el.fecha.split('').slice(2,4)}/{el.fecha.split('').slice(4,8)}</p>
+            list.map((el, i) => {
+                const f = String(el.fecha || "00000000");
+                return (
+                <span key={el.id || el.aId || i} className={selectedList.includes(el) ? `${styles.audListIndiv} ${styles.audListIndivSelected}` : `${styles.audListIndiv}`} onClick={() => processSelected(el)}>
+                    <p>{el.hora} - {f.substring(0,2)}/{f.substring(2,4)}/{f.substring(4,8)}</p>
                     <p>{el.tipo}</p>
                 </span>
-            ))
+                )
+            })
         )}
         </section></>
     )}

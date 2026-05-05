@@ -127,7 +127,7 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
                 await withRetry(() => updateData(dateToUse, item.id, 'resuelvo', updateRealTimeFunction()));
                 await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', `${updateRealTimeFunction()} | ${currentState}`));
                 if (item.tipo === "DEBATE DEL JUICIO ORAL") {
-                    await withRetry(() => saveAudienciaDebate(item));
+                    await withRetry(() => saveAudienciaDebate({...item, fecha: item.fecha || dateToUse}));
                 }
             } else {
                 if (currentState === 'EN_CURSO' && !stopwatchRunning) await stopwatch();
