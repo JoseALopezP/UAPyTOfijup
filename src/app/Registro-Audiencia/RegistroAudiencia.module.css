@@ -31,8 +31,9 @@
     display: inline-flex;
     flex-direction: row;
     margin: 0;
-    margin-left: 2.5vw;
-    width: 100%;
+    margin-left: 3vw;
+    /* Movido a la derecha como se solicitó */
+    width: calc(100vw - 3vw);
     padding: 0;
     border-radius: 4px;
     height: calc(100vh - 10px);
@@ -92,6 +93,7 @@
     width: 2vw;
     margin: 0;
     opacity: 0;
+    /* Restaurado sistema que oculta la lista */
     border-right: solid 1px var(--border);
     z-index: 2;
     background: var(--surface);
@@ -299,20 +301,42 @@
 
 /* ── Control block (panel principal) ────────────────────────── */
 .controlBlock {
-    width: 95vw;
+    width: 100%;
+    /* Ocupar todo el espacio restante para evitar huecos */
     background: var(--surface2);
     display: inline-flex;
     flex-direction: row;
 }
 
 .controlBlockLeft {
-    width: 36%;
+    width: 28vw;
+    /* Reducido para ser más angosto */
     height: 100%;
     border-right: solid 1px var(--border);
-    overflow-y: scroll;
-    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
     background: var(--surface);
     padding: 0;
+    overflow: hidden;
+    position: relative;
+    /* Clave para que los hijos absolutos se posicionen aquí */
+}
+
+.scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 8px;
+    /* Padding ajustado */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fullWidth {
+    width: 100%;
+    flex: none;
+    /* Evita que crezca verticalmente en flex-column */
 }
 
 /* ── Botones de acción ───────────────────────────────────────── */
@@ -496,12 +520,23 @@
 
 .inputLeft100 {
     flex: 1;
+    width: 100%;
     min-width: 0;
 }
 
+/* En contenedores de columna, evitamos que crezcan verticalmente */
+.scrollArea>.inputLeft100,
+.inputLeftColumn>.inputLeft100,
+.scrollArea>button.inputLeft100 {
+    flex: none;
+    height: 22px;
+}
+
 .inputLeft {
-    height: 24px;
-    font-size: 15px;
+    height: 22px;
+    /* Reducido de 24px */
+    font-size: 13px;
+    /* Reducido de 15px */
     border: 1px solid var(--input-border);
     border-radius: 2px;
     outline: none;
@@ -623,11 +658,11 @@
     border: 1px solid var(--input-border);
     width: 100%;
     box-sizing: border-box;
-    height: 24px;
+    height: 22px;
     background: var(--input-bg);
     color: var(--input-text);
     outline: none;
-    font-size: 15px;
+    font-size: 13px;
     padding: 0 4px;
     border-radius: 2px;
 }
@@ -636,11 +671,11 @@
     flex: 7;
     min-width: 0;
     border: 1px solid var(--input-border);
-    height: 24px;
+    height: 22px;
     background: var(--input-bg);
     color: var(--input-text);
     outline: none;
-    font-size: 15px;
+    font-size: 13px;
     padding: 0 4px;
     box-sizing: border-box;
     border-radius: 2px;
@@ -860,13 +895,14 @@
 
 /* ── State block (barra de estado flotante) ──────────────────── */
 .stateBlock {
-    position: fixed;
-    left: 4.5vw;
-    top: 85vh;
-    width: 25vw;
-    display: inline-flex;
+    width: 100%;
+    display: flex;
     flex-direction: column;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    padding: 8px 4px;
     z-index: 25;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .stateBlockHovered {
@@ -913,14 +949,15 @@
 /* Crono */
 .cronoBlock {
     width: 100%;
-    margin-left: .33%;
-    height: 80px;
+    margin-left: 0;
+    height: 70px;
+    /* Reducido de 80px */
     border-radius: 4px;
     background-color: var(--prevColor);
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    line-height: 10px;
+    line-height: 1;
 }
 
 .cronoBlockPressing {
@@ -954,7 +991,8 @@
 }
 
 .timeNumbers {
-    font-size: 20px;
+    font-size: 18px;
+    /* Reducido de 20px */
 }
 
 /* ── NavBar (tabs) ───────────────────────────────────────────── */
@@ -1158,15 +1196,20 @@
 
 /* ── Edit hitos ──────────────────────────────────────────────── */
 .editHitosButtonBlock {
-    left: 27vw;
-    top: 10px;
-    position: fixed;
+    right: 10px;
+    position: absolute;
+    z-index: 110;
+    /* Mayor que el z-index de editHitosBlock (100) */
     width: 40px;
     height: 40px;
     cursor: pointer;
     border-radius: 20px;
-    background: transparent;
-    border: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .editHitosButtonBlockHovered {
@@ -1179,16 +1222,21 @@
 }
 
 .editHitosBlock {
-    position: fixed;
-    top: 6vh;
-    width: 25vw;
-    height: 70vh;
-    background: var(--surface2);
-    border: solid var(--border) 1px;
-    border-radius: 4px;
-    display: inline-flex;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    height: 80%;
+    background: var(--surface);
+    border-right: solid var(--border) 1px;
+    display: flex;
     flex-direction: column;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    padding: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Permitir scroll si hay muchos hitos */
 }
 
 .editHitosBlockHovered {

@@ -60,7 +60,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         if (!aud || isSaving) return;
         setIsSaving(true);
         
-        let retries = 3;
+        let retries = 5;
         let success = false;
         
         while (retries > 0 && !success) {
@@ -108,7 +108,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 console.error(`Error saving all data. Retries left: ${retries - 1}`, error);
                 retries -= 1;
                 if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, 1500)); // wait 1.5s
+                    await new Promise(resolve => setTimeout(resolve, 15000)); // wait 15s
                 } else {
                     alert("Error al guardar los cambios después de varios intentos. Verifique su conexión y reintente.");
                 }

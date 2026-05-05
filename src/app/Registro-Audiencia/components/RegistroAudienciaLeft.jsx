@@ -305,14 +305,14 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
     return (
         <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
-
-            {item.hitos &&
-                <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
-                    <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg></span>
-            }
-            {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse} />}
-            <div className={styles.headerLeftConBoton}>
+            <div className={styles.scrollArea}>
+                {item.hitos &&
+                    <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
+                        <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></span>
+                }
+                {showEditHitos && <EditHitos hitos={item.hitos} isHovered={isHovered} item={item} dateToUse={dateToUse} />}
+                <div className={styles.headerLeftConBoton}>
                 <h2 className={`${styles.audControlTitle}`}>
                     {item.numeroLeg} - {item.hora}
                     <span style={{ opacity: 0.6, fontSize: '0.65em', marginLeft: '12px', fontWeight: '400' }}>
@@ -623,7 +623,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </select></span>
                 </>
             }
-            <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
+                <span className={`${styles.inputLeftColumn} ${styles.footerSpace}`}></span>
+            </div>
             <Cronometro item={item} dateToUse={dateToUse} isHovered={isHovered} minuta={minuta} setMinuta={setMinuta} cierre={cierre} setCierre={setCierre} />
         </form>
     );
