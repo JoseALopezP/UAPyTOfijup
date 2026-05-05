@@ -19,7 +19,7 @@ const deepCopy = (obj) => {
 };
 
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, refreshAud }) {
-    const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
+    const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados, saveAudienciaDebate } = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -156,39 +156,57 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
         while (retries > 0 && !success) {
             try {
-                if (!deepEqual(caratula2, caratula)) await updateData(dateToUse, item.id, 'caratula', caratula);
-                if (!deepEqual(mpf2, mpf)) await updateData(dateToUse, item.id, 'mpf', mpf);
-                if (!deepEqual(defensa2, defensa)) await updateData(dateToUse, item.id, 'defensa', defensa);
-                if (!deepEqual(imputado2, imputado)) await updateData(dateToUse, item.id, 'imputado', imputado);
-                if (!deepEqual(partes2, partes)) await updateData(dateToUse, item.id, 'partes', partes);
-                if (!deepEqual(razonDemora2, razonDemora)) await updateData(dateToUse, item.id, 'razonDemora', razonDemora);
-                if (!deepEqual(ufi2, ufi)) await updateData(dateToUse, item.id, 'ufi', ufi);
-                if (!deepEqual(defensoria2, defensoria)) await updateData(dateToUse, item.id, 'defensoria', defensoria);
-                if (!deepEqual(saeNum2, saeNum)) await updateData(dateToUse, item.id, 'saeNum', saeNum);
+                let updatedItem = { ...item };
+                let itemChanged = false;
+
+                if (!deepEqual(caratula2, caratula)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'caratula', caratula); updatedItem.caratula = caratula; itemChanged = true; }
+                if (!deepEqual(mpf2, mpf)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'mpf', mpf); updatedItem.mpf = mpf; itemChanged = true; }
+                if (!deepEqual(defensa2, defensa)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'defensa', defensa); updatedItem.defensa = defensa; itemChanged = true; }
+                if (!deepEqual(imputado2, imputado)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'imputado', imputado); updatedItem.imputado = imputado; itemChanged = true; }
+                if (!deepEqual(partes2, partes)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'partes', partes); updatedItem.partes = partes; itemChanged = true; }
+                if (!deepEqual(razonDemora2, razonDemora)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'razonDemora', razonDemora); updatedItem.razonDemora = razonDemora; itemChanged = true; }
+                if (!deepEqual(ufi2, ufi)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'ufi', ufi); updatedItem.ufi = ufi; itemChanged = true; }
+                if (!deepEqual(defensoria2, defensoria)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'defensoria', defensoria); updatedItem.defensoria = defensoria; itemChanged = true; }
+                if (!deepEqual(saeNum2, saeNum)) { if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'saeNum', saeNum); updatedItem.saeNum = saeNum; itemChanged = true; }
 
                 if (showReconversion) {
                     if (!deepEqual(tipo, tipoAux)) {
                         if (!deepEqual(tipo2, tipo2Aux)) {
                             if (!deepEqual(tipo3, tipo3Aux)) {
-                                await updateData(dateToUse, item.id, 'tipo', tipo);
-                                await updateData(dateToUse, item.id, 'tipo2', tipo2);
-                                await updateData(dateToUse, item.id, 'tipo3', tipo3);
+                                if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
+                                    await updateData(dateToUse, item.id, 'tipo', tipo);
+                                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                                    await updateData(dateToUse, item.id, 'tipo3', tipo3);
+                                }
+                                updatedItem.tipo = tipo; updatedItem.tipo2 = tipo2; updatedItem.tipo3 = tipo3; itemChanged = true;
                             } else {
-                                await updateData(dateToUse, item.id, 'tipo', tipo);
-                                await updateData(dateToUse, item.id, 'tipo2', tipo2);
-                                await updateData(dateToUse, item.id, 'tipo3', '');
+                                if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
+                                    await updateData(dateToUse, item.id, 'tipo', tipo);
+                                    await updateData(dateToUse, item.id, 'tipo2', tipo2);
+                                    await updateData(dateToUse, item.id, 'tipo3', '');
+                                }
+                                updatedItem.tipo = tipo; updatedItem.tipo2 = tipo2; updatedItem.tipo3 = ''; itemChanged = true;
                             }
                         } else {
-                            await updateData(dateToUse, item.id, 'tipo', tipo);
-                            await updateData(dateToUse, item.id, 'tipo2', '');
-                            await updateData(dateToUse, item.id, 'tipo3', '');
+                            if (item.tipo !== "DEBATE DEL JUICIO ORAL") {
+                                await updateData(dateToUse, item.id, 'tipo', tipo);
+                                await updateData(dateToUse, item.id, 'tipo2', '');
+                                await updateData(dateToUse, item.id, 'tipo3', '');
+                            }
+                            updatedItem.tipo = tipo; updatedItem.tipo2 = ''; updatedItem.tipo3 = ''; itemChanged = true;
                         }
-                        await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
+                        if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'reconvertida', `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`);
+                        updatedItem.reconvertida = `${tipoAux} + ${tipo2Aux} + ${tipo3Aux}`; itemChanged = true;
                     }
                 }
                 if (await checkForResuelvo(item)) {
                     const currentTime = updateRealTimeFunction();
-                    await updateData(dateToUse, item.id, 'horaResuelvo', currentTime);
+                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, item.id, 'horaResuelvo', currentTime);
+                    updatedItem.horaResuelvo = currentTime; itemChanged = true;
+                }
+
+                if (item.tipo === "DEBATE DEL JUICIO ORAL" && itemChanged) {
+                    await saveAudienciaDebate(updatedItem);
                 }
 
                 await updateByDate(dateToUse);

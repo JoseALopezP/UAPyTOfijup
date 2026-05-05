@@ -8,7 +8,7 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
     const [changeToMake, setChangeToMake] = useState('')
     const [tiempoPedido, setTiempoPedido] = useState(false)
     const [pidiente, setPidiente] = useState(false)
-    const {updateData, pushToAudienciaArray, changeStatusBlockJuicio, updateByDate} = useContext(DataContext)
+    const {updateData, pushToAudienciaArray, changeStatusBlockJuicio, updateByDate, saveAudienciaDebate} = useContext(DataContext)
     const states = {
         'FINALIZADA': ['REINICIAR', 'RESUELVO'],
         'CUARTO_INTERMEDIO': ['CONTINUAR'],
@@ -31,14 +31,24 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
     const handleSubmit = async() =>{
         const currentTime = updateRealTimeFunction();
         try {
+            let updatedItem = { ...item };
+            let itemChanged = false;
+
             if(changeToMake==='RESUELVO'){
-                await updateData(dateToUse, audId, 'resuelvo', currentTime)
-                await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${translate[changeToMake]}`)
+                if (item && item.tipo !== "DEBATE DEL JUICIO ORAL") {
+                    await updateData(dateToUse, audId, 'resuelvo', currentTime)
+                    await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${translate[changeToMake]}`)
+                } else {
+                    updatedItem.resuelvo = currentTime;
+                    updatedItem.hitos = [...(updatedItem.hitos || []), `${currentTime} | ${translate[changeToMake]}`];
+                    itemChanged = true;
+                }
                 setChangeToMake('')
             }
             if(changeToMake && changeToMake!=='RESUELVO'){
                 const newEstado = translate[changeToMake];
-                await updateData(dateToUse, audId, 'estado', newEstado)
+                if (item && item.tipo !== "DEBATE DEL JUICIO ORAL") await updateData(dateToUse, audId, 'estado', newEstado);
+                else { updatedItem.estado = newEstado; itemChanged = true; }
                 
                 // Sincronizar con Juicio si es un debate
                 if (item && item.titulo === 'DEBATE' && item.juicioReference) {
@@ -47,10 +57,15 @@ export default function RegistroChangeState({estado, dateToUse, audId, estadoFun
                 }
 
                 if(changeToMake == 'CUARTO INTERMEDIO'){
-                    await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
+                    if (item && item.tipo !== "DEBATE DEL JUICIO ORAL") await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`)
+                    else { updatedItem.hitos = [...(updatedItem.hitos || []), `${currentTime} | ${newEstado} | ${tiempoPedido ? tiempoPedido : 0} | ${pidiente ? pidiente : "juez"}`]; itemChanged = true; }
                 }else{
-                    await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado}`)
+                    if (item && item.tipo !== "DEBATE DEL JUICIO ORAL") await pushToAudienciaArray(dateToUse, audId, `${currentTime} | ${newEstado}`)
+                    else { updatedItem.hitos = [...(updatedItem.hitos || []), `${currentTime} | ${newEstado}`]; itemChanged = true; }
                 }
+            }
+            if (item && item.tipo === "DEBATE DEL JUICIO ORAL" && itemChanged) {
+                await saveAudienciaDebate(updatedItem);
             }
             await estadoFunction(translate[changeToMake])
             await updateByDate(dateToUse)

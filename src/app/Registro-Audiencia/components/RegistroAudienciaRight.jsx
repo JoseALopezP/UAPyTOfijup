@@ -22,7 +22,7 @@ function extractNames(obj) {
 }
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, defensoria, estado, defensa, imputado, tipo, tipo2, tipo3, partes, needsSaving, onGlobalSave, isSaving }) {
-    const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
+    const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta, saveAudienciaDebate} = useContext(DataContext)
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -72,21 +72,38 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
 
         while (retries > 0 && !success) {
             try {
-                if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-                    await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
+                let updatedItem = { ...item };
+                let itemChanged = false;
+
+                if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined) {
+                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
                     setResuelvo2(resuelvo);
+                    updatedItem.resuelvoText = resuelvo;
+                    itemChanged = true;
                 }
-                if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-                    await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
+                if (!deepEqual(minuta2, minuta) && minuta !== undefined) {
+                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
                     setMinuta2(minuta);
+                    updatedItem.minuta = minuta;
+                    itemChanged = true;
                 }
-                if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
-                    await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
+                if (!deepEqual(cierre2, cierre) && cierre !== undefined) {
+                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
                     setCierre2(cierre);
+                    updatedItem.cierre = cierre;
+                    itemChanged = true;
                 }        
                 if (checkForResuelvo(item)) {
-                    await updateDataDeep(dateToUse, item.id, 'horaResuelvo', updateRealTimeFunction());
+                    const currentTime = updateRealTimeFunction();
+                    if (item.tipo !== "DEBATE DEL JUICIO ORAL") await updateDataDeep(dateToUse, item.id, 'horaResuelvo', currentTime);
+                    updatedItem.horaResuelvo = currentTime;
+                    itemChanged = true;
                 }
+
+                if (item.tipo === "DEBATE DEL JUICIO ORAL" && itemChanged) {
+                    await saveAudienciaDebate(updatedItem);
+                }
+
                 await setGuardarInc(false)
                 await updateByDate(dateToUse)
                 success = true;
