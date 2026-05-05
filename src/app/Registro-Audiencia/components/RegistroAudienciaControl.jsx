@@ -58,10 +58,6 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
 
     const handleGlobalSave = async () => {
         if (!aud || isSaving) return;
-        if (!aud.id) {
-            alert("Error: No se puede guardar porque la audiencia no tiene un ID válido.");
-            return;
-        }
         setIsSaving(true);
         
         let retries = 3;
@@ -69,24 +65,18 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         
         while (retries > 0 && !success) {
             try {
-                console.log(`Intento de guardado ${4 - retries}/3 para audiencia ${aud.id}`);
-                
                 // Guardar Minuta, Resuelvo, Cierre
                 if (minuta !== (aud.minuta || '') && removeHtmlTags(minuta) !== '') {
-                    console.log("Guardando minuta...");
                     await updateDataOnly(dateToUse, aud.id, 'minuta', minuta);
                 }
                 if (resuelvo !== (aud.resuelvoText || '') && removeHtmlTags(resuelvo) !== '') {
-                    console.log("Guardando resuelvo...");
                     await updateDataOnly(dateToUse, aud.id, 'resuelvoText', resuelvo);
                 }
                 if (cierre !== (aud.cierre || '') && removeHtmlTags(cierre) !== '') {
-                    console.log("Guardando cierre...");
                     await updateDataOnly(dateToUse, aud.id, 'cierre', cierre);
                 }
                 
                 // Guardar Metadatos
-                console.log("Guardando metadatos...");
                 if (caratula !== (aud.caratula || '')) await updateData(dateToUse, aud.id, 'caratula', caratula);
                 if (saeNum !== (aud.saeNum || '')) await updateData(dateToUse, aud.id, 'saeNum', saeNum);
                 if (razonDemora !== (aud.razonDemora || '')) await updateData(dateToUse, aud.id, 'razonDemora', razonDemora);
@@ -108,23 +98,19 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 }
 
                 if (checkForResuelvo(aud)) {
-                    console.log("Actualizando hora de resuelvo...");
                     await updateDataDeep(dateToUse, aud.id, 'horaResuelvo', updateRealTimeFunction());
                 }
 
-                console.log("Finalizando guardado y refrescando datos...");
                 await updateByDate(dateToUse);
                 if (refreshAud) await refreshAud();
-                
-                success = true; 
-                console.log("Guardado exitoso.");
+                success = true; // Succeeded!
             } catch (error) {
-                console.error(`Error en intento ${4 - retries}:`, error);
+                console.error(`Error saving all data. Retries left: ${retries - 1}`, error);
                 retries -= 1;
                 if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, 60000)); // Esperar 1m
+                    await new Promise(resolve => setTimeout(resolve, 60000)); // wait 1m
                 } else {
-                    alert(`Error al guardar los cambios: ${error.message || "Error desconocido"}. \n\nSi el problema persiste, verifique su conexión.`);
+                    alert("Error al guardar los cambios después de varios intentos. Verifique su conexión y reintente.");
                 }
             }
         }
