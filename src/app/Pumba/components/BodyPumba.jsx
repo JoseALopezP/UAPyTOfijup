@@ -101,7 +101,7 @@ export default function BodyPumba({ dateToUse }) {
                 saved.tipoVictima || audData.tipoVictima || '',
                 saved.sala || audData.sala || '',
                 saved.operador || audData.operador || '',
-                saved.fiscal || (tabItem.mpf ? tabItem.mpf[0].nombre : ''),
+                saved.fiscal || (tabItem.mpf && tabItem.mpf.length > 0 ? tabItem.mpf[0].nombre : ''),
                 saved.defensa || (tabItem.defensa && tabItem.defensa.length > 0 ? formatDefensa(tabItem.defensa[0]) : ''),
                 saved.juez || audData.juez || '',
                 saved.finAudiencia || audData.finAudiencia || '',
