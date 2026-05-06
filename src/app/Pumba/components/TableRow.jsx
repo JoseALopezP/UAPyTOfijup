@@ -115,7 +115,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index, onStatu
         cantImputados === '' && (savedData.cantImputados !== undefined && savedData.cantImputados !== '' ? setCantImputados(savedData.cantImputados) : audData.intervinientes && setCantImputados(audData.intervinientes.filter(el2 => el2.includes('IMPUTADO')).length))
         sala === '' && (savedData.sala ? setSala(savedData.sala) : tabItem.sala && setSala(tabItem.sala))
         operador === '' && (savedData.operador ? setOperador(savedData.operador) : tabItem.operador && setOperador(tabItem.operador))
-        fiscal === '' && (savedData.fiscal ? setFiscal(savedData.fiscal) : tabItem.mpf && setFiscal(tabItem.mpf[0].nombre))
+        fiscal === '' && (savedData.fiscal ? setFiscal(savedData.fiscal) : tabItem.mpf && tabItem.mpf.length > 0 && setFiscal(tabItem.mpf[0].nombre))
         defensa === '' && (savedData.defensa ? setDefensa(savedData.defensa) : tabItem.defensa && tabItem.defensa.length > 0 && setDefensa(formatDefensa(tabItem.defensa[0])))
         juez === '' && (savedData.juez ? setJuez(savedData.juez) : tabItem.juez && setJuez(tabItem.juez))
         finAudiencia === '' && (savedData.finAudiencia ? setFinAudiencia(savedData.finAudiencia) : audData.finAudiencia && setFinAudiencia(audData.finAudiencia))
@@ -422,7 +422,7 @@ export default function TableRow({ audData, dateToUse, autofillB, index, onStatu
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyPuma}`}>
                 {audData.intervinientes && audData.intervinientes.find(el => el.includes('FISCAL')) && audData.intervinientes.find(el => el.includes('FISCAL')).split(': ')[1]}</td>
             <td className={`${styles.cellBodyFixed} ${styles.cellBodyTablero}`}>
-                {tabItem.mpf && tabItem.mpf[0].nombre}</td>
+                {tabItem.mpf?.[0]?.nombre || ''}</td>
             <td className={fiscalT ? `${styles.cellBodyFixed} ${styles.cellBodyOk}` : `${styles.cellBodyFixed} ${styles.cellBodyError}`}>
                 <textarea className={`${styles.inputCell}`} value={fiscal} onChange={(e) => setFiscal(e.target.value)} />
             </td>
