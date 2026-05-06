@@ -1,7 +1,7 @@
 'use client'
 import styles from './sorteoOperador.module.css'
-import { DataContextProvider } from '@/context New/DataContext';
-import { AuthContextProvider } from '@/context New/AuthContext';
+import { DataContextProvider } from '@/context/DataContext';
+import { AuthContextProvider } from '@/context/AuthContext';
 import SorteoBlock from './components/SorteoBlock';
 import ListBlock from './components/ListBlock';
 
@@ -15,3 +15,4 @@ export default function Page() {
         </DataContextProvider></AuthContextProvider>
     );
 }
+

@@ -3,7 +3,7 @@ import { useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { Reconversion } from './Reconversion';
 import styles from '../RegistroAudiencia.module.css';
 import RegistroChangeState from './RegistroChangeState';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import DeleteSVGF from './DeleteSVGF';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import deepEqual from '@/utils/deepEqual';
@@ -11,7 +11,7 @@ import Cronometro from './Cronometro';
 import EditHitos from './EditHitos';
 import { nameTranslate } from '@/utils/traductorNombres';
 import { RepresentationSelector } from './RepresentationSelector';
-import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 const deepCopy = (obj) => {
     if (obj === null || typeof obj !== 'object') return obj;

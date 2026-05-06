@@ -1,8 +1,8 @@
 'use client'
 import { useContext, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context New/DataContext';
-import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
+import { DataContext } from '@/context/DataContext';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 export default function RegistroChangeState({estado, dateToUse, audId, estadoFunction, item, refreshAud}) {
     const [changeToMake, setChangeToMake] = useState('')

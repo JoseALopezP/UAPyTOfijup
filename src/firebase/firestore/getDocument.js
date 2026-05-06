@@ -1,18 +1,19 @@
 import firebase_app from "../config";
-import { getFirestore, getDoc, doc } from "firebase/firestore";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
-const db = getFirestore(firebase_app)
-export default async function getDocument(collectionName, fechaId, hora, numeroLeg) {
+const db = getFirestore(firebase_app);
+
+export default async function getDocument(collectionName, date) {
+    if (!collectionName || !date || (typeof date === 'string' && !date.trim())) {
+        // console.warn(`getDocument called with missing or invalid parameters: collectionName=${collectionName}, date=${date}`);
+        return null;
+    }
     try {
-        const docId = `${hora.replace(/:/g, '')}${numeroLeg}`;
-        const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
-        const snapshot = await getDoc(docRef);
-        if (snapshot.exists()) {
-            return snapshot.data();
-        }
-        return null;
+        const docRef = doc(db, collectionName, date);
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() ? docSnap.data() : null;
     } catch (e) {
-        console.error("Error getting document:", e);
-        return null;
+        console.error("Firebase fetch error:", e);
+        throw new Error(e.message || "Failed to fetch data from Firestore.");
     }
 }

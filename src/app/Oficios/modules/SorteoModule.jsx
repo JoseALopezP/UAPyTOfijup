@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from '../Oficios.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import { nameTranslateActuario } from '@/utils/traductorNombres'
 
 export default function SorteoModule({date, arr}) {

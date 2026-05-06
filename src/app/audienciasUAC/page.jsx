@@ -1,5 +1,5 @@
 'use client'
-import { DataContextProvider } from "@/context New/DataContext";
+import { DataContextProvider } from "@/context/DataContext";
 
 export default function Admin() {
     return (

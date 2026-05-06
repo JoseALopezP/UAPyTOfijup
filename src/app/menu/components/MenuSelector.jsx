@@ -3,7 +3,7 @@ import Link from 'next/link'
 import styles from '../Menu.module.css'
 import { useEffect, useContext } from 'react'
 import { useRouter } from 'next/navigation'
-import { AuthContext } from '@/context New/AuthContext'
+import { AuthContext } from '@/context/AuthContext'
 
 export default function MenuSelector() {
   const { user } = useContext(AuthContext);

@@ -10,7 +10,7 @@ import { agendarAudiencia, rechazarSolicitud } from '../src/app/Solicitudes-Audi
 import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
 import { extraerDetalles } from '../src/app/Solicitudes-Audiencia/funciones/extraccionDetalles.js';
 import { getInfoAudiencia } from '../src/app/Pumba/components/scrappingUAL.js';
-import { bloqueoMasivoAuto, parsearBloques } from '../src/firebase new/firestore/bloqueoAuto.js';
+import { bloqueoMasivoAuto, parsearBloques } from '../src/firebase/firestore/bloqueoAuto.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

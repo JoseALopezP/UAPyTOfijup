@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from './ScheduleTable.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { todayFunction } from '@/utils/dateUtils';
 
 export function ScheduleTable({ filterValue }) {

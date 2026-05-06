@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getFirestore, collection, doc, writeBatch, getDocs, getDoc } from 'firebase/firestore';
-import firebase_app from '@/firebase new/config'; // Usamos la configuración de 'firebase new'
+import firebase_app from '@/firebase/config'; // Usamos la configuración de 'firebase'
 
 const db = getFirestore(firebase_app);
 
@@ -216,3 +216,4 @@ const MigrationPanel = () => {
 };
 
 export default MigrationPanel;
+

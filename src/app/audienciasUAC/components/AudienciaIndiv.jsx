@@ -1,6 +1,6 @@
 import { useEffect, useContext, useState } from 'react';
 import styles from './audiencia.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { Oficio } from './Oficio';
 

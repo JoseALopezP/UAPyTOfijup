@@ -7,7 +7,7 @@ import { TestigoEditList } from './TestigoEditList';
 import { JuicioSelection } from './JuicioSelection';
 import EditExisting from './EditExisting';
 import { getCurrentYear } from '@/utils/dateUtils';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { ButtonSelection } from './ButtonSelection';
 
 export default function JuicioFrame() {

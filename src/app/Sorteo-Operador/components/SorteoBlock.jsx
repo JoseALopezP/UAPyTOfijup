@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import OperadorSelector from './OperadorSelector';
 import SorteoFunction from './SorteoFunction';
 import styles from '../sorteoOperador.module.css'
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import SorteoList from './SorteoList';
 import { formatDate } from '@/utils/excelUtils';
 import { todayFunction } from '@/utils/dateUtils';

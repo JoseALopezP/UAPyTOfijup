@@ -6,7 +6,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
 import dynamic from 'next/dynamic';
 const TextEditor = dynamic(() => import('@/app/Registro-Audiencia/components/TextEditor'), { ssr: false });
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 
 export default function OficioRightBlock({aud, date}) {
     const {updateData, updateByDate} = useContext(DataContext)

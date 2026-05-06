@@ -2,7 +2,7 @@
 import styles from '../Pumba.module.css'
 import Image from 'next/image'
 import { useState, useContext } from 'react'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 
 export default function HeaderPumba({ setDateToUse, autofillB, setAutofillB }) {
     const { pumaData, updatePumaData, addPumaData } = useContext(DataContext);

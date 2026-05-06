@@ -1,6 +1,6 @@
 'use client'
 import { useState, useContext, useEffect } from 'react'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import styles from '../SolicitudesAudiencia.module.css'
 
 const STORAGE_KEY = 'app-theme'

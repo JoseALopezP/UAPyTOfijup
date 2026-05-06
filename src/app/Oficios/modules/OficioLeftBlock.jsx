@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from '../Oficios.module.css';
 import ControlButtonsBlock from './ControlButtonsBlock';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import ErroresUgaList from './ErroresUgaList';
 
 export default function OficioLeftBlock({ date, aud }) {
@@ -102,3 +102,4 @@ export default function OficioLeftBlock({ date, aud }) {
         </div>
     );
 }
+

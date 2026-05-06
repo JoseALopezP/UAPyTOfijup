@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import { ButtonSelection } from './ButtonSelection'
 
 export default function AddJuicioInfo({ setBloquesArray, newState, onToggle, setTestigos, setJuicioInfo, juicioInfo }) {

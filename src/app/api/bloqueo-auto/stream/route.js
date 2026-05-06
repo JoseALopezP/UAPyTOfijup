@@ -10,7 +10,7 @@
  * }
  */
 export async function POST(request) {
-    const { bloqueoMasivoAuto, parsearBloques } = await import('@/firebase new/firestore/bloqueoAuto');
+    const { bloqueoMasivoAuto, parsearBloques } = await import('@/firebase/firestore/bloqueoAuto');
 
     const body = await request.json().catch(() => ({}));
 
@@ -48,3 +48,4 @@ export async function POST(request) {
         },
     });
 }
+

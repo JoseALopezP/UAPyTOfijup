@@ -1,6 +1,6 @@
 'use client'
 import styles from '../listasDesplegables.module.css'
-import { DataContext } from "@/context New/DataContext";
+import { DataContext } from "@/context/DataContext";
 import { useContext, useState } from 'react';
 import DesplegablesList from './DesplegablesList';
 import AddToListBlock from './AddToListBlock';

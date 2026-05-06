@@ -1,6 +1,6 @@
 'use client'
-import { AuthContextProvider } from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context New/DataContext";
+import { AuthContextProvider } from "@/context/AuthContext";
+import { DataContextProvider } from "@/context/DataContext";
 import styles from './Pumba.module.css'
 import HeaderPumba from "./components/HeaderPumba";
 import BodyPumba from "./components/BodyPumba";

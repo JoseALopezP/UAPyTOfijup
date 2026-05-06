@@ -1,7 +1,7 @@
 'use client'
 import styles from './ScheduleTable.module.css'
 import { useEffect, useContext } from 'react';
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 
 export function Clock() {
     const { updateRealTime, realTime } = useContext(DataContext);
@@ -24,4 +24,5 @@ export function Clock() {
         </div>
     )
 }
+
 

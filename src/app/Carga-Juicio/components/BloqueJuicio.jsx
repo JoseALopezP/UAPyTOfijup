@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 
 export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, index, removeBloque}){
     const [option, setOption] = useState(last ? 'LECTURA DE SENTENCIA' : 'DEBATE')
@@ -46,3 +46,4 @@ export function BloqueJuicio ({bloque, testigos, last, updateArrayAttribute, ind
         </div>
     )
 }
+

@@ -1,5 +1,5 @@
 export async function POST(request) {
-    const { parsearBloques, bloqueoMasivoAuto } = await import('@/firebase new/firestore/bloqueoAuto');
+    const { parsearBloques, bloqueoMasivoAuto } = await import('@/firebase/firestore/bloqueoAuto');
 
     // Configuración por defecto — se puede sobreescribir enviando body en el POST
     const FIXED_DEFAULT = {
@@ -39,3 +39,4 @@ export async function POST(request) {
         }
     );
 }
+

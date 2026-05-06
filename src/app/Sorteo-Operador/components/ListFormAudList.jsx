@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
 import styles from '../sorteoOperador.module.css'
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import ListIndiv from './ListIndiv';
 import { todayFunction } from '@/utils/dateUtils';
 

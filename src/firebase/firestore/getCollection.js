@@ -1,15 +1,23 @@
 import firebase_app from "../config";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
-const db = getFirestore(firebase_app)
+const db = getFirestore(firebase_app);
+
+/**
+ * Fetches all documents from a top-level collection.
+ * @param {string} collectionName 
+ * @returns {Promise<Array>}
+ */
 export default async function getCollection(collectionName) {
-    let result = null;
     try {
-        const document = collection(db, collectionName)
-        const col = await getDocs(document)
-        result = await col.docs.map((doc) => doc = {id: doc.id, ...doc.data()})
+        const colRef = collection(db, collectionName);
+        const snapshot = await getDocs(colRef);
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
     } catch (e) {
-        console.log(e)
+        console.error("Firebase fetch error:", e);
+        throw new Error(e.message || "Failed to fetch collection from Firestore.");
     }
-    return result;
 }

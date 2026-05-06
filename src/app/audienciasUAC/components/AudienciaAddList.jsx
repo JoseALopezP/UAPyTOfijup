@@ -1,6 +1,6 @@
 import { useEffect, useContext, useState } from 'react';
 import styles from './audiencia.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { AudienciaIndiv } from './AudienciaIndiv';
 
 export function AudienciaAddList() {
@@ -51,3 +51,4 @@ export function AudienciaAddList() {
         </section>
     );
 }
+

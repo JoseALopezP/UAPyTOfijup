@@ -1,7 +1,7 @@
 'use client'
 import { useContext, useEffect } from 'react'
 import styles from '../Menu.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import { todayFunction } from '@/utils/dateUtils'
 
 export default function MenuImportantDates() {

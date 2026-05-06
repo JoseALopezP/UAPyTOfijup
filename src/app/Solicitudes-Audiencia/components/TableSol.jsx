@@ -1,10 +1,10 @@
 'use client'
 import { useContext, useEffect, useState, useCallback } from "react"
-import { DataContext } from "@/context New/DataContext"
+import { DataContext } from "@/context/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
 import RowSol from "./RowSol"
 import { compareFyH } from "@/utils/compareFecha"
-import { addOrUpdateObject } from "@/firebase new/firestore/addOrUpdateObject"
+import { addOrUpdateObject } from "@/firebase/firestore/addOrUpdateObject"
 
 // sortKey  → campo en el objeto solicitud para ordenar (null = no sorteable)
 // filterKey → campo(s) en el objeto para filtrar (string o array de strings)
@@ -208,3 +208,4 @@ export default function TableSol() {
         </div>
     )
 }
+

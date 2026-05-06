@@ -1,7 +1,7 @@
 'use client'
 import styles from './AudienciaList.module.css'
 import { useContext, useEffect } from 'react'
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { titillium } from '../ui/fonts';
 import { todayFunction } from '@/utils/dateUtils';
 

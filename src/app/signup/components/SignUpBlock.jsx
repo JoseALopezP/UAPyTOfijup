@@ -1,7 +1,7 @@
 'use client'
 import { useState, useContext } from 'react';
 import signUp from '@/firebase/auth/signup';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 
 export function SignUpBlock() {
     const { addUser } = useContext(DataContext);

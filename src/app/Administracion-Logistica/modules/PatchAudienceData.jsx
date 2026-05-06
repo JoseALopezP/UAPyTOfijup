@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useContext, useEffect } from 'react';
 import styles from '../administracionLogistica.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 
 export default function PatchAudienceData() {
     const { updateByDateView, bydateView, updateData, updateByDate } = useContext(DataContext);
@@ -3476,3 +3476,4 @@ export default function PatchAudienceData() {
         </div>
     );
 }
+

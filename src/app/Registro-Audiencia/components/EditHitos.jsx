@@ -1,7 +1,7 @@
 'use client'
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 
 export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
   const { updateData } = useContext(DataContext);
@@ -126,3 +126,4 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
     </div>
   );
 }
+

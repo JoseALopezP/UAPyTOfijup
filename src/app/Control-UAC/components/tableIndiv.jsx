@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useContext } from 'react'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import styles from '../ControlUac.module.css'
 
 export default function TableIndiv({item, date}){

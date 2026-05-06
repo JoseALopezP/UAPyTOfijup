@@ -2,7 +2,7 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
 import { saveLocalVersion } from '@/utils/localBackup';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
 import { generatePDF } from '@/utils/pdfUtils';
 import deepEqual from '@/utils/deepEqual';
@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 const TextEditor = dynamic(() => import('./TextEditor'), { ssr: false });
 import RegistroNavBar from './RegistroNavBar';
 import { removeHtmlTags } from '@/utils/removeHtmlTags';
-import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 import HistorialDeVersiones from './HistorialVersiones';
 import normalizeHtml from '@/utils/normalizeHtml';
 

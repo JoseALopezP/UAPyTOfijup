@@ -1,13 +1,13 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react';
-import RegistroAudienciaList from './components/RegistroAudienciaList';
-import { todayFunction } from '@/utils/dateUtils';
+import RegistroAudienciaList from './components/RegistroAudienciaList.jsx';
+import { todayFunction } from '@/utils/dateUtils.js';
 import styles from './RegistroAudiencia.module.css'
-import { DataContextProvider } from '@/context New/DataContext';
-import { AuthContextProvider } from '@/context New/AuthContext';
-import RegistroAudienciaControl from './components/RegistroAudienciaControl';
+import { DataContextProvider } from '@/context/DataContext.js';
+import { AuthContextProvider } from '@/context/AuthContext.js';
+import RegistroAudienciaControl from './components/RegistroAudienciaControl.jsx';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import firebase_app from '@/firebase new/config';
+import firebase_app from '@/firebase/config.js';
 
 const db = getFirestore(firebase_app);
 
@@ -80,3 +80,4 @@ export default function Page() {
         </DataContextProvider></AuthContextProvider>
     );
 }
+

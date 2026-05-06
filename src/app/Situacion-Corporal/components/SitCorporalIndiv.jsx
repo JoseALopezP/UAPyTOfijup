@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react'
 import styles from '../SituacionCorporal.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 
 export default function SitCorporalIndiv({aud, date, selected, selectedF}) {
     const [sit, setSit] = useState(aud.situacion)

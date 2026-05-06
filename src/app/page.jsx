@@ -1,6 +1,6 @@
 'use client'
-import { AuthContextProvider } from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context New/DataContext";
+import { AuthContextProvider } from "@/context/AuthContext";
+import { DataContextProvider } from "@/context/DataContext";
 import Menu from "./menu/page";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";

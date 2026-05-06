@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../RegistroAudiencia.module.css';
-import { DataContext } from '@/context New/DataContext';
-import RegistroAudienciaLeft from './RegistroAudienciaLeft';
-import RegistroAudienciaRight from './RegistroAudienciaRight';
-import deepEqual from '@/utils/deepEqual';
-import { removeHtmlTags } from '@/utils/removeHtmlTags';
-import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
-import { checkForResuelvo } from '@/utils/resuelvoUtils';
+import { DataContext } from '@/context/DataContext.js';
+import RegistroAudienciaLeft from './RegistroAudienciaLeft.jsx';
+import RegistroAudienciaRight from './RegistroAudienciaRight.jsx';
+import deepEqual from '@/utils/deepEqual.js';
+import { removeHtmlTags } from '@/utils/removeHtmlTags.js';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction.js';
+import { checkForResuelvo } from '@/utils/resuelvoUtils.js';
 
 export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, setNeedsSaving1, setNeedsSaving2, needsSaving1, needsSaving2, refreshAud}) {
     const {updateDesplegables, updateDataOnly, updateDataDeep, updateByDate, updateData} = useContext(DataContext)
@@ -56,7 +56,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     // needsSaving2 es manejado por RegistroAudienciaRight
     // El estado de sala/operador se guarda inmediatamente, no necesita tracking
 
-    const handleGlobalSave = async () => {
+    const handleGlobalSave = useCallback(async () => {
         if (!aud || isSaving) return;
         setIsSaving(true);
         
@@ -115,7 +115,29 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
             }
         }
         setIsSaving(false);
-    };
+    }, [aud, isSaving, minuta, resuelvo, cierre, caratula, saeNum, razonDemora, ufi, estado, defensoria, operadorAud, sala, mpf, defensa, imputado, partes, tipo, tipo2, tipo3, dateToUse, updateDataOnly, updateData, updateDataDeep, updateByDate, refreshAud]);
+
+    useEffect(() => {
+        const handleAutoSave = () => {
+            if (document.visibilityState === 'hidden' && (needsSaving1 || needsSaving2)) {
+                handleGlobalSave();
+            }
+        };
+
+        const handleBlur = () => {
+            if (needsSaving1 || needsSaving2) {
+                handleGlobalSave();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleAutoSave);
+        window.addEventListener('blur', handleBlur);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleAutoSave);
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, [handleGlobalSave, needsSaving1, needsSaving2]);
 
 
     return (

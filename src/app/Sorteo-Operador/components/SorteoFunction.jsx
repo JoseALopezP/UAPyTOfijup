@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import styles from '../sorteoOperador.module.css'
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { todayFunction } from '@/utils/dateUtils';
 
 export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr, selectedSorteo, setSelectedSorteo, setEmptyTitle, setTitleSorteo}){
@@ -40,3 +40,4 @@ export default function SorteoFunction({selectedList, titleSorteo, sorteoListCur
         </div>
     );
 }
+

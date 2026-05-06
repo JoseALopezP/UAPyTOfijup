@@ -1,6 +1,6 @@
 'use client'
 import { useContext, useState, useEffect, useRef, useMemo } from "react"
-import { DataContext } from "@/context New/DataContext"
+import { DataContext } from "@/context/DataContext"
 import styles from "../SolicitudesAudiencia.module.css"
 import ExpandContent from "./ExpandContent"
 import SelectorDropdown from "./SelectorDropdown"

@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import styles from '../Oficios.module.css';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 
 export default function ErroresUgaList({ aud, date, errores, setErrores }) {
     const { updateData } = useContext(DataContext);

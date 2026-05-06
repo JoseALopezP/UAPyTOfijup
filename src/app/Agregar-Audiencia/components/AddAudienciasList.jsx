@@ -1,4 +1,4 @@
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import styles from './AddAudiencia.module.css'
 import { AddAudienciaTableHead } from './AddAudienciaTableHead';
 import { AddAudienciaIndiv } from './AddAudienciaIndiv';
@@ -26,3 +26,4 @@ export function AddAudienciaList ({date}){
         </section>
     )
 }
+

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import styles from './Carga-Juicio.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import { ButtonSelection } from './ButtonSelection'
 import { numberCheck, listCheck, typeCheck, changeHandler, changeHandlerSplitter, digitsCheck } from '@/utils/inputChecks'
 

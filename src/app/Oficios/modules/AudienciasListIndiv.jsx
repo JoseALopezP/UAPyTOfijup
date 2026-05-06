@@ -3,7 +3,7 @@ import { nameTranslateActuario } from '@/utils/traductorNombres'
 import styles from '../Oficios.module.css'
 import { oficioState } from '@/utils/oficioState'
 import { useContext, useEffect, useState } from 'react'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 
 const SVGs = {
     'vacio': (

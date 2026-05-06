@@ -1,41 +1,36 @@
-import { doc, setDoc, deleteDoc, getDocs, collection, getFirestore } from "firebase/firestore";
+import { collection, doc, getFirestore, writeBatch } from "firebase/firestore";
 import firebase_app from "../config";
 
 const db = getFirestore(firebase_app);
 
-export async function saveAudienciaByFecha(fechaId, data) {
-  const audId = `${data.hora}${data.numeroLeg}`;
-  const docRef = doc(db, "audiencias", fechaId, "audiencias", audId);
-  await setDoc(docRef, data, { merge: true });
-}
-
-export async function saveAudienciaByLegajo(numeroLeg, data) {
-  const audId = `${data.hora}${data.numeroLeg}`;
-  const docRef = doc(db, "legajos", numeroLeg, "audiencias", audId);
-  await setDoc(docRef, data, { merge: true });
-}
-
-export async function getAudienciasByLegajo(numeroLeg) {
-  const collectionRef = collection(db, "legajos", numeroLeg, "audiencias");
-  const querySnapshot = await getDocs(collectionRef);
-  return querySnapshot.docs.map(doc => doc.data());
-}
-
-export async function deleteAudiencia(fechaId, numeroLeg, hora) {
-  const audId = `${hora.replace(/:/g, '')}${numeroLeg}`;
-  const docRefFecha = doc(db, "audiencias", fechaId, "audiencias", audId);
-  await deleteDoc(docRefFecha);
-  const docRefLegajo = doc(db, "legajos", numeroLeg, "audiencias", audId);
-  await deleteDoc(docRefLegajo);
-}
-
-export default async function addOrUpdateDocument(collectionName, fechaId, data) {
+export default async function addOrUpdateDocument(collectionName, date, subCol, data, customId = null) {
+  if (!collectionName || !date || !subCol) {
+    // console.warn(`addOrUpdateDocument called with missing parameters: ${collectionName}/${date}/${subCol}`);
+    return null;
+  }
   try {
-    const cleanHora = data.hora.replace(/:/g, '');
-    const docId = `${cleanHora}${data.numeroLeg}`;
-    const docRef = doc(db, collectionName, fechaId, "audiencias", docId);
-    await setDoc(docRef, data, { merge: true });
+    const batch = writeBatch(db);
+
+    // Generar el ID antes de escribir (o usar el provisto)
+    const targetCollectionRef = collection(db, collectionName, date, subCol);
+    const newDocRef = customId ? doc(targetCollectionRef, customId) : doc(targetCollectionRef);
+    const audId = customId || newDocRef.id;
+
+    // Inyectar el ID dentro del propio data
+    const dataWithId = { ...data, id: audId };
+
+    // Operación 1: subcolección
+    batch.set(newDocRef, dataWithId);
+
+    // Operación 2: audienciasView (mirror)
+    const viewDocRef = doc(db, "audienciasView", date);
+    batch.set(viewDocRef, { [audId]: dataWithId }, { merge: true });
+
+    // Commit ATÓMICO → ambas o ninguna
+    await batch.commit();
+    return audId;
   } catch (e) {
-    console.error("Error in addOrUpdateDocument:", e);
+    console.error("Error adding/updating document:", e);
+    throw new Error(e.message || "Failed to add or update document.");
   }
 }

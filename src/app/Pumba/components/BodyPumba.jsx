@@ -1,7 +1,7 @@
 'use client'
 import styles from '../Pumba.module.css'
 import { useContext, useEffect, useState } from 'react'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 import TableRow from './TableRow';
 import { calculateCuartos, calculateCuartosOtros } from '@/utils/calculators';
 import { formatDefensa } from '@/utils/genderUtils';

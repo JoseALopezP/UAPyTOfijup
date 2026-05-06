@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import TableIndiv from './tableIndiv';
 
 export default function TableBody({ date, filterValue }) {
@@ -49,3 +49,4 @@ export default function TableBody({ date, filterValue }) {
         </>
     );
 }
+

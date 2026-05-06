@@ -1,4 +1,4 @@
-import getDocument from '@/firebase new/firestore/getDocument';
+import getDocument from '@/firebase/firestore/getDocument';
 
 export const maxDuration = 60;
 
@@ -26,3 +26,4 @@ export async function GET() {
         return Response.json({ error: error.message, solicitudes: [] }, { status: 200 });
     }
 }
+

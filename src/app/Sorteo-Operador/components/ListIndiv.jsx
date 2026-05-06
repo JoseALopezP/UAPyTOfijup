@@ -1,6 +1,6 @@
 import styles from '../sorteoOperador.module.css'
 import demoraCalculator from '@/utils/demoraCalculator';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import { nameTranslate } from '@/utils/traductorNombres';
 import { useContext, useEffect, useState } from 'react';
 import { todayFunction } from '@/utils/dateUtils';

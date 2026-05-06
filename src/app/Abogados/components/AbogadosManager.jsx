@@ -1,6 +1,6 @@
 'use client'
 import { useContext, useEffect, useState, useCallback } from 'react';
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import styles from './Abogados.module.css';
 import { LISTA_ABOGADOS_INICIAL } from './listaAbogadosData';
 
@@ -526,3 +526,4 @@ export default function AbogadosManager() {
         </div>
     );
 }
+

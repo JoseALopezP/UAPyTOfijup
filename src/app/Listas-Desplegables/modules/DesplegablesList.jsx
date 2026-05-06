@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from '../listasDesplegables.module.css'
-import { DataContext } from '@/context New/DataContext';
+import { DataContext } from '@/context/DataContext';
 import Selector from './Selector';
 
 export default function DesplegablesList({desplegableFunction, listSelection, setListSelection}) {

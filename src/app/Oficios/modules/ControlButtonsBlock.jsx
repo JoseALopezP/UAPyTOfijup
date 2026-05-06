@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import styles from '../Oficios.module.css'
-import { DataContext } from '@/context New/DataContext'
+import { DataContext } from '@/context/DataContext'
 
 export default function ControlButtonsBlock({date, aud, control, controlFunction, auxControl, setAuxControl}) {
     const {updateData} = useContext(DataContext)

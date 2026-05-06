@@ -1,6 +1,6 @@
 'use client'
-import { AuthContextProvider} from "@/context New/AuthContext";
-import { DataContextProvider } from "@/context New/DataContext";
+import { AuthContextProvider} from "@/context/AuthContext";
+import { DataContextProvider } from "@/context/DataContext";
 import JuicioFrame from './components/JuicioFrame';
 
 export default function page(){

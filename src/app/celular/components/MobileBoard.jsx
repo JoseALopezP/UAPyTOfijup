@@ -1,7 +1,7 @@
 'use client'
 import { useContext, useEffect, useState } from 'react';
-import { DataContext } from '@/context New/DataContext';
-import { useAuthContext } from '@/context New/AuthContext';
+import { DataContext } from '@/context/DataContext';
+import { useAuthContext } from '@/context/AuthContext';
 import { todayFunction } from '@/utils/dateUtils';
 import { generateMinutaSection } from '@/utils/resuelvoUtils';
 import { useRouter } from 'next/navigation';
@@ -212,3 +212,4 @@ export default function MobileBoard() {
         </div>
     );
 }
+

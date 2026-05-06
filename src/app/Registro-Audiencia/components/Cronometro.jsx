@@ -2,8 +2,8 @@
 
 import styles from '../RegistroAudiencia.module.css';
 import { useState, useContext, useEffect, useRef } from 'react';
-import { DataContext } from '@/context New/DataContext';
-import updateRealTimeFunction from '@/firebase new/firestore/updateRealTimeFunction';
+import { DataContext } from '@/context/DataContext';
+import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 const translateColor = {
     'FINALIZADA': '#28a745',
@@ -350,3 +350,4 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
         </div>
     );
 }
+
