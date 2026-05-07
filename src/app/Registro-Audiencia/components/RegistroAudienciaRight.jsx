@@ -67,23 +67,25 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     }
     const updateDataAud = async() => {
         setGuardando(true)
-        if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
+        // Permitir guardar contenido vacío (borrado legítimo)
+        if (normalizeHtml(resuelvo2) !== normalizeHtml(resuelvo)) {
             await updateDataOnly(dateToUse, item.id, 'resuelvoText', resuelvo);
             setResuelvo2(resuelvo);
         }
-        if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
+        if (normalizeHtml(minuta2) !== normalizeHtml(minuta)) {
             await updateDataOnly(dateToUse, item.id, 'minuta', minuta);
             setMinuta2(minuta);
         }
-        if (!deepEqual(cierre2, cierre) && cierre !== undefined && removeHtmlTags(cierre) !== '') {
+        if (normalizeHtml(cierre2) !== normalizeHtml(cierre)) {
             await updateDataOnly(dateToUse, item.id, 'cierre', cierre);
             setCierre2(cierre);
         }        
         if (checkForResuelvo(item)) {
             await updateDataDeep(dateToUse, item.id, 'horaResuelvo', updateRealTimeFunction());
         }
-        await setGuardarInc(false)
-        await setGuardando(false)
+        setGuardarInc(false)
+        setNeedsSaving2(false)
+        setGuardando(false)
         await updateByDate(dateToUse)
     }
     const handleSubmit = async () => {
@@ -94,9 +96,9 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         await setCheckDescarga('')
     }
     const checkGuardar = useCallback(() => {
-        const guardarStatus = !deepEqual(resuelvo2, resuelvo) ||
-            !deepEqual(normalizeHtml(minuta2), normalizeHtml(minuta)) ||
-            !deepEqual(normalizeHtml(cierre2), normalizeHtml(cierre))
+        const guardarStatus = normalizeHtml(resuelvo2) !== normalizeHtml(resuelvo) ||
+            normalizeHtml(minuta2) !== normalizeHtml(minuta) ||
+            normalizeHtml(cierre2) !== normalizeHtml(cierre)
         setGuardarInc(guardarStatus);
         setNeedsSaving2(guardarStatus)
     }, [resuelvo, resuelvo2, minuta, minuta2, cierre, cierre2]);
