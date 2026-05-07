@@ -146,7 +146,7 @@ export default function TextEditor({ textValue, setTextValue }) {
         </button>
       </div>
 
-      <div className={styles.quillContainer}>
+      <div className={styles.quillContainer} spellcheck="true">
         <ReactQuill
           ref={quillRef}
           value={textValue}
