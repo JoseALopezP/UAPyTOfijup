@@ -18,7 +18,7 @@ const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj));
 };
 
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, refreshAud }) {
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, mpfSubrogandoPor, setMpfSubrogandoPor, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, refreshAud }) {
     const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
@@ -30,6 +30,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const [razonDemora2, setRazonDemora2] = useState('');
     const [ufi2, setUfi2] = useState('');
     const [defensoria2, setDefensoria2] = useState('');
+    const [mpfSubrogandoPor2, setMpfSubrogandoPor2] = useState('');
     const [tipoAux, setTipoAux] = useState('');
     const [tipo2Aux, setTipo2Aux] = useState('');
     const [tipo3Aux, setTipo3Aux] = useState('');
@@ -137,6 +138,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setRazonDemora2(item.razonDemora || '');
         setUfi2(item.ufi || '');
         setDefensoria2(item.defensoria || '');
+        setMpfSubrogandoPor2(item.mpfSubrogandoPor || '');
         setTipoAux(item.tipo || '');
         setTipo2Aux(item.tipo2 || '');
         setTipo3Aux(item.tipo3 || '');
@@ -158,6 +160,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 if (!deepEqual(razonDemora2, razonDemora)) await updateData(dateToUse, item.id, 'razonDemora', razonDemora);
                 if (!deepEqual(ufi2, ufi)) await updateData(dateToUse, item.id, 'ufi', ufi);
                 if (!deepEqual(defensoria2, defensoria)) await updateData(dateToUse, item.id, 'defensoria', defensoria);
+                if (!deepEqual(mpfSubrogandoPor2, mpfSubrogandoPor)) await updateData(dateToUse, item.id, 'mpfSubrogandoPor', mpfSubrogandoPor);
                 if (!deepEqual(saeNum2, saeNum)) await updateData(dateToUse, item.id, 'saeNum', saeNum);
 
                 if (showReconversion) {
@@ -195,6 +198,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 setRazonDemora2(razonDemora);
                 setUfi2(ufi);
                 setDefensoria2(defensoria);
+                setMpfSubrogandoPor2(mpfSubrogandoPor);
                 setSaeNum2(saeNum);
                 if (showReconversion) {
                     setTipoAux(tipo);
@@ -236,6 +240,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             normalize(razonDemora2) !== normalize(razonDemora) ||
             normalize(ufi2) !== normalize(ufi) ||
             normalize(defensoria2) !== normalize(defensoria) ||
+            normalize(mpfSubrogandoPor2) !== normalize(mpfSubrogandoPor) ||
             (showReconversion && (
                 normalize(tipoAux) !== normalize(tipo) ||
                 normalize(tipo2Aux) !== normalize(tipo2) ||
@@ -248,7 +253,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
         setGuardarInc(hasChanges);
         setNeedsSaving1(hasChanges);
-    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, defensoria, defensoria2, tipo, tipo2, tipo3, tipoAux, tipo2Aux, tipo3Aux, showReconversion, saeNum, saeNum2]);
+    }, [caratula, caratula2, mpf, mpf2, razonDemora, razonDemora2, defensa, defensa2, imputado, imputado2, partes, partes2, ufi, ufi2, defensoria, defensoria2, mpfSubrogandoPor, mpfSubrogandoPor2, tipo, tipo2, tipo3, tipoAux, tipo2Aux, tipo3Aux, showReconversion, saeNum, saeNum2]);
     const operadorChange = (valueAux) => {
         updateData(dateToUse, item.id, 'operador', valueAux)
         setOperadorAud(valueAux)
@@ -383,6 +388,16 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                             <option key={option} value={option}>{option}</option>
                         ))}</datalist>
                     </div>
+                    {mpf.some(m => m.subrogando) && (
+                        <div className={styles.inputRow} style={{ marginTop: '10px' }}>
+                            <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>A quien subroga:</label>
+                            <input list='fiscalesListSub' className={`${styles.inputLeft} ${styles.inputLeft100}`} value={mpfSubrogandoPor || ''}
+                                onChange={(e) => setMpfSubrogandoPor(e.target.value)} placeholder="Subrogando a..." />
+                            <datalist id='fiscalesListSub'>{fiscalesList && fiscalesList.map(option => (
+                                <option key={option} value={option}>{option}</option>
+                            ))}</datalist>
+                        </div>
+                    )}
                 </span>
             )}
             <div className={styles.sectionHeader} onClick={() => toggleSection('imputados')}>
