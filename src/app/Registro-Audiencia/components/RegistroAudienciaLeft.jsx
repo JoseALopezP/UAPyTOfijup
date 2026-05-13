@@ -18,11 +18,8 @@ const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj));
 };
 
-<<<<<<< HEAD
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, resuelvo, refreshAud }) {
-=======
-export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, mpfSubrogandoPor, setMpfSubrogandoPor, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, refreshAud }) {
->>>>>>> ca79055ad4b236b307550756d2330dfcf4696c6c
+
+export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, mpfSubrogandoPor, setMpfSubrogandoPor, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, resuelvo, refreshAud }) {
     const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
