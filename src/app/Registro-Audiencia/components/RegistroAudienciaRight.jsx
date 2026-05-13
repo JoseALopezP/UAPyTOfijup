@@ -23,6 +23,7 @@ function extractNames(obj) {
 const cierreModelo = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`
 export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUse, resuelvo, setResuelvo, minuta, setMinuta, cierre, setCierre, sala, saeNum, caratula, razonDemora, mpf, ufi, defensoria, estado, defensa, imputado, tipo, tipo2, tipo3, partes, needsSaving, onGlobalSave, isSaving }) {
     const {updateDataDeep, updateDataOnly, updateByDate, modelosMinuta, updateModelosMinuta} = useContext(DataContext)
+    const isDebate = item.tipo?.toUpperCase().includes('DEBATE');
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const [modeloSelector, setModeloSelector] = useState('');
@@ -189,12 +190,12 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
 
                 <button type='button' className={`${styles.buttonDownload}`} onClick={() => handleDescargar()}>{item.resuelvo ? 'DESCARGAR MINUTA' : '-'}</button>
             </div>
-            <RegistroNavBar navbarList={['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab} needsSaving={needsSaving} onSave={onGlobalSave} isSaving={isSaving}/>
+            <RegistroNavBar navbarList={isDebate ? ['Cuerpo minuta', 'Resuelvo'] : ['Cuerpo minuta', 'Resuelvo', 'Cierre']} selectedTab={selectedTab} setSelectedTab={setSelectedTab} needsSaving={needsSaving} onSave={onGlobalSave} isSaving={isSaving}/>
             {selectedTab === 'Cuerpo minuta' &&
                 <TextEditor key={`minuta-${item.id}`} textValue={minuta} setTextValue={setMinuta}/>
             }{selectedTab === 'Resuelvo' &&
                 <TextEditor key={`resuelvo-${item.id}`} textValue={resuelvo} setTextValue={setResuelvo}/>
-            }{selectedTab === 'Cierre' &&
+            }{selectedTab === 'Cierre' && !isDebate &&
                 <TextEditor key={`cierre-${item.id}`} textValue={cierre} setTextValue={setCierre}/>
             }
         </div></>

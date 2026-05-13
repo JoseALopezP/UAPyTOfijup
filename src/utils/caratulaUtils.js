@@ -6,7 +6,7 @@ import React from "react";
 
 export function normalizeName(name) {
     if (!name) return '';
-    return name.toLowerCase().replace(/(^|[ \t\n,])([a-z\u00C0-\u017F])/g, (match, p1, p2) => p1 + p2.toUpperCase());
+    return name.toLowerCase().replace(/(^|[ \t\n,\.\-])([a-z\u00C0-\u017F])/g, (match, p1, p2) => p1 + p2.toUpperCase());
 }
 
 export function capitalizeFirst(sentence) {

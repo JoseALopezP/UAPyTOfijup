@@ -12,7 +12,7 @@ export default function menu() {
       <AuthContextProvider>
         <DataContextProvider>
             <SelectBar selectedList={selectedList} setSelectedList={setSelectedList}/>
-            <EditBlock />
+            <EditBlock selectedList={selectedList} />
         </DataContextProvider>
       </AuthContextProvider>
       </>

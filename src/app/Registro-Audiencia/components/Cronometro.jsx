@@ -4,6 +4,7 @@ import styles from '../RegistroAudiencia.module.css';
 import { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '@/context/DataContext';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
+import { removeHtmlTags } from '@/utils/removeHtmlTags';
 
 const translateColor = {
     'FINALIZADA': '#28a745',
@@ -15,8 +16,10 @@ const translateColor = {
     'RESUELVO': '#1F572B'
 };
 
-export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinuta, cierre, setCierre }) {
+export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinuta, cierre, setCierre, resuelvoText }) {
     const { updateData, updateDataOnly, pushToAudienciaArray, updateByDate } = useContext(DataContext);
+
+    const isDebate = item.tipo?.toUpperCase().includes('DEBATE');
 
     const formatJudges = (j) => {
         if (!j) return "";
@@ -43,6 +46,11 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
     const [timeStampStart, setTimeStampStart] = useState(item.stopwatchStart || 0);
     const [progress, setProgress] = useState(0);
     const [isPressing, setIsPressing] = useState(false);
+
+    // Debate finalization states
+    const [debateFinShow, setDebateFinShow] = useState(false);
+    const [debateNextDate, setDebateNextDate] = useState('');
+    const [debateNextTime, setDebateNextTime] = useState('08:00');
 
     const intervalRef = useRef(null);
     const savingRef = useRef(false);
@@ -115,6 +123,11 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
             setCuartoShow(true);
             return;
         }
+        // Debate: show date/time inputs before finalizing
+        if (isDebate && currentState === 'FINALIZADA' && !debateFinShow) {
+            setDebateFinShow(true);
+            return;
+        }
         if (savingRef.current) return;
         if (!currentState) return;
 
@@ -124,6 +137,16 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
 
         try {
             if (currentState === 'RESUELVO') {
+                // Debate: only allow Resuelvo if resuelvoText has content
+                if (isDebate) {
+                    const hasContent = resuelvoText && removeHtmlTags(resuelvoText).trim() !== '';
+                    if (!hasContent) {
+                        setErrorMsg('Escriba el contenido del Resuelvo antes de completar.');
+                        savingRef.current = false;
+                        setGuardando(false);
+                        return;
+                    }
+                }
                 await withRetry(() => updateData(dateToUse, item.id, 'resuelvo', updateRealTimeFunction()));
                 await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', `${updateRealTimeFunction()} | ${currentState}`));
             } else {
@@ -136,6 +159,7 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
 
                 await withRetry(() => pushToAudienciaArray(dateToUse, item.id, 'hitos', entry));
                 setCuartoShow(false);
+                setDebateFinShow(false);
 
                 // Actualizar Minuta con texto automático
                 const currentHora = updateRealTimeFunction();
@@ -161,26 +185,35 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
                     setMinuta(updatedMinuta);
                     await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
                 } else if (currentState === 'FINALIZADA') {
-                    const currentHora = updateRealTimeFunction();
-                    let updatedCierre = cierre || item.cierre || "";
-                    const closureModel = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`;
-
-                    if (!updatedCierre || updatedCierre.replace(/<[^>]*>/g, '').trim() === "") {
-                        updatedCierre = closureModel.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                    if (isDebate) {
+                        // Debate: inject cuarto intermedio for next day into minuta body
+                        const text = `<br><b>Sr. Juez dispone CUARTO INTERMEDIO para el día ${debateNextDate} a las ${debateNextTime} horas.</b>`;
+                        updatedMinuta += text;
+                        setMinuta(updatedMinuta);
+                        await withRetry(() => updateDataOnly(dateToUse, item.id, 'minuta', updatedMinuta));
                     } else {
-                        // Reemplazar el patrón de la hora en el texto existente
-                        if (updatedCierre.includes("siendo las  horas")) {
-                            updatedCierre = updatedCierre.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                        // Non-debate: generate cierre as usual
+                        const currentHora = updateRealTimeFunction();
+                        let updatedCierre = cierre || item.cierre || "";
+                        const closureModel = `En este estado, siendo las  horas se dio por terminado el acto, labrándose la presente, dándose por concluida la presente Audiencia, quedando las partes plenamente notificadas de lo resuelto y habiendo quedado ésta íntegramente grabada mediante el sistema de audio y video.`;
+
+                        if (!updatedCierre || updatedCierre.replace(/<[^>]*>/g, '').trim() === "") {
+                            updatedCierre = closureModel.replace("siendo las  horas", `siendo las ${currentHora} horas`);
                         } else {
-                            // Intento de reemplazo por regex si ya tiene una hora o espacios distintos
-                            const regex = /siendo las\s*(\d{2}:\d{2})?\s*horas/;
-                            if (regex.test(updatedCierre)) {
-                                updatedCierre = updatedCierre.replace(regex, `siendo las ${currentHora} horas`);
+                            // Reemplazar el patrón de la hora en el texto existente
+                            if (updatedCierre.includes("siendo las  horas")) {
+                                updatedCierre = updatedCierre.replace("siendo las  horas", `siendo las ${currentHora} horas`);
+                            } else {
+                                // Intento de reemplazo por regex si ya tiene una hora o espacios distintos
+                                const regex = /siendo las\s*(\d{2}:\d{2})?\s*horas/;
+                                if (regex.test(updatedCierre)) {
+                                    updatedCierre = updatedCierre.replace(regex, `siendo las ${currentHora} horas`);
+                                }
                             }
                         }
+                        setCierre(updatedCierre);
+                        await withRetry(() => updateDataOnly(dateToUse, item.id, 'cierre', updatedCierre));
                     }
-                    setCierre(updatedCierre);
-                    await withRetry(() => updateDataOnly(dateToUse, item.id, 'cierre', updatedCierre));
                 }
             }
 
@@ -303,7 +336,31 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
 
             {/* Cronómetro */}
             <span className={isPressing ? `${styles.cronoBlock} ${styles.cronoBlockPressing}` : styles.cronoBlock}>
-                {cuartoShow ? (
+                {debateFinShow ? (
+                    <>
+                        <button type="button" className={styles.confirmarButton} onClick={() => changeState()}>CONFIRMAR</button>
+                        <span className={styles.timeBlock}>
+                            <p>PRÓXIMO DÍA:</p>
+                            <input
+                                type="text"
+                                className={`${styles.inputCrono} ${styles.inputPidiente}`}
+                                value={debateNextDate}
+                                onChange={(e) => setDebateNextDate(e.target.value)}
+                                placeholder="DD/MM/AAAA"
+                            />
+                        </span>
+                        <span className={styles.timeBlock}>
+                            <p>HORA:</p>
+                            <input
+                                type="text"
+                                className={`${styles.inputCrono} ${styles.inputTiempoPedido}`}
+                                value={debateNextTime}
+                                onChange={(e) => setDebateNextTime(e.target.value)}
+                                placeholder="HH:MM"
+                            />
+                        </span>
+                    </>
+                ) : cuartoShow ? (
                     <>
                         <button type="button" className={styles.confirmarButton} onClick={() => changeState()}>CONFIRMAR</button>
                         <span className={styles.timeBlock}>

@@ -50,7 +50,7 @@ export default function TableSol() {
     const [pendingRows, setPendingRows] = useState({})
     const [forceSave, setForceSave] = useState(false)
     const [sortKey, setSortKey] = useState('fyhcreacion')
-    const [sortDir, setSortDir] = useState('asc')
+    const [sortDir, setSortDir] = useState('desc')
     const [filters, setFilters] = useState({})
     const [isSaving, setIsSaving] = useState(false)
     const [activeNotificarRow, setActiveNotificarRow] = useState(null)

@@ -237,7 +237,7 @@ function juecesPart(jueces) {
 }
 
 function removeTimeMarks(text) {
-    return text.replace(/\(\s*(?:minuto\s*)?\d{1,2}:\d{2}(?::\d{2})?(?:\s*\/\s*\d{1,2}:\d{2}(?::\d{2})?)?\s*(?:video\s*\d+)?\s*\)/gi, "").trim();
+    return text.replace(/\(\s*(?:minuto\s*)?\d{1,2}:\d{2}(?::\d{2})?(?:\s*\/\s*\d{1,2}:\d{2}(?::\d{2})?)?\s*(?:video\s*\d+)?(?:\s*d[ií]a\s*\d{2}\/\d{2}\/\d{4})?\s*\)/gi, "").trim();
 }
 
 export async function generateOficioSection(item, date, traslado = '', oficiados, resuelvo, imputadoList) {

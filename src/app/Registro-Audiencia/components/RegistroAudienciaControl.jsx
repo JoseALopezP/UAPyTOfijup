@@ -301,6 +301,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 setNeedsSaving1={setNeedsSaving1}
                 minuta={minuta} setMinuta={setMinuta}
                 cierre={cierre} setCierre={setCierre}
+                resuelvo={resuelvo}
                 refreshAud={refreshAud}/>
             <RegistroAudienciaRight item={aud} dateToUse={dateToUse}
                 setNeedsSaving2={setNeedsSaving2}

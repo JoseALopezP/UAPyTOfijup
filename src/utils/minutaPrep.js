@@ -2,19 +2,20 @@ import { removeHtmlTags } from "./removeHtmlTags";
 import { inferGender } from "./genderUtils";
 
 function extractTimestamp(text) {
-    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/i;
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)(?:\s*d[ií]a\s*(\d{2}\/\d{2}\/\d{4}))?\)?/i;
     const match = text.match(timestampRegex);
     if (!match) return null;
 
     return {
         video: match[7] || "0",
         start: `${match[1]}:${match[2]}:${match[3]}`,
-        end: match[4] ? `${match[4]}:${match[5]}:${match[6]}` : null
+        end: match[4] ? `${match[4]}:${match[5]}:${match[6]}` : null,
+        dia: match[8] || null
     };
 }
 
 function splitByTimestamps(text) {
-    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)\)?/gi;
+    const timestampRegex = /\(?\bminuto\b\s*(\d{2}):(\d{2}):(\d{2})(?:\s*\/\s*(\d{2}):(\d{2}):(\d{2}))?\s*\bvideo\b\s*(\d+)(?:\s*d[ií]a\s*(\d{2}\/\d{2}\/\d{4}))?\)?/gi;
     let matches, lastIndex = 0;
     let result = [];
 
@@ -121,6 +122,6 @@ export const minutaPrep = (item) => {
                 return a.timestamp.start.localeCompare(b.timestamp.start);
             }),
         ...auxCie
-    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video})`, bold: false},...el.text]} : {text:[...el.text]});
+    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video}${el.timestamp.dia ? ` DÍA ${el.timestamp.dia}` : ''})`, bold: false},...el.text]} : {text:[...el.text]});
     return sortedItems
 };

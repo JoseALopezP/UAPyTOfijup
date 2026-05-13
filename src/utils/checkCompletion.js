@@ -2,6 +2,7 @@ export const checkCompletion = (aud) => {
   if (!aud || typeof aud !== 'object') {
     return 'Error: Objeto de audiencia no válido.';
   }
+  const isDebate = aud.tipo?.toUpperCase().includes('DEBATE');
   const missingFields = [];
   if (!aud.tipo) {
     missingFields.push('tipo');
@@ -33,10 +34,10 @@ export const checkCompletion = (aud) => {
   if (!aud.minuta) {
     missingFields.push('completar minuta');
   }
-  if (!aud.cierre) {
+  if (!isDebate && !aud.cierre) {
     missingFields.push('completar cierre');
   }
-  if (!aud.resuelvoText) {
+  if (!isDebate && !aud.resuelvoText) {
     missingFields.push('completar resuelvo');
   }
   if (missingFields.length === 0) {

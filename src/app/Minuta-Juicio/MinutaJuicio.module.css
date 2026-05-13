@@ -45,3 +45,72 @@
 .audListIndivSelected{
     background-color: #2B2B2B;
 }
+.editBlock{
+    display: inline-flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 99vh;
+}
+.editBlockEmpty{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #888;
+    font-size: 0.95em;
+}
+.editBlockHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #2B2B2B;
+    margin-bottom: 12px;
+    color: #f4f4f4;
+}
+.editBlockHeader h3{
+    margin: 0;
+    font-size: 1em;
+}
+.editBlockHeaderInfo{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85em;
+    color: #aaa;
+}
+.buttonDownloadFinal{
+    background-color: #1F572B;
+    color: #f4f4f4;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+.buttonDownloadFinal:hover{
+    background-color: #28a745;
+}
+.editBlockContent{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+.editBlockSection{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.editBlockLabel{
+    color: #ccc;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

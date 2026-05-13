@@ -49,6 +49,6 @@ export default function SelectBar({selectedList, setSelectedList}) {
             />
             <button type='button' className={`${styles.buttonSearch}`} onClick={() => updateLegajo()}>BUSCAR</button></span>
         </section>
-        <AudList list={byLegajo /*.filter(value => value.tipo === "DEBATE")*/} setSelected={setSelectedList} selectedList={selectedList}/></div>
+        <AudList list={byLegajo ? Object.values(byLegajo).filter(v => typeof v === 'object' && v.tipo?.toUpperCase().includes('DEBATE')) : byLegajo} setSelected={setSelectedList} selectedList={selectedList}/></div>
     )
 }
