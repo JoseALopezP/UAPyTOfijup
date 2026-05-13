@@ -30,19 +30,20 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     const [tipo3, setTipo3] = useState('');
     const [partes, setPartes] = useState([]);
     const [defensoria, setDefensoria] = useState('');
+    const [mpfSubrogandoPor, setMpfSubrogandoPor] = useState('');
 
     // ── Snapshots: "último valor guardado/cargado" para comparación precisa ──
     const savedSnapshot = useRef({});
 
     const buildSnapshot = useCallback(() => ({
         resuelvo, minuta, cierre,
-        caratula, saeNum, razonDemora, ufi, estado, defensoria, operadorAud, sala,
+        caratula, saeNum, razonDemora, ufi, estado, defensoria, mpfSubrogandoPor, operadorAud, sala,
         mpf: JSON.parse(JSON.stringify(mpf)),
         defensa: JSON.parse(JSON.stringify(defensa)),
         imputado: JSON.parse(JSON.stringify(imputado)),
         partes: JSON.parse(JSON.stringify(partes)),
         tipo, tipo2, tipo3
-    }), [resuelvo, minuta, cierre, caratula, saeNum, razonDemora, ufi, estado, defensoria, operadorAud, sala, mpf, defensa, imputado, partes, tipo, tipo2, tipo3]);
+    }), [resuelvo, minuta, cierre, caratula, saeNum, razonDemora, ufi, estado, defensoria, mpfSubrogandoPor, operadorAud, sala, mpf, defensa, imputado, partes, tipo, tipo2, tipo3]);
 
     useEffect(() => {
         if (aud) {
@@ -61,6 +62,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
             setImputado(aud.imputado ? JSON.parse(JSON.stringify(aud.imputado)) : []);
             setPartes(aud.partes ? JSON.parse(JSON.stringify(aud.partes)) : []);
             setDefensoria(aud.defensoria || '');
+            setMpfSubrogandoPor(aud.mpfSubrogandoPor || '');
             setTipo(aud.tipo || '');
             setTipo2(aud.tipo2 || '');
             setTipo3(aud.tipo3 || '');
@@ -76,6 +78,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 ufi: aud.ufi || '',
                 estado: aud.estado || '',
                 defensoria: aud.defensoria || '',
+                mpfSubrogandoPor: aud.mpfSubrogandoPor || '',
                 operadorAud: aud.operador || '',
                 sala: aud.sala || '',
                 mpf: aud.mpf ? JSON.parse(JSON.stringify(aud.mpf)) : [],
@@ -103,6 +106,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     const ufiRef = useRef(ufi);
     const estadoRef = useRef(estado);
     const defensoriaRef = useRef(defensoria);
+    const mpfSubrogandoPorRef = useRef(mpfSubrogandoPor);
     const operadorAudRef = useRef(operadorAud);
     const salaRef = useRef(sala);
     const mpfRef = useRef(mpf);
@@ -122,6 +126,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
     useEffect(() => { ufiRef.current = ufi; }, [ufi]);
     useEffect(() => { estadoRef.current = estado; }, [estado]);
     useEffect(() => { defensoriaRef.current = defensoria; }, [defensoria]);
+    useEffect(() => { mpfSubrogandoPorRef.current = mpfSubrogandoPor; }, [mpfSubrogandoPor]);
     useEffect(() => { operadorAudRef.current = operadorAud; }, [operadorAud]);
     useEffect(() => { salaRef.current = sala; }, [sala]);
     useEffect(() => { mpfRef.current = mpf; }, [mpf]);
@@ -149,6 +154,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
         const currentUfi = ufiRef.current;
         const currentEstado = estadoRef.current;
         const currentDefensoria = defensoriaRef.current;
+        const currentMpfSubrogandoPor = mpfSubrogandoPorRef.current;
         const currentOperadorAud = operadorAudRef.current;
         const currentSala = salaRef.current;
         const currentMpf = mpfRef.current;
@@ -186,6 +192,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 if (currentUfi !== snap.ufi) await updateData(dateToUse, aud.id, 'ufi', currentUfi);
                 if (currentEstado !== snap.estado) await updateData(dateToUse, aud.id, 'estado', currentEstado);
                 if (currentDefensoria !== snap.defensoria) await updateData(dateToUse, aud.id, 'defensoria', currentDefensoria);
+                if (currentMpfSubrogandoPor !== snap.mpfSubrogandoPor) await updateData(dateToUse, aud.id, 'mpfSubrogandoPor', currentMpfSubrogandoPor);
                 if (currentOperadorAud !== snap.operadorAud) await updateData(dateToUse, aud.id, 'operador', currentOperadorAud);
                 if (currentSala !== snap.sala) await updateData(dateToUse, aud.id, 'sala', currentSala);
                 
@@ -215,6 +222,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                     ufi: currentUfi,
                     estado: currentEstado,
                     defensoria: currentDefensoria,
+                    mpfSubrogandoPor: currentMpfSubrogandoPor,
                     operadorAud: currentOperadorAud,
                     sala: currentSala,
                     mpf: JSON.parse(JSON.stringify(currentMpf)),
@@ -293,6 +301,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 estado={estado} setEstado={setEstado} 
                 defensa={defensa} setDefensa={setDefensa} 
                 defensoria={defensoria} setDefensoria={setDefensoria}
+                mpfSubrogandoPor={mpfSubrogandoPor} setMpfSubrogandoPor={setMpfSubrogandoPor}
                 imputado={imputado} setImputado={setImputado} 
                 tipo={tipo} setTipo={setTipo} 
                 tipo2={tipo2} setTipo2={setTipo2} 
@@ -308,7 +317,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 resuelvo={resuelvo} setResuelvo={setResuelvo}
                 minuta={minuta} setMinuta={setMinuta}
                 cierre={cierre} setCierre={setCierre}
-                sala={sala} saeNum={saeNum} caratula={caratula} razonDemora={razonDemora} mpf={mpf} ufi={ufi} defensoria={defensoria} estado={estado} defensa={defensa} imputado={imputado} tipo={tipo} tipo2={tipo2} tipo3={tipo3} partes={partes}
+                sala={sala} saeNum={saeNum} caratula={caratula} razonDemora={razonDemora} mpf={mpf} ufi={ufi} defensoria={defensoria} mpfSubrogandoPor={mpfSubrogandoPor} estado={estado} defensa={defensa} imputado={imputado} tipo={tipo} tipo2={tipo2} tipo3={tipo3} partes={partes}
                 needsSaving={needsSaving1 || needsSaving2} onGlobalSave={handleGlobalSave} isSaving={isSaving}
             /></>}
         </div>
