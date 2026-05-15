@@ -1,4 +1,4 @@
-export const nameTranslate = (operadorName) =>{
+export const nameTranslate = (operadorName) => {
     const traducciones = {
         "Echegaray, Andrea": 'ANDI',
         "Galaburri, Enrique": 'QUIQUE',
@@ -26,18 +26,19 @@ export const nameTranslate = (operadorName) =>{
         "Martinazzo, Ignacio": 'IGNA',
         "Venerado, Tomás": 'TOMI',
         "Narvaez, Facundo Nahuel": 'FACU',
-        "Paroli, Carla Antonela": 'ANTO' 
+        "Paroli, Carla Antonela": 'ANTO',
+        'Roldan, Eliana': 'ELI'
     }
     return traducciones[operadorName]
 }
-export const nameTranslateActuario = (actuarioNombre) =>{
+export const nameTranslateActuario = (actuarioNombre) => {
     const traducciones = {
         "Sánchez, Gemma Luciana": 'GEMMA',
         "Pérez, Juan Carlos": 'CHARLIE',
         "Gimenez, María Agostina": 'AGOS',
-        "Bosch, Mauricio":"MAURI",
-        "Paniagua, Guillermo":"GUILLE",
-        "Roldán, Eliana":"ELI"
+        "Bosch, Mauricio": "MAURI",
+        "Paniagua, Guillermo": "GUILLE",
+        "Roldán, Eliana": "ELI"
     }
     return traducciones[actuarioNombre]
 }
