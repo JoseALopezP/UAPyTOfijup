@@ -12,7 +12,7 @@ import EditHitos from './EditHitos';
 import { nameTranslate } from '@/utils/traductorNombres';
 import { RepresentationSelector } from './RepresentationSelector';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
-
+import getDocument from '@/firebase/firestore/getDocument';
 const deepCopy = (obj) => {
     if (obj === null || typeof obj !== 'object') return obj;
     return JSON.parse(JSON.stringify(obj));
@@ -232,6 +232,74 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setTipo2(tipo2Aux)
         setTipo3(tipo3Aux)
     }
+    const traerDatosAnterior = async () => {
+        if (!item.numeroLeg) {
+            alert("No hay número de legajo.");
+            return;
+        }
+        
+        try {
+            const legajoData = await getDocument('legajos', item.numeroLeg);
+            if (!legajoData) {
+                alert("No se encontró el legajo en la base de datos.");
+                return;
+            }
+            
+            const audiencias = Object.values(legajoData).filter(a => typeof a === 'object' && a.id && a.numeroLeg);
+            
+            const parseDateAndTime = (dStr, tStr) => {
+                if (!dStr) return new Date(0);
+                let d;
+                if (dStr.includes('/')) {
+                    const parts = dStr.split('/');
+                    d = new Date(parts[2], parts[1] - 1, parts[0]);
+                } else if (dStr.length === 8) {
+                    const day = dStr.slice(0, 2);
+                    const month = dStr.slice(2, 4);
+                    const year = dStr.slice(4, 8);
+                    d = new Date(year, month - 1, day);
+                } else {
+                    d = new Date(dStr);
+                }
+                if (tStr) {
+                    const parts = tStr.split(':');
+                    d.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+                }
+                return d;
+            };
+
+            const previousAudiencias = audiencias
+                .filter(a => a.id !== item.id)
+                .sort((a, b) => {
+                    const timeA = parseDateAndTime(a.fecha || '', a.hora || '').getTime();
+                    const timeB = parseDateAndTime(b.fecha || '', b.hora || '').getTime();
+                    return timeB - timeA;
+                });
+
+            if (previousAudiencias.length === 0) {
+                alert("No hay audiencias anteriores en este legajo.");
+                return;
+            }
+
+            const previous = previousAudiencias[0];
+
+            const confirmReplace = window.confirm("¿Seguro que desea copiar los datos de la carátula desde la audiencia anterior? (Se sobreescribirán los datos actuales, recuerde guardar)");
+            if (!confirmReplace) return;
+
+            if (previous.caratula) setCaratula(previous.caratula);
+            if (previous.mpf) setMpf(deepCopy(previous.mpf));
+            if (previous.defensa) setDefensa(deepCopy(previous.defensa));
+            if (previous.imputado) setImputado(deepCopy(previous.imputado));
+            if (previous.partes) setPartes(deepCopy(previous.partes));
+            if (previous.ufi) setUfi(previous.ufi);
+            if (previous.defensoria) setDefensoria(previous.defensoria);
+            if (previous.mpfSubrogandoPor) setMpfSubrogandoPor(previous.mpfSubrogandoPor);
+
+        } catch (error) {
+            console.error("Error fetching previous audiencia:", error);
+            alert("Hubo un error al buscar los datos de la audiencia anterior.");
+        }
+    };
     const checkGuardar = useCallback(() => {
         const normalize = (val) => (val === null || val === undefined ? '' : val);
 
@@ -329,7 +397,17 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             {item.tipo === "TRÁMITES DE EJECUCIÓN" &&
                 <><span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>SAE:</label>
                     <input className={`${styles.inputTyped100} ${styles.inputLeft}`} value={saeNum} onChange={(e) => setSaeNum(e.target.value)} /></span></>}
-            <span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>Carátula</label>
+            <span className={`${styles.inputLeftColumn}`}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4px' }}>
+                    <label className={`${styles.inputLeftNameDColumn}`} style={{ marginBottom: 0 }}>Carátula</label>
+                    <button type="button" onClick={traerDatosAnterior} className={`${styles.btnTraerAnterior}`} title="Copiar datos de la audiencia anterior del mismo legajo">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                        TRAER ANTERIOR
+                    </button>
+                </div>
                 <input className={`${styles.inputLeft} ${styles.inputLeft100} ${styles.inputTyped100}`}
                     type="text" value={caratula} onChange={(e) => setCaratula(e.target.value)} /></span>
             <button className={showReconversion ? `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButtonClicked}` : `${styles.inputLeft} ${styles.inputLeft100} ${styles.reconvertidaButton}`} type="button" onClick={() => handleReconversion()}>{showReconversion ? 'RECONVERTIDA' : 'TIPO ORIGINAL'}</button>
