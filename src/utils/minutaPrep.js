@@ -64,14 +64,25 @@ function splitByTimestamps(text) {
 
 
 
+function normalizeBoldTags(html) {
+    if (typeof html !== 'string') return '';
+    return html
+        .replace(/<b\b[^>]*>/gi, '<strong>')
+        .replace(/<\/b>/gi, '</strong>')
+        .replace(/<strong\b[^>]*>/gi, '<strong>')
+        .replace(/<span\b[^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*"[^>]*>(.*?)<\/span>/gi, '<strong>$1</strong>');
+}
+
 function splitNormalBold(text) {
-    const parts = text.split(/(<strong>|<\/strong>)/).filter(p => p.trim());
+    const normalized = normalizeBoldTags(text);
+    const parts = normalized.split(/(<strong>|<\/strong>)/i).filter(p => p.trim());
     let bold = false;
     return parts.map(part => {
-        if (part === "<strong>") {
+        const lowerPart = part.toLowerCase();
+        if (lowerPart === "<strong>") {
             bold = true;
             return null;
-        } else if (part === "</strong>") {
+        } else if (lowerPart === "</strong>") {
             bold = false;
             return null;
         }
@@ -89,12 +100,13 @@ function resuelvoStructure(juez) {
     return `<strong><br/>Fundamentos y Resolución:</strong> ${titleJuez} <strong>MOTIVA Y RESUELVE</strong>`;
 }
 function extractFundamento(text) {
+    const normalized = normalizeBoldTags(text);
     const regex = new RegExp(
         `<strong>\\s*Fundamentos\\s*y\\s*Resoluci[oó]n\\s*:\\s*</strong>\\s*(El\\s+Tribunal\\s+Colegiado|El\\s+Sr\\.?\\s+Juez|La\\s+Sra\\.?\\s+Jueza)\\s*<strong>\\s*MOTIVA\\s*y\\s*RESUELVE\\s*</strong>`,
         'gi'
     );
 
-    return text.replace(regex, '');
+    return normalized.replace(regex, '');
 }
   
   
