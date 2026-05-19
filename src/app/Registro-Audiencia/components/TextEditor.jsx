@@ -42,6 +42,12 @@ const BG_COLORS = [
   { name: 'Resaltado Púrpura', value: '#a855f7' },
 ];
 
+const toTitleCase = (str) => {
+  return str.toLowerCase().replace(/(^|[^a-záéíóúüñ])([a-záéíóúüñ])/gi, (match, p1, p2) => {
+    return p1 + p2.toUpperCase();
+  });
+};
+
 export default function TextEditor({ textValue, setTextValue }) {
   const quillRef = useRef(null);
   const editorRef = useRef(null);
@@ -316,6 +322,10 @@ export default function TextEditor({ textValue, setTextValue }) {
         <button type="button" title="Convertir a minúsculas" className={styles.toolbarBtn}
           onMouseDown={(e) => { e.preventDefault(); transformSelection(t => t.toLowerCase()); }}>
           a↓
+        </button>
+        <button type="button" title="Convertir a Mayúsculas Iniciales" className={styles.toolbarBtn}
+          onMouseDown={(e) => { e.preventDefault(); transformSelection(toTitleCase); }}>
+          Aa
         </button>
       </div>
 
