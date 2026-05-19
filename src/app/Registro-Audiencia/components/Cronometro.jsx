@@ -338,7 +338,17 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
             <span className={isPressing ? `${styles.cronoBlock} ${styles.cronoBlockPressing}` : styles.cronoBlock}>
                 {debateFinShow ? (
                     <>
-                        <button type="button" className={styles.confirmarButton} onClick={() => changeState()}>CONFIRMAR</button>
+                        <button type="button" className={styles.confirmarButton} onClick={() => {
+                            if (!debateNextDate || !debateNextDate.trim()) {
+                                alert("Por favor, ingrese la fecha del próximo día para continuar.");
+                                return;
+                            }
+                            if (!debateNextTime || !debateNextTime.trim()) {
+                                alert("Por favor, ingrese la hora de reanudación para continuar.");
+                                return;
+                            }
+                            changeState();
+                        }}>CONFIRMAR</button>
                         <span className={styles.timeBlock}>
                             <p>PRÓXIMO DÍA:</p>
                             <input

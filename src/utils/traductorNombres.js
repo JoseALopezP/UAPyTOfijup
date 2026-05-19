@@ -29,7 +29,9 @@ export const nameTranslate = (operadorName) => {
         "Paroli, Carla Antonela": 'ANTO',
         'Roldan, Eliana': 'ELI',
         'Maldonado, Juan Francisco': 'JUANFRA',
-        'Aubone, Maria Estela': 'ESTELA'
+        'Aubone, Maria Estela': 'ESTELA',
+        'Elizondo, Ricardo': 'RICARDO',
+        'Lopez, Ana': 'ANA'
     }
     return traducciones[operadorName]
 }

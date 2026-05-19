@@ -122,6 +122,19 @@ export const minutaPrep = (item) => {
     const auxMin = processText(item.minuta);
     const auxRes = processText(extractFundamento(item.resuelvoText), true);
     const auxCie = processText(item.cierre);
+    const isDebate = item.tipo?.toUpperCase().includes('DEBATE');
+    
+    const formatDate = (fecha) => {
+        if (!fecha) return null;
+        if (fecha.includes('/')) return fecha;
+        if (fecha.length === 8) {
+            return `${fecha.slice(0, 2)}/${fecha.slice(2, 4)}/${fecha.slice(4, 8)}`;
+        }
+        return fecha;
+    };
+
+    const defaultDia = isDebate ? formatDate(item.fecha) : null;
+
     const sortedItems = [
         ...auxMin.filter(el => !el.timestamp),
         ...auxRes.filter(el => !el.timestamp),
@@ -134,6 +147,15 @@ export const minutaPrep = (item) => {
                 return a.timestamp.start.localeCompare(b.timestamp.start);
             }),
         ...auxCie
-    ].map(el => el.timestamp ? {text:[{text:`(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video}${el.timestamp.dia ? ` DÍA ${el.timestamp.dia}` : ''})`, bold: false},...el.text]} : {text:[...el.text]});
-    return sortedItems
+    ].map(el => {
+        if (el.timestamp) {
+            const diaValue = el.timestamp.dia || defaultDia;
+            const textContent = `(Minuto ${el.timestamp.start}${el.timestamp.end ? `/${el.timestamp.end}` : ''} Video ${el.timestamp.video}${diaValue ? ` DÍA ${diaValue}` : ''})`;
+            return {
+                text: [{ text: textContent, bold: false }, ...el.text]
+            };
+        }
+        return { text: [...el.text] };
+    });
+    return sortedItems;
 };
