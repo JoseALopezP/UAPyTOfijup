@@ -1,16 +1,54 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import styles from './TextEditor.module.css'
+import styles from './TextEditor.module.css';
 
-// Sin toolbar nativa de Quill — usamos la nuestra
+// Configurar Quill para usar estilos inline en alineación de texto
+if (typeof window !== "undefined") {
+  try {
+    const Quill = ReactQuill.Quill;
+    if (Quill) {
+      const AlignStyle = Quill.import('attributors/style/align');
+      Quill.register(AlignStyle, true);
+    }
+  } catch (error) {
+    console.error("Error registering Quill AlignStyle:", error);
+  }
+}
+
 const QUILL_MODULES = { toolbar: false };
+
+const TEXT_COLORS = [
+  { name: 'Predeterminado', value: false },
+  { name: 'Blanco', value: '#ffffff' },
+  { name: 'Gris Claro', value: '#d3d3d3' },
+  { name: 'Rojo', value: '#ff4d4d' },
+  { name: 'Naranja', value: '#ff9900' },
+  { name: 'Amarillo', value: '#ffff33' },
+  { name: 'Verde', value: '#4caf50' },
+  { name: 'Celeste', value: '#33ccff' },
+  { name: 'Azul', value: '#3b82f6' },
+  { name: 'Púrpura', value: '#a855f7' },
+];
+
+const BG_COLORS = [
+  { name: 'Sin Fondo', value: false },
+  { name: 'Resaltado Amarillo', value: '#ffff00' },
+  { name: 'Resaltado Verde', value: '#00ff00' },
+  { name: 'Resaltado Celeste', value: '#00ffff' },
+  { name: 'Resaltado Rosa', value: '#ff00ff' },
+  { name: 'Resaltado Rojo', value: '#ff0000' },
+  { name: 'Resaltado Naranja', value: '#ffa500' },
+  { name: 'Resaltado Púrpura', value: '#a855f7' },
+];
 
 export default function TextEditor({ textValue, setTextValue }) {
   const quillRef = useRef(null);
   const editorRef = useRef(null);
+  const toolbarRef = useRef(null);
   const savedRangeRef = useRef(null);
   const [formats, setFormats] = useState({});
+  const [activeDropdown, setActiveDropdown] = useState(null); // 'color' | 'background' | null
 
   useEffect(() => {
     if (!quillRef.current) return;
@@ -35,6 +73,17 @@ export default function TextEditor({ textValue, setTextValue }) {
       if (sel) setFormats(editor.getFormat(sel));
     });
   }, []);
+
+  // Cerrar dropdowns si se hace clic fuera de la barra de herramientas
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (activeDropdown && toolbarRef.current && !toolbarRef.current.contains(e.target)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [activeDropdown]);
 
   const handleChange = (value) => {
     if (setTextValue) setTextValue(value);
@@ -72,20 +121,9 @@ export default function TextEditor({ textValue, setTextValue }) {
   const on = (format, val) =>
     val !== undefined ? formats[format] === val : !!formats[format];
 
-  const btn = (label, format, val, title) => (
-    <button
-      type="button"
-      title={title}
-      className={on(format, val) ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
-      onMouseDown={(e) => { e.preventDefault(); fmt(format, val); }}
-    >
-      {label}
-    </button>
-  );
-
   return (
     <div>
-      <div className={styles.customToolbar}>
+      <div ref={toolbarRef} className={styles.customToolbar}>
         {/* Formato de texto */}
         <button type="button" title="Negrita (Ctrl+B)"
           className={on('bold') ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
@@ -102,6 +140,85 @@ export default function TextEditor({ textValue, setTextValue }) {
           onMouseDown={(e) => { e.preventDefault(); fmt('underline'); }}>
           <u>U</u>
         </button>
+
+        <span className={styles.toolbarSep} />
+
+        {/* Color de texto */}
+        <div className={styles.dropdownContainer}>
+          <button
+            type="button"
+            title="Color de texto"
+            className={`${styles.toolbarBtn} ${activeDropdown === 'color' ? styles.toolbarBtnActive : ''}`}
+            onClick={() => setActiveDropdown(activeDropdown === 'color' ? null : 'color')}
+          >
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
+              <span style={{ fontWeight: 'bold' }}>A</span>
+              <span style={{ 
+                width: '12px', 
+                height: '3px', 
+                backgroundColor: formats.color || '#ffffff', 
+                marginTop: '1px' 
+              }} />
+            </span>
+          </button>
+          {activeDropdown === 'color' && (
+            <div className={styles.colorPalette}>
+              {TEXT_COLORS.map(c => (
+                <button
+                  key={c.name}
+                  type="button"
+                  className={c.value ? styles.colorOption : `${styles.colorOption} ${styles.colorOptionDefault}`}
+                  style={c.value ? { backgroundColor: c.value } : {}}
+                  title={c.name}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    fmt('color', c.value);
+                    setActiveDropdown(null);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Color de resaltado (fondo) */}
+        <div className={styles.dropdownContainer}>
+          <button
+            type="button"
+            title="Color de resaltado"
+            className={`${styles.toolbarBtn} ${activeDropdown === 'background' ? styles.toolbarBtnActive : ''}`}
+            onClick={() => setActiveDropdown(activeDropdown === 'background' ? null : 'background')}
+          >
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
+              <span style={{ fontSize: '11px', display: 'flex', alignItems: 'center', height: '14px' }}>✎</span>
+              <span style={{ 
+                width: '12px', 
+                height: '3px', 
+                backgroundColor: formats.background || 'transparent', 
+                border: formats.background ? 'none' : '1.5px dashed #777',
+                marginTop: '1px' 
+              }} />
+            </span>
+          </button>
+          {activeDropdown === 'background' && (
+            <div className={styles.colorPalette}>
+              {BG_COLORS.map(c => (
+                <button
+                  key={c.name}
+                  type="button"
+                  className={c.value ? styles.colorOption : `${styles.colorOption} ${styles.colorOptionDefault}`}
+                  style={c.value ? { backgroundColor: c.value } : {}}
+                  title={c.name}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    fmt('background', c.value);
+                    setActiveDropdown(null);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
         <span className={styles.toolbarSep} />
 
@@ -131,6 +248,62 @@ export default function TextEditor({ textValue, setTextValue }) {
           className={on('list', 'ordered') ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
           onMouseDown={(e) => { e.preventDefault(); fmt('list', on('list', 'ordered') ? false : 'ordered'); }}>
           1.≡
+        </button>
+
+        <span className={styles.toolbarSep} />
+
+        {/* Alineación */}
+        <button
+          type="button"
+          title="Alinear a la izquierda"
+          className={(!formats.align || formats.align === 'left') ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
+          onMouseDown={(e) => { e.preventDefault(); fmt('align', false); }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="17" y1="10" x2="3" y2="10"></line>
+            <line x1="21" y1="6" x2="3" y2="6"></line>
+            <line x1="21" y1="14" x2="3" y2="14"></line>
+            <line x1="15" y1="18" x2="3" y2="18"></line>
+          </svg>
+        </button>
+        <button
+          type="button"
+          title="Alinear al centro"
+          className={formats.align === 'center' ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
+          onMouseDown={(e) => { e.preventDefault(); fmt('align', 'center'); }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="10" x2="6" y2="10"></line>
+            <line x1="21" y1="6" x2="3" y2="6"></line>
+            <line x1="21" y1="14" x2="3" y2="14"></line>
+            <line x1="18" y1="18" x2="6" y2="18"></line>
+          </svg>
+        </button>
+        <button
+          type="button"
+          title="Alinear a la derecha"
+          className={formats.align === 'right' ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
+          onMouseDown={(e) => { e.preventDefault(); fmt('align', 'right'); }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="21" y1="10" x2="7" y2="10"></line>
+            <line x1="21" y1="6" x2="3" y2="6"></line>
+            <line x1="21" y1="14" x2="3" y2="14"></line>
+            <line x1="21" y1="18" x2="9" y2="18"></line>
+          </svg>
+        </button>
+        <button
+          type="button"
+          title="Justificar"
+          className={formats.align === 'justify' ? `${styles.toolbarBtn} ${styles.toolbarBtnActive}` : styles.toolbarBtn}
+          onMouseDown={(e) => { e.preventDefault(); fmt('align', 'justify'); }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="21" y1="10" x2="3" y2="10"></line>
+            <line x1="21" y1="6" x2="3" y2="6"></line>
+            <line x1="21" y1="14" x2="3" y2="14"></line>
+            <line x1="21" y1="18" x2="3" y2="18"></line>
+          </svg>
         </button>
 
         <span className={styles.toolbarSep} />
