@@ -66,17 +66,6 @@ export default function Cronometro({ item, dateToUse, isHovered, minuta, setMinu
         'RESUELVO': ['']
     };
 
-    const translate = {
-        'REINICIAR': 'EN_CURSO',
-        'RESUELVO': 'RESUELVO',
-        'CONTINUAR': 'EN_CURSO',
-        'FINALIZAR': 'FINALIZADA',
-        'CUARTO INTERMEDIO': 'CUARTO_INTERMEDIO',
-        'INICIAR': 'EN_CURSO',
-        'CANCELAR': 'CANCELADA',
-        'REPROGRAMAR': 'REPROGRAMADA'
-    };
-
     const formatTime = (ms) => {
         const totalSeconds = Math.floor(ms / 1000);
         const hours = Math.floor(totalSeconds / 3600);

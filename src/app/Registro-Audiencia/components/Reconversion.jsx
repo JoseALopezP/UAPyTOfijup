@@ -10,7 +10,7 @@ export function Reconversion({ item, setTipo, setTipo2, setTipo3, tipo, tipo2, t
         updateDesplegables();
     }, []);
     return (
-    <div className={`${styles.reconversionBlock}`} onSubmit={(event) => handleSubmit(event)}>
+    <div className={`${styles.reconversionBlock}`}>
         <div className={`${styles.inputTipos}`}>
         <input list="tipo1" className={`${styles.inputLeft} ${styles.inputLeft100}`} placeholder={item.tipo} onChange={(e)=>{setTipo(e.target.value)}}/>
         <datalist id='tipo1'>

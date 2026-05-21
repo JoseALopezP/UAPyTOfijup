@@ -31,8 +31,6 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
     const [minuta2, setMinuta2] = useState('');
     const [cierre2, setCierre2] = useState('');
     const [selectedTab, setSelectedTab] = useState('Cuerpo minuta');
-    const [errorDescarga, setErrorDescarga] = useState(false)
-    const [checkDescarga, setCheckDescarga] = useState('')
     const [reloadHistorial, setReloadHistorial] = useState(0);
     const [isInitialized, setIsInitialized] = useState(false);
     const updateComparisson = () => {
@@ -88,13 +86,6 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         setNeedsSaving2(false)
         setGuardando(false)
         await updateByDate(dateToUse)
-    }
-    const handleSubmit = async () => {
-        await updateDataAud()
-    };
-    const handleDescargar2 = async() =>{
-        await generatePDF(aux, dateToUse)
-        await setCheckDescarga('')
     }
     const checkGuardar = useCallback(() => {
         const guardarStatus = normalizeHtml(resuelvo2) !== normalizeHtml(resuelvo) ||
@@ -162,11 +153,7 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
         setGuardando(false)
     }, [item]);
     return (
-        <>{checkDescarga !== '' && <div className={`${styles.checkDescargaFalta}`}>
-                <p>{checkDescarga}</p>
-                <button type='button' className={`${styles.buttonDownload2}`} onClick={() => handleDescargar2()}>DESCARGAR</button>
-            </div>}
-            <div className={`${styles.controlBlockRight}`}>
+        <div className={`${styles.controlBlockRight}`}>
             <div className={`${styles.topBlockMinuta}`}>
                 <span className={`${styles.insertarModeloBlock}`} onClick={() => callUpdateModelosMinuta()}>
                 <select className={`${styles.inputLeft} ${styles.inputModelo}`}
@@ -199,6 +186,6 @@ export default function RegistroAudienciaRight({ setNeedsSaving2, item, dateToUs
             }{selectedTab === 'Cierre' && !isDebate &&
                 <TextEditor key={`cierre-${item.id}`} textValue={cierre} setTextValue={setCierre}/>
             }
-        </div></>
+        </div>
     );
 }

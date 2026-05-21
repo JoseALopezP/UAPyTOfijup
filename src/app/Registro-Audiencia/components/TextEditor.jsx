@@ -157,14 +157,12 @@ export default function TextEditor({ textValue, setTextValue }) {
             className={`${styles.toolbarBtn} ${activeDropdown === 'color' ? styles.toolbarBtnActive : ''}`}
             onClick={() => setActiveDropdown(activeDropdown === 'color' ? null : 'color')}
           >
-            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
-              <span style={{ fontWeight: 'bold' }}>A</span>
-              <span style={{ 
-                width: '12px', 
-                height: '3px', 
-                backgroundColor: formats.color || '#ffffff', 
-                marginTop: '1px' 
-              }} />
+            <span className={styles.colorIconBtn}>
+              <span className={styles.boldText}>A</span>
+              <span 
+                className={styles.colorBar} 
+                style={{ backgroundColor: formats.color || '#ffffff' }} 
+              />
             </span>
           </button>
           {activeDropdown === 'color' && (
@@ -195,15 +193,15 @@ export default function TextEditor({ textValue, setTextValue }) {
             className={`${styles.toolbarBtn} ${activeDropdown === 'background' ? styles.toolbarBtnActive : ''}`}
             onClick={() => setActiveDropdown(activeDropdown === 'background' ? null : 'background')}
           >
-            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1' }}>
-              <span style={{ fontSize: '11px', display: 'flex', alignItems: 'center', height: '14px' }}>✎</span>
-              <span style={{ 
-                width: '12px', 
-                height: '3px', 
-                backgroundColor: formats.background || 'transparent', 
-                border: formats.background ? 'none' : '1.5px dashed #777',
-                marginTop: '1px' 
-              }} />
+            <span className={styles.colorIconBtn}>
+              <span className={styles.highlighterIcon}>✎</span>
+              <span 
+                className={styles.backgroundBar} 
+                style={{ 
+                  backgroundColor: formats.background || 'transparent', 
+                  border: formats.background ? 'none' : '1.5px dashed #777' 
+                }} 
+              />
             </span>
           </button>
           {activeDropdown === 'background' && (

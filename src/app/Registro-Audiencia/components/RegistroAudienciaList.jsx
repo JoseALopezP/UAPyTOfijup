@@ -6,7 +6,6 @@ import AudienciaRegistroIndiv from './AudienciaRegistroIndiv';
 import { DataContext} from '@/context/DataContext';
 import { useAuthContext } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation';
-import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction';
 
 export default function RegistroAudienciaList({date, dateFunction, audFunction, selectedAud, setIsHovered, isHovered, needsSaving1, needsSaving2}) {
     const router = useRouter()

@@ -1,8 +1,7 @@
 'use client'
-import { useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { Reconversion } from './Reconversion';
 import styles from '../RegistroAudiencia.module.css';
-import RegistroChangeState from './RegistroChangeState';
 import { DataContext } from '@/context/DataContext';
 import DeleteSVGF from './DeleteSVGF';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
@@ -20,7 +19,7 @@ const deepCopy = (obj) => {
 
 
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, mpfSubrogandoPor, setMpfSubrogandoPor, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, resuelvo, refreshAud }) {
-    const { updateDesplegables, desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
+    const { desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -237,16 +236,16 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             alert("No hay número de legajo.");
             return;
         }
-        
+
         try {
             const legajoData = await getDocument('legajos', item.numeroLeg);
             if (!legajoData) {
                 alert("No se encontró el legajo en la base de datos.");
                 return;
             }
-            
+
             const audiencias = Object.values(legajoData).filter(a => typeof a === 'object' && a.id && a.numeroLeg);
-            
+
             const parseDateAndTime = (dStr, tStr) => {
                 if (!dStr) return new Date(0);
                 let d;
@@ -355,7 +354,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
     return (
         <form className={`${styles.controlBlockLeft}`} onSubmit={(event) => handleSubmit(event)}>
-
             {item.hitos &&
                 <span title='Editar Hitos' onClick={() => setShowEditHitos(!showEditHitos)} className={isHovered ? `${styles.editHitosButtonBlock} ${styles.editHitosButtonBlockHovered}` : `${styles.editHitosButtonBlock}`}><svg className={`${styles.editHitosButtonSVG}`} viewBox="0 0 24 24">
                     <path stroke='#ffc107' fill='none' d="M12 7V12L14.5 10.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -365,7 +363,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             <div className={styles.headerLeftConBoton}>
                 <h2 className={`${styles.audControlTitle}`}>
                     {item.numeroLeg} - {item.hora}
-                    <span style={{ opacity: 0.6, fontSize: '0.65em', marginLeft: '12px', fontWeight: '400' }}>
+                    <span className={styles.tipoSpan}>
                         {tipo}{tipo2 ? ` - ${tipo2}` : ''}{tipo3 ? ` - ${tipo3}` : ''}
                     </span>
                 </h2>
@@ -379,7 +377,6 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     </button>
                 )}
             </div>
-            <RegistroChangeState estadoFunction={setEstado} estado={estado} audId={item.id} dateToUse={dateToUse} aId={(item.aId || false)} item={item} refreshAud={refreshAud} />
             <span className={`${styles.inputLeftRow}`}><label className={`${styles.inputLeftNameDRow}`}>SALA: </label>
                 <input list='sala' className={`${styles.inputLeft} ${styles.inputLeft30} ${styles.inputLeftDRow}`} value={sala} onChange={e => setSala(e.target.value)} />
                 <datalist id='sala' className={`${styles.tableCellInput} ${styles.inputLeft35}`}><option>{sala}</option>
@@ -398,10 +395,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                 <><span className={`${styles.inputLeftColumn}`}><label className={`${styles.inputLeftNameDColumn}`}>SAE:</label>
                     <input className={`${styles.inputTyped100} ${styles.inputLeft}`} value={saeNum} onChange={(e) => setSaeNum(e.target.value)} /></span></>}
             <span className={`${styles.inputLeftColumn}`}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4px' }}>
-                    <label className={`${styles.inputLeftNameDColumn}`} style={{ marginBottom: 0 }}>Carátula</label>
+                <div className={styles.caratulaHeader}>
+                    <label className={`${styles.inputLeftNameDColumn} ${styles.caratulaLabel}`}>Carátula</label>
                     <button type="button" onClick={traerDatosAnterior} className={`${styles.btnTraerAnterior}`} title="Copiar datos de la audiencia anterior del mismo legajo">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.btnIcon}>
                             <polyline points="1 4 1 10 7 10"></polyline>
                             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
                         </svg>
@@ -419,7 +416,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             {sectionsVisible.mpf && (
                 <span className={`${styles.inputLeftColumn}`}>
                     {mpf.map((input, index) => (
-                        <div key={input.id} style={{ marginBottom: '4px' }}>
+                        <div key={input.id} className={styles.rowWrapper}>
                             <div className={styles.inputRow}>
                                 <input
                                     list={`mpf-${index}`}
@@ -459,8 +456,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </div>
                     ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setMpf, { nombre: '', representa: [], asistencia: true, presencial: true, subrogando: false }, 'f')}>+ FISCAL</button>
-                    <div className={styles.inputRow} style={{ marginTop: '10px' }}>
-                        <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>UFI:</label>
+                    <div className={`${styles.inputRow} ${styles.inputRowMarginTop}`}>
+                        <label className={`${styles.inputLeftNameDRow} ${styles.labelAuto}`}>UFI:</label>
                         <input list='ufi' className={`${styles.inputLeft} ${styles.inputLeft100}`} value={ufi}
                             onChange={(e) => setUfi(e.target.value)} placeholder="UFI" />
                         <datalist id='ufi'>{desplegables.ufi && desplegables.ufi.map(option => (
@@ -468,8 +465,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         ))}</datalist>
                     </div>
                     {mpf.some(m => m.subrogando) && (
-                        <div className={styles.inputRow} style={{ marginTop: '10px' }}>
-                            <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>A quien subroga:</label>
+                        <div className={`${styles.inputRow} ${styles.inputRowMarginTop}`}>
+                            <label className={`${styles.inputLeftNameDRow} ${styles.labelAuto}`}>A quien subroga:</label>
                             <input list='fiscalesListSub' className={`${styles.inputLeft} ${styles.inputLeft100}`} value={mpfSubrogandoPor || ''}
                                 onChange={(e) => setMpfSubrogandoPor(e.target.value)} placeholder="Subrogando a..." />
                             <datalist id='fiscalesListSub'>{fiscalesList && fiscalesList.map(option => (
@@ -502,7 +499,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
                                     {input.presencial ? 'FIS' : 'VIR'}
                                 </button>
-                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete} ${styles.marginLeft4}`} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
                             </div>
                             {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
                                 <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
@@ -518,7 +515,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         >+ IMPUTADO</button>
                     </span>
 
-                    <label className={`${styles.inputLeftNameDColumn}`} style={{ marginTop: '10px' }}>Condenados</label>
+                    <label className={`${styles.inputLeftNameDColumn} ${styles.labelMarginTop}`}>Condenados</label>
                     {imputado.map((input, realIndex) => !input.condenado ? null : (
                         <div key={input.id}>
                             <div className={`${styles.condenadoInput} ${styles.inputRow}`}>
@@ -536,7 +533,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
                                     {input.presencial ? 'FIS' : 'VIR'}
                                 </button>
-                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete} ${styles.marginLeft4}`} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
                             </div>
                             {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
                                 <input className={`${styles.inputLeft} ${styles.inputTyped100}`}
@@ -568,7 +565,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 >
                                     {input.tipo === 'Particular' ? 'PAR' : 'OFI'}
                                 </button>
-                                <div style={{ flex: 1, minWidth: 0, display: 'flex' }}>
+                                <div className={styles.flexContainer}>
                                     {(!input.tipo || input.tipo === 'Oficial') ? (
                                         <>
                                             <input list={`oficial-${index}`}
@@ -619,11 +616,11 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                     />
                                     SUB
                                 </label>
-                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
+                                <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete} ${styles.marginLeft4}`} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
                             </div>
                             {(imputado && imputado.length > 1) && (
                                 <div className={styles.inputRowFlexible}>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div className={styles.flex1MinWidth0}>
                                         <RepresentationSelector
                                             selectedItems={defensa[index].imputado}
                                             availableItems={Array.isArray(imputado) ? imputado : []}
@@ -635,8 +632,8 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </div>
                     ))}
                     <button className={`${styles.btnControl} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setDefensa, { tipo: 'Oficial', nombre: '', imputado: [], asistencia: true, presencial: true, subrogando: false }, 'd')}>+ DEFENSA</button>
-                    <div className={styles.inputRow} style={{ marginTop: '10px' }}>
-                        <label className={`${styles.inputLeftNameDRow}`} style={{ width: 'auto', marginRight: '8px' }}>DEFENSORÍA:</label>
+                    <div className={`${styles.inputRow} ${styles.inputRowMarginTop}`}>
+                        <label className={`${styles.inputLeftNameDRow} ${styles.labelAuto}`}>DEFENSORÍA:</label>
                         <input className={`${styles.inputLeft} ${styles.inputLeft100}`}
                             value={defensoria || ''}
                             onChange={(e) => setDefensoria(e.target.value)}

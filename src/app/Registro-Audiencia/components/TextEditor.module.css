@@ -122,3 +122,34 @@
   font-size: 14px;
   font-weight: bold;
 }
+
+/* Custom refactoring additions */
+.colorIconBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.boldText {
+  font-weight: bold;
+}
+
+.colorBar {
+  width: 12px;
+  height: 3px;
+  margin-top: 1px;
+}
+
+.highlighterIcon {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  height: 14px;
+}
+
+.backgroundBar {
+  width: 12px;
+  height: 3px;
+  margin-top: 1px;
+}
