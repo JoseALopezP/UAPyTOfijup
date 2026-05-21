@@ -114,100 +114,101 @@ const SyncPanel = () => {
 
     return (
         <div style={{
-            padding: '24px',
-            maxWidth: '800px',
-            background: '#1a1f2e',
+            padding: '20px',
+            width: '100%',
+            background: '#111115',
             borderRadius: '12px',
             color: '#e2e8f0',
-            margin: '20px auto',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+            border: '1px solid #2B2B2B',
+            boxSizing: 'border-box',
             fontFamily: 'Inter, system-ui, sans-serif'
         }}>
-            <h2 style={{ margin: '0 0 6px 0', color: '#60a5fa', fontSize: '20px' }}>
-                🔄 Forzar Sincronización <code style={{ fontSize: '14px', background: '#2d3748', padding: '2px 6px', borderRadius: '4px' }}>audiencias → audienciasView</code>
+            <h2 style={{ margin: '0 0 6px 0', color: '#ffffff', fontSize: '18px', fontWeight: 600 }}>
+                🔄 Forzar Sincronización <code style={{ fontSize: '12px', background: '#1c1c24', color: '#60a5fa', padding: '2px 6px', borderRadius: '4px' }}>audiencias → audienciasView</code>
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '20px', lineHeight: '1.6' }}>
-                Lee los datos de <strong style={{ color: '#e2e8f0' }}>audiencias</strong> (fuente de verdad) y sobreescribe el espejo <strong style={{ color: '#e2e8f0' }}>audienciasView</strong> para el día seleccionado.
-                Solo sincroniza los campos que realmente se guardan en ambas colecciones: <code style={{ background: '#2d3748', padding: '1px 4px', borderRadius: '3px', fontSize: '12px' }}>estado, hitos, mpf, defensa, imputado, partes, caratula, ...</code>
+            <p style={{ color: '#88889a', fontSize: '12px', marginBottom: '16px', lineHeight: '1.5' }}>
+                Lee los datos de <strong style={{ color: '#ffffff' }}>audiencias</strong> y sobreescribe el espejo <strong style={{ color: '#ffffff' }}>audienciasView</strong> para el día seleccionado para garantizar consistencia total.
             </p>
 
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontWeight: '600', fontSize: '14px', color: '#94a3b8' }}>Fecha a sincronizar:</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'flex-end', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '140px' }}>
+                    <label style={{ fontWeight: '600', fontSize: '12px', color: '#88889a' }}>Fecha a sincronizar:</label>
                     <input
                         type="date"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
                         disabled={isSyncing}
                         style={{
-                            padding: '10px 14px',
-                            borderRadius: '8px',
-                            border: '1px solid #4a5568',
-                            background: '#2d3748',
-                            color: '#e2e8f0',
-                            fontSize: '15px',
+                            padding: '8px 12px',
+                            borderRadius: '6px',
+                            border: '1px solid #2B2B2B',
+                            background: '#1c1c24',
+                            color: '#ffffff',
+                            fontSize: '14px',
                             outline: 'none',
                             cursor: isSyncing ? 'not-allowed' : 'text'
                         }}
                     />
                 </div>
 
-                <button
-                    onClick={handleSync}
-                    disabled={isSyncing || !selectedDate}
-                    style={{
-                        padding: '10px 24px',
-                        background: isSyncing ? '#4a5568' : '#2563eb',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: (isSyncing || !selectedDate) ? 'not-allowed' : 'pointer',
-                        fontWeight: '700',
-                        fontSize: '15px',
-                        transition: 'background 0.2s',
-                        whiteSpace: 'nowrap',
-                        opacity: !selectedDate ? 0.5 : 1,
-                    }}
-                >
-                    {isSyncing ? '⏳ Sincronizando...' : '🔄 Forzar Sincronización'}
-                </button>
-
-                {logs.length > 0 && !isSyncing && (
+                <div style={{ display: 'flex', gap: '8px' }}>
                     <button
-                        onClick={() => setLogs([])}
+                        onClick={handleSync}
+                        disabled={isSyncing || !selectedDate}
                         style={{
-                            padding: '10px 16px',
-                            background: 'transparent',
-                            color: '#64748b',
-                            border: '1px solid #4a5568',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontSize: '13px',
+                            padding: '8px 16px',
+                            background: isSyncing ? '#2B2B2B' : '#1d4ed8',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: (isSyncing || !selectedDate) ? 'not-allowed' : 'pointer',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            transition: 'background 0.2s',
+                            whiteSpace: 'nowrap',
+                            opacity: !selectedDate ? 0.5 : 1,
                         }}
                     >
-                        Limpiar
+                        {isSyncing ? 'Sincronizando...' : 'Sincronizar'}
                     </button>
-                )}
+
+                    {logs.length > 0 && !isSyncing && (
+                        <button
+                            onClick={() => setLogs([])}
+                            style={{
+                                padding: '8px 12px',
+                                background: 'transparent',
+                                color: '#f87171',
+                                border: '1px solid #7f1d1d',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '13px',
+                            }}
+                        >
+                            Limpiar
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Campos que se sincronizan */}
             <details style={{ marginBottom: '16px' }}>
-                <summary style={{ cursor: 'pointer', color: '#60a5fa', fontSize: '13px', userSelect: 'none' }}>
+                <summary style={{ cursor: 'pointer', color: '#3b82f6', fontSize: '12px', userSelect: 'none', fontWeight: 500 }}>
                     Ver campos sincronizados ({SYNCED_FIELDS.length})
                 </summary>
                 <div style={{
                     marginTop: '8px',
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '6px',
+                    gap: '4px',
                 }}>
                     {SYNCED_FIELDS.map(f => (
                         <span key={f} style={{
-                            background: '#1e3a5f',
+                            background: '#1c1c24',
                             color: '#93c5fd',
-                            padding: '2px 8px',
+                            padding: '1px 6px',
                             borderRadius: '4px',
-                            fontSize: '12px',
+                            fontSize: '11px',
                             fontFamily: 'monospace'
                         }}>{f}</span>
                     ))}
@@ -216,26 +217,26 @@ const SyncPanel = () => {
 
             {/* Consola de logs */}
             <div style={{
-                background: '#0d1117',
+                background: '#0c0c0e',
                 color: '#4af626',
-                padding: '14px',
+                padding: '12px',
                 borderRadius: '8px',
-                height: '280px',
+                height: '200px',
                 overflowY: 'auto',
                 fontFamily: 'Consolas, monospace',
-                fontSize: '13px',
-                border: '2px solid #2d3748'
+                fontSize: '12px',
+                border: '1px solid #2B2B2B'
             }}>
-                <div style={{ marginBottom: '10px', color: '#6b7280', borderBottom: '1px solid #1e293b', paddingBottom: '8px', fontWeight: 'bold' }}>
-                    Consola
+                <div style={{ marginBottom: '8px', color: '#6b7280', borderBottom: '1px solid #1c1c24', paddingBottom: '6px', fontWeight: 'bold' }}>
+                    Consola de Sincronización
                 </div>
                 {logs.length === 0 && (
                     <div style={{ color: '#4b5563' }}>Esperando acción...</div>
                 )}
                 {logs.map((log, i) => (
                     <div key={i} style={{
-                        marginBottom: '5px',
-                        lineHeight: '1.5',
+                        marginBottom: '4px',
+                        lineHeight: '1.4',
                         color: log.includes('❌') ? '#f87171' : log.includes('✅') ? '#4af626' : log.includes('⚠️') ? '#fbbf24' : '#4af626'
                     }}>
                         {log}

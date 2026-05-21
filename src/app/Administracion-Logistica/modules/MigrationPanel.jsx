@@ -122,31 +122,56 @@ const MigrationPanel = () => {
     };
 
     return (
-        <div style={{ padding: '20px', maxWidth: '800px', background: '#f5f7fa', borderRadius: '12px', color: '#1a1a1a', margin: '20px auto', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ marginBottom: '10px', color: '#0d2b45' }}>Herramienta de Migración: Esquema Espejo 🔄</h2>
-            <p style={{ color: '#555', marginBottom: '20px', fontSize: '14px' }}>
-                Migra la colección <code style={{background: '#ddd', padding: '2px 4px', borderRadius: '4px'}}>audiencias</code> del formato antiguo al nuevo (mirror a <code style={{background: '#ddd', padding: '2px 4px', borderRadius: '4px'}}>audienciasView</code>). El proceso garantiza integridad de IDs atómicamente y elimina documentos viejos redundantes.
+        <div style={{ 
+            padding: '20px', 
+            width: '100%', 
+            background: '#111115', 
+            borderRadius: '12px', 
+            color: '#e2e8f0', 
+            border: '1px solid #2B2B2B',
+            boxSizing: 'border-box',
+            fontFamily: 'Inter, system-ui, sans-serif'
+        }}>
+            <h2 style={{ marginBottom: '8px', color: '#ffffff', fontSize: '18px', fontWeight: 600 }}>Herramienta de Migración: Esquema Espejo 🔄</h2>
+            <p style={{ color: '#88889a', marginBottom: '16px', fontSize: '12px', lineHeight: '1.5' }}>
+                Migra la colección <code style={{background: '#1c1c24', color: '#60a5fa', padding: '2px 4px', borderRadius: '4px', fontSize: '11px'}}>audiencias</code> del formato antiguo al nuevo (mirror a <code style={{background: '#1c1c24', color: '#60a5fa', padding: '2px 4px', borderRadius: '4px', fontSize: '11px'}}>audienciasView</code>) con integridad de IDs.
             </p>
 
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <label style={{fontWeight: 'bold', marginBottom: '5px'}}>Fecha Inicio:</label>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '130px' }}>
+                    <label style={{fontWeight: '600', marginBottom: '4px', fontSize: '12px', color: '#88889a'}}>Fecha Inicio:</label>
                     <input
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         disabled={isMigrating}
-                        style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+                        style={{ 
+                            padding: '8px 12px', 
+                            borderRadius: '6px', 
+                            border: '1px solid #2B2B2B',
+                            background: '#1c1c24',
+                            color: '#ffffff',
+                            fontSize: '14px',
+                            outline: 'none'
+                        }}
                     />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <label style={{fontWeight: 'bold', marginBottom: '5px'}}>Fecha Fin:</label>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: '130px' }}>
+                    <label style={{fontWeight: '600', marginBottom: '4px', fontSize: '12px', color: '#88889a'}}>Fecha Fin:</label>
                     <input
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         disabled={isMigrating}
-                        style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+                        style={{ 
+                            padding: '8px 12px', 
+                            borderRadius: '6px', 
+                            border: '1px solid #2B2B2B',
+                            background: '#1c1c24',
+                            color: '#ffffff',
+                            fontSize: '14px',
+                            outline: 'none'
+                        }}
                     />
                 </div>
             </div>
@@ -155,44 +180,44 @@ const MigrationPanel = () => {
                 onClick={handleMigration}
                 disabled={isMigrating}
                 style={{
-                    padding: '12px 24px',
-                    background: isMigrating ? '#aaa' : '#0056b3',
+                    padding: '10px 20px',
+                    background: isMigrating ? '#2B2B2B' : '#1d4ed8',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: isMigrating ? 'not-allowed' : 'pointer',
-                    fontWeight: 'bold',
+                    fontWeight: '600',
                     width: '100%',
-                    fontSize: '16px',
-                    transition: 'all 0.3s'
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
                 }}
             >
                 {isMigrating ? 'Procesando migración...' : 'Iniciar Migración Segura'}
             </button>
 
             {isMigrating && (
-                <div style={{ marginTop: '20px', fontWeight: 'bold', color: '#e85d04', textAlign: 'center' }}>
-                    <span style={{ fontSize: '18px' }}>⏳</span> Procesando fecha actualmente: {currentDateProccessing.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3")}
+                <div style={{ marginTop: '12px', fontWeight: 'bold', color: '#f59e0b', textAlign: 'center', fontSize: '13px' }}>
+                    <span>⏳</span> Procesando fecha actualmente: {currentDateProccessing.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3")}
                 </div>
             )}
 
             <div style={{
-                marginTop: '30px',
-                background: '#1e1e1e',
+                marginTop: '16px',
+                background: '#0c0c0e',
                 color: '#4af626',
-                padding: '15px',
+                padding: '12px',
                 borderRadius: '8px',
-                height: '300px',
+                height: '200px',
                 overflowY: 'auto',
                 fontFamily: 'Consolas, monospace',
-                fontSize: '14px',
-                border: '4px solid #333'
+                fontSize: '12px',
+                border: '1px solid #2B2B2B'
             }}>
-                <h4 style={{ margin: '0 0 15px 0', color: '#fff', borderBottom: '1px solid #444', paddingBottom: '10px' }}>Consola de Operaciones:</h4>
+                <h4 style={{ margin: '0 0 10px 0', color: '#6b7280', borderBottom: '1px solid #1c1c24', paddingBottom: '6px', fontSize: '12px', fontWeight: 'bold' }}>Consola de Operaciones:</h4>
                 {logs.map((log, index) => (
-                    <div key={index} style={{ marginBottom: '8px', lineHeight: '1.4' }}>{log}</div>
+                    <div key={index} style={{ marginBottom: '4px', lineHeight: '1.4' }}>{log}</div>
                 ))}
-                {logs.length === 0 && <div style={{ color: '#888' }}>Esperando a que inicies el proceso...</div>}
+                {logs.length === 0 && <div style={{ color: '#4b5563' }}>Esperando a que inicies el proceso...</div>}
             </div>
         </div>
     );

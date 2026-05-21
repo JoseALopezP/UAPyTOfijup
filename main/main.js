@@ -8,6 +8,7 @@ import os from 'os';
 // Dynamically import required puppeteer modules from the Next.js src folder
 import { agendarAudiencia, rechazarSolicitud } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
 import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
+import { extraerAnuladas } from '../src/app/Solicitudes-Audiencia/funciones/extraccionAnuladas.js';
 import { extraerDetalles } from '../src/app/Solicitudes-Audiencia/funciones/extraccionDetalles.js';
 import { getInfoAudiencia } from '../src/app/Pumba/components/scrappingUAL.js';
 import { bloqueoMasivoAuto, parsearBloques } from '../src/firebase/firestore/bloqueoAuto.js';
@@ -283,6 +284,33 @@ app.on("ready", () => {
       return { success: true, resultado };
     } catch (error) {
       console.error('Error in rechazar-solicitud IPC:', error);
+      sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('extraer-anuladas', async (event, body) => {
+    const sendEvent = (data) => {
+      event.sender.send('extraer-anuladas-progress', data);
+    };
+    const onProgress = (msg, pct) => {
+      sendEvent({ type: 'progress', message: msg, pct: pct || null });
+    };
+
+    try {
+      const { fechaHasta, downloadDir } = body;
+      sendEvent({ type: 'progress', message: 'Inicializando extracción de anuladas...' });
+      
+      const result = await extraerAnuladas({
+        fechaHasta,
+        downloadDir: downloadDir || null,
+        onProgress,
+      });
+      
+      sendEvent({ type: 'done', data: result });
+      return { success: true, data: result };
+    } catch (error) {
+      console.error('Error in extraer-anuladas IPC:', error);
       sendEvent({ type: 'error', error: error.message });
       return { success: false, error: error.message };
     }
