@@ -3,74 +3,80 @@ import styles from '../Oficios.module.css'
 import { DataContext } from '@/context/DataContext';
 import { generateOficioSection } from '@/utils/resuelvoUtils';
 
-export default function GeneradorOficioBlock({item, date, resuelvo}) {
-    const {desplegables} = useContext(DataContext)
-    const [traslado, setTraslado] = useState(`Se informa que la fecha de detención del Sr. XXX fue el día XXXX, habiendo intervenido Comisaría XXX; por lo que se solicita que cuando se efectivice el traslado del mencionado al SERVICIO PENITENCIARIO PROVINCIAL, se informe dicha circunstancia a la Oficina Judicial Penal al correo: casosofijup@jussanjuan.gov.ar y/o al teléfono 2644554725 de la Unidad de Administración de Casos.`)
-    const [inputList, setInputList] = useState([]);
-    const [imputadoList, setImputadoList] = useState([])
-    const handleInputChange = (e, index) => {
-        const { value } = e.target;
-        const list = [...inputList];
-        list[index].value = value;
-        setInputList(list);
-    };
-    const handleAddInput = () => {
-        setInputList([...inputList, { value: '' }]);
-    };
-    const handleRemoveInput = (index) => {
-        const list = [...inputList];
-        list.splice(index, 1);
-        setInputList(list);
-    };
-    const submitHandler = (e) => {
-        e.preventDefault();
-        generateOficioSection(item,date,traslado,inputList, resuelvo, imputadoList.filter(item => item.selected === true))
-    };
-    function editarPropiedad(arr, idBuscado, nuevoValor) {
-      const nuevoArray = arr.map((item, i) => {
-        if (i === idBuscado) {
-            return { ...item,
-              selected: nuevoValor
-            };
-          }
-          return item;
-        });
-      return nuevoArray;
+export default function GeneradorOficioBlock({ item, date, resuelvo }) {
+  const { desplegables } = useContext(DataContext)
+  const [traslado, setTraslado] = useState(`Se informa que la fecha de detención del Sr. XXX fue el día XXXX, habiendo intervenido Comisaría XXX; por lo que se solicita que cuando se efectivice el traslado del mencionado al SERVICIO PENITENCIARIO PROVINCIAL, se informe dicha circunstancia a la Oficina Judicial Penal al correo: casosofijup@jussanjuan.gov.ar y/o al teléfono 2644554725 de la Unidad de Administración de Casos.`)
+  const [inputList, setInputList] = useState([]);
+  const [imputadoList, setImputadoList] = useState([])
+  const handleInputChange = (e, index) => {
+    const { value } = e.target;
+    const list = [...inputList];
+    list[index].value = value;
+    setInputList(list);
+  };
+  const handleAddInput = () => {
+    setInputList([...inputList, { value: '' }]);
+  };
+  const handleRemoveInput = (index) => {
+    const list = [...inputList];
+    list.splice(index, 1);
+    setInputList(list);
+  };
+  const submitHandler = (e) => {
+    e.preventDefault();
+    generateOficioSection(item, date, traslado, inputList, resuelvo, imputadoList.filter(item => item.selected === true))
+  };
+  function editarPropiedad(arr, idBuscado, nuevoValor) {
+    const nuevoArray = arr.map((item, i) => {
+      if (i === idBuscado) {
+        return {
+          ...item,
+          selected: nuevoValor
+        };
+      }
+      return item;
+    });
+    return nuevoArray;
+  }
+  useEffect(() => {
+    setImputadoList(item.imputado.map(el => ({ ...el, selected: true })))
+  }, [item.imputado])
+  useEffect(() => {
+    if (inputList.map(el => el.value).includes('REGISTRO NACIONAL DE REINCIDENCIA ')) {
+      setTraslado(traslado + '\nSe informa que, de ser necesaria la remisión de la ficha dactiloscópica, la misma deberá ser gestionada por el organismo solicitante ante el Departamento de Antecedentes Personales de la Policía, atento a que esta oficina no cuenta con los datos referidos.')
     }
-    useEffect(()=>{
-      setImputadoList(item.imputado.map(el=>({...el,selected: true})))
-    },[item.imputado])
-    return (
-        <form className={styles.generadorOficioForm} onSubmit={(event) => submitHandler(event)}>
-            {inputList.map((input, index) => (
-            <div key={index}>
-              <input className={`${styles.oficioInput}`}
-                list={`options-${index}`}
-                value={input.value}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-              <datalist id={`options-${index}`}>
-                {desplegables.oficios && desplegables.oficios.map((option, i) => (
-                  <option key={i} value={option} />
-                ))}
-              </datalist>
-              <button type='button' className={`${styles.controlButton} ${styles.controlButtonQuitar}`} onClick={() => handleRemoveInput(index)}>
-                QUITAR
-              </button>
-            </div>
-          ))}
-          <button type='button' className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
-          <textarea spellCheck='true' className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)}/>
-          <div className={`${styles.selectImputadoBlock}`}>
-            {imputadoList.length > 0 ? <>{imputadoList.map((el, i) =>(
-              <span className={`${styles.selectImputadoIndiv}`}>
-              <button type='button' onClick={() => setImputadoList(editarPropiedad(imputadoList,i,!el.selected))}>{el.selected ? "🗹" : "☐"}</button>
-              <p>{el.nombre} - {el.dni}{el.detenido && '- ' + el.detenido}</p>
-              </span>
-            ))}</>:
-            <p>No hay imputados cargados</p>}
-          </div>
-          <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit">DESCARGAR</button>
-        </form>
-    )
+  }, [inputList])
+  return (
+    <form className={styles.generadorOficioForm} onSubmit={(event) => submitHandler(event)}>
+      {inputList.map((input, index) => (
+        <div key={index}>
+          <input className={`${styles.oficioInput}`}
+            list={`options-${index}`}
+            value={input.value}
+            onChange={(e) => handleInputChange(e, index)}
+          />
+          <datalist id={`options-${index}`}>
+            {desplegables.oficios && desplegables.oficios.map((option, i) => (
+              <option key={i} value={option} />
+            ))}
+          </datalist>
+          <button type='button' className={`${styles.controlButton} ${styles.controlButtonQuitar}`} onClick={() => handleRemoveInput(index)}>
+            QUITAR
+          </button>
+        </div>
+      ))}
+      <button type='button' className={`${styles.controlButton} ${styles.controlButtonAgregar}`} onClick={handleAddInput}>+ AGREGAR</button>
+      <textarea spellCheck='true' className={`${styles.textAreaTraslado}`} rows={12} value={traslado} onChange={(e) => setTraslado(e.target.value)} />
+      <div className={`${styles.selectImputadoBlock}`}>
+        {imputadoList.length > 0 ? <>{imputadoList.map((el, i) => (
+          <span className={`${styles.selectImputadoIndiv}`}>
+            <button type='button' onClick={() => setImputadoList(editarPropiedad(imputadoList, i, !el.selected))}>{el.selected ? "🗹" : "☐"}</button>
+            <p>{el.nombre} - {el.dni}{el.detenido && '- ' + el.detenido}</p>
+          </span>
+        ))}</> :
+          <p>No hay imputados cargados</p>}
+      </div>
+      <button className={`${styles.controlButton} ${styles.controlButtonDescargar}`} type="submit">DESCARGAR</button>
+    </form>
+  )
 }
