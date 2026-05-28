@@ -1,23 +1,31 @@
 import puppeteer from "puppeteer";
 import { getBrowserPath } from "../../utils/browserPath.js";
 
-const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
-const FORM_URL = "http://10.107.1.184:8094/bloqueo-persona/create";
+function getUrls(baseIp = '10.107.1.184') {
+    return {
+        LOGIN_URL: `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`,
+        FORM_URL: `http://${baseIp}:8094/bloqueo-persona/create`
+    };
+}
 
 // ── Login ─────────────────────────────────────────────────────────────────────
-async function login(page) {
+async function login(page, credentials = {}) {
+    const { username = "20423341980", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const { LOGIN_URL } = getUrls(baseIp);
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
     await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
-    await page.$eval("#loginform-username", el => el.value = "20423341980");
-    await page.$eval("#loginform-password", el => el.value = "Marzo24");
+    await page.$eval("#loginform-username", el => el.value = username);
+    await page.$eval("#loginform-password", el => el.value = password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
     console.log("   ✓ Login exitoso.");
 }
 
 // ── Llenar y enviar para UN período ──────────────────────────────────────────
-async function llenarYEnviar(page, fixed, periodo, index, total) {
+async function llenarYEnviar(page, fixed, periodo, index, total, credentials = {}) {
+    const { baseIp = "10.107.1.184" } = credentials;
+    const { FORM_URL } = getUrls(baseIp);
     console.log(`\n[${index + 1}/${total}] Período: ${periodo.desde} → ${periodo.hasta}`);
 
     await page.goto(FORM_URL, { waitUntil: "networkidle2" });
@@ -197,7 +205,7 @@ export function generarPeriodos(anio, mesInicio, mesFin, diasSemana, horaDesde, 
  * @param {string} [fixed.observaciones]
  * @param {Array<{desde:string, hasta:string}>} periodos - Formato "dd/mm/yyyy HH:mm:ss"
  */
-export async function bloqueoMasivoAuto(fixed, periodos, onEvent = null) {
+export async function bloqueoMasivoAuto(fixed, periodos, onEvent = null, credentials = {}) {
     const notify = (data) => { try { if (onEvent) onEvent(data); } catch { /* ignorar */ } };
     const errores = [];
     let exitosos = 0;
@@ -212,7 +220,7 @@ export async function bloqueoMasivoAuto(fixed, periodos, onEvent = null) {
     const page = (await browser.pages())[0] || await browser.newPage();
 
     try {
-        await login(page);
+        await login(page, credentials);
 
         for (let i = 0; i < periodos.length; i++) {
             const bloqueLabel = `${periodos[i].desde} → ${periodos[i].hasta}`;
@@ -222,7 +230,7 @@ export async function bloqueoMasivoAuto(fixed, periodos, onEvent = null) {
 
             while (intentos < 3) {
                 try {
-                    await llenarYEnviar(page, fixed, periodos[i], i, periodos.length);
+                    await llenarYEnviar(page, fixed, periodos[i], i, periodos.length, credentials);
                     exito = true;
                     break;
                 } catch (err) {

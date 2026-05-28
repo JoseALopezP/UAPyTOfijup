@@ -101,8 +101,8 @@ UAPyTOfijup/
 │   ├── firebase/
 │   │   ├── config.js                  # Configuración Firebase
 │   │   ├── auth/                      # Sign in, sign up, roles
-│   │   └── firestore/                 # 29 módulos de abstracción Firestore
-│   └── utils/                         # 28 utilidades compartidas
+│   │   └── firestore/                 # 24 módulos de abstracción Firestore
+│   └── utils/                         # 27 utilidades compartidas
 │       ├── resuelvoUtils.js           # Generación de resuelvos y minutas
 │       ├── pdfUtils.js                # Motor PDF con justificado y layout
 │       ├── excelUtils.js              # Exportación XLSX
@@ -288,7 +288,7 @@ Esta separación optimiza las lecturas: la lista lateral solo descarga el docume
 
 ## 🔧 Capa de Abstracción Firebase
 
-El proyecto implementa **29 módulos de abstracción** sobre Firestore:
+El proyecto implementa **24 módulos de abstracción** sobre Firestore:
 
 | Módulo | Operación |
 |---|---|
@@ -299,7 +299,6 @@ El proyecto implementa **29 módulos de abstracción** sobre Firestore:
 | `batchWrite` | Escrituras batch para operaciones masivas |
 | `bloqueoAuto` | Bloqueo masivo automatizado de horarios |
 | `getListCollection` | Obtiene docs de subcollection como array |
-| `listenToDateView` | Listener en tiempo real para cambios |
 | `updateInternalUALData` | Actualización de datos UAL anidados |
 
 ### Estado Global — DataContext
@@ -430,8 +429,8 @@ El proyecto se deploya automáticamente en Vercel. Puppeteer se excluye del bund
 | Archivos fuente | 243 |
 | Tamaño del código fuente | ~2.3 MB |
 | Módulos funcionales | 17 |
-| Abstracciones Firestore | 29 módulos |
-| Utilidades compartidas | 28 módulos |
+| Abstracciones Firestore | 24 módulos |
+| Utilidades compartidas | 27 módulos |
 | Plantillas de audiencia | 14 tipos |
 | API Routes | 7 |
 | Tiempo de desarrollo | Abril 2024 — presente |

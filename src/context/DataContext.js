@@ -570,9 +570,12 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     };
     const updateSolicitudesPendientes = async () => {
         try {
-            const data = await getDocument('solicitudes', 'pendientes');
-            if (data) {
-                setSolicitudesPendientes(Object.entries(data).map(([key, val]) => ({ ...val, rowKey: key })));
+            const data1 = await getDocument('solicitudes', 'pendientes') || {};
+            const data2 = await getDocument('solicitudes', 'pendientes2') || {};
+            const combined = { ...data1, ...data2 };
+            
+            if (Object.keys(combined).length > 0) {
+                setSolicitudesPendientes(Object.entries(combined).map(([key, val]) => ({ ...val, rowKey: key })));
             } else {
                 setSolicitudesPendientes([]);
             }
@@ -582,14 +585,50 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     };
     const addSolicitudData = async (rowKey, data) => {
         try {
-            await addOrUpdateObject('solicitudes', 'pendientes', rowKey, data);
+            // Check where it belongs
+            const existingIndex = Array.isArray(solicitudesPendientes) ? solicitudesPendientes.findIndex(i => i.rowKey === rowKey) : -1;
+            let targetDoc = 'pendientes';
+            
+            if (existingIndex === -1) {
+                // New item. Send to pendientes2 if total is large
+                if (Array.isArray(solicitudesPendientes) && solicitudesPendientes.length >= 100) {
+                    targetDoc = 'pendientes2';
+                }
+            } else {
+                // We don't easily know which doc it came from strictly from state, 
+                // but we can just let Firebase addOrUpdateObject handle it. 
+                // Wait, if it exists, it might be in pendientes2. 
+                // Let's check using getDocument (it's cached in memory usually, but let's be safe).
+                // A better approach: if it's > 100 we just default to pendientes2 for updates too 
+                // UNLESS we want to be exact. Let's just try to fetch the existing keys.
+                // Actually, if we just update both it's an extra write. Let's just use a simple heuristic:
+                if (solicitudesPendientes[existingIndex].targetDoc) {
+                    targetDoc = solicitudesPendientes[existingIndex].targetDoc;
+                } else {
+                    // Try to determine by getting data1
+                    const data1 = await getDocument('solicitudes', 'pendientes') || {};
+                    if (data1[rowKey]) {
+                        targetDoc = 'pendientes';
+                    } else {
+                        const data2 = await getDocument('solicitudes', 'pendientes2') || {};
+                        if (data2[rowKey]) {
+                            targetDoc = 'pendientes2';
+                        } else {
+                            targetDoc = solicitudesPendientes.length >= 100 ? 'pendientes2' : 'pendientes';
+                        }
+                    }
+                }
+            }
+
+            await addOrUpdateObject('solicitudes', targetDoc, rowKey, data);
+            
             setSolicitudesPendientes(prev => {
                 const newData = Array.isArray(prev) ? [...prev] : [];
                 const index = newData.findIndex(item => item.rowKey === rowKey);
                 if (index !== -1) {
-                    newData[index] = { ...newData[index], ...data, rowKey };
+                    newData[index] = { ...newData[index], ...data, rowKey, targetDoc };
                 } else {
-                    newData.push({ ...data, rowKey });
+                    newData.push({ ...data, rowKey, targetDoc });
                 }
                 return newData;
             });
@@ -599,7 +638,10 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     };
     const removeSolicitudPendiente = async (rowKey) => {
         try {
+            // Intentar borrar de ambos por si acaso, removeObject no falla si no existe
             await removeObject('solicitudes', 'pendientes', rowKey);
+            await removeObject('solicitudes', 'pendientes2', rowKey);
+            
             setSolicitudesPendientes(prev =>
                 Array.isArray(prev) ? prev.filter(item => item.rowKey !== rowKey) : []
             );
@@ -654,6 +696,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
                         await addOrUpdateObject('solicitudesLegacy', numeroLeg, idSolicitud, solicitud);
                         // Remover de pendientes
                         await removeObject('solicitudes', 'pendientes', solicitud.rowKey);
+                        await removeObject('solicitudes', 'pendientes2', solicitud.rowKey);
                         archivedCount++;
                     } catch (error) {
                         console.error("Error archivando solicitud:", error);

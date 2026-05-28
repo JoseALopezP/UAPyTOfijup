@@ -62,6 +62,12 @@ export async function POST(request) {
                 
                 const { agendarAudiencia } = await import('@/app/Solicitudes-Audiencia/funciones/agendamiento');
                 
+                const credentials = {
+                    username: process.env.PUMA_SOLICITUDES_USERNAME || process.env.PUMA_USERNAME,
+                    password: process.env.PUMA_SOLICITUDES_PASSWORD || process.env.PUMA_PASSWORD,
+                    baseIp: process.env.PUMA_SOLICITUDES_BASE_IP || process.env.PUMA_BASE_IP
+                };
+
                 const resultado = await agendarAudiencia({
                     linkSol,
                     tipo,
@@ -74,6 +80,7 @@ export async function POST(request) {
                     agregar,
                     documentos,
                     action,
+                    credentials,
                     // Pass everything else just in case
                     ...body
                 }, onProgress);

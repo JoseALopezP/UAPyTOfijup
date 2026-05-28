@@ -1,14 +1,14 @@
 import puppeteer from 'puppeteer';
 import { getBrowserPath } from '../../../utils/browserPath.js';
 
-const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
-
-async function login(page) {
+async function login(page, credentials = {}) {
+    const { username = "27355078316", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const loginUrl = `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`;
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
-    await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded" });
-    await page.type("#loginform-username", "20423341980");
-    await page.type("#loginform-password", "Marzo24");
+    await page.goto(loginUrl, { waitUntil: "domcontentloaded" });
+    await page.type("#loginform-username", username);
+    await page.type("#loginform-password", password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
@@ -258,7 +258,7 @@ async function subirDocumentosLegajo(page, linkLeg, documentos, log) {
 
 export async function agendarAudiencia({ 
     linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, 
-    agregar = [], documentos = [], action = 'agendar', solicitud = {} 
+    agregar = [], documentos = [], action = 'agendar', solicitud = {}, credentials = {} 
 }, onProgress) {
     const log = (msg) => {
         console.log(`[agendamiento] ${msg}`);
@@ -295,7 +295,7 @@ export async function agendarAudiencia({
     try {
         // ── 1. Login ──────────────────────────────────────────────────────
         log("Iniciando login...");
-        await login(page);
+        await login(page, credentials);
         log("Login OK.");
 
         // ── 2. Agregar partes faltantes al legajo (si las hay) ────────────
@@ -835,6 +835,7 @@ export async function rechazarSolicitud({
     legajoFiscal,
     solicitante = 'MPF',
     fyhcreacion,
+    credentials = {}
 }, onProgress) {
     const log = (msg) => {
         console.log(`[rechazarSolicitud] ${msg}`);
@@ -852,7 +853,8 @@ export async function rechazarSolicitud({
             const u = new URL(ref);
             return `${u.protocol}//${u.host}`;
         } catch {
-            return 'http://10.107.1.184:8092';
+            const { baseIp = "10.107.1.184" } = credentials;
+            return `http://${baseIp}:8092`;
         }
     })();
 
@@ -917,7 +919,7 @@ export async function rechazarSolicitud({
     try {
         // ── LOGIN ──────────────────────────────────────────────────────────────
         log('Iniciando login...');
-        await login(page);
+        await login(page, credentials);
         log('Login OK.');
 
         // ═══════════════════════════════════════════════════════════════════════

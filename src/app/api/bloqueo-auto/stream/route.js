@@ -30,7 +30,12 @@ export async function POST(request) {
             };
 
             try {
-                await bloqueoMasivoAuto(fixed, periodos, send);
+                const credentials = {
+                    username: process.env.PUMA_USERNAME,
+                    password: process.env.PUMA_PASSWORD,
+                    baseIp: process.env.PUMA_BASE_IP
+                };
+                await bloqueoMasivoAuto(fixed, periodos, send, credentials);
             } catch (err) {
                 send({ type: 'fatal', message: err.message });
             } finally {

@@ -23,7 +23,13 @@ export async function POST(request) {
         // Sin body → usar defaults
     }
 
-    bloqueoMasivoAuto(fixed, periodos).catch(err =>
+    const credentials = {
+        username: process.env.PUMA_USERNAME,
+        password: process.env.PUMA_PASSWORD,
+        baseIp: process.env.PUMA_BASE_IP
+    };
+
+    bloqueoMasivoAuto(fixed, periodos, null, credentials).catch(err =>
         console.error("[bloqueo-auto] Error:", err)
     );
 

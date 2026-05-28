@@ -41,6 +41,7 @@ export default function HeaderSolicitudes() {
             const existingData = Array.isArray(solicitudesPendientes) ? solicitudesPendientes : [];
 
             const bodyData = { existingData, tiposAudiencia: desplegables?.tiposPuma || [] };
+            let globalNewItems = [];
 
             if (typeof window !== 'undefined' && window.electronAPI) {
                 window.electronAPI.removeAllListeners('extraer-solicitudes-progress');
@@ -53,6 +54,7 @@ export default function HeaderSolicitudes() {
                 if (!result.success) throw new Error(result.error);
 
                 const newItems = result.data || [];
+                globalNewItems = newItems;
                 console.log(`[ui] Guardando ${newItems.length} solicitudes nuevas en Firestore...`);
                 setSyncStatus(`Guardando ${newItems.length} solicitudes...`);
                 for (const item of newItems) {
@@ -92,6 +94,7 @@ export default function HeaderSolicitudes() {
                                 setSyncStatus(parsed.message);
                             } else if (parsed.type === 'done') {
                                 const newItems = parsed.data || [];
+                                globalNewItems = newItems;
                                 console.log(`[ui] Guardando ${newItems.length} solicitudes nuevas en Firestore...`);
                                 setSyncStatus(`Guardando ${newItems.length} solicitudes...`);
                                 for (const item of newItems) {
@@ -115,10 +118,25 @@ export default function HeaderSolicitudes() {
             // Archivar solicitudes viejas (> 1 semana) después de la sincronización
             setSyncStatus('Archivando solicitudes antiguas...');
             const archivedCount = await archiveOldSolicitudes(Array.isArray(solicitudesPendientes) ? solicitudesPendientes : []);
-            if (archivedCount > 0) {
-                setSyncStatus(`✓ Sincronizado. ${archivedCount} archivadas.`);
+            
+            // Generar reporte de errores
+            const itemsConErrores = globalNewItems.filter(item => item.erroresExtraccion && item.erroresExtraccion.length > 0);
+            if (itemsConErrores.length > 0) {
+                let reportContent = "⚠️ REPORTE DE ANOMALÍAS EN EXTRACCIÓN\n";
+                reportContent += "===================================\n\n";
+                itemsConErrores.forEach(item => {
+                    reportContent += `LEGAJO: ${item.numeroLeg}\n`;
+                    reportContent += `ERRORES:\n - ${item.erroresExtraccion.join('\n - ')}\n`;
+                    reportContent += `-----------------------------------\n`;
+                });
+                alert(reportContent);
+                setSyncStatus(`✓ Sincronizado con advertencias. ${archivedCount} archivadas. ${itemsConErrores.length} errores detectados.`);
             } else {
-                setSyncStatus(`✓ Sincronizado correctamente.`);
+                if (archivedCount > 0) {
+                    setSyncStatus(`✓ Sincronizado. ${archivedCount} archivadas.`);
+                } else {
+                    setSyncStatus(`✓ Sincronizado correctamente.`);
+                }
             }
 
         } catch (error) {

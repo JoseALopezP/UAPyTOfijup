@@ -123,18 +123,21 @@ function filterAudiencias(arr) {
     }).filter(a => a !== null);
 }
 
-async function login() {
+async function login(credentials = {}) {
+    const { username = "20423341980", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const loginUrl = `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`;
     await initBrowser();
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
-    await page.goto('http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F')
-    await page.type('#loginform-username', '20423341980');
-    await page.type('#loginform-password', 'Marzo24');
+    await page.goto(loginUrl);
+    await page.type('#loginform-username', username);
+    await page.type('#loginform-password', password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
 
-async function goToAgenda(fechaStr, pageInstance) {
+async function goToAgenda(fechaStr, pageInstance, credentials = {}) {
+    const { baseIp = "10.107.1.184" } = credentials;
     console.log(`[goToAgenda] Iniciando navegación para fecha: ${fechaStr}`);
     const dia = fechaStr.substring(0, 2).replace(/^0/, '');
     const mesNum = parseInt(fechaStr.substring(2, 4));
@@ -147,7 +150,7 @@ async function goToAgenda(fechaStr, pageInstance) {
     // 1. Navegar a la URL de la agenda si no estamos ahí
     if (!pageInstance.url().includes('/audiencia/agenda')) {
         console.log(`[goToAgenda] Navegando directamente a URL de agenda...`);
-        await pageInstance.goto('http://10.107.1.184:8094/audiencia/agenda', { waitUntil: 'networkidle2' });
+        await pageInstance.goto(`http://${baseIp}:8094/audiencia/agenda`, { waitUntil: 'networkidle2' });
     }
 
     // 2. Asegurar vista de "Día"
@@ -253,7 +256,9 @@ async function goToAgenda(fechaStr, pageInstance) {
 
 
 
-async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks, onProgressChunk) {
+async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks, onProgressChunk, credentials = {}) {
+    const { username = "20423341980", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const loginUrl = `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`;
     const browserInstance = await puppeteer.launch({
         headless: true,
         executablePath: getBrowserPath(),
@@ -268,13 +273,13 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
     const selectorLinks = 'td a';
 
     try {
-        await pageInstance.goto('http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F');
-        await pageInstance.type('#loginform-username', '20423341980');
-        await pageInstance.type('#loginform-password', 'Marzo24');
+        await pageInstance.goto(loginUrl);
+        await pageInstance.type('#loginform-username', username);
+        await pageInstance.type('#loginform-password', password);
         await pageInstance.click('button[name="login-button"]');
         await pageInstance.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 
-        await goToAgenda(fechaStr, pageInstance);
+        await goToAgenda(fechaStr, pageInstance, credentials);
 
         await pageInstance.waitForSelector(selectorLinks, { visible: true });
         console.log(`[Chunk] Iniciando procesamiento de audiencias (${indicesParaProcesar.length} items)...`);
@@ -408,7 +413,7 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
                             const loader = document.querySelector('#view-grid-notificaciones-pjax .kv-loader-overlay');
                             return !loader || loader.style.display === 'none' || loader.classList.contains('hide');
                         }, { timeout: 10000 }).catch(() => null);
-                        await new Promise(r => setTimeout(r, 1500)); 
+                        await new Promise(r => setTimeout(r, 1500));
                     }
 
                     const fechaNotif = await pageInstance.evaluate(() => {
@@ -496,12 +501,12 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
                 console.log(`[Chunk] Item ${globalIndex} completado.`);
                 console.log(`[Chunk] Re-estableciendo estado de la agenda para el siguiente item...`);
 
-                await goToAgenda(fechaStr, pageInstance);
+                await goToAgenda(fechaStr, pageInstance, credentials);
                 await pageInstance.waitForSelector(selectorLinks, { visible: true });
             } catch (error) {
                 console.warn(`[Chunk] ⚠️ Error crítico en índice ${globalIndex}: ${error.message}`);
                 resultadosChunk.push({ index: globalIndex, data: null, status: 'error' });
-                try { await goToAgenda(fechaStr, pageInstance); } catch (e) { }
+                try { await goToAgenda(fechaStr, pageInstance, credentials); } catch (e) { }
             } finally {
                 if (onProgressChunk) onProgressChunk(globalIndex);
             }
@@ -517,9 +522,9 @@ async function procesarChunkAudiencias(fechaStr, indicesParaProcesar, totalLinks
     return JSON.parse(JSON.stringify(resultadosChunk));
 }
 
-export async function getInfoAudiencia(fechaStr = "26012026", onProgress) {
-    await login();
-    await goToAgenda(fechaStr, page);
+export async function getInfoAudiencia(fechaStr = "26012026", onProgress, credentials = {}) {
+    await login(credentials);
+    await goToAgenda(fechaStr, page, credentials);
 
     // Usar el mismo selector específico aquí
     const selectorLinks = 'td a';
@@ -584,7 +589,8 @@ export async function getInfoAudiencia(fechaStr = "26012026", onProgress) {
                         const progress = Math.round((completadas / totalLinks) * 100);
                         onProgress(progress, completadas, totalLinks);
                     }
-                }
+                },
+                credentials
             );
         })
     );
@@ -594,7 +600,6 @@ export async function getInfoAudiencia(fechaStr = "26012026", onProgress) {
     });
 
     const datosFiltrados = filterAudiencias(resultados);
-    console.log(`Proceso completado. Datos extraídos finales: ${datosFiltrados.length}`);
 
     if (browser) {
         await browser.close();

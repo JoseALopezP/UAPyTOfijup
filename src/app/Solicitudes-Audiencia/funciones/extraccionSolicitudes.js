@@ -2,22 +2,30 @@ import puppeteer from 'puppeteer';
 import { getBrowserPath } from '../../../utils/browserPath.js';
 import { extraerDetalles } from './extraccionDetalles.js';
 
-const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
-const SOLICITUD_URL = "http://10.107.1.184:8094/solicitud";
+function getUrls(baseIp = '10.107.1.184') {
+    return {
+        LOGIN_URL: `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`,
+        SOLICITUD_URL: `http://${baseIp}:8094/solicitud`
+    };
+}
 
-async function login(page) {
+async function login(page, credentials = {}) {
+    const { username = "27355078316", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const { LOGIN_URL } = getUrls(baseIp);
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
     console.log("[extraccion-solicitudes] Iniciando login...");
     await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
-    await page.type("#loginform-username", "20423341980");
-    await page.type("#loginform-password", "Marzo24");
+    await page.type("#loginform-username", username);
+    await page.type("#loginform-password", password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
     console.log("[extraccion-solicitudes] Login exitoso.");
 }
 
-export async function extraerSolicitudes(existingData = [], onProgress, tiposAudiencia = [], forceReviewAll = false) {
+export async function extraerSolicitudes(existingData = [], onProgress, tiposAudiencia = [], forceReviewAll = false, credentials = {}) {
+    const { baseIp = "10.107.1.184" } = credentials;
+    const { SOLICITUD_URL } = getUrls(baseIp);
     // onProgress lo usamos internamente solo al final para no hacer ruido
     // en la primera fase, que es rápida
     const notify = (msg) => {
@@ -35,7 +43,7 @@ export async function extraerSolicitudes(existingData = [], onProgress, tiposAud
 
     try {
         notify("Iniciando login...");
-        await login(page);
+        await login(page, credentials);
 
         notify(`Navegando a la página de solicitudes: ${SOLICITUD_URL}`);
         await page.goto(SOLICITUD_URL, { waitUntil: "networkidle2" });
@@ -75,6 +83,15 @@ export async function extraerSolicitudes(existingData = [], onProgress, tiposAud
         await page.waitForSelector('#w0-container table tbody tr[data-key]', { visible: true, timeout: 15000 });
 
         notify("Filtros aplicados. Iniciando extracción...");
+
+        // Helper para obtener el total de items del paginador
+        const getTotalItems = async () => page.evaluate(() => {
+            const summary = document.querySelector('.summary');
+            if (!summary) return 0;
+            const match = summary.innerText.match(/de\s+([\d,.]+)/i) || summary.innerText.match(/of\s+([\d,.]+)/i);
+            if (match) return parseInt(match[1].replace(/[^\d]/g, ''), 10);
+            return 0;
+        });
 
 
         // ── Helpers ───────────────────────────────────────────────────────────
@@ -128,53 +145,77 @@ export async function extraerSolicitudes(existingData = [], onProgress, tiposAud
 
         // ── Loop principal ────────────────────────────────────────────────────
 
-        const allSolicitudes = [];
-        let stopFound = false;
+        let allSolicitudes = [];
+        let listaValida = false;
+        let intentosRecorrido = 0;
 
-        while (!stopFound) {
-            // 1. Extraer filas de la página actual
-            const rows = await extractRows();
-            notify(`${rows.length} filas en página actual.`);
+        while (!listaValida && intentosRecorrido < 3) {
+            intentosRecorrido++;
+            allSolicitudes = [];
+            
+            const totalItemsInicio = await getTotalItems();
+            notify(`Recorrido intento ${intentosRecorrido}. Total items reportados: ${totalItemsInicio}`);
 
-            for (const row of rows) {
-                const alreadyExists = existingData.some(
-                    d => d.numeroLeg === row.numeroLeg && d.fyhcreacion === row.fyhcreacion
-                );
-                if (alreadyExists && !forceReviewAll) {
-                    notify(`Match encontrado: ${row.numeroLeg}. Deteniendo.`);
-                    stopFound = true;
+            let stopFound = false;
+            while (!stopFound) {
+                const rows = await extractRows();
+                notify(`${rows.length} filas extraídas en página actual.`);
+
+                for (const row of rows) {
+                    const alreadyExists = existingData.some(
+                        d => d.numeroLeg === row.numeroLeg && d.fyhcreacion === row.fyhcreacion
+                    );
+                    if (alreadyExists && !forceReviewAll) {
+                        notify(`Match encontrado: ${row.numeroLeg}. Deteniendo extracción base.`);
+                        stopFound = true;
+                        break;
+                    }
+                    allSolicitudes.push(row);
+                }
+                if (stopFound) break;
+
+                const nextBtn = await page.$('li.next:not(.disabled) a');
+                if (!nextBtn) {
+                    notify("No hay más páginas.");
                     break;
                 }
-                allSolicitudes.push(row);
-            }
-            if (stopFound) break;
 
-            // 2. Buscar botón "Siguiente"
-            const nextBtn = await page.$('li.next:not(.disabled) a');
-            if (!nextBtn) {
-                notify("No hay más páginas.");
-                break;
-            }
+                const currentPage = await getActivePage();
+                const targetPage = currentPage + 1;
+                notify(`Navegando a página ${targetPage + 1}...`);
+                await nextBtn.click();
 
-            // 3. Anotar página actual y hacer clic
-            const currentPage = await getActivePage();
-            const targetPage = currentPage + 1;
-            notify(`Navegando a página ${targetPage + 1}...`);
-            await nextBtn.click();
-
-            // 4. Esperar cambio de página (hasta 30s); si no cambia, reintentar una vez
-            const ok = await waitForPageChange(targetPage, 30000);
-            if (!ok) {
-                notify("Timeout devuelto. Reintentando clic en Siguiente...");
-                const retryBtn = await page.$('li.next:not(.disabled) a');
-                if (retryBtn) await retryBtn.click();
-                const okRetry = await waitForPageChange(targetPage, 30000);
-                if (!okRetry) {
-                    notify("Página tildada tras reintento. Abortando paginación.");
-                    break;
+                const ok = await waitForPageChange(targetPage, 30000);
+                if (!ok) {
+                    notify("Timeout devuelto. Reintentando clic en Siguiente...");
+                    const retryBtn = await page.$('li.next:not(.disabled) a');
+                    if (retryBtn) await retryBtn.click();
+                    const okRetry = await waitForPageChange(targetPage, 30000);
+                    if (!okRetry) {
+                        notify("Página tildada tras reintento. Abortando paginación.");
+                        break;
+                    }
                 }
+                notify(`Página ${targetPage + 1} cargada.`);
             }
-            notify(`Página ${targetPage + 1} cargada.`);
+
+            // Volver a la página 1 para el chequeo final
+            notify("Volviendo a página 1 para comprobación de integridad...");
+            const firstPageBtn = await page.$('.pagination li[data-page="1"] a, .pagination li[data-page="0"] a');
+            if (firstPageBtn) {
+                await firstPageBtn.click();
+                await waitForPageChange(1, 15000);
+            } else {
+                await page.reload({ waitUntil: "networkidle2" });
+            }
+
+            const totalItemsFin = await getTotalItems();
+            if (totalItemsInicio === totalItemsFin) {
+                notify("Integridad de lista verificada. La cantidad de solicitudes no cambió.");
+                listaValida = true;
+            } else {
+                notify(`¡Advertencia! La lista cambió durante la extracción (${totalItemsInicio} -> ${totalItemsFin}). Repitiendo recorrido.`);
+            }
         }
 
         notify(`Total extraídos tabla base: ${allSolicitudes.length}`);
@@ -184,7 +225,7 @@ export async function extraerSolicitudes(existingData = [], onProgress, tiposAud
         // ── Extracción de detalles (4 navegadores en paralelo) ────────────────
         notify(`Pasando a extracción detallada (${allSolicitudes.length} items)...`);
 
-        const allDetalles = await extraerDetalles(allSolicitudes, onProgress, tiposAudiencia);
+        const allDetalles = await extraerDetalles(allSolicitudes, onProgress, tiposAudiencia, credentials);
         return allDetalles;
 
 

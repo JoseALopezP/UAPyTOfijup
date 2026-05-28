@@ -25,9 +25,15 @@ export async function GET(request) {
             try {
                 const { extraerSolicitudes } = await import('@/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes');
 
+                const credentials = {
+                    username: process.env.PUMA_SOLICITUDES_USERNAME || process.env.PUMA_USERNAME,
+                    password: process.env.PUMA_SOLICITUDES_PASSWORD || process.env.PUMA_PASSWORD,
+                    baseIp: process.env.PUMA_SOLICITUDES_BASE_IP || process.env.PUMA_BASE_IP
+                };
+
                 const data = await extraerSolicitudes(tipo, (msg, done = false) => {
                     emit({ message: msg, done });
-                });
+                }, [], false, credentials);
 
                 const finalData = JSON.stringify({ type: 'done', data }) + '\n';
                 controller.enqueue(encoder.encode(finalData));

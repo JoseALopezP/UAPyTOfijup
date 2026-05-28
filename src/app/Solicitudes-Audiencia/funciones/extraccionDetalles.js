@@ -1,15 +1,14 @@
 import puppeteer from 'puppeteer';
 import { getBrowserPath } from '../../../utils/browserPath.js';
 
-const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
-const BROWSER_COUNT = 4;
-
-async function login(page) {
+async function login(page, credentials = {}) {
+    const { username = "27355078316", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const loginUrl = `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`;
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
-    await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
-    await page.type("#loginform-username", "20423341980");
-    await page.type("#loginform-password", "Marzo24");
+    await page.goto(loginUrl, { waitUntil: "networkidle2" });
+    await page.type("#loginform-username", username);
+    await page.type("#loginform-password", password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
@@ -22,7 +21,7 @@ function chunkArray(arr, n) {
     }
     return chunks;
 }
-async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudiencia = []) {
+async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudiencia = [], credentials = {}) {
     const log = (msg) => {
         console.log(`[worker-${workerId}] ${msg}`);
     };
@@ -38,7 +37,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
 
     try {
         log("Iniciando login...");
-        await login(page);
+        await login(page, credentials);
         log(`Login OK. Procesando ${chunk.length} solicitudes...`);
 
         const results = [];
@@ -48,10 +47,24 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
             log(`[${i + 1}/${chunk.length}] Navegando a: ${sol.linkSol}`);
 
             try {
-                await page.goto(sol.linkSol, { waitUntil: "networkidle2", timeout: 30000 });
+                let extra = null;
+                let erroresExtraccion = [];
+                let retryCount = 0;
+                let maxRetries = 1;
+                let success = false;
 
-                // ── Extracción de datos del detalle de la solicitud ──────────
-                const extra = await page.evaluate(() => {
+                while (retryCount <= maxRetries && !success) {
+                    if (retryCount > 0) {
+                        log(`  -> Datos incompletos detectados. Reintentando extracción (Intento ${retryCount + 1})...`);
+                        await page.reload({ waitUntil: "networkidle2", timeout: 30000 });
+                        await new Promise(r => setTimeout(r, 2000));
+                    } else {
+                        await page.goto(sol.linkSol, { waitUntil: "networkidle2", timeout: 30000 });
+                    }
+
+                    try {
+                        // ── Extracción de datos del detalle de la solicitud ──────────
+                        extra = await page.evaluate(() => {
                     const origin = window.location.origin;
 
                     // ── 1. Tipo Solicitud (primer panel) ─────────────────────
@@ -248,7 +261,30 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
                     }
                 }
 
-                results.push({ ...sol, ...extra });
+                // Validar integridad de datos
+                let erroresActuales = [];
+                if (!extra.tipo || extra.tipo.length === 0) erroresActuales.push('Falta el tipo de audiencia');
+                if (!extra.intervinientes || Object.keys(extra.intervinientes).length === 0) erroresActuales.push('No se encontraron intervinientes');
+                if (!extra.documentos || extra.documentos.length === 0) erroresActuales.push('No se encontraron documentos');
+                
+                if (erroresActuales.length > 0) {
+                    erroresExtraccion = erroresActuales;
+                    retryCount++;
+                } else {
+                    success = true;
+                    erroresExtraccion = [];
+                }
+            } catch (err) {
+                erroresExtraccion.push(`Error en extracción de detalle: ${err.message}`);
+                retryCount++;
+            }
+        } // Fin de while retryCount
+
+        if (!extra) {
+            extra = { tipo: null, solicitante: null, intervinientes: {}, documentos: [] };
+        }
+
+        results.push({ ...sol, ...extra, erroresExtraccion });
 
                 // ── Filtro temprano: FLAGRANCIA en solicitante ────────────
                 if (extra.solicitante && /flagrancia/i.test(extra.solicitante)) {
@@ -566,7 +602,7 @@ async function procesarChunk(workerId, chunk, onProgress, sharedState, tiposAudi
  * @param {Function} onProgress - Opcional callback de progreso
  * @returns {Promise<Array>} - Array enriquecido con los datos de detalle
  */
-export async function extraerDetalles(solicitudes, onProgress, tiposAudiencia = []) {
+export async function extraerDetalles(solicitudes, onProgress, tiposAudiencia = [], credentials = {}) {
     if (!solicitudes || solicitudes.length === 0) {
         if (onProgress) onProgress("No hay solicitudes para procesar.");
 
@@ -574,6 +610,7 @@ export async function extraerDetalles(solicitudes, onProgress, tiposAudiencia = 
         return [];
     }
 
+    const BROWSER_COUNT = 4;
     // Solo paralelizamos hasta BROWSER_COUNT workers (o menos si hay pocas solicitudes)
     const count = Math.min(BROWSER_COUNT, solicitudes.length);
     const chunks = chunkArray(solicitudes, count);
@@ -585,7 +622,7 @@ export async function extraerDetalles(solicitudes, onProgress, tiposAudiencia = 
 
     // Lanzamos todos los workers en paralelo
     const allResults = await Promise.all(
-        chunks.map((chunk, i) => procesarChunk(i, chunk, onProgress, sharedState, tiposAudiencia))
+        chunks.map((chunk, i) => procesarChunk(i, chunk, onProgress, sharedState, tiposAudiencia, credentials))
     );
 
 

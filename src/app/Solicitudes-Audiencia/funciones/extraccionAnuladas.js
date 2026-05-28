@@ -3,24 +3,22 @@ import { getBrowserPath } from '../../../utils/browserPath.js';
 import path from 'path';
 import fs from 'fs';
 
-const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
-const SOLICITUD_URL = "http://10.107.1.184:8094/solicitud";
-const BASE_URL = "http://10.107.1.184:8094";
-const BROWSER_COUNT = 4;
+function getUrls(baseIp = '10.107.1.184') {
+    return {
+        LOGIN_URL: `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`,
+        SOLICITUD_URL: `http://${baseIp}:8094/solicitud`,
+        BASE_URL: `http://${baseIp}:8094`
+    };
+}
 
-// IDs conocidos de los filtros (extraídos del HTML provisto)
-// tipo_solicitud_combinado: SUSPENSIÓN/MODIFICACIÓN DE FECHA DE AUDIENCIA
-const ID_TIPO_SOL_COMBINADO = "g5m5-1a034caf-b997-44df-a908-873bcabf47b1"; // El UUID de ese option
-// id_tipo_solicitud: SOLICITUD JURISDICCIONAL
-// id_estado_solicitud_jurisdiccional: ANULADA
-const ID_ESTADO_JURISDICCIONAL_ANULADA = "d0a38ed2-f9be-43c8-82ef-eb8ce0ad6793";
-
-async function login(page) {
+async function login(page, credentials = {}) {
+    const { username = "27355078316", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const { LOGIN_URL } = getUrls(baseIp);
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
     await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
-    await page.type("#loginform-username", "20423341980");
-    await page.type("#loginform-password", "Marzo24");
+    await page.type("#loginform-username", username);
+    await page.type("#loginform-password", password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
 }
@@ -66,11 +64,14 @@ function parseFechaHastaInput(str) {
  * Fase 1: extrae todos los links de solicitudes (listado paginado)
  * hasta que la fecha de la fila sea anterior a fechaHasta.
  */
-export async function extraerLinksAnuladas(fechaHastaStr, onProgress) {
+export async function extraerLinksAnuladas(fechaHastaStr, onProgress, credentials = {}) {
     const notify = (msg) => {
         console.log(`[extraccion-anuladas] ${msg}`);
         if (onProgress) onProgress(msg);
     };
+
+    const { baseIp = "10.107.1.184" } = credentials;
+    const { SOLICITUD_URL, BASE_URL } = getUrls(baseIp);
 
     // Usar el parser correcto para el formato YYYY-MM-DD del input HTML
     const fechaHasta = parseFechaHastaInput(fechaHastaStr);
@@ -87,7 +88,7 @@ export async function extraerLinksAnuladas(fechaHastaStr, onProgress) {
 
     try {
         notify("Iniciando login...");
-        await login(page);
+        await login(page, credentials);
 
         notify(`Navegando a solicitudes...`);
         await page.goto(SOLICITUD_URL, { waitUntil: "networkidle2" });
@@ -253,11 +254,14 @@ export async function extraerLinksAnuladas(fechaHastaStr, onProgress) {
  * Fase 2: procesa un chunk de solicitudes, extrae datos y descarga documentos.
  * Solo guarda la solicitud si "Parte Solicitante" empieza con "FISCAL".
  */
-async function procesarChunkAnuladas(workerId, chunk, onProgress, sharedState, downloadDir) {
+async function procesarChunkAnuladas(workerId, chunk, onProgress, sharedState, downloadDir, credentials = {}) {
     const log = (msg) => {
         console.log(`[worker-${workerId}] ${msg}`);
         if (onProgress) onProgress(`[W${workerId}] ${msg}`);
     };
+
+    const { baseIp = "10.107.1.184" } = credentials;
+    const { BASE_URL } = getUrls(baseIp);
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -270,7 +274,7 @@ async function procesarChunkAnuladas(workerId, chunk, onProgress, sharedState, d
 
     try {
         log("Login...");
-        await login(page);
+        await login(page, credentials);
         log(`Procesando ${chunk.length} solicitudes...`);
 
         const results = [];
@@ -474,7 +478,7 @@ async function procesarChunkAnuladas(workerId, chunk, onProgress, sharedState, d
 /**
  * Función principal: extrae links y luego procesa detalles con 4 workers.
  */
-export async function extraerAnuladas({ fechaHasta, downloadDir, onProgress }) {
+export async function extraerAnuladas({ fechaHasta, downloadDir, onProgress, credentials = {} }) {
     const notify = (msg, pct) => {
         console.log(`[extraer-anuladas] ${msg}`);
         if (onProgress) onProgress(msg, pct);
@@ -486,7 +490,7 @@ export async function extraerAnuladas({ fechaHasta, downloadDir, onProgress }) {
     }
 
     notify("Iniciando extracción de links...");
-    const links = await extraerLinksAnuladas(fechaHasta, notify);
+    const links = await extraerLinksAnuladas(fechaHasta, notify, credentials);
     notify(`Links extraídos: ${links.length}. Iniciando procesamiento de detalles...`);
 
     if (links.length === 0) {
@@ -494,12 +498,13 @@ export async function extraerAnuladas({ fechaHasta, downloadDir, onProgress }) {
         return [];
     }
 
+    const BROWSER_COUNT = 4;
     const count = Math.min(BROWSER_COUNT, links.length);
     const chunks = chunkArray(links, count);
     const sharedState = { total: links.length, count: 0 };
 
     const allResults = await Promise.all(
-        chunks.map((chunk, i) => procesarChunkAnuladas(i, chunk, notify, sharedState, downloadDir))
+        chunks.map((chunk, i) => procesarChunkAnuladas(i, chunk, notify, sharedState, downloadDir, credentials))
     );
 
     const flat = allResults.flat();

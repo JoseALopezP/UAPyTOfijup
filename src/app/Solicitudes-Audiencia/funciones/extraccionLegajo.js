@@ -1,19 +1,19 @@
 import puppeteer from 'puppeteer';
 
-const LOGIN_URL = "http://10.107.1.184:8092/site/login?urlBack=http%3A%2F%2F10.107.1.184%3A8094%2F";
-
-async function login(page) {
+async function login(page, credentials = {}) {
+    const { username = "27355078316", password = "Marzo24", baseIp = "10.107.1.184" } = credentials;
+    const loginUrl = `http://${baseIp}:8092/site/login?urlBack=http%3A%2F%2F${baseIp}%3A8094%2F`;
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(60000);
     console.log("[extraccion] Iniciando login...");
-    await page.goto(LOGIN_URL, { waitUntil: "networkidle2" });
-    await page.type("#loginform-username", "20423341980");
-    await page.type("#loginform-password", "Marzo24");
+    await page.goto(loginUrl, { waitUntil: "networkidle2" });
+    await page.type("#loginform-username", username);
+    await page.type("#loginform-password", password);
     await page.click('button[name="login-button"]');
     await page.waitForSelector('a[href="/audiencia/agenda"]', { visible: true, timeout: 60000 });
     console.log("[extraccion] Login exitoso.");
 }
-export async function extraerDatosDeUrl(url) {
+export async function extraerDatosDeUrl(url, credentials = {}) {
     if (!url) throw new Error("URL no proporcionada");
 
     const browser = await puppeteer.launch({
@@ -25,7 +25,7 @@ export async function extraerDatosDeUrl(url) {
     const page = (await browser.pages())[0] || await browser.newPage();
 
     try {
-        await login(page);
+        await login(page, credentials);
 
         console.log(`[extraccion] Navegando a: ${url}`);
         await page.goto(url, { waitUntil: "networkidle2" });

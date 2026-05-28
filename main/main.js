@@ -114,8 +114,90 @@ const createWindow = () => {
   });
 };
 
+async function getPumaCredentials(type = 'general') {
+  const configPath = path.join(app.getPath('userData'), 'puma_config.json');
+  try {
+    const data = await fs.readFile(configPath, 'utf8');
+    const config = JSON.parse(data);
+    
+    // Check if the configuration has the nested structure
+    if (config.general || config.solicitudes) {
+      const section = config[type] || {};
+      return {
+        username: section.username || (type === 'general' ? "20423341980" : "27355078316"),
+        password: section.password || "Marzo24",
+        baseIp: section.baseIp || "10.107.1.184"
+      };
+    }
+    
+    // Fallback to old flat structure for backward compatibility
+    return {
+      username: config.username || "20423341980",
+      password: config.password || "Marzo24",
+      baseIp: config.baseIp || "10.107.1.184"
+    };
+  } catch (error) {
+    const defaultConfig = {
+      general: {
+        username: "20423341980",
+        password: "Marzo24",
+        baseIp: "10.107.1.184"
+      },
+      solicitudes: {
+        username: "27355078316",
+        password: "Marzo24",
+        baseIp: "10.107.1.184"
+      }
+    };
+    try {
+      await fs.writeFile(configPath, JSON.stringify(defaultConfig, null, 2), 'utf8');
+    } catch (writeErr) {
+      console.error('Error writing default puma_config.json:', writeErr);
+    }
+    return defaultConfig[type];
+  }
+}
+
 app.on("ready", () => {
   createWindow();
+
+  // ------ IPC Handlers for Configuration Management ------
+
+  ipcMain.handle('get-puma-config', async () => {
+    const configPath = path.join(app.getPath('userData'), 'puma_config.json');
+    try {
+      const data = await fs.readFile(configPath, 'utf8');
+      return JSON.parse(data);
+    } catch {
+      return {
+        general: { username: "20423341980", password: "Marzo24", baseIp: "10.107.1.184" },
+        solicitudes: { username: "27355078316", password: "Marzo24", baseIp: "10.107.1.184" }
+      };
+    }
+  });
+
+  ipcMain.handle('save-puma-config', async (event, newConfig) => {
+    const configPath = path.join(app.getPath('userData'), 'puma_config.json');
+    try {
+      const config = {
+        general: {
+          username: newConfig.general?.username || newConfig.username || "",
+          password: newConfig.general?.password || newConfig.password || "",
+          baseIp: newConfig.general?.baseIp || newConfig.baseIp || ""
+        },
+        solicitudes: {
+          username: newConfig.solicitudes?.username || newConfig.username || "",
+          password: newConfig.solicitudes?.password || newConfig.password || "",
+          baseIp: newConfig.solicitudes?.baseIp || newConfig.baseIp || ""
+        }
+      };
+      await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+      return { success: true };
+    } catch (error) {
+      console.error('Error saving puma_config.json:', error);
+      return { success: false, error: error.message };
+    }
+  });
 
   // ------ IPC Handlers for Puppeteer Scripts ------
 
@@ -152,8 +234,9 @@ app.on("ready", () => {
 
       sendEvent({ type: 'progress', message: 'Iniciando agendamiento con Puppeteer local...' });
       
+      const credentials = await getPumaCredentials('solicitudes');
       const resultado = await agendarAudiencia({
-        linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentos, action, ...body
+        linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentos, action, credentials, ...body
       }, onProgress);
 
       sendEvent({ type: 'done', data: resultado });
@@ -181,7 +264,8 @@ app.on("ready", () => {
       const { existingData, tiposAudiencia, forceReviewAll } = body;
       sendEvent({ type: 'progress', message: 'Extraer: Inicializando Puppeteer...' });
       
-      const result = await extraerSolicitudes(existingData || [], onProgress, tiposAudiencia || [], forceReviewAll);
+      const credentials = await getPumaCredentials('solicitudes');
+      const result = await extraerSolicitudes(existingData || [], onProgress, tiposAudiencia || [], forceReviewAll, credentials);
       
       sendEvent({ type: 'done', data: result });
       return { success: true, data: result };
@@ -195,7 +279,8 @@ app.on("ready", () => {
   ipcMain.handle('extraer-solicitud-individual', async (event, body) => {
     try {
       const { solicitud, tiposAudiencia } = body;
-      const result = await extraerDetalles([solicitud], null, tiposAudiencia || []);
+      const credentials = await getPumaCredentials('solicitudes');
+      const result = await extraerDetalles([solicitud], null, tiposAudiencia || [], credentials);
       if (result && result.length > 0) {
         return { success: true, data: result[0] };
       }
@@ -222,7 +307,8 @@ app.on("ready", () => {
 
     try {
       console.log(`[IPC] Iniciando scrape-pumba para día: ${dia}`);
-      const resultados = await getInfoAudiencia(dia, onProgress);
+      const credentials = await getPumaCredentials('general');
+      const resultados = await getInfoAudiencia(dia, onProgress, credentials);
       
       sendEvent({
         type: 'complete',
@@ -246,7 +332,8 @@ app.on("ready", () => {
       const { fixed, bloques, periodos } = body;
       const periodosParsed = bloques ? parsearBloques(bloques) : (periodos || []);
       
-      await bloqueoMasivoAuto(fixed, periodosParsed, sendEvent);
+      const credentials = await getPumaCredentials('general');
+      await bloqueoMasivoAuto(fixed, periodosParsed, sendEvent, credentials);
       return { success: true };
     } catch (error) {
       console.error('Error in bloqueo-masivo IPC:', error);
@@ -275,9 +362,10 @@ app.on("ready", () => {
 
       sendEvent({ type: 'progress', message: `Iniciando rechazo de solicitud ${numeroLeg}...` });
 
+      const credentials = await getPumaCredentials('solicitudes');
       const resultado = await rechazarSolicitud({
         linkLeg, linkSol, razonRechazo, numeroLeg, fyhcreacion, legajoFiscal,
-        solicitante: solicitanteRechazo || 'MPF'
+        solicitante: solicitanteRechazo || 'MPF', credentials
       }, onProgress);
 
       sendEvent({ type: 'done', data: resultado });
@@ -301,10 +389,12 @@ app.on("ready", () => {
       const { fechaHasta, downloadDir } = body;
       sendEvent({ type: 'progress', message: 'Inicializando extracción de anuladas...' });
       
+      const credentials = await getPumaCredentials('solicitudes');
       const result = await extraerAnuladas({
         fechaHasta,
         downloadDir: downloadDir || null,
         onProgress,
+        credentials
       });
       
       sendEvent({ type: 'done', data: result });

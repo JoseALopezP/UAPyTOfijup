@@ -8,9 +8,12 @@ export const maxDuration = 60;
  */
 export async function GET() {
     try {
-        const data = await getDocument('solicitudes', 'pendientes');
+        const data1 = await getDocument('solicitudes', 'pendientes') || {};
+        const data2 = await getDocument('solicitudes', 'pendientes2') || {};
 
-        if (!data) {
+        const data = { ...data1, ...data2 };
+
+        if (Object.keys(data).length === 0) {
             return Response.json({ solicitudes: [] });
         }
 
