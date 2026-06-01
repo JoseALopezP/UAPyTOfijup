@@ -136,7 +136,7 @@ export function generateResuelvo(item, date) {
     const resuelvo = `
 Lugar y Fecha: San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}
 Tipo de Audiencia: ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''}
-Legajo: N° ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} Caratulado ${item.caratula}
+Legajo: N° ${item.numeroLeg}${item.saeNum ? ` SAE N°: ${item.saeNum}` : ''} Caratulado ${item.caratula}
 Sala de Audiencias: ${item.sala}
 Hora programada: ${item.hora} horas
 Hora real de inicio: ${item.hitos?.[0]?.split(' | ')[0] || ''} horas
@@ -156,7 +156,7 @@ export function generateResuelvoSection(item, date) {
     const sections = [
         { title: 'Lugar y Fecha:', text: `San Juan, ${date.slice(0, 2)} de ${capitalizeFirst(getMonthName(date.slice(2, 4)))} de ${date.slice(4, 8)}.` },
         { title: 'Tipo de Audiencia:', text: `${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''}.` },
-        { title: 'Legajo:', text: `N° ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} Caratulado ${item.caratula}.` },
+        { title: 'Legajo:', text: `N° ${item.numeroLeg}${item.saeNum ? ` SAE N°: ${item.saeNum}` : ''} Caratulado ${item.caratula}.` },
         { title: 'Sala de Audiencias:', text: `${item.sala}.` },
         { title: 'Hora programada:', text: `${item.hora} horas.` },
         { title: 'Hora real de inicio:', text: `${item.hitos?.[0]?.split(' | ')[0] || ''} horas.` },
@@ -295,7 +295,7 @@ export async function generateOficioSection(item, date, traslado = '', oficiados
     sections.push({ right: `San Juan, ${today.slice(0, 2)} de ${getMonthName(today.slice(2, 4))} de ${today.slice(4, 8)}.` });
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
     sections.push({
-        text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` / ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
+        text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` SAE N°: ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
     En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${formatAbogadoName(el.nombre)}${el.subrogando ? ` (subrogando por ${item.mpfSubrogandoPor || item.ufi})` : ''}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${formatAbogadoName(el.nombre)}${el.subrogando ? ` (subrogando a la Defensoría Oficial N°${item.defensoria})` : ''}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${normalizeName(el.nombre)} D.N.I.N°: ${el.dni}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${normalizeName(item.operador)}. ${traslado !== '' ? `
         `+ traslado : ''}
     Saluda atte.`});
