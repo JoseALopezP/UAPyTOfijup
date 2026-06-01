@@ -57,6 +57,12 @@ graph TD
 1. El operador ingresa una lista de legajos y salas a bloquear separados por saltos de línea.
 2. El sistema parsea cada línea, comprueba colisiones, e inhabilita dichos bloques de agendamiento en el sistema Puppeteer de agendamiento masivo.
 
+### Workflow 3: Extracción de Solicitudes Anuladas
+1. Se accede a través del panel integrado en la primera columna del dashboard logístico.
+2. El operador selecciona la fecha límite de búsqueda (`fechaHasta`) y presiona el botón de extracción.
+3. El sistema inicia workers paralelos de Puppeteer que inician sesión en el portal judicial usando el perfil de credenciales `solicitudes` (desde `puma_config.json`).
+4. Recupera y filtra solicitudes anuladas del tipo "Suspensión/Modificación de Audiencia" que pertenezcan a organismos del MPF (Fiscales), y las persiste en Firestore.
+
 ---
 
 ## 🚀 4. Trabajo Futuro y Mejoras Pendientes

@@ -40,6 +40,22 @@ graph TD
 - **Ajuste de Género:** Al redactar un oficio judicial a una autoridad, el sistema recupera el campo de género del profesional (`s` en la base de abogados) y ajusta automáticamente la redacción del saludo: *"Al Señor Juez"* / *"A la Señora Jueza"*, *"Al Doctor"* / *"A la Doctora"*.
 - **Destinatarios Predeterminados:** Permite autocompletar con UFI específicas, comisarías, juzgados de garantías o defensores oficiales.
 
+### C. Integración con el Sistema de Reincidencia
+- **Detección Automática de Destinatario:** Al agregar como destinatario de un oficio al `"REGISTRO NACIONAL DE REINCIDENCIA "`, el sistema detecta de forma inteligente este valor en la lista de entradas de oficios.
+- **Inserción de Advertencia y Plantilla Estructurada:** Automáticamente, añade al campo de `traslado` una nota indicando que la remisión de la ficha dactiloscópica debe ser gestionada por el organismo solicitante ante el Departamento de Antecedentes Personales de la Policía, junto con una plantilla estructurada con los siguientes campos clave para completar el pedido:
+  - **TIPO:** PEDIDO de informes o RESOLUCIÓN, SENTENCIA o TESTIMONIO judicial
+  - **ORGANISMO:** nombre del organismo judicial
+  - **CAUSA:** número de causa
+  - **PRIORIDAD:** (no completar)
+  - **DELITO:** descripción del delito
+  - **RESOLUCIÓN:** sentencia condenatoria, sobreseimiento, etc.
+  - **DNI:** número de DNI
+  - **SEXO:** MASCULINO o FEMENINO
+  - **FECHA DE NACIMIENTO:** formato DD/MM/AAAA (Prestar especial atención al formato)
+  - **NACIONALIDAD:** nacionalidad del causante
+  - **DATOS DE FILIACIÓN:** apellidos/nombres del causante, y de su padre y madre.
+- **Prevención de Duplicados:** Valida que el fragmento de la nota informativa y la plantilla de reincidencia no se agreguen múltiples veces si el usuario realiza modificaciones consecutivas en la lista de destinatarios.
+
 ---
 
 ## 🚀 3. Trabajo Futuro y Mejoras Pendientes

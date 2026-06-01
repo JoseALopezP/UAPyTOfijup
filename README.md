@@ -341,17 +341,30 @@ Los cambios de estado de audiencia requieren mantener presionado el botón:
 ### Comunicación IPC Segura (Electron)
 
 ```javascript
-// Main process — maneja Puppeteer
+// Main process — maneja Puppeteer y Credenciales
 ipcMain.handle('agendar-puppeteer', async (event, body) => {
     const onProgress = (msg) => {
         event.sender.send('agendar-puppeteer-progress', { type: 'progress', message: msg });
     };
-    const resultado = await agendarAudiencia(body, onProgress);
+    const credentials = await getPumaCredentials('solicitudes');
+    const resultado = await agendarAudiencia({ ...body, credentials }, onProgress);
     return { success: true, resultado };
 });
 ```
 
 El renderer envía tareas al main process via `ipcRenderer.invoke()`, y recibe actualizaciones de progreso en tiempo real via eventos IPC.
+
+### Segregación de Credenciales y Configuración Centralizada (PUMA/UAL)
+Para proteger las credenciales de acceso a los portales judiciales y la IP del servidor sin hardcodearlas:
+- **Segregación:** Dos perfiles de credenciales (`general` para bloqueos y agendas, `solicitudes` para creación y anulación de audiencias).
+- **Persistencia:** Almacenamiento local en `puma_config.json` dentro de `userData` de Electron.
+- **Acceso seguro:** El frontend invoca `get-puma-config` y `save-puma-config` vía IPC de Electron de manera segura.
+
+### Importación de Antecedentes (Traer Anterior)
+Para acelerar la carga de audiencias repetitivas, el sistema permite importar datos históricos de audiencias del mismo legajo:
+- **Búsqueda Histórica:** Recupera todas las audiencias asociadas al legajo de la causa.
+- **Ordenamiento y Selección:** Ordena de forma descendente por fecha y hora para seleccionar la audiencia inmediatamente anterior.
+- **Mapeo de Datos:** Copia campos como carátula, intervinientes (fiscales, defensores, imputados) y dependencias (UFI, Defensoría) tras confirmación expresa del operador.
 
 ---
 

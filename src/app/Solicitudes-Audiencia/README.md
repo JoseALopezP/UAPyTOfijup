@@ -51,6 +51,10 @@ Para evitar errores de duplicidad e inconsistencia en los nombres de las persona
 - Una vez agendadas o anuladas, se mueven a `solicitudes/completadas`.
 - **Archivado Automático (Legacy):** Tras cada sincronización exitosa, el sistema ejecuta un proceso de archivado para solicitudes con más de **7 días de antigüedad** con respecto a su `fechaAudiencia`. Estas solicitudes se clonan en la colección `solicitudesLegacy/{legajo}` y se eliminan de `solicitudes/pendientes` para optimizar el rendimiento de Firestore.
 
+### D. Reporte de Anomalías en Tiempo Real (Alert en App)
+- Durante la sincronización masiva o la revisión de solicitudes, si se detectan anomalías de extracción (por ejemplo, intervinientes incompletos, errores de red al leer iframes de DNI, etc.), el sistema no interrumpe el proceso ni descarga archivos locales `.txt`.
+- En su lugar, el sistema compila de inmediato un reporte estructurado y lo presenta directamente al operador en pantalla mediante un modal `alert` interactivo que lista cada legajo y las inconsistencias específicas halladas, facilitando la visualización directa e inmediata de errores sin requerir manejo de archivos extras.
+
 ---
 
 ## 🔄 3. Flujos de Trabajo (Workflows)
@@ -93,15 +97,24 @@ Este subflujo automatiza el rechazo formal de una solicitud que no cumple con lo
 
 ---
 
+## ⚙️ 4. Configuración y Seguridad (Segregación de Credenciales)
+
+Para robustecer la seguridad del sistema y evitar el uso de credenciales quemadas en el código fuente, se ha implementado un esquema parametrizado y segregado:
+- **Segregación de Credenciales:** El sistema divide los accesos a PUMA en dos perfiles diferenciados:
+  - `general`: Usado para consultas de agenda pública y bloqueo masivo de salas.
+  - `solicitudes`: Asignado exclusivamente para la gestión y procesamiento de solicitudes de audiencia (agendamientos, extracciones de detalles y anulaciones).
+- **Almacenamiento Local Parametrizado:** Las credenciales y la IP del servidor judicial se persisten en un archivo local `puma_config.json` en la carpeta `userData` del entorno Electron en cada máquina cliente.
+- **Canales IPC de Configuración:** La interfaz React consume e interactúa con esta configuración mediante los IPC handlers `get-puma-config` y `save-puma-config`, lo que permite un desacoplamiento completo y elimina el riesgo de fuga de credenciales del codebase.
+
+---
+
 ## 🖥️ 5. Interacción con el Sistema Judicial Externo (PUMA)
 
 Las funciones externas esperan una estructura fija de la plataforma legacy PUMA. A continuación se detallan los requisitos técnicos de integración:
 
 ### A. Parámetros de Conexión y Login
 - **URL Base:** `http://10.107.1.184:8092` (Login y portal principal de redirección) y `http://10.107.1.184:8094` (Módulo específico de Solicitudes y Legajos).
-- **Credenciales por Defecto (como Fallback):** 
-  - Usuario CUIL (Solicitudes): `27355078316`
-  - Contraseña: `Marzo24`
+- **Credenciales y Configuración:** El sistema carga dinámicamente las credenciales a través del canal IPC correspondientes al perfil `solicitudes` desde `puma_config.json`. Si no existe el archivo, se utiliza un fallback por defecto para desarrollo.
 
 ### B. Selectores CSS y Dependencias del DOM
 Cualquier modificación en el frontend de PUMA romperá los scripts de automatización. Los selectores críticos mapeados son:
@@ -115,18 +128,14 @@ Cualquier modificación en el frontend de PUMA romperá los scripts de automatiz
 
 ## 🚀 6. Trabajo Futuro y Mejoras Pendientes
 
-### 🔒 A. Seguridad y Configuración Centralizada
-- **Problema:** Las credenciales de acceso a PUMA y la dirección IP del servidor judicial se encuentran quemadas (hardcoded) en el código de múltiples archivos (`extraccionSolicitudes.js`, `extraccionDetalles.js`, `agendamiento.js`, `extraccionLegajo.js`, `extraccionAnuladas.js`).
-- **Solución Propuesta:** Migrar estas constantes a variables de entorno (`.env`) o crear una pantalla de Configuración protegida en la UI de OFIJUPenal que guarde estas credenciales de forma encriptada en la máquina local del operador.
-
-### 🛡️ B. Estabilidad de Workers en Paralelo
+### 🛡️ A. Estabilidad de Workers en Paralelo
 - **Problema:** En conexiones de red inestables o bajo alta carga en el servidor judicial, los 4 workers paralelos pueden experimentar fallos de timeout (configurado a 30s) al intentar extraer los DNI dentro de los perfiles de imputados (especialmente cuando los perfiles cargan a través de sub-iframes lentos).
 - **Solución Propuesta:** Implementar una cola de tareas resiliente (ej. con `p-queue`) que intente re-procesar solicitudes fallidas de forma individual antes de dar por terminado el lote, y añadir logs visibles de progreso de cada worker en la UI del sistema.
 
-### 🧩 C. Desacoplamiento de Lógica en la Interfaz (Header)
+### 🧩 B. Desacoplamiento de Lógica en la Interfaz (Header)
 - **Problema:** El componente `HeaderSolicitudes.jsx` tiene más de 700 líneas y mezcla el renderizado visual con la lógica densa de preparación de PDFs de notificaciones masivas, decodificación base64, mapeo de intervinientes y triggers de IPC.
 - **Solución Propuesta:** Refactorizar el procesamiento masivo abstrayéndolo en un hook personalizado llamado `useSolicitudesProcess.js` para simplificar la mantenibilidad y modularidad del código de la interfaz de usuario.
 
-### ⚖️ D. Control de Normalización y Tipos
+### ⚖️ C. Control de Normalización y Tipos
 - **Problema:** En raras ocasiones, al procesar "Reconversiones" (solicitudes con tipos de audiencia modificados respecto al original de PUMA), el sistema puede duplicar participantes si sus nombres contienen partes del tipo de audiencia no contemplados en el diccionario de limpieza.
 - **Solución Propuesta:** Utilizar coincidencia difusa (Fuzzy Matching) en base a la distancia Levenshtein para asociar defensores e imputados de manera unívoca sin depender exclusivamente de strings estáticos.
