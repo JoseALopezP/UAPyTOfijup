@@ -156,10 +156,21 @@ export default function EditBlock({ selectedList }) {
             setDefensoria(consolidatedParties.defensoria || '');
             setOperador(consolidatedParties.operador || '');
             setMpfSubrogandoPor(consolidatedParties.mpfSubrogandoPor || '');
-            setMpf(consolidatedParties.mpf ? JSON.parse(JSON.stringify(consolidatedParties.mpf)) : []);
-            setImputado(consolidatedParties.imputado ? JSON.parse(JSON.stringify(consolidatedParties.imputado)) : []);
-            setDefensa(consolidatedParties.defensa ? JSON.parse(JSON.stringify(consolidatedParties.defensa)) : []);
-            setPartes(consolidatedParties.partes ? JSON.parse(JSON.stringify(consolidatedParties.partes)) : []);
+            const ensureIds = (array, prefix) => {
+                if (!Array.isArray(array)) return [];
+                return array.map((item, idx) => {
+                    if (item && typeof item === 'object') {
+                        if (!item.id) {
+                            return { ...item, id: `${prefix}-${Date.now()}-${idx}-${Math.floor(Math.random() * 100000)}` };
+                        }
+                    }
+                    return item;
+                });
+            };
+            setMpf(ensureIds(consolidatedParties.mpf, 'f'));
+            setImputado(ensureIds(consolidatedParties.imputado, 'i'));
+            setDefensa(ensureIds(consolidatedParties.defensa, 'd'));
+            setPartes(ensureIds(consolidatedParties.partes, 'p'));
         } else {
             setSala('');
             setJuez('');
@@ -200,17 +211,39 @@ export default function EditBlock({ selectedList }) {
             prev.map(def => ({
                 ...def,
                 imputado: Array.isArray(def.imputado)
-                    ? def.imputado.map(v =>
-                        (v === id || v.id === id) ? { ...v, ...newData } : v
-                    )
+                    ? def.imputado.map(v => {
+                        if (!v) return v;
+                        if (typeof v === 'object') {
+                            return v.id === id ? { ...v, ...newData } : v;
+                        }
+                        return v === id ? { id: v, nombre: newData.nombre || '' } : v;
+                    })
                     : def.imputado,
                 condenado: Array.isArray(def.condenado)
-                    ? def.condenado.map(v =>
-                        (v === id || v.id === id) ? { ...v, ...newData } : v
-                    )
+                    ? def.condenado.map(v => {
+                        if (!v) return v;
+                        if (typeof v === 'object') {
+                            return v.id === id ? { ...v, ...newData } : v;
+                        }
+                        return v === id ? { id: v, nombre: newData.nombre || '' } : v;
+                    })
                     : def.condenado,
             }))
-        )
+        );
+        setPartes(prev =>
+            prev.map(p => ({
+                ...p,
+                representa: Array.isArray(p.representa)
+                    ? p.representa.map(v => {
+                        if (!v) return v;
+                        if (typeof v === 'object') {
+                            return v.id === id ? { ...v, ...newData } : v;
+                        }
+                        return v === id ? { id: v, nombre: newData.nombre || '' } : v;
+                    })
+                    : p.representa
+            }))
+        );
     };
 
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
@@ -220,11 +253,11 @@ export default function EditBlock({ selectedList }) {
 
             if (toggleArray) {
                 const arr = Array.isArray(current[key]) ? [...current[key]] : [];
-                const exists = arr.some(item => (item === valueObj.id || item.id === valueObj.id));
+                const exists = arr.some(item => (item && typeof item === 'object' ? item.id === valueObj.id : item === valueObj.id));
                 updated[index] = {
                     ...current,
                     [key]: exists
-                        ? arr.filter(item => (item !== valueObj.id && item.id !== valueObj.id))
+                        ? arr.filter(item => (item && typeof item === 'object' ? item.id !== valueObj.id : item !== valueObj.id))
                         : [...arr, valueObj]
                 };
             } else {
@@ -238,6 +271,29 @@ export default function EditBlock({ selectedList }) {
                     }
                 }
             }
+
+            // Propagate name changes for partes (Denunciante) to other partes representing them
+            if (setter === setPartes && key === 'name') {
+                const id = current.id;
+                if (id) {
+                    return updated.map((p, idx) => {
+                        if (idx === index) return p;
+                        return {
+                            ...p,
+                            representa: Array.isArray(p.representa)
+                                ? p.representa.map(v => {
+                                    if (!v) return v;
+                                    if (typeof v === 'object') {
+                                        return v.id === id ? { ...v, nombre: valueObj } : v;
+                                    }
+                                    return v === id ? { id: v, nombre: valueObj } : v;
+                                })
+                                : p.representa
+                        };
+                    });
+                }
+            }
+
             return updated;
         })
     };
@@ -252,13 +308,40 @@ export default function EditBlock({ selectedList }) {
             prev.map(def => ({
                 ...def,
                 imputado: Array.isArray(def.imputado)
-                    ? def.imputado.filter(v => (v !== id && v.id !== id))
+                    ? def.imputado.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
                     : def.imputado,
                 condenado: Array.isArray(def.condenado)
-                    ? def.condenado.filter(v => (v !== id && v.id !== id))
+                    ? def.condenado.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
                     : def.condenado
             }))
         );
+        setPartes(prev =>
+            prev.map(p => ({
+                ...p,
+                representa: Array.isArray(p.representa)
+                    ? p.representa.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
+                    : p.representa
+            }))
+        );
+    };
+
+    const removeParte = (index) => {
+        const parteToRemove = partes[index];
+        if (parteToRemove && parteToRemove.id) {
+            const id = parteToRemove.id;
+            setPartes(prev =>
+                prev
+                    .filter((_, i) => i !== index)
+                    .map(p => ({
+                        ...p,
+                        representa: Array.isArray(p.representa)
+                            ? p.representa.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
+                            : p.representa
+                    }))
+            );
+        } else {
+            setPartes(prev => prev.filter((_, i) => i !== index));
+        }
     };
 
     const removeInput = (setter, index) => {
@@ -603,7 +686,7 @@ export default function EditBlock({ selectedList }) {
                                         </label>
                                         <button className={`${regStyles.btnControl} ${regStyles.btnCompact} ${regStyles.btnDelete}`} style={{ marginLeft: '4px' }} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
                                     </div>
-                                    {(imputado && imputado.length > 1) && (
+                                    {(imputado && imputado.length > 0) && (
                                         <div className={regStyles.inputRowFlexible}>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <RepresentationSelector
@@ -635,39 +718,65 @@ export default function EditBlock({ selectedList }) {
                     </div>
                     {sectionsVisible.partes && (
                         <span className={`${regStyles.inputLeftColumn}`}>
-                            {partes.map((input, index) => (
-                                <div key={input.id} style={{ marginBottom: '8px', borderBottom: '1px dashed var(--border)', paddingBottom: '6px' }}>
-                                    <div className={regStyles.inputRow} style={{ marginBottom: '4px' }}>
-                                        <input list='partesVarias'
-                                            className={`${regStyles.inputLeft} ${regStyles.inputLeft50} ${regStyles.inputLeftSelect}`}
-                                            value={input.role}
-                                            onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
-                                            placeholder="Tipo" />
-                                        <datalist id='partesVarias'>
-                                            {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte => (
-                                                <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
-                                        </datalist>
-                                        <input className={`${regStyles.inputLeft} ${regStyles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="Nombre" />
-                                    </div>
-                                    <div className={regStyles.inputRow}>
-                                        <input className={`${regStyles.inputLeft} ${regStyles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="DNI" />
-                                        <button className={`${regStyles.btnControl} ${regStyles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                                        <button className={`${regStyles.btnControl} ${regStyles.btnCompact}`} title={input.presencial ? 'PRESENCIAL' : 'VIRTUAL'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
-                                            {input.presencial ? 'FIS' : 'VIR'}
-                                        </button>
-                                        <button className={`${regStyles.btnControl} ${regStyles.btnDelete} ${regStyles.deleteNarrow}`} type="button" onClick={() => removeInput(setPartes, index)}><DeleteSVGF /></button>
-                                    </div>
-                                    <div className={regStyles.inputRowFlexible} style={{ marginTop: '4px' }}>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <RepresentationSelector
-                                                selectedItems={partes[index].representa}
-                                                availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
-                                                onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
-                                            />
+                            {partes.map((input, index) => {
+                                const isQuerella = input.role && (input.role.toUpperCase() === 'QUERELLA' || input.role.toUpperCase() === 'QUERELLANTE');
+                                return (
+                                    <div key={input.id} style={{ marginBottom: '8px', borderBottom: '1px dashed var(--border)', paddingBottom: '6px' }}>
+                                        <div className={regStyles.inputRow} style={{ marginBottom: '4px' }}>
+                                            <input list='partesVarias'
+                                                className={`${regStyles.inputLeft} ${regStyles.inputLeft50} ${regStyles.inputLeftSelect}`}
+                                                value={input.role}
+                                                onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
+                                                placeholder="Tipo" />
+                                            <datalist id='partesVarias'>
+                                                {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte => (
+                                                    <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
+                                            </datalist>
+                                            {isQuerella ? (
+                                                <>
+                                                    <input list={`querella-particular-${index}`}
+                                                        className={`${regStyles.inputLeft} ${regStyles.inputLeft50}`}
+                                                        value={input.name}
+                                                        onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)}
+                                                        placeholder="Nombre Abogado Querella"
+                                                        onBlur={(e) => {
+                                                            if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
+                                                                alert("Por favor, selecciona un nombre de la lista.");
+                                                                handleInputChange(setPartes, index, 'name', '');
+                                                            }
+                                                        }} />
+                                                    <datalist id={`querella-particular-${index}`}>
+                                                        {defensoresParticularesList && defensoresParticularesList.map(option => (
+                                                            <option key={option} value={option}>{option}</option>
+                                                        ))}
+                                                    </datalist>
+                                                </>
+                                            ) : (
+                                                <input className={`${regStyles.inputLeft} ${regStyles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="Nombre" />
+                                            )}
                                         </div>
+                                        <div className={regStyles.inputRow}>
+                                            <input className={`${regStyles.inputLeft} ${regStyles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="DNI" />
+                                            <button className={`${regStyles.btnControl} ${regStyles.btnCompact}`} title={input.asistencia ? 'PRESENTE' : 'AUSENTE'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                            <button className={`${regStyles.btnControl} ${regStyles.btnCompact}`} title={input.presencial ? 'PRESENCIAL' : 'VIRTUAL'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
+                                                {input.presencial ? 'FIS' : 'VIR'}
+                                            </button>
+                                            <button className={`${regStyles.btnControl} ${regStyles.btnDelete} ${regStyles.deleteNarrow}`} type="button" onClick={() => removeParte(index)}><DeleteSVGF /></button>
+                                        </div>
+                                        {isQuerella && (
+                                            <div className={regStyles.inputRowFlexible} style={{ marginTop: '4px' }}>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <RepresentationSelector
+                                                        selectedItems={partes[index].representa}
+                                                        availableItems={Array.isArray(partes) ? partes.filter(p => p.role && p.role.toUpperCase() === 'DENUNCIANTE') : []}
+                                                        onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             <button className={`${regStyles.btnControl} ${regStyles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', dni: '', representa: [], asistencia: true, presencial: true }, 'p')}>+ PARTE</button>
                         </span>
                     )}

@@ -698,7 +698,6 @@ export default function HeaderSolicitudes() {
                                     borderRadius: '50%', width: '20px', height: '20px',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: '11px', fontWeight: 'bold',
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
                                     pointerEvents: 'none'
                                 }}>
                                     {totalProcesar}

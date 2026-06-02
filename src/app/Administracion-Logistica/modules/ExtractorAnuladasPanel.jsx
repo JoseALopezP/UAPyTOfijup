@@ -14,16 +14,13 @@ export default function ExtractorAnuladasPanel() {
             style={{
                 padding: '32px 24px',
                 maxWidth: '800px',
-                background: 'linear-gradient(135deg, #1b1b22 0%, #121216 100%)',
-                borderRadius: '16px',
+                background: '#111115',
+                borderRadius: '12px',
                 color: '#e2e8f0',
                 margin: '20px auto',
-                boxShadow: cardHover 
-                    ? '0 12px 32px rgba(245, 158, 11, 0.15), 0 0 1px 1px rgba(245, 158, 11, 0.3)' 
-                    : '0 8px 24px rgba(0,0,0,0.4), 0 0 1px 1px rgba(255,255,255,0.1)',
                 fontFamily: 'Inter, system-ui, sans-serif',
-                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                border: '1px solid transparent',
+                transition: 'all 0.3s ease',
+                border: cardHover ? '1px solid #f59e0b' : '1px solid #2B2B2B',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -32,25 +29,12 @@ export default function ExtractorAnuladasPanel() {
                 overflow: 'hidden'
             }}
         >
-            {/* Background Glow Effect */}
-            <div style={{
-                position: 'absolute',
-                top: '-50%',
-                right: '-50%',
-                width: '100%',
-                height: '100%',
-                background: 'radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%)',
-                pointerEvents: 'none',
-                transform: cardHover ? 'scale(1.2)' : 'scale(1)',
-                transition: 'transform 0.5s ease'
-            }} />
-
             <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                     <span style={{ 
                         fontSize: '32px',
-                        transform: cardHover ? 'scale(1.1) rotate(5deg)' : 'scale(1) rotate(0deg)',
-                        transition: 'transform 0.4s ease'
+                        transform: cardHover ? 'scale(1.05)' : 'scale(1)',
+                        transition: 'transform 0.3s ease'
                     }}>⚖️</span>
                     <h2 style={{ 
                         margin: 0, 
@@ -59,7 +43,7 @@ export default function ExtractorAnuladasPanel() {
                         fontWeight: '700',
                         letterSpacing: '-0.025em'
                     }}>
-                        Extractor de Solicitudes Anuladas
+                         Extractor de Solicitudes Anuladas
                     </h2>
                 </div>
 
@@ -88,19 +72,14 @@ export default function ExtractorAnuladasPanel() {
                     style={{
                         width: '100%',
                         padding: '14px 28px',
-                        background: btnHover 
-                            ? 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)' 
-                            : 'linear-gradient(90deg, #d97706 0%, #b45309 100%)',
+                        background: btnHover ? '#b45309' : '#d97706',
                         color: '#ffffff',
                         border: 'none',
-                        borderRadius: '10px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         fontWeight: '700',
                         fontSize: '16px',
-                        boxShadow: btnHover 
-                            ? '0 0 20px rgba(245, 158, 11, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2)' 
-                            : '0 2px 6px rgba(0, 0, 0, 0.3)',
-                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        transition: 'all 0.2s ease',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

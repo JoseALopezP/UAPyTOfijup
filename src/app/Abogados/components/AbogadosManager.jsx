@@ -257,6 +257,12 @@ export default function AbogadosManager() {
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const { desplegables } = useContext(DataContext);
+    const [visibleCount, setVisibleCount] = useState(100);
+
+    // Reset render limit when filters or search change to keep DOM small
+    useEffect(() => {
+        setVisibleCount(100);
+    }, [search, selectedCargos, selectedLugares]);
 
     useEffect(() => {
         const load = async () => {
@@ -474,12 +480,21 @@ export default function AbogadosManager() {
                     <input className={styles.searchInput} placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
                 <div className={styles.abogadosList}>
-                    {list.map(a => (
+                    {list.slice(0, visibleCount).map(a => (
                         <div key={a.m} className={`${styles.abogadoItem} ${selectedId === a.m ? styles.abogadoItemActive : ''}`} onClick={() => setSelectedId(a.m)}>
                             <p className={styles.abogadoItemName}>{a.n}</p>
                             <p className={styles.abogadoItemSub}>#{a.m} · {a.c || 'PJ'}</p>
                         </div>
                     ))}
+                    {list.length > visibleCount && (
+                        <button
+                            className={styles.btnSecondary}
+                            style={{ width: '100%', marginTop: '8px', padding: '8px', cursor: 'pointer', fontSize: '12px' }}
+                            onClick={() => setVisibleCount(prev => prev + 100)}
+                        >
+                            Ver más ({list.length - visibleCount} restantes)
+                        </button>
+                    )}
                 </div>
             </div>
             <div className={styles.main}>
@@ -515,8 +530,42 @@ export default function AbogadosManager() {
 
                         <tbody>
                             {showNuevo && <NuevoAbogadoRow onSave={handleAdd} onCancel={() => setShowNuevo(false)} />}
-                            {loading ? <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#444' }}>Cargando...</td></tr> :
-                                list.map(a => <AbogadoRow key={a.m} abogado={a} isSelected={selectedId === a.m} onSelect={setSelectedId} onSave={handleUpdate} onDelete={handleDelete} />)}
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#444' }}>
+                                        Cargando...
+                                    </td>
+                                </tr>
+                            ) : (
+                                <>
+                                    {list.slice(0, visibleCount).map(a => (
+                                        <AbogadoRow
+                                            key={a.m}
+                                            abogado={a}
+                                            isSelected={selectedId === a.m}
+                                            onSelect={setSelectedId}
+                                            onSave={handleUpdate}
+                                            onDelete={handleDelete}
+                                        />
+                                    ))}
+                                    {list.length > visibleCount && (
+                                        <tr>
+                                            <td colSpan={7} style={{ textAlign: 'center', padding: '15px' }}>
+                                                <span style={{ fontSize: '13px', color: '#888', marginRight: '15px' }}>
+                                                    Mostrando {visibleCount} de {list.length} registros.
+                                                </span>
+                                                <button
+                                                    className={styles.btnPrimary}
+                                                    style={{ padding: '6px 12px', fontSize: '12px', cursor: 'pointer' }}
+                                                    onClick={() => setVisibleCount(prev => prev + 150)}
+                                                >
+                                                    Cargar más abogados
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </>
+                            )}
                         </tbody>
                     </table>
                 </div>

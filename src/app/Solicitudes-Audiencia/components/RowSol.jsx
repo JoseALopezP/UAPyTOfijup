@@ -444,38 +444,38 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
     const rowStyle = (() => {
         if (savedData.agendadaError) return {
             '--row-input-tint': 'rgba(239, 68, 68, 0.1)',
-            '--sticky-col-override': 'linear-gradient(rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.12)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(239, 68, 68, 0.12), var(--sticky-col))',
             background: 'rgba(239, 68, 68, 0.12)',
         }
         if (savedData.agendada) return {
             '--row-input-tint': 'rgba(16, 185, 129, 0.1)',
-            '--sticky-col-override': 'linear-gradient(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(16, 185, 129, 0.15), var(--sticky-col))',
             background: 'rgba(16, 185, 129, 0.15)',
             borderLeft: '4px solid #10b981'
         }
         if (cancelar) return {
             '--row-input-tint': 'rgba(251, 146, 60, 0.08)',
-            '--sticky-col-override': 'linear-gradient(rgba(251, 146, 60, 0.10), rgba(251, 146, 60, 0.10)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(251, 146, 60, 0.10), var(--sticky-col))',
             background: 'rgba(251, 146, 60, 0.10)',
         }
         if (reprogramar) return {
             '--row-input-tint': 'rgba(168, 85, 247, 0.07)',
-            '--sticky-col-override': 'linear-gradient(rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.08)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(168, 85, 247, 0.08), var(--sticky-col))',
             background: 'rgba(168, 85, 247, 0.08)',
         }
         if (marcarBorrar) return {
             '--row-input-tint': 'rgba(220, 38, 38, 0.10)',
-            '--sticky-col-override': 'linear-gradient(rgba(220, 38, 38, 0.20), rgba(220, 38, 38, 0.20)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(220, 38, 38, 0.20), var(--sticky-col))',
             background: 'rgba(220, 38, 38, 0.20)',
         }
         if (revisado) return {
             '--row-input-tint': 'rgba(59, 130, 246, 0.07)',
-            '--sticky-col-override': 'linear-gradient(rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.08)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(59, 130, 246, 0.08), var(--sticky-col))',
             background: 'rgba(59, 130, 246, 0.08)',
         }
         if (agendar) return {
             '--row-input-tint': 'rgba(34, 197, 94, 0.08)',
-            '--sticky-col-override': 'linear-gradient(rgba(34, 197, 94, 0.10), rgba(34, 197, 94, 0.10)), var(--sticky-col)',
+            '--sticky-col-override': 'color-mix(in srgb, rgba(34, 197, 94, 0.10), var(--sticky-col))',
             background: 'rgba(34, 197, 94, 0.10)',
         }
         return {}
@@ -493,7 +493,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                 <button 
                     onClick={(e) => { e.stopPropagation(); actualizarIndividualHandler(); }} 
                     disabled={isActualizando}
-                    style={{ position: 'absolute', top: '2px', right: data.noEncontrada ? '80px' : '2px', fontSize: '11px', padding: '3px 6px', cursor: 'pointer', background: 'var(--accent)', color: '#ffffff', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.15)' }}
+                    style={{ position: 'absolute', top: '2px', right: data.noEncontrada ? '80px' : '2px', fontSize: '11px', padding: '3px 6px', cursor: 'pointer', background: 'var(--accent)', color: '#ffffff', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12 }}
                     title="Actualizar"
                 >
                     <i className={`fa ${isActualizando ? 'fa-spinner fa-spin' : 'fa-refresh'}`}></i>
@@ -541,7 +541,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         </div>
                     ))}
                     {showAddTipo ? (
-                        <div style={{ position: 'absolute', left: '0px', right: '0px', bottom: '0px', background: 'var(--surface)', zIndex: 20, display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '4px', borderTop: '1px solid var(--border)', boxShadow: '0 -2px 6px rgba(0,0,0,0.1)', gap: '4px', paddingRight: '26px' }}>
+                        <div style={{ position: 'absolute', left: '0px', right: '0px', bottom: '0px', background: 'var(--surface)', zIndex: 20, display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '4px', borderTop: '1px solid var(--border)', gap: '4px', paddingRight: '26px' }}>
                             <input
                                 list={`tipos-datalist-${rowKey}`}
                                 className={styles.listAddInput}
@@ -621,7 +621,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                         </div>
                     ))}
                     {showAddImputado ? (
-                        <div style={{ position: 'absolute', left: '0px', right: '0px', bottom: '0px', background: 'var(--surface)', zIndex: 20, display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '4px', borderTop: '1px solid var(--border)', boxShadow: '0 -2px 6px rgba(0,0,0,0.1)', gap: '4px', paddingRight: '26px' }}>
+                        <div style={{ position: 'absolute', left: '0px', right: '0px', bottom: '0px', background: 'var(--surface)', zIndex: 20, display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '4px', borderTop: '1px solid var(--border)', gap: '4px', paddingRight: '26px' }}>
                             <select
                                 className={styles.listAddInput}
                                 value={`${newNombre}|${newDni}`}
@@ -969,8 +969,7 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     fontSize: '10px',
-                                    fontWeight: 'bold',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                    fontWeight: 'bold'
                                 }}>
                                     {notificaciones.filter(n => !n.notificada).length}
                                 </span>
@@ -986,7 +985,6 @@ export default function RowSol({ data, onStatusChange, forceSave, showNotificar,
                                     justifyContent: 'center',
                                     fontSize: '9px',
                                     fontWeight: 'bold',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
                                     textTransform: 'uppercase'
                                 }}>
                                     Notificada

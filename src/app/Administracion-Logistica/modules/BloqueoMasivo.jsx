@@ -994,7 +994,7 @@ const s = {
     },
     progressBar: {
         height: '6px',
-        background: 'linear-gradient(90deg, #7c3aed, #22c55e)',
+        background: '#7c3aed',
         transition: 'width 0.4s ease',
     },
     progressStats: {

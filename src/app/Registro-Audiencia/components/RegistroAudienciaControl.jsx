@@ -57,10 +57,27 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
             setRazonDemora(aud.razonDemora || '');
             setUfi(aud.ufi || '');
             setEstado(aud.estado || '');
-            setMpf(aud.mpf ? JSON.parse(JSON.stringify(aud.mpf)) : []);
-            setDefensa(aud.defensa ? JSON.parse(JSON.stringify(aud.defensa)) : []);
-            setImputado(aud.imputado ? JSON.parse(JSON.stringify(aud.imputado)) : []);
-            setPartes(aud.partes ? JSON.parse(JSON.stringify(aud.partes)) : []);
+            const ensureIds = (array, prefix) => {
+                if (!Array.isArray(array)) return [];
+                return array.map((item, idx) => {
+                    if (item && typeof item === 'object') {
+                        if (!item.id) {
+                            return { ...item, id: `${prefix}-${Date.now()}-${idx}-${Math.floor(Math.random() * 100000)}` };
+                        }
+                    }
+                    return item;
+                });
+            };
+
+            const mpfWithIds = ensureIds(aud.mpf, 'f');
+            const defensaWithIds = ensureIds(aud.defensa, 'd');
+            const imputadoWithIds = ensureIds(aud.imputado, 'i');
+            const partesWithIds = ensureIds(aud.partes, 'p');
+
+            setMpf(mpfWithIds);
+            setDefensa(defensaWithIds);
+            setImputado(imputadoWithIds);
+            setPartes(partesWithIds);
             setDefensoria(aud.defensoria || '');
             setMpfSubrogandoPor(aud.mpfSubrogandoPor || '');
             setTipo(aud.tipo || '');
@@ -81,10 +98,10 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 mpfSubrogandoPor: aud.mpfSubrogandoPor || '',
                 operadorAud: aud.operador || '',
                 sala: aud.sala || '',
-                mpf: aud.mpf ? JSON.parse(JSON.stringify(aud.mpf)) : [],
-                defensa: aud.defensa ? JSON.parse(JSON.stringify(aud.defensa)) : [],
-                imputado: aud.imputado ? JSON.parse(JSON.stringify(aud.imputado)) : [],
-                partes: aud.partes ? JSON.parse(JSON.stringify(aud.partes)) : [],
+                mpf: mpfWithIds,
+                defensa: defensaWithIds,
+                imputado: imputadoWithIds,
+                partes: partesWithIds,
                 tipo: aud.tipo || '',
                 tipo2: aud.tipo2 || '',
                 tipo3: aud.tipo3 || '',

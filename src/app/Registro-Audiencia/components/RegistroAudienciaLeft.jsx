@@ -65,17 +65,39 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             prev.map(def => ({
                 ...def,
                 imputado: Array.isArray(def.imputado)
-                    ? def.imputado.map(v =>
-                        v.id === id ? { ...v, ...newData } : v
-                    )
+                    ? def.imputado.map(v => {
+                        if (!v) return v;
+                        if (typeof v === 'object') {
+                            return v.id === id ? { ...v, ...newData } : v;
+                        }
+                        return v === id ? { id: v, nombre: newData.nombre || '' } : v;
+                    })
                     : def.imputado,
                 condenado: Array.isArray(def.condenado)
-                    ? def.condenado.map(v =>
-                        v.id === id ? { ...v, ...newData } : v
-                    )
+                    ? def.condenado.map(v => {
+                        if (!v) return v;
+                        if (typeof v === 'object') {
+                            return v.id === id ? { ...v, ...newData } : v;
+                        }
+                        return v === id ? { id: v, nombre: newData.nombre || '' } : v;
+                    })
                     : def.condenado,
             }))
-        )
+        );
+        setPartes(prev =>
+            prev.map(p => ({
+                ...p,
+                representa: Array.isArray(p.representa)
+                    ? p.representa.map(v => {
+                        if (!v) return v;
+                        if (typeof v === 'object') {
+                            return v.id === id ? { ...v, ...newData } : v;
+                        }
+                        return v === id ? { id: v, nombre: newData.nombre || '' } : v;
+                    })
+                    : p.representa
+            }))
+        );
     };
 
     const handleInputChange = (setter, index, key, valueObj, toggleArray = false) => {
@@ -85,11 +107,11 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
 
             if (toggleArray) {
                 const arr = Array.isArray(current[key]) ? [...current[key]] : [];
-                const exists = arr.some(item => item.id === valueObj.id);
+                const exists = arr.some(item => (item && typeof item === 'object' ? item.id === valueObj.id : item === valueObj.id));
                 updated[index] = {
                     ...current,
                     [key]: exists
-                        ? arr.filter(item => item.id !== valueObj.id)
+                        ? arr.filter(item => (item && typeof item === 'object' ? item.id !== valueObj.id : item !== valueObj.id))
                         : [...arr, valueObj]
                 };
             } else {
@@ -104,8 +126,31 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     }
                 }
             }
-            return updated
-        })
+
+            // Propagate name changes for partes (Denunciante) to other partes representing them
+            if (setter === setPartes && key === 'name') {
+                const id = current.id;
+                if (id) {
+                    return updated.map((p, idx) => {
+                        if (idx === index) return p;
+                        return {
+                            ...p,
+                            representa: Array.isArray(p.representa)
+                                ? p.representa.map(v => {
+                                    if (!v) return v;
+                                    if (typeof v === 'object') {
+                                        return v.id === id ? { ...v, nombre: valueObj } : v;
+                                    }
+                                    return v === id ? { id: v, nombre: valueObj } : v;
+                                })
+                                : p.representa
+                        };
+                    });
+                }
+            }
+
+            return updated;
+        });
     };
 
     const addNewInput = (setter, template, prefix) => {
@@ -117,13 +162,39 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             prev.map(def => ({
                 ...def,
                 imputado: Array.isArray(def.imputado)
-                    ? def.imputado.filter(v => v !== id)
+                    ? def.imputado.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
                     : def.imputado,
                 condenado: Array.isArray(def.condenado)
-                    ? def.condenado.filter(v => v !== id)
+                    ? def.condenado.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
                     : def.condenado
             }))
         );
+        setPartes(prev =>
+            prev.map(p => ({
+                ...p,
+                representa: Array.isArray(p.representa)
+                    ? p.representa.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
+                    : p.representa
+            }))
+        );
+    };
+    const removeParte = (index) => {
+        const parteToRemove = partes[index];
+        if (parteToRemove && parteToRemove.id) {
+            const id = parteToRemove.id;
+            setPartes(prev =>
+                prev
+                    .filter((_, i) => i !== index)
+                    .map(p => ({
+                        ...p,
+                        representa: Array.isArray(p.representa)
+                            ? p.representa.filter(v => v && (typeof v === 'object' ? v.id !== id : v !== id))
+                            : p.representa
+                    }))
+            );
+        } else {
+            setPartes(prev => prev.filter((_, i) => i !== index));
+        }
     };
     const removeInput = (setter, index) => {
         setter(prev => prev.filter((_, i) => i !== index));
@@ -618,7 +689,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 </label>
                                 <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete} ${styles.marginLeft4}`} title="ELIMINAR" type="button" onClick={() => removeInput(setDefensa, index)}><DeleteSVGF /></button>
                             </div>
-                            {(imputado && imputado.length > 1) && (
+                            {(imputado && imputado.length > 0) && (
                                 <div className={styles.inputRowFlexible}>
                                     <div className={styles.flex1MinWidth0}>
                                         <RepresentationSelector
@@ -649,31 +720,57 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
             </div>
             {sectionsVisible.partes && (
                 <span className={`${styles.inputLeftColumn}`}>
-                    {partes.map((input, index) => (
-                        <div key={input.id}>
-                            <input list='partesVarias'
-                                className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`}
-                                value={input.role}
-                                onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
-                                placeholder="tipo" />
-                            <datalist id='partesVarias'>
-                                {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte => (
-                                    <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
-                            </datalist>
-                            <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre" />
-                            <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni" />
-                            <RepresentationSelector
-                                selectedItems={partes[index].representa}
-                                availableItems={[...(Array.isArray(imputado) ? imputado : []), ...(Array.isArray(partes) ? partes.filter(p => p.role === 'Denunciante') : [])]}
-                                onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
-                            />
-                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
-                                {input.presencial ? 'FIS' : 'VIR'}
-                            </button>
-                            <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeInput(setPartes, index)}><DeleteSVGF /></button>
-                        </div>
-                    ))}
+                    {partes.map((input, index) => {
+                        const isQuerella = input.role && (input.role.toUpperCase() === 'QUERELLA' || input.role.toUpperCase() === 'QUERELLANTE');
+                        return (
+                            <div key={input.id}>
+                                <input list='partesVarias'
+                                    className={`${styles.inputLeft} ${styles.inputLeft50}  ${styles.inputLeftSelect}`}
+                                    value={input.role}
+                                    onChange={(e) => handleInputChange(setPartes, index, 'role', e.target.value)}
+                                    placeholder="tipo" />
+                                <datalist id='partesVarias'>
+                                    {desplegables.tiposPartes && desplegables.tiposPartes.map(tipoParte => (
+                                        <option key={tipoParte} value={tipoParte}>{tipoParte}</option>))}
+                                </datalist>
+                                {isQuerella ? (
+                                    <>
+                                        <input list={`querella-particular-${index}`}
+                                            className={`${styles.inputLeft} ${styles.inputLeft50}`}
+                                            value={input.name}
+                                            onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)}
+                                            placeholder="Nombre Abogado Querella"
+                                            onBlur={(e) => {
+                                                if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
+                                                    alert("Por favor, selecciona un nombre de la lista.");
+                                                    handleInputChange(setPartes, index, 'name', '');
+                                                }
+                                            }} />
+                                        <datalist id={`querella-particular-${index}`}>
+                                            {defensoresParticularesList && defensoresParticularesList.map(option => (
+                                                <option key={option} value={option}>{option}</option>
+                                            ))}
+                                        </datalist>
+                                    </>
+                                ) : (
+                                    <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.name} onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)} placeholder="nombre" />
+                                )}
+                                <input className={`${styles.inputLeft} ${styles.inputLeft50}`} type="text" value={input.dni} onChange={(e) => handleInputChange(setPartes, index, 'dni', e.target.value)} placeholder="dni" />
+                                {isQuerella && (
+                                    <RepresentationSelector
+                                        selectedItems={partes[index].representa}
+                                        availableItems={Array.isArray(partes) ? partes.filter(p => p.role && p.role.toUpperCase() === 'DENUNCIANTE') : []}
+                                        onUpdate={(newItems) => handleInputChange(setPartes, index, "representa", newItems)}
+                                    />
+                                )}
+                                <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'Presente' : 'Ausente'} type="button" onClick={() => handleInputChange(setPartes, index, 'asistencia', (!input.asistencia))}>{input.asistencia ? 'PRE' : 'AUS'}</button>
+                                <button className={`${styles.inputLeft} ${styles.inputLeft20}`} title={input.presencial ? 'fisicamente' : 'Virtual'} type="button" onClick={() => handleInputChange(setPartes, index, 'presencial', (!input.presencial))}>
+                                    {input.presencial ? 'FIS' : 'VIR'}
+                                </button>
+                                <button className={`${styles.inputLeft} ${styles.inputLeft15} ${styles.inputLeftDelete}`} type="button" onClick={() => removeParte(index)}><DeleteSVGF /></button>
+                            </div>
+                        );
+                    })}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button" onClick={() => addNewInput(setPartes, { role: '', name: '', representa: [], asistencia: true, presencial: true }, 'p')}>+ PARTE</button>
                 </span>
             )}

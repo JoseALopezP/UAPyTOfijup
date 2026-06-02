@@ -9,9 +9,17 @@ import styles from '../RegistroAudiencia.module.css';
  * @param {Function} onUpdate - Callback function to update the list
  */
 export const RepresentationSelector = ({ selectedItems = [], availableItems = [], onUpdate }) => {
-    
-    const safeSelectedItems = Array.isArray(selectedItems) ? selectedItems : [];
     const safeAvailableItems = Array.isArray(availableItems) ? availableItems : [];
+    const safeSelectedItems = (Array.isArray(selectedItems) ? selectedItems : []).map(item => {
+        if (item && typeof item === 'object') {
+            return item;
+        }
+        const person = safeAvailableItems.find(p => p.id === item);
+        return {
+            id: item,
+            nombre: person ? (person.name || person.nombre || '') : ''
+        };
+    });
 
     const handleChange = (index, valueId) => {
         const newItems = [...safeSelectedItems];

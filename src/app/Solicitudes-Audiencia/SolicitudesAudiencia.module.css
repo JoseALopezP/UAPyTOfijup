@@ -195,8 +195,6 @@
     background: var(--th-bg);
     position: sticky;
     top: 0;
-    z-index: 20;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     vertical-align: top;
 }
 
@@ -314,7 +312,7 @@
     left: 0;
     z-index: 5;
     background: var(--sticky-col-override, var(--sticky-col)) !important;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    border-right: 2px solid var(--border2);
     border-left: 1px solid var(--border);
     font-weight: 600;
     font-size: 12px;
@@ -323,8 +321,11 @@
 }
 
 .cellBodyError {
-    --cell-error: inset 0 0 0 1px rgba(239, 68, 68, 0.35);
     background: rgba(239, 68, 68, 0.04) !important;
+}
+
+.cellBodyError .inputCell {
+    border: 1.5px solid rgba(239, 68, 68, 0.6) !important;
 }
 
 .urgenteCell {
@@ -391,10 +392,8 @@
     height: 100%;
     padding: 6px 8px;
     background: var(--row-input-tint, var(--input-bg));
-    border: none;
+    border: 1px solid transparent;
     outline: none;
-    /* Hereda --cell-error del padre cellBodyError si existe */
-    box-shadow: var(--cell-error, none);
     color: var(--text);
     font-family: inherit;
     font-size: 13px;
@@ -412,8 +411,7 @@
 
 .inputCell:focus {
     background: var(--row-input-tint, var(--input-bg));
-    /* Al enfocar, mantiene el borde de error si existe */
-    box-shadow: var(--cell-error, none), inset 0 0 0 1px var(--accent);
+    border: 1.5px solid var(--accent) !important;
 }
 
 /* Hack para evitar que el navegador cambie el fondo al seleccionar (autofill) */
@@ -440,11 +438,11 @@
     margin: 2px;
     overflow: hidden;
     vertical-align: top;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    transition: transform 0.1s ease, border-color 0.1s ease;
 }
 
 .listPill:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
     transform: translateY(-1px);
 }
 
@@ -722,7 +720,6 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     animation: fadeInUp 0.2s ease;
     display: flex;
     align-items: center;
@@ -879,10 +876,9 @@
     right: 0;
     z-index: 2000;
     background: var(--surface);
-    border: 1px solid var(--border2);
+    border: 1.5px solid var(--border2);
     border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
     min-width: 190px;
     display: flex;
     flex-direction: column;
@@ -1023,7 +1019,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    border-right: 1.5px solid var(--border2);
 }
 
 .modalTitle {
@@ -1203,11 +1199,10 @@
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: #d97706;
     color: white;
     font-size: 11px;
     cursor: help;
-    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.5);
     animation: spinAnim 2s linear infinite;
 }
 

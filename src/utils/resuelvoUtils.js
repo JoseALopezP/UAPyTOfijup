@@ -35,7 +35,7 @@ export function listDefensa(arr, defensoriaGlobal) {
         const imputados = (el.imputado && el.imputado.length > 0)
             ? el.imputado
                 .map((p, idx) => {
-                    const pName = normalizeName(p.nombre || p.name || '');
+                    const pName = normalizeName(p ? (p.nombre || p.name || '') : '');
                     if (idx === 0) return pName?.split(',').join('') || '';
                     if (idx === el.imputado.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                     return `, ${pName?.split(',').join('') || ''}`;
@@ -61,7 +61,7 @@ export function listRepresentantes(arr, rolText) {
         const representados = (el.representa && el.representa.length > 0)
             ? el.representa
                 .map((p, idx) => {
-                    const pName = normalizeName(p.nombre || p.name || '');
+                    const pName = normalizeName(p ? (p.nombre || p.name || '') : '');
                     if (idx === 0) return pName?.split(',').join('') || '';
                     if (idx === el.representa.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                     return `, ${pName?.split(',').join('') || ''}`;
@@ -104,7 +104,7 @@ export function listPartes(arr) {
         const representados = (el.representa && el.representa.length > 0)
             ? el.representa
                 .map((p, idx) => {
-                    const pName = normalizeName(p.nombre || p.name || '');
+                    const pName = normalizeName(p ? (p.nombre || p.name || '') : '');
                     if (idx === 0) return pName?.split(',').join('') || '';
                     if (idx === el.representa.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                     return `, ${pName?.split(',').join('') || ''}`;
@@ -188,7 +188,7 @@ export function generateResuelvoSection(item, date) {
             let list = oficiales.map(el => {
                 const imputados = (el.imputado && el.imputado.length > 0)
                     ? el.imputado.map((p, idx) => {
-                        const pName = normalizeName(p.nombre || p.name || '');
+                        const pName = normalizeName(p ? (p.nombre || p.name || '') : '');
                         if (idx === 0) return pName?.split(',').join('') || '';
                         if (idx === el.imputado.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                         return `, ${pName?.split(',').join('') || ''}`;
@@ -213,7 +213,7 @@ export function generateResuelvoSection(item, date) {
             let list = particulares.map(el => {
                 const imputados = (el.imputado && el.imputado.length > 0)
                     ? el.imputado.map((p, idx) => {
-                        const pName = normalizeName(p.nombre || p.name || '');
+                        const pName = normalizeName(p ? (p.nombre || p.name || '') : '');
                         if (idx === 0) return pName?.split(',').join('') || '';
                         if (idx === el.imputado.length - 1) return ` y ${pName?.split(',').join('') || ''}`;
                         return `, ${pName?.split(',').join('') || ''}`;

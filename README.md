@@ -366,6 +366,12 @@ Para acelerar la carga de audiencias repetitivas, el sistema permite importar da
 - **Ordenamiento y Selección:** Ordena de forma descendente por fecha y hora para seleccionar la audiencia inmediatamente anterior.
 - **Mapeo de Datos:** Copia campos como carátula, intervinientes (fiscales, defensores, imputados) y dependencias (UFI, Defensoría) tras confirmación expresa del operador.
 
+### 🎨 Diseño y Estilo Visual (Minimalismo Utilitario)
+El sistema implementa un enfoque de **Diseño Plano (Flat Design) y Minimalismo Utilitario** para optimizar la velocidad de carga, reducir el uso de recursos del sistema (CPU/GPU) y garantizar una alta legibilidad sin distracciones:
+- **Sin Sombras ni Degradados:** Se han eliminado por completo las sombras difusas complejas (`box-shadow`, `drop-shadow`) y los degradados de color (`linear-gradient`, `radial-gradient`), reemplazándolos con bordes sólidos y contrastes directos.
+- **Paleta Profesional y Neutra:** Uso exclusivo de colores neutros para fondos (blanco/gris claro en modo claro, oscuro puro en modo oscuro) con un color de acento sólido para la interactividad de botones y alertas.
+- **Superposiciones Inteligentes:** Uso de la función nativa CSS `color-mix()` para generar celdas y filas fijas coloreadas sobre fondos sólidos, eliminando el sobrecosto de renderizado de imágenes superpuestas.
+
 ---
 
 ## 🛠️ Stack Tecnológico
