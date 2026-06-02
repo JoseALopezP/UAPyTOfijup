@@ -38,6 +38,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
     const [guardando, setGuardando] = useState(false);
     const [showEditHitos, setShowEditHitos] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [editingPPId, setEditingPPId] = useState(null);
     const [sectionsVisible, setSectionsVisible] = useState({
         mpf: true,
         imputados: true,
@@ -570,6 +571,45 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
                                     {input.presencial ? 'FIS' : 'VIR'}
                                 </button>
+                                {editingPPId === input.id ? (
+                                    <input
+                                        type="text"
+                                        className={`${styles.inputLeft}`}
+                                        style={{ width: '60px', minWidth: '60px', flex: 'none', height: '24px', fontSize: '13px', padding: '0 4px' }}
+                                        value={input.nropp || ""}
+                                        placeholder="PP"
+                                        maxLength={6}
+                                        autoFocus
+                                        onBlur={() => {
+                                            if (input.nropp && !/^\d{6}$/.test(input.nropp)) {
+                                                alert("La Planilla Prontuarial debe ser de exactamente 6 dígitos.");
+                                                updateImputado(input.id, { nropp: "" });
+                                            }
+                                            setEditingPPId(null);
+                                        }}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === "" || /^\d{1,6}$/.test(val)) {
+                                                updateImputado(input.id, { nropp: val });
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                e.target.blur();
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <button
+                                        className={`${styles.btnControl} ${styles.btnCompact} ${input.nropp ? styles.activePP : ''}`}
+                                        title="Planilla Prontuarial"
+                                        type="button"
+                                        onClick={() => setEditingPPId(input.id)}
+                                    >
+                                        PP
+                                    </button>
+                                )}
                                 <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete} ${styles.marginLeft4}`} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
                             </div>
                             {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
@@ -582,7 +622,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                     ))}
                     <span className={styles.imputadoButtons}>
                         <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                            onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i')}
+                            onClick={() => addNewInput(setImputado, { nombre: '', dni: '', nropp: '', condenado: false, asistencia: true, detenido: '', presencial: true, }, 'i')}
                         >+ IMPUTADO</button>
                     </span>
 
@@ -604,6 +644,45 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                 <button className={`${styles.btnControl} ${styles.btnCompact}`} title="PRESENCIALMENTE" type="button" onClick={() => handleInputChange(setImputado, realIndex, 'presencial', (!input.presencial))}>
                                     {input.presencial ? 'FIS' : 'VIR'}
                                 </button>
+                                {editingPPId === input.id ? (
+                                    <input
+                                        type="text"
+                                        className={`${styles.inputLeft}`}
+                                        style={{ width: '60px', minWidth: '60px', flex: 'none', height: '24px', fontSize: '13px', padding: '0 4px' }}
+                                        value={input.nropp || ""}
+                                        placeholder="PP"
+                                        maxLength={6}
+                                        autoFocus
+                                        onBlur={() => {
+                                            if (input.nropp && !/^\d{6}$/.test(input.nropp)) {
+                                                alert("La Planilla Prontuarial debe ser de exactamente 6 dígitos.");
+                                                updateImputado(input.id, { nropp: "" });
+                                            }
+                                            setEditingPPId(null);
+                                        }}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === "" || /^\d{1,6}$/.test(val)) {
+                                                updateImputado(input.id, { nropp: val });
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                e.target.blur();
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <button
+                                        className={`${styles.btnControl} ${styles.btnCompact} ${input.nropp ? styles.activePP : ''}`}
+                                        title="Planilla Prontuarial"
+                                        type="button"
+                                        onClick={() => setEditingPPId(input.id)}
+                                    >
+                                        PP
+                                    </button>
+                                )}
                                 <button className={`${styles.btnControl} ${styles.btnCompact} ${styles.btnDelete} ${styles.marginLeft4}`} title="ELIMINAR" type="button" onClick={() => removeImputado(input.id)}><DeleteSVGF /></button>
                             </div>
                             {(item.tipo === "CONTROL DE DETENCIÓN" || item.tipo2 === "CONTROL DE DETENCIÓN" || item.tipo3 === "CONTROL DE DETENCIÓN") &&
@@ -615,7 +694,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                         </div>
                     ))}
                     <button className={`${styles.inputLeft} ${styles.inputLeft100}`} type="button"
-                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i')}
+                        onClick={() => addNewInput(setImputado, { nombre: '', dni: '', nropp: '', condenado: true, asistencia: true, detenido: '', presencial: true, }, 'i')}
                     >+ CONDENADO</button>
                 </span>
             )}
