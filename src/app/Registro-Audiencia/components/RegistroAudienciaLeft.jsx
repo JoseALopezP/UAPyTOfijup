@@ -826,7 +826,7 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                                 }
                                             }} />
                                         <datalist id={`querella-particular-${index}`}>
-                                            {querellaAbogadosList && querellaAbogadosList.map(option => (
+                                            {querellaAbogadosList && querellaAbogadosList.filter(o => o.toLowerCase().includes((input.name || '').toLowerCase())).slice(0, 30).map(option => (
                                                 <option key={option} value={option}>{option}</option>
                                             ))}
                                         </datalist>
