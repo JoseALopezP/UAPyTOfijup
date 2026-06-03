@@ -107,8 +107,7 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                 tipo3: aud.tipo3 || '',
             };
         }
-    }, [aud]);
-
+    }, [aud?.id]);
     // needsSaving1 es manejado por RegistroAudienciaLeft
     // needsSaving2 es manejado por RegistroAudienciaRight
     // El estado de sala/operador se guarda inmediatamente, no necesita tracking
