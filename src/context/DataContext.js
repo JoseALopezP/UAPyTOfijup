@@ -80,6 +80,15 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
             .sort((a, b) => a.localeCompare(b));
     }, [abogados]);
 
+    const querellaAbogadosList = React.useMemo(() => {
+        if (!abogados || !Array.isArray(abogados)) return [];
+        return abogados
+            .filter(a => !a.c || (!a.c.toLowerCase().includes('fiscal') && !a.c.toLowerCase().includes('juez')))
+            .map(a => a.m ? `${a.n} (#${a.m})` : a.n)
+            .sort((a, b) => a.localeCompare(b));
+    }, [abogados]);
+
+
     const updateByDate = async (date) => {
         if (!date) return;
         try {
@@ -768,10 +777,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
-        solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados,
+        solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados, querellaAbogadosList,
         fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList
-
     };
     return <Provider value={context}>{children}</Provider>;
 };
-

@@ -19,7 +19,7 @@ const deepCopy = (obj) => {
 
 
 export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse, operadorAud, setOperadorAud, isHovered, sala, setSala, saeNum, setSaeNum, caratula, setCaratula, razonDemora, setRazonDemora, mpf, setMpf, ufi, setUfi, defensoria, setDefensoria, mpfSubrogandoPor, setMpfSubrogandoPor, estado, setEstado, defensa, setDefensa, imputado, setImputado, tipo, setTipo, tipo2, setTipo2, tipo3, setTipo3, partes, setPartes, minuta, setMinuta, cierre, setCierre, resuelvo, refreshAud }) {
-    const { desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados } = useContext(DataContext)
+    const { desplegables, updateData, updateByDate, fiscalesList, defensoresOficialesList, defensoresParticularesList, querellaAbogadosList, abogados } = useContext(DataContext)
     const [caratula2, setCaratula2] = useState('');
     const [saeNum2, setSaeNum2] = useState('');
     const [mpf2, setMpf2] = useState([]);
@@ -820,13 +820,13 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
                                             onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)}
                                             placeholder="Nombre Abogado Querella"
                                             onBlur={(e) => {
-                                                if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
+                                                if (e.target.value && querellaAbogadosList && !querellaAbogadosList.includes(e.target.value)) {
                                                     alert("Por favor, selecciona un nombre de la lista.");
                                                     handleInputChange(setPartes, index, 'name', '');
                                                 }
                                             }} />
                                         <datalist id={`querella-particular-${index}`}>
-                                            {defensoresParticularesList && defensoresParticularesList.map(option => (
+                                            {querellaAbogadosList && querellaAbogadosList.map(option => (
                                                 <option key={option} value={option}>{option}</option>
                                             ))}
                                         </datalist>

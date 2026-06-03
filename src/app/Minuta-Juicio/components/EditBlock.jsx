@@ -15,7 +15,7 @@ import dynamic from 'next/dynamic'
 const TextEditor = dynamic(() => import('../../Registro-Audiencia/components/TextEditor'), { ssr: false })
 
 export default function EditBlock({ selectedList }) {
-    const { updateDesplegables, desplegables, updateData, fiscalesList, defensoresOficialesList, defensoresParticularesList, abogados, juecesList } = useContext(DataContext);
+    const { updateDesplegables, desplegables, updateData, fiscalesList, defensoresOficialesList, defensoresParticularesList, querellaAbogadosList, abogados, juecesList } = useContext(DataContext);
 
     const [editableBody, setEditableBody] = useState('');
     const [editableResuelvo, setEditableResuelvo] = useState('');
@@ -740,13 +740,13 @@ export default function EditBlock({ selectedList }) {
                                                         onChange={(e) => handleInputChange(setPartes, index, 'name', e.target.value)}
                                                         placeholder="Nombre Abogado Querella"
                                                         onBlur={(e) => {
-                                                            if (e.target.value && defensoresParticularesList && !defensoresParticularesList.includes(e.target.value)) {
+                                                            if (e.target.value && querellaAbogadosList && !querellaAbogadosList.includes(e.target.value)) {
                                                                 alert("Por favor, selecciona un nombre de la lista.");
                                                                 handleInputChange(setPartes, index, 'name', '');
                                                             }
                                                         }} />
                                                     <datalist id={`querella-particular-${index}`}>
-                                                        {defensoresParticularesList && defensoresParticularesList.map(option => (
+                                                        {querellaAbogadosList && querellaAbogadosList.map(option => (
                                                             <option key={option} value={option}>{option}</option>
                                                         ))}
                                                     </datalist>
