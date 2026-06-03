@@ -24,7 +24,7 @@ export const nameTranslate = (operadorName) => {
         "Victoria, Gonzalo José": 'GONZA',
         "Fernández Chipre, Cecilia": 'CHECHU',
         "Martinazzo, Ignacio": 'IGNA',
-        "Venerado, Tomás": 'TOMI',
+        "Venerando, Tomás": 'TOMI',
         "Narvaez, Facundo Nahuel": 'FACU',
         "Paroli, Carla Antonela": 'ANTO',
         'Roldan, Eliana': 'ELI',

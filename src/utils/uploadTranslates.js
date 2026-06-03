@@ -399,9 +399,9 @@ const operadoresTranslate = {
   "Victoria, Gonzalo José": "VICTORIA GONZALO JOSÉ",
   "Waisman, Natasha": "WAISMAN NATASHA",
   "Martinazzo, Ignacio": "MARTINAZZO IGNACIO",
-  "Venerado, Tomás": "VENERANDO TOMAS",
+  "Venerando, Tomás": "VENERANDO TOMAS",
   "Narvaez, Facundo Nahuel": "FACUNDO NARVAEZ",
-  "Paroli, Carla Antonela": 'PAROLI ANTONELA' 
+  "Paroli, Carla Antonela": 'PAROLI ANTONELA'
 };
 const oficialesTranslate = {
   "Dr. García, Martín Alejandro - Defensoría N°11": "MARTIN GARCÍA ALEJANDRO (OFICIAL)",
@@ -425,31 +425,31 @@ const oficialesTranslate = {
   "Dr. Maximiliano Vedia (ayudante) -Dfensoría N° 21": "VEDIA MAXIMILIANO (OFICIAL)",
   "Dra. Sandra Leveque -Defensoría N.º. 23": "LEVEQUE SANDRA LORENA (OFICIAL)"
 };
-export default function excelTranslate(value, type){
-    switch(type){
-        case 'fiscal':
-            if(fiscalesTranslate.hasOwnProperty(value)){
-                return fiscalesTranslate[value]
-            }
-            break;
-        case 'defensa':
-            if(particularesTranslate.hasOwnProperty(value)){
-                return particularesTranslate[value]
-            }
-            if(oficialesTranslate.hasOwnProperty(value)){
-                return oficialesTranslate[value]
-            }
-            break;
-        case 'juez':
-            if(juecesTranslate.hasOwnProperty(value)){
-                return juecesTranslate[value]
-            }
-            break;
-        case 'operador':
-            if(operadoresTranslate.hasOwnProperty(value)){
-                return operadoresTranslate[value]
-            }
-            break;
-    }
-    return value
+export default function excelTranslate(value, type) {
+  switch (type) {
+    case 'fiscal':
+      if (fiscalesTranslate.hasOwnProperty(value)) {
+        return fiscalesTranslate[value]
+      }
+      break;
+    case 'defensa':
+      if (particularesTranslate.hasOwnProperty(value)) {
+        return particularesTranslate[value]
+      }
+      if (oficialesTranslate.hasOwnProperty(value)) {
+        return oficialesTranslate[value]
+      }
+      break;
+    case 'juez':
+      if (juecesTranslate.hasOwnProperty(value)) {
+        return juecesTranslate[value]
+      }
+      break;
+    case 'operador':
+      if (operadoresTranslate.hasOwnProperty(value)) {
+        return operadoresTranslate[value]
+      }
+      break;
+  }
+  return value
 }
