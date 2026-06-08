@@ -67,7 +67,7 @@ export default function NavBar() {
         }
 
         if (r === 'ugaadmin' || r === 'uga') {
-            const ugaRoutes = ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA'];
+            const ugaRoutes = ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal'];
             return ugaRoutes.includes(route);
         }
 
