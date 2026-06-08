@@ -1,0 +1,218 @@
+.container {
+    padding: 24px;
+    background: #141414;
+    color: #e0e0e0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    width: calc(100vw - 80px);
+    margin-left: 60px;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a2a2a;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #888888;
+    margin-left: 8px;
+    font-weight: 400;
+}
+
+.searchBar {
+    width: 300px;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    font-size: 13px;
+    outline: none;
+}
+
+.searchBar:focus {
+    border-color: #4a7fa5;
+}
+
+.tableContainer {
+    background: #171717;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 16px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+.table th {
+    background: #1e1e1e;
+    color: #888888;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    border-bottom: 2px solid #2a2a2a;
+}
+
+.table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2a2a2a;
+    color: #c8c8c8;
+    vertical-align: middle;
+}
+
+.table tr:hover {
+    background: #1e1e1e;
+}
+
+.editInput {
+    background: #1e1e1e;
+    border: 1px solid #2e2e2e;
+    border-radius: 4px;
+    color: #d4d4d4;
+    font-size: 12.5px;
+    padding: 6px 10px;
+    outline: none;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.editInput:focus {
+    border-color: #4a7fa5;
+    background: #1a2535;
+}
+
+.roleSelect {
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    color: #e0e0e0;
+    padding: 6px 10px;
+    font-size: 12.5px;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.roleSelect:focus {
+    border-color: #4a7fa5;
+}
+
+.btnAction {
+    background: #1e3a5f;
+    border: 1px solid #2a5080;
+    color: #7bb3e0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: background 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btnAction:hover {
+    background: #264a72;
+}
+
+.btnDanger {
+    background: #3a1a1a;
+    border: 1px solid #6a2020;
+    color: #e07b7b;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.btnDanger:hover {
+    background: #4a2020;
+}
+
+.btnSecondary {
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #868686;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.btnSecondary:hover {
+    background: #1e1e1e;
+    color: #c0c0c0;
+}
+
+.rowActions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.iconBtn:hover {
+    background: #222;
+    color: #c0c0c0;
+}
+
+.iconBtnDanger:hover {
+    background: #3a1a1a;
+    color: #e07b7b;
+}
+
+.denied {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    background: #181818;
+    color: #e07b7b;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.loading {
+    padding: 48px;
+    text-align: center;
+    color: #888888;
+    font-size: 14px;
+}

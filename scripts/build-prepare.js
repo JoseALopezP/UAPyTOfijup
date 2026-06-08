@@ -21,7 +21,8 @@ const TARGET_ROUTES = {
   ],
   ual: [
     'Pumba',
-    'tablero'
+    'tablero',
+    'Gestion-Usuarios'
   ],
   vercel: null // Vercel can build all routes or a subset if desired
 };

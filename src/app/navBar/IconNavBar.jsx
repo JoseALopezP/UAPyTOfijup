@@ -137,6 +137,11 @@ export default function IconNavBar({ iconRoute }) {
                     <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
                 </svg>
             )}
+            {iconRoute === 'Gestion-Usuarios' && (
+                <svg viewBox="0 0 24 24" fill={('/' + iconRoute) === currentRoute ? '#d7d7d7' : (hovering ? '#d7d7d7' : '#868686')}>
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm5-2c1.66 0 3-1.34 3-3s-1.34-3-3-3c-.36 0-.7.09-1 .24a3.98 3.98 0 0 1 0 5.52c.3.15.64.24 1 .24zm2.5 2.1c1.23.8 2.5 1.9 2.5 3.4v2h3v-2c0-2.1-3.6-3.2-5.5-3.4z"/>
+                </svg>
+            )}
             {hovering && <ViewNameText viewName={iconRoute} />}
         </Link>
     );

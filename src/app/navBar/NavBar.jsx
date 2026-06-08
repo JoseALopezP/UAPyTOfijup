@@ -46,7 +46,7 @@ export default function NavBar() {
             const targetAllowedRoutes = {
                 unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones'],
                 uga: ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal'],
-                ual: ['Pumba', 'tablero', 'Notificaciones']
+                ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios']
             };
             const allowed = targetAllowedRoutes[buildTarget];
             if (allowed && !allowed.includes(route) && !publicRoutes.includes(route)) {
@@ -97,6 +97,7 @@ export default function NavBar() {
                 {hasAccess('Abogados') && <IconNavBar iconRoute={'Abogados'} />}
                 {hasAccess('Listas-Desplegables') && <IconNavBar iconRoute={'Listas-Desplegables'} />}
                 {hasAccess('Notificaciones') && <IconNavBar iconRoute={'Notificaciones'} />}
+                {hasAccess('Gestion-Usuarios') && <IconNavBar iconRoute={'Gestion-Usuarios'} />}
                 {hasAccess('Manual') && <IconNavBar iconRoute={'Manual'} />}</span>
         </div>
     );

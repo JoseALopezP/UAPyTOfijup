@@ -20,7 +20,8 @@ export function SignUpBlock() {
             setError(null);
             const data = {
                 userId: result.uid,
-                type: userType
+                type: userType,
+                email: email
             }
             await addUser(data)
         } catch (error) {

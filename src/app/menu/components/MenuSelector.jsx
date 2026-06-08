@@ -7,7 +7,7 @@ import { AuthContext } from '@/context/AuthContext'
 import logOut from '@/firebase/auth/signout'
 
 export default function MenuSelector() {
-  const { user } = useContext(AuthContext);
+  const { user, userRole } = useContext(AuthContext);
   const router = useRouter()
 
   useEffect(() => {
@@ -30,7 +30,10 @@ export default function MenuSelector() {
       <div className={`${styles.menuSelector}`}>
         <div className={`${styles.selectorBody}`}>
           <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
-          <Link href="/signup" className={`${styles.linkRedirection}`}>CONTROL USUARIOS</Link>
+          <Link href="/signup" className={`${styles.linkRedirection}`}>NUEVO USUARIO</Link>
+          {(userRole?.toLowerCase() === 'ual' || userRole?.toLowerCase() === 'admin') && (
+            <Link href="/Gestion-Usuarios" className={`${styles.linkRedirection}`}>GESTION USUARIOS</Link>
+          )}
         </div>
       </div>
       <button onClick={handleSignOut} className={styles.logoutButton}>

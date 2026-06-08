@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import styles from '../centroUga.module.css';
 import { DataContext } from '@/context/DataContext';
 import { generarSorteoUGA } from '@/utils/sorteoAlgoritmo';
+import { getFirestore, doc, writeBatch } from "firebase/firestore";
+import firebase_app from "@/firebase/config";
 
 export default function SorteoPanel() {
     const { bydate: data, updateByDate, desplegables, updateDesplegables } = useContext(DataContext);
@@ -18,6 +20,8 @@ export default function SorteoPanel() {
     const [operadoresDisponibles, setOperadoresDisponibles] = useState([]);
     const [selectedOperadores, setSelectedOperadores] = useState({});
     const [isLoadingSorteo, setIsLoadingSorteo] = useState(false);
+    const [draftAssignments, setDraftAssignments] = useState({});
+    const [isSaving, setIsSaving] = useState(false);
 
     // Cargar listas desplegables al montar
     useEffect(() => {
@@ -47,12 +51,16 @@ export default function SorteoPanel() {
 
             // Auto-check: marcar los que no tienen operador asignado
             const selAuds = {};
+            const initialDraft = {};
             sortedData.forEach(aud => {
                 selAuds[aud.id] = !aud.operador || aud.operador.trim() === '';
+                initialDraft[aud.id] = aud.operador || '';
             });
             setSelectedAudiencias(selAuds);
+            setDraftAssignments(initialDraft);
         } else {
             setAudienciasList([]);
+            setDraftAssignments({});
         }
     }, [data]);
 
@@ -85,21 +93,70 @@ export default function SorteoPanel() {
         const result = await generarSorteoUGA(audienciasAAsignar, opsAAsignar, formattedDate);
         
         if (result && result.success) {
-            let resumenTxt = `Sorteo completado con éxito. Se asignaron ${result.asignadas} audiencias.\n\nRESUMEN:\n`;
+            let resumenTxt = `Sorteo generado con éxito en memoria. Se pre-asignaron ${result.asignadas} audiencias.\n\nRESUMEN:\n`;
             resumenTxt += Object.entries(result.resumen).map(([k,v]) => `- ${k}: ${v} audiencias`).join('\n');
+            resumenTxt += `\n\nRecuerde presionar "Guardar Cambios" para confirmar en la base de datos.`;
             alert(resumenTxt);
-            await updateByDate(formattedDate);
+
+            setDraftAssignments(prev => {
+                const next = { ...prev };
+                if (result.resultados) {
+                    result.resultados.forEach(res => {
+                        next[res.id] = res.operador;
+                    });
+                }
+                return next;
+            });
         } else {
             alert("Hubo un error al generar el sorteo: " + (result?.error || "Desconocido"));
         }
         setIsLoadingSorteo(false);
     };
 
+    const handleSaveChanges = async () => {
+        setIsSaving(true);
+        try {
+            const formattedDate = selectedDate.split('-').reverse().join(''); 
+            const db = getFirestore(firebase_app);
+            const batch = writeBatch(db);
+            
+            let changeCount = 0;
+            audienciasList.forEach(aud => {
+                const currentOp = draftAssignments[aud.id] || '';
+                const originalOp = aud.operador || '';
+                if (currentOp !== originalOp) {
+                    changeCount++;
+                    
+                    const audDocRef = doc(db, "audiencias", formattedDate, "audiencias", aud.id);
+                    batch.update(audDocRef, { operador: currentOp });
+                    
+                    const viewDocRef = doc(db, "audienciasView", formattedDate);
+                    batch.update(viewDocRef, { [`${aud.id}.operador`]: currentOp });
+                }
+            });
+
+            if (changeCount > 0) {
+                await batch.commit();
+                alert(`Se guardaron las asignaciones para ${changeCount} audiencias.`);
+                await updateByDate(formattedDate);
+            } else {
+                alert("No hay cambios pendientes de guardar.");
+            }
+        } catch (error) {
+            console.error("Error al guardar cambios de operadores:", error);
+            alert("Hubo un error al guardar los cambios: " + error.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const hasChanges = audienciasList.some(aud => (draftAssignments[aud.id] || '') !== (aud.operador || ''));
+
     return (
         <div className={styles.panel}>
             <div className={styles.card}>
                 <h2 className={styles.title}>Asignación por Bloques</h2>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <input 
                         type="date" 
                         className={styles.input} 
@@ -109,6 +166,46 @@ export default function SorteoPanel() {
                     <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleLoadDate}>
                         Cargar Audiencias
                     </button>
+                    {hasChanges && (
+                        <>
+                            <button 
+                                className={styles.btn} 
+                                style={{ 
+                                    backgroundColor: '#4CAF50', 
+                                    color: '#fff', 
+                                    fontWeight: 'bold', 
+                                    border: 'none',
+                                    cursor: isSaving ? 'wait' : 'pointer'
+                                }} 
+                                onClick={handleSaveChanges}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                            </button>
+                            <button 
+                                className={styles.btn} 
+                                style={{ 
+                                    backgroundColor: '#f44336', 
+                                    color: '#fff', 
+                                    fontWeight: 'bold', 
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }} 
+                                onClick={() => {
+                                    if (confirm("¿Deseas descartar los cambios no guardados?")) {
+                                        const initialDraft = {};
+                                        audienciasList.forEach(aud => {
+                                            initialDraft[aud.id] = aud.operador || '';
+                                        });
+                                        setDraftAssignments(initialDraft);
+                                    }
+                                }}
+                                disabled={isSaving}
+                            >
+                                Descartar
+                            </button>
+                        </>
+                    )}
                 </div>
                 <p className={styles.textMuted}>Selecciona un día para pre-visualizar y asignar operadores.</p>
             </div>
@@ -137,6 +234,10 @@ export default function SorteoPanel() {
                                 ) : (
                                     audienciasList.map(aud => {
                                         const type = `${aud.tipo || ''} ${aud.tipo2 || ''} ${aud.tipo3 || ''}`.trim();
+                                        const currentOp = draftAssignments[aud.id] || '';
+                                        const originalOp = aud.operador || '';
+                                        const isUnsaved = currentOp !== originalOp;
+                                        
                                         return (
                                             <tr key={aud.id}>
                                                 <td>
@@ -150,8 +251,40 @@ export default function SorteoPanel() {
                                                 <td>{aud.numeroLeg || '-'}</td>
                                                 <td>{type}</td>
                                                 <td>{aud.juez || '-'}</td>
-                                                <td style={{ color: aud.operador ? '#fff' : '#ffc107', fontWeight: aud.operador ? 'normal' : 'bold' }}>
-                                                    {aud.operador || 'Sin Asignar'}
+                                                <td style={{ 
+                                                    backgroundColor: isUnsaved ? '#ffd54f' : 'transparent',
+                                                    color: isUnsaved ? '#000000' : (currentOp ? '#ffffff' : '#ffc107'),
+                                                    fontWeight: currentOp ? 'normal' : 'bold',
+                                                    padding: '4px'
+                                                }}>
+                                                    <select
+                                                        value={currentOp}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setDraftAssignments(prev => ({ ...prev, [aud.id]: val }));
+                                                        }}
+                                                        style={{
+                                                            backgroundColor: isUnsaved ? '#ffd54f' : 'transparent',
+                                                            color: isUnsaved ? '#000000' : (currentOp ? '#ffffff' : '#ffc107'),
+                                                            border: isUnsaved ? '1px solid #ffb300' : 'none',
+                                                            fontWeight: currentOp ? 'normal' : 'bold',
+                                                            width: '100%',
+                                                            padding: '4px 8px',
+                                                            borderRadius: '4px',
+                                                            cursor: 'pointer',
+                                                            outline: 'none'
+                                                        }}
+                                                    >
+                                                        <option value="" style={{ backgroundColor: '#1e1e1e', color: '#ffc107' }}>Sin Asignar</option>
+                                                        {operadoresDisponibles.map((op, idx) => {
+                                                            const opName = typeof op === 'string' ? op : op.nombre || op.value;
+                                                            return (
+                                                                <option key={idx} value={opName} style={{ backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                                                                    {opName}
+                                                                </option>
+                                                            );
+                                                        })}
+                                                    </select>
                                                 </td>
                                             </tr>
                                         );
@@ -192,7 +325,7 @@ export default function SorteoPanel() {
                         disabled={countSelectedAuds === 0 || countSelectedOps === 0 || isLoadingSorteo}
                         onClick={handleAsignar}
                     >
-                        {isLoadingSorteo ? 'Asignando...' : 'Generar Bloques y Asignar'}
+                        {isLoadingSorteo ? 'Sorteando...' : 'Sortear'}
                     </button>
                 </div>
             </div>

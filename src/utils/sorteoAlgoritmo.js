@@ -350,13 +350,12 @@ export async function generarSorteoUGA(audienciasSeleccionadas, operadoresSelecc
             mejorOp.bloquesAsignadosLista.push(bloque);
         }
 
-        // 4. Guardar en Firestore usando Batch
-        await batchWrite(dateCollection, resultadosParaFirebase, 'id');
-
+        // 4. Retornar asignaciones en memoria para previsualizacion y edicion
         return {
             success: true,
             asignadas: resultadosParaFirebase.length,
-            resumen: resumenOperadores
+            resumen: resumenOperadores,
+            resultados: resultadosParaFirebase
         };
 
     } catch (e) {
