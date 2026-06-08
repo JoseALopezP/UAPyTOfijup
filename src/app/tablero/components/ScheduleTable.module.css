@@ -157,9 +157,9 @@
 }
 .tableroSearch{
     position: fixed;
-    left: 80%;
+    right: 180px;
     top: 14px;
-    width: 18%;
+    width: 250px;
     border: none;
     outline: none;
     font-family: inherit;
@@ -168,6 +168,37 @@
     border-width: 0 0 0 4px;
     padding-left: 8px;
 }
+
+.logoutButton{
+    position: fixed;
+    right: 24px;
+    top: 14px;
+    width: 140px;
+    height: 42px;
+    background-color: #375166;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s, transform 0.1s;
+    z-index: 60;
+}
+
+.logoutButton:hover{
+    background-color: #dc3545;
+}
+
+.logoutButton:active{
+    transform: scale(0.98);
+}
+
 
 .ofijupTitle{
     position: fixed;

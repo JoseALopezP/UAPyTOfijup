@@ -22,7 +22,6 @@ function translateError(error) {
 export default function SignIn() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [clicked, setClicked] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
 
@@ -38,28 +37,46 @@ export default function SignIn() {
     }
 
     return (
-        <div className={`${styles.signinBody}`}>
-            <section className={`${styles.signInSection}`}>
+        <div className={styles.signinBody}>
+            <section className={styles.signInSection}>
                 <Image
-                    className={`${styles.corteLogo}`}
+                    className={styles.corteLogo}
                     src="/cortelogo.png"
-                    width={227}
-                    height={212}
+                    width={200}
+                    height={187}
                     alt="Logo Corte de Justicia"
                     priority={true}
                 />
-                <div className={`${styles.formWrapper}`}>
+                <div className={styles.formWrapper}>
                     <h1>Iniciar sesión</h1>
-                    <form onSubmit={handleForm} className={`${styles.formBlock}`}>
-                        <label htmlFor="email" className={`${styles.labelSquare}`}>
-                            <input className={`${styles.inputBlock}`} onChange={(e) => setEmail(e.target.value)} required type="email" name="email" id="email" placeholder="ejemplo@mail.com" />
+                    <form onSubmit={handleForm} className={styles.formBlock}>
+                        <label htmlFor="email" className={styles.labelSquare}>
+                            <span className={styles.labelText}>Correo Electrónico</span>
+                            <input 
+                                className={styles.inputBlock} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                required 
+                                type="email" 
+                                name="email" 
+                                id="email" 
+                                placeholder="ejemplo@mail.com" 
+                            />
                         </label>
-                        <label htmlFor="password" className={`${styles.labelSquare}`}>
-                            <input className={`${styles.inputBlock}`} onChange={(e) => setPassword(e.target.value)} required type="password" name="password" id="password" placeholder="contraseña" />
+                        <label htmlFor="password" className={styles.labelSquare}>
+                            <span className={styles.labelText}>Contraseña</span>
+                            <input 
+                                className={styles.inputBlock} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                                type="password" 
+                                name="password" 
+                                id="password" 
+                                placeholder="••••••••" 
+                            />
                         </label>
                         {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
-                        <button type="submit" onClick={() => setClicked(!clicked)} className={clicked ? `${styles.loginButton} ${styles.loginButtonClicked}` : `${styles.loginButton}`}>
-                            Iniciar Sesión
+                        <button type="submit" className={styles.loginButton}>
+                            Entrar al Sistema
                         </button>
                     </form>
                 </div>
@@ -67,4 +84,3 @@ export default function SignIn() {
         </div>
     );
 }
-
