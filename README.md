@@ -413,9 +413,17 @@ Esto inicia Next.js en `localhost:3000` y abre la ventana Electron apuntando al 
 
 ### Build Producción
 
+Para reducir el tamaño del instalable final (excluyendo páginas y dependencias pesadas como Puppeteer según el rol), el sistema permite compilar por **targets de compilación**:
+
 ```bash
-npm run build  # next build → electron-builder
+npm run build:uga    # Solo UGA (minutas, cronómetro, etc.). Excluye Puppeteer. (~80% más liviano)
+npm run build:unc    # Solo UNC/UAC (carga de audiencias, solicitudes, etc.). Incluye Puppeteer.
+npm run build:ual    # Solo UAL (Pumba, métricas, etc.). Incluye Puppeteer.
+npm run build:admin  # Compilación completa con todos los módulos.
+npm run build:vercel # Compilación pura frontend lista para desplegar en Vercel.
 ```
+
+El script de ejecución de build (`scripts/build.js`) aplica de forma segura el enmascaramiento de páginas no autorizadas con placeholders ligeros y genera configuraciones de `electron-builder` adaptadas para cada target, restaurando los archivos fuente originales al finalizar.
 
 ### Targets de distribución
 
@@ -427,16 +435,16 @@ npm run build  # next build → electron-builder
 
 ### Deploy Web (Vercel)
 
-El proyecto se deploya automáticamente en Vercel. Puppeteer se excluye del bundle web:
+El proyecto se deploya automáticamente en Vercel. Se utiliza el target de Vercel para empaquetar de forma pura el frontend estático:
 
 ```json
 {
-  "installCommand": "PUPPETEER_SKIP_DOWNLOAD=true npm install",
-  "buildCommand": "next build"
+  "installCommand": "PUPPETEER_SKIP_DOWNLOAD=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install",
+  "buildCommand": "npm run build:vercel"
 }
 ```
 
-> **Nota:** Las funciones de automatización (agendamiento, scraping) solo están disponibles en la versión desktop.
+> **Nota:** Las funciones de automatización (agendamiento, scraping con Puppeteer) solo están disponibles en la versión desktop compilada para los targets correspondientes (UNC, UAL, Admin).
 
 ---
 

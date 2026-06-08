@@ -16,10 +16,8 @@ export default function menu() {
   }, [router]);
 
   return (
-    <AuthContextProvider>
-      <DataContextProvider>
-        <Menu />
-      </DataContextProvider>
-    </AuthContextProvider>
+    <DataContextProvider>
+      <Menu />
+    </DataContextProvider>
   )
 }

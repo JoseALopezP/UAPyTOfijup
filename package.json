@@ -6,7 +6,12 @@
   "main": "main/main.js",
   "scripts": {
     "dev": "cross-env ELECTRON_ENABLE_LOGGING=1 concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev\" \"electron .\"",
-    "build": "next build && electron-builder",
+    "build": "node scripts/build.js",
+    "build:uga": "cross-env BUILD_TARGET=uga node scripts/build.js",
+    "build:unc": "cross-env BUILD_TARGET=unc node scripts/build.js",
+    "build:ual": "cross-env BUILD_TARGET=ual node scripts/build.js",
+    "build:admin": "cross-env BUILD_TARGET=admin node scripts/build.js",
+    "build:vercel": "cross-env BUILD_TARGET=vercel node scripts/build.js",
     "start": "next start",
     "lint": "next lint"
   },

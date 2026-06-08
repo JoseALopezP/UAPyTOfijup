@@ -49,6 +49,7 @@ export function SignUpBlock() {
                     <select value={userType} onChange={(e) => setUserType(e.target.value)}>
                         <option value="">Select User Type</option>
                         <option value="admin">Admin</option>
+                        <option value="ual">UAL</option>
                         <option value="uac">UAC</option>
                         <option value="ugaadmin">UGA Admin</option>
                         <option value="operador">operador</option>

@@ -1,0 +1,43 @@
+import { useState, useContext, useEffect } from 'react';
+import styles from '../sorteoOperador.module.css'
+import { DataContext } from '@/context/DataContext';
+import { todayFunction } from '@/utils/dateUtils';
+
+export default function SorteoFunction({selectedList, titleSorteo, sorteoListCurr, setSorteoListCurr, selectedSorteo, setSelectedSorteo, setEmptyTitle, setTitleSorteo}){
+    const [sorteo, setSorteo] = useState([])
+    const { addSorteo } = useContext(DataContext);
+    function shuffleArray() {
+        if(!titleSorteo || titleSorteo === ''){
+            setEmptyTitle(true);
+            setTimeout(() => {
+                setEmptyTitle(false);
+            }, 1000)
+            console.log(sorteo)
+        }else{
+            const shuffledArray = [...selectedList];
+            for (let i = shuffledArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+            }
+            setSorteo(shuffledArray)
+            addSorteo({
+                title: titleSorteo,
+                sorteo: shuffledArray
+            } , todayFunction())
+            setSorteoListCurr([{title: titleSorteo, sorteo: shuffledArray}, ...sorteoListCurr])
+            setSelectedSorteo({title: titleSorteo, sorteo: shuffledArray})
+            setTitleSorteo('')
+        }
+    }
+    return (
+        <div className={[styles.sorteoFunctionBlock]}>
+            <button className={[styles.sorteoButton]} onClick={() => shuffleArray()}>SORTEAR</button>
+            <div className={[styles.listSorteadoBlock]}>
+                {selectedSorteo && selectedSorteo.sorteo.map((el,i)=>(
+                    <span key={el} className={[styles.listSorteadoItem]}>{i+1}. {el}</span>
+                ))}
+            </div>
+        </div>
+    );
+}
+

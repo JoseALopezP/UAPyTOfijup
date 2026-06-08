@@ -1,0 +1,29 @@
+.container { display: flex; flex-direction: column; width: 98vw; height: calc(100vh - 10px); margin-left: 2.4vw; color: #d7d7d7; }
+.header { display: flex; flex-direction: row; border-bottom: 1px solid #2B2B2B; height: 50px; }
+.tabButton { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; border: none; color: #868686; font-size: 16px; cursor: pointer; text-transform: uppercase; font-weight: bold; transition: 0.2s; }
+.tabButton:hover { color: #d7d7d7; background: rgba(255,255,255,0.05); }
+.tabButtonActive { color: #fff; border-bottom: 2px solid #569CD6; background: rgba(255,255,255,0.02); }
+.badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: bold; }
+.content { flex: 1; display: flex; flex-direction: row; overflow: hidden; padding: 10px; gap: 10px; }
+
+/* Paneles */
+.panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+
+/* General utilities */
+.btn { background: #2B2B2B; color: #d7d7d7; border: 1px solid #3c3c3c; padding: 8px 16px; cursor: pointer; border-radius: 2px; transition: 0.2s; }
+.btn:hover { background: #3c3c3c; }
+.btnPrimary { background: #569CD6; color: #fff; font-weight: bold; border: none; }
+.btnPrimary:hover { background: #4a8dc2; }
+
+.card { background: #1e1e1e; border: 1px solid #2B2B2B; border-radius: 4px; padding: 15px; margin-bottom: 10px; }
+.input { background: #2B2B2B; border: 1px solid #3c3c3c; color: #fff; padding: 6px; border-radius: 2px; outline: none; }
+.input:focus { border-color: #569CD6; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th, .table td { padding: 10px; border-bottom: 1px solid #2B2B2B; text-align: left; }
+.table th { color: #868686; text-transform: uppercase; font-size: 12px; font-weight: normal; }
+.table tr:hover td { background-color: rgba(255,255,255,0.03); }
+
+/* Helpers de texto */
+.textMuted { color: #868686; font-size: 12px; }
+.title { font-size: 20px; color: #fff; margin: 0 0 10px 0; font-weight: 500; }

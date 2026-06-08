@@ -5,14 +5,6 @@ import path from 'path';
 import fs from 'fs/promises';
 import os from 'os';
 
-// Dynamically import required puppeteer modules from the Next.js src folder
-import { agendarAudiencia, rechazarSolicitud } from '../src/app/Solicitudes-Audiencia/funciones/agendamiento.js';
-import { extraerSolicitudes } from '../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js';
-import { extraerAnuladas } from '../src/app/Solicitudes-Audiencia/funciones/extraccionAnuladas.js';
-import { extraerDetalles } from '../src/app/Solicitudes-Audiencia/funciones/extraccionDetalles.js';
-import { getInfoAudiencia } from '../src/app/Pumba/components/scrappingUAL.js';
-import { bloqueoMasivoAuto, parsearBloques } from '../src/firebase/firestore/bloqueoAuto.js';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -235,6 +227,7 @@ app.on("ready", () => {
       sendEvent({ type: 'progress', message: 'Iniciando agendamiento con Puppeteer local...' });
       
       const credentials = await getPumaCredentials('solicitudes');
+      const { agendarAudiencia } = await import('../src/app/Solicitudes-Audiencia/funciones/agendamiento.js');
       const resultado = await agendarAudiencia({
         linkSol, tipo, jueces, intervinientes, fyhInicio, fyhFin, sala, linkLeg, agregar, documentos, action, credentials, ...body
       }, onProgress);
@@ -265,6 +258,7 @@ app.on("ready", () => {
       sendEvent({ type: 'progress', message: 'Extraer: Inicializando Puppeteer...' });
       
       const credentials = await getPumaCredentials('solicitudes');
+      const { extraerSolicitudes } = await import('../src/app/Solicitudes-Audiencia/funciones/extraccionSolicitudes.js');
       const result = await extraerSolicitudes(existingData || [], onProgress, tiposAudiencia || [], forceReviewAll, credentials);
       
       sendEvent({ type: 'done', data: result });
@@ -280,6 +274,7 @@ app.on("ready", () => {
     try {
       const { solicitud, tiposAudiencia } = body;
       const credentials = await getPumaCredentials('solicitudes');
+      const { extraerDetalles } = await import('../src/app/Solicitudes-Audiencia/funciones/extraccionDetalles.js');
       const result = await extraerDetalles([solicitud], null, tiposAudiencia || [], credentials);
       if (result && result.length > 0) {
         return { success: true, data: result[0] };
@@ -308,6 +303,7 @@ app.on("ready", () => {
     try {
       console.log(`[IPC] Iniciando scrape-pumba para día: ${dia}`);
       const credentials = await getPumaCredentials('general');
+      const { getInfoAudiencia } = await import('../src/app/Pumba/components/scrappingUAL.js');
       const resultados = await getInfoAudiencia(dia, onProgress, credentials);
       
       sendEvent({
@@ -330,6 +326,7 @@ app.on("ready", () => {
 
     try {
       const { fixed, bloques, periodos } = body;
+      const { bloqueoMasivoAuto, parsearBloques } = await import('../src/firebase/firestore/bloqueoAuto.js');
       const periodosParsed = bloques ? parsearBloques(bloques) : (periodos || []);
       
       const credentials = await getPumaCredentials('general');
@@ -363,6 +360,7 @@ app.on("ready", () => {
       sendEvent({ type: 'progress', message: `Iniciando rechazo de solicitud ${numeroLeg}...` });
 
       const credentials = await getPumaCredentials('solicitudes');
+      const { rechazarSolicitud } = await import('../src/app/Solicitudes-Audiencia/funciones/agendamiento.js');
       const resultado = await rechazarSolicitud({
         linkLeg, linkSol, razonRechazo, numeroLeg, fyhcreacion, legajoFiscal,
         solicitante: solicitanteRechazo || 'MPF', credentials
@@ -390,6 +388,7 @@ app.on("ready", () => {
       sendEvent({ type: 'progress', message: 'Inicializando extracción de anuladas...' });
       
       const credentials = await getPumaCredentials('solicitudes');
+      const { extraerAnuladas } = await import('../src/app/Solicitudes-Audiencia/funciones/extraccionAnuladas.js');
       const result = await extraerAnuladas({
         fechaHasta,
         downloadDir: downloadDir || null,

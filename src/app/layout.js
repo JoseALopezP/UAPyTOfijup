@@ -10,12 +10,16 @@ export const metadata = {
   }
 };
 
+import { AuthContextProvider } from "@/context/AuthContext";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={titillium.className}>
-        <NavBar />
-        {children}
+        <AuthContextProvider>
+          <NavBar />
+          {children}
+        </AuthContextProvider>
       </body>
     </html>
   );

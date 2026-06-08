@@ -1,6 +1,6 @@
 {
   "installCommand": "PUPPETEER_SKIP_DOWNLOAD=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install",
-  "buildCommand": "next build",
+  "buildCommand": "npm run build:vercel",
   "framework": "nextjs",
   "build": {
     "env": {

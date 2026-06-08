@@ -8,6 +8,7 @@ import { removeHtmlTags } from '@/utils/removeHtmlTags.js';
 import updateRealTimeFunction from '@/firebase/firestore/updateRealTimeFunction.js';
 import { checkForResuelvo } from '@/utils/resuelvoUtils.js';
 import normalizeHtml from '@/utils/normalizeHtml.js';
+import { registrarEstadisticasResuelvo } from '@/utils/sorteoUtils.js';
 
 export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, setNeedsSaving1, setNeedsSaving2, needsSaving1, needsSaving2, refreshAud}) {
     const {updateDesplegables, updateDataOnly, updateDataDeep, updateByDate, updateData} = useContext(DataContext)
@@ -222,9 +223,15 @@ export default function RegistroAudienciaControl({ aud, dateToUse, isHovered, se
                     await updateData(dateToUse, aud.id, 'tipo2', currentTipo2);
                     await updateData(dateToUse, aud.id, 'tipo3', currentTipo3);
                 }
-
                 if (checkForResuelvo(aud)) {
-                    await updateDataDeep(dateToUse, aud.id, 'horaResuelvo', updateRealTimeFunction());
+                    const timeRes = updateRealTimeFunction();
+                    await updateDataDeep(dateToUse, aud.id, 'horaResuelvo', timeRes);
+                    if (!aud.estadisticasComputadas) {
+                        const savedStats = await registrarEstadisticasResuelvo(aud, timeRes);
+                        if (savedStats) {
+                            await updateDataDeep(dateToUse, aud.id, 'estadisticasComputadas', true);
+                        }
+                    }
                 }
 
                 // ── Actualizar snapshot con los valores que acabamos de guardar ──
