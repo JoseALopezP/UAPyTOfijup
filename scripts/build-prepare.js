@@ -19,7 +19,8 @@ const TARGET_ROUTES = {
     'Centro-UGA',
     'Registro-Audiencia',
     'Situacion-Corporal',
-    'Sorteo-Operador'
+    'Sorteo-Operador',
+    'Gestion-Usuarios'
   ],
   ual: [
     'Pumba',

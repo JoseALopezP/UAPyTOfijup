@@ -31,7 +31,7 @@ export default function MenuSelector() {
         <div className={`${styles.selectorBody}`}>
           <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
           <Link href="/signup" className={`${styles.linkRedirection}`}>NUEVO USUARIO</Link>
-          {(userRole?.toLowerCase() === 'ual' || userRole?.toLowerCase() === 'admin') && (
+          {(userRole?.toLowerCase() === 'ual' || userRole?.toLowerCase() === 'admin' || userRole?.toLowerCase() === 'ugaadmin') && (
             <Link href="/Gestion-Usuarios" className={`${styles.linkRedirection}`}>GESTION USUARIOS</Link>
           )}
         </div>
