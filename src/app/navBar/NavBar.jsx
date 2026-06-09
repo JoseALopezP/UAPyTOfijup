@@ -88,9 +88,11 @@ export default function NavBar() {
 
         if (publicRoutes.includes(route)) return true;
 
-        if (!userRole) return false;
+        if (!userRole) return true; // Lax default during loading or if role is missing
         
-        const r = userRole.toLowerCase();
+        const r = typeof userRole === 'string' ? userRole.toLowerCase() : '';
+        if (!r) return true;
+
         if (r === 'admin' || r === 'ual') return true;
 
         if (r === 'uac' || r === 'unc') {
@@ -108,7 +110,7 @@ export default function NavBar() {
             return ugaRoutes.includes(route);
         }
 
-        return false;
+        return true; // Lax fallback for unrecognized roles (e.g. operador, uapyt)
     };
 
     return (
