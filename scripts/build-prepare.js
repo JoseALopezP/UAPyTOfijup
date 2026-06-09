@@ -10,7 +10,8 @@ const TARGET_ROUTES = {
     'Carga-Juicio',
     'Oficios',
     'audienciasUAC',
-    'Solicitudes-Audiencia'
+    'Solicitudes-Audiencia',
+    'Situacion-Corporal'
   ],
   uga: [
     'Agregar-Audiencia',

@@ -44,7 +44,7 @@ export default function NavBar() {
 
         if (buildTarget && buildTarget !== 'admin' && buildTarget !== 'vercel') {
             const targetAllowedRoutes = {
-                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones'],
+                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'],
                 uga: ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal', 'Sorteo-Operador'],
                 ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios']
             };
@@ -62,7 +62,7 @@ export default function NavBar() {
         if (r === 'admin' || r === 'ual') return true;
 
         if (r === 'uac') {
-            const uacRoutes = ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones'];
+            const uacRoutes = ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'];
             return uacRoutes.includes(route);
         }
 
