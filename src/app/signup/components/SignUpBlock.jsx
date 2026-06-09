@@ -52,6 +52,7 @@ export function SignUpBlock() {
                         <option value="admin">Admin</option>
                         <option value="ual">UAL</option>
                         <option value="uac">UAC</option>
+                        <option value="unc">UNC</option>
                         <option value="ugaadmin">UGA Admin</option>
                         <option value="operador">operador</option>
                         <option value="uapyt">UAPyT</option>

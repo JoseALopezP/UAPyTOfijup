@@ -93,7 +93,7 @@ export default function NavBar() {
         const r = userRole.toLowerCase();
         if (r === 'admin' || r === 'ual') return true;
 
-        if (r === 'uac') {
+        if (r === 'uac' || r === 'unc') {
             const uacRoutes = ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'];
             return uacRoutes.includes(route);
         }

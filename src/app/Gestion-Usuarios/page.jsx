@@ -67,6 +67,7 @@ function UserRow({ userItem, onSave, onDelete }) {
                         <option value="admin">Admin</option>
                         <option value="ual">UAL</option>
                         <option value="uac">UAC</option>
+                        <option value="unc">UNC</option>
                         <option value="ugaadmin">UGA Admin</option>
                         <option value="uga">UGA</option>
                         <option value="operador">Operador</option>
@@ -137,6 +138,7 @@ function NuevoUserRow({ onSave, onCancel }) {
                     <option value="admin">Admin</option>
                     <option value="ual">UAL</option>
                     <option value="uac">UAC</option>
+                    <option value="unc">UNC</option>
                     <option value="ugaadmin">UGA Admin</option>
                     <option value="uga">UGA</option>
                     <option value="operador">Operador</option>
