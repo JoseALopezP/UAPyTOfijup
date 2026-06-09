@@ -17,7 +17,8 @@ const TARGET_ROUTES = {
     'Minuta-Juicio',
     'Centro-UGA',
     'Registro-Audiencia',
-    'Situacion-Corporal'
+    'Situacion-Corporal',
+    'Sorteo-Operador'
   ],
   ual: [
     'Pumba',

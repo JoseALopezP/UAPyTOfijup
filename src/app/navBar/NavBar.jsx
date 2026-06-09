@@ -45,7 +45,7 @@ export default function NavBar() {
         if (buildTarget && buildTarget !== 'admin' && buildTarget !== 'vercel') {
             const targetAllowedRoutes = {
                 unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones'],
-                uga: ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal'],
+                uga: ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal', 'Sorteo-Operador'],
                 ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios']
             };
             const allowed = targetAllowedRoutes[buildTarget];
@@ -67,7 +67,7 @@ export default function NavBar() {
         }
 
         if (r === 'ugaadmin' || r === 'uga') {
-            const ugaRoutes = ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal'];
+            const ugaRoutes = ['Agregar-Audiencia', 'Minuta-Juicio', 'Centro-UGA', 'Registro-Audiencia', 'Situacion-Corporal', 'Sorteo-Operador'];
             return ugaRoutes.includes(route);
         }
 
@@ -89,6 +89,7 @@ export default function NavBar() {
                 {hasAccess('Registro-Audiencia') && <IconNavBar iconRoute={'Registro-Audiencia'} />}
                 {hasAccess('Minuta-Juicio') && <IconNavBar iconRoute={'Minuta-Juicio'} />}
                 {hasAccess('Centro-UGA') && <IconNavBar iconRoute={'Centro-UGA'} />}
+                {hasAccess('Sorteo-Operador') && <IconNavBar iconRoute={'Sorteo-Operador'} />}
                 <p></p>
                 {hasAccess('Situacion-Corporal') && <IconNavBar iconRoute={'Situacion-Corporal'} />}</span>
             <span className={[styles.subcontainer]}>

@@ -86,7 +86,8 @@ UAPyTOfijup/
 │   │   ├── Oficios/                   # Generador de oficios judiciales
 │   │   ├── Agregar-Audiencia/         # Alta de audiencias
 │   │   ├── Carga-Juicio/             # Carga de juicios orales
-│   │   ├── Sorteo-Operador/          # Sorteo aleatorio de operadores
+│   │   ├── Centro-UGA/               # Tablero y consola de gestión centralizada UGA
+│   │   ├── Sorteo-Operador/          # Sorteo aleatorio tradicional de operadores (Legacy)
 │   │   ├── Control-UAC/              # Control de audiencias UAC
 │   │   ├── Abogados/                 # ABM de abogados/fiscales/jueces
 │   │   ├── Situacion-Corporal/       # Registro de situación corporal
@@ -218,7 +219,8 @@ El sistema incluye 14 modelos de minutas para distintos tipos de audiencia penal
 | Minuta Juicio | `/Minuta-Juicio` | Editor especializado para juicios orales multi-día |
 | Admin Logística | `/Administracion-Logistica` | Panel admin (exportaciones, bloqueo masivo, sync, migración) |
 | Oficios | `/Oficios` | Generador de oficios judiciales |
-| Sorteo Operador | `/Sorteo-Operador` | Asignación aleatoria de operadores |
+| Centro UGA | `/Centro-UGA` | Consola central de gestión UGA (errores, sorteo por bloques, simulación y analíticas) |
+| Sorteo Operador | `/Sorteo-Operador` | Sorteo aleatorio tradicional de operadores (Legacy) |
 | Abogados | `/Abogados` | ABM de abogados, fiscales, jueces y defensores |
 | Control UAC | `/Control-UAC` | Checklist de control de audiencias |
 | Situación Corporal | `/Situacion-Corporal` | Registro de situación corporal de detenidos |
