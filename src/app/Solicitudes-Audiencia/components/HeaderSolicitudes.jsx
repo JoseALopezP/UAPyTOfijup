@@ -1,36 +1,12 @@
 'use client'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { DataContext } from '@/context/DataContext'
 import styles from '../SolicitudesAudiencia.module.css'
-
-const STORAGE_KEY = 'app-theme'
 
 export default function HeaderSolicitudes() {
     const { solicitudesPendientes, addSolicitudData, addAudiencia, desplegables, archiveOldSolicitudes } = useContext(DataContext);
     const [syncStatus, setSyncStatus] = useState('');
     const [isSyncing, setIsSyncing] = useState(false);
-    const [isLight, setIsLight] = useState(false);
-
-    // Cargar preferencia guardada al montar
-    useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY)
-        if (saved === 'light') {
-            setIsLight(true)
-            document.body.classList.add('light-mode')
-        }
-    }, [])
-
-    const toggleTheme = () => {
-        const next = !isLight
-        setIsLight(next)
-        if (next) {
-            document.body.classList.add('light-mode')
-            localStorage.setItem(STORAGE_KEY, 'light')
-        } else {
-            document.body.classList.remove('light-mode')
-            localStorage.setItem(STORAGE_KEY, 'dark')
-        }
-    }
 
     const syncSolicitudesHandler = async () => {
         try {
@@ -726,16 +702,6 @@ export default function HeaderSolicitudes() {
                     </span>
                 )}
             </span>
-
-            {/* Botón tema — empujado al extremo derecho */}
-            <button
-                className={styles.themeButton}
-                onClick={toggleTheme}
-                title={isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
-            >
-                <span>{isLight ? '🌙' : '☀️'}</span>
-                <span className={styles.themeLabel}>{isLight ? 'Oscuro' : 'Claro'}</span>
-            </button>
         </div>
     )
 }

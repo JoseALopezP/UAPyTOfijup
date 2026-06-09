@@ -210,7 +210,7 @@ function GestionUsuariosContent() {
     };
 
     useEffect(() => {
-        if (user && (userRole === 'ual' || userRole === 'admin' || userRole === 'ugaadmin')) {
+        if (user && (userRole === 'ual' || userRole === 'admin')) {
             fetchUsers();
         }
     }, [user, userRole]);
@@ -219,8 +219,8 @@ function GestionUsuariosContent() {
         return <div className={styles.denied}>Debes iniciar sesión para ver esta página.</div>;
     }
 
-    if (userRole !== 'ual' && userRole !== 'admin' && userRole !== 'ugaadmin') {
-        return <div className={styles.denied}>Acceso Denegado. Solo UAL, Admin y UGA Admin pueden gestionar usuarios.</div>;
+    if (userRole !== 'ual' && userRole !== 'admin') {
+        return <div className={styles.denied}>Acceso Denegado. Solo UAL y Admin pueden gestionar usuarios.</div>;
     }
 
     const handleSaveUser = async (userObj, formValues) => {

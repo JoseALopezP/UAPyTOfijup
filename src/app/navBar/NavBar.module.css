@@ -9,6 +9,12 @@
     z-index: 10;
     border-right: solid 1px #2B2B2B;
 }
+
+:global(body.light-mode) .container {
+    background-color: #ffffff;
+    border-right-color: #e5e7eb;
+}
+
 .navButton {
     justify-content: center;
     border: solid #0078d400 0px;
@@ -19,16 +25,23 @@
     align-items: center;
     flex-shrink: 0;
 }
+
 .navButtonCurrent {
     color: #d7d7d7;
     border-left-color: #0078d4ff;
 }
+
+:global(body.light-mode) .navButtonCurrent {
+    border-left-color: #0078d4ff;
+}
+
 .viewNameBlock {
     position: absolute;
     background-color: #fff;
     border-radius: 2px;
     left: 2.5%;
 }
+
 .scrollWrapper {
     flex: 1;
     display: flex;
@@ -37,6 +50,7 @@
     width: 100%;
     position: relative;
 }
+
 .scrollableMiddle {
     flex: 1;
     overflow-y: auto;
@@ -45,9 +59,11 @@
     width: 100%;
     scrollbar-width: none; /* Firefox */
 }
+
 .scrollableMiddle::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
 }
+
 .scrollArrow {
     width: 100%;
     height: 28px;
@@ -65,10 +81,24 @@
     border-bottom: 1px solid #2B2B2B;
     border-top: 1px solid #2B2B2B;
 }
+
 .scrollArrow:hover {
     background-color: #2b2b2b;
     color: #ffffff;
 }
+
+:global(body.light-mode) .scrollArrow {
+    background-color: #f3f4f6;
+    border-bottom-color: #e5e7eb;
+    border-top-color: #e5e7eb;
+    color: #666666;
+}
+
+:global(body.light-mode) .scrollArrow:hover {
+    background-color: #e5e7eb;
+    color: #111111;
+}
+
 .separator {
     height: 1px;
     background-color: #2B2B2B;
@@ -76,16 +106,40 @@
     border: none;
     flex-shrink: 0;
 }
+
+:global(body.light-mode) .separator {
+    background-color: #e5e7eb;
+}
+
 .topLogo {
     width: 100%;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
 }
+
 .bottomWrapper {
     width: 100%;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     margin-top: auto;
+}
+
+.themeToggle {
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--nav-icon-inactive);
+    padding: 20% 12% 10% 10%;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    width: 100%;
+    transition: color 0.2s;
+}
+
+.themeToggle:hover {
+    color: var(--nav-icon-hover);
 }

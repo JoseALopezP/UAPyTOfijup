@@ -404,6 +404,33 @@ app.on("ready", () => {
       return { success: false, error: error.message };
     }
   });
+
+  ipcMain.handle('revisar-notificacion', async (event, body) => {
+    const sendEvent = (data) => {
+      event.sender.send('revisar-notificacion-progress', data);
+    };
+    const onProgress = (msg) => {
+      sendEvent({ type: 'progress', message: msg });
+    };
+
+    try {
+      const { linkSolicitud } = body;
+      sendEvent({ type: 'progress', message: 'Inicializando Puppeteer...' });
+      
+      const credentials = await getPumaCredentials('solicitudes');
+      const { revisarNotificacion } = await import('../src/app/Notificaciones/funciones/revisarNotificacion.js');
+      const resultado = await revisarNotificacion({
+        linkSolicitud, credentials
+      }, onProgress);
+
+      sendEvent({ type: 'done', data: resultado });
+      return { success: true, resultado };
+    } catch (error) {
+      console.error('Error in revisar-notificacion IPC:', error);
+      sendEvent({ type: 'error', error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
 });
 
 app.on("window-all-closed", () => {

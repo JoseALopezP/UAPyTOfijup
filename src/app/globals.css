@@ -1,3 +1,15 @@
+:root {
+    --nav-icon-active: #d7d7d7;
+    --nav-icon-hover: #ffffff;
+    --nav-icon-inactive: #868686;
+}
+
+body.light-mode {
+    --nav-icon-active: #0078d4;
+    --nav-icon-hover: #111111;
+    --nav-icon-inactive: #666666;
+}
+
 body {
     width: calc(100vw - (100vw - 100%));
     padding: 0;
@@ -8,6 +20,11 @@ body {
     display: inline-flex;
     flex-direction: row;
 }
+
+body.light-mode {
+    background-color: #f3f4f6;
+}
+
 
 ::-webkit-scrollbar {
     width: 10px;
