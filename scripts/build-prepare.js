@@ -12,20 +12,23 @@ const TARGET_ROUTES = {
     'audienciasUAC',
     'Solicitudes-Audiencia',
     'Notificaciones',
-    'Situacion-Corporal'
+    'Situacion-Corporal',
+    'Abogados'
   ],
   uga: [
     'Agregar-Audiencia',
     'Centro-UGA',
     'Registro-Audiencia',
     'Sorteo-Operador',
-    'Gestion-Usuarios'
+    'Gestion-Usuarios',
+    'Abogados'
   ],
   ual: [
     'Pumba',
     'tablero',
     'Notificaciones',
-    'Gestion-Usuarios'
+    'Gestion-Usuarios',
+    'Abogados'
   ],
   vercel: null // Vercel can build all routes or a subset if desired
 };

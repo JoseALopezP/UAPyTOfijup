@@ -93,9 +93,9 @@ export default function NavBar() {
 
         if (buildTarget && buildTarget !== 'admin' && buildTarget !== 'vercel') {
             const targetAllowedRoutes = {
-                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'],
-                uga: ['Agregar-Audiencia', 'Centro-UGA', 'Registro-Audiencia', 'Sorteo-Operador', 'Gestion-Usuarios'],
-                ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios']
+                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal', 'Abogados'],
+                uga: ['Agregar-Audiencia', 'Centro-UGA', 'Registro-Audiencia', 'Sorteo-Operador', 'Gestion-Usuarios', 'Abogados'],
+                ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios', 'Abogados']
             };
             const allowed = targetAllowedRoutes[buildTarget];
             if (allowed && !allowed.includes(route) && !publicRoutes.includes(route)) {

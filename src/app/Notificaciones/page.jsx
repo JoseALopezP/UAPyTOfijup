@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import React, { useState, useEffect, useMemo } from 'react';
 import getDocument from '@/firebase/firestore/getDocument';
 import { addOrUpdateObject } from '@/firebase/firestore/addOrUpdateObject';
@@ -31,12 +31,72 @@ export default function NotificacionesPage() {
     const [wsEditingId, setWsEditingId] = useState(null);
     const [wsEditValue, setWsEditValue] = useState('');
 
+    // Comisarías states
+    const [comisarias, setComisarias] = useState({});
+    const [newComisaria, setNewComisaria] = useState({ nombre: '', departamental: '', mailComisaria: '', mailDepartamental: '' });
+    const [isEditingComisaria, setIsEditingComisaria] = useState(false);
+    const [editingComisariaId, setEditingComisariaId] = useState(null);
+    const [searchComisaria, setSearchComisaria] = useState('');
+
+    const fetchComisarias = async () => {
+        try {
+            const data = await getDocument('desplegables', 'comisarias');
+            setComisarias(data || {});
+        } catch (error) {
+            console.error("Error fetching comisarias:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchComisarias();
+    }, []);
+
+    const handleSaveComisaria = async (e) => {
+        e.preventDefault();
+        const nombreClean = newComisaria.nombre.trim();
+        if (!nombreClean) {
+            alert("El nombre de la comisaría es obligatorio.");
+            return;
+        }
+        try {
+            if (isEditingComisaria && editingComisariaId && editingComisariaId !== nombreClean) {
+                await removeObject('desplegables', 'comisarias', editingComisariaId);
+            }
+            const data = {
+                nombre: nombreClean,
+                departamental: newComisaria.departamental.trim(),
+                mailComisaria: newComisaria.mailComisaria.trim(),
+                mailDepartamental: newComisaria.mailDepartamental.trim()
+            };
+            await addOrUpdateObject('desplegables', 'comisarias', nombreClean, data);
+            setNewComisaria({ nombre: '', departamental: '', mailComisaria: '', mailDepartamental: '' });
+            setIsEditingComisaria(false);
+            setEditingComisariaId(null);
+            fetchComisarias();
+        } catch (error) {
+            console.error("Error saving comisaria:", error);
+            alert("Error al guardar la comisaría.");
+        }
+    };
+
+    const handleDeleteComisaria = async (id) => {
+        if (confirm(`¿Estás seguro de eliminar la comisaría "${id}"?`)) {
+            try {
+                await removeObject('desplegables', 'comisarias', id);
+                fetchComisarias();
+            } catch (error) {
+                console.error("Error deleting comisaria:", error);
+                alert("Error al eliminar la comisaría.");
+            }
+        }
+    };
+
     useEffect(() => {
         if (activeTab === 'pendientes') {
             fetchPendientes();
         } else if (activeTab === 'historial') {
             fetchHistorial();
-        } else {
+        } else if (activeTab !== 'comisarias') {
             fetchWorkspaceData();
         }
     }, [activeTab, selectedMonth, selectedYear]);
@@ -142,13 +202,13 @@ export default function NotificacionesPage() {
                 });
 
                 const result = await window.electronAPI.invoke('revisar-notificacion', { linkSolicitud });
-                if (result && result.success) setReviewStatus('RevisiÃ³n completada.');
+                if (result && result.success) setReviewStatus('Revisión completada.');
                 else {
                     console.error("Error al revisar:", result?.error);
                     alert(`Error al revisar: ${result?.error || 'Sin respuesta'}`);
                 }
             } else {
-                alert("La automatizaciÃ³n no estÃ¡ disponible en este entorno.");
+                alert("La automatización no está disponible en este entorno.");
             }
         } catch (err) {
             console.error("Error en handleReviewNotification:", err);
@@ -262,7 +322,7 @@ export default function NotificacionesPage() {
                     const d = parseDateWS(item.data.fechaAud || '');
                     if (!d) return false;
                     const esDia = d >= targetDay && d < targetDayEnd;
-                    const esTurno = turno === 'maÃ±ana' ? d.getHours() < 14 : d.getHours() >= 14;
+                    const esTurno = turno === 'mañana' ? d.getHours() < 14 : d.getHours() >= 14;
                     return esDia && esTurno;
                 });
             }
@@ -285,9 +345,9 @@ export default function NotificacionesPage() {
         if (!d) return { dayLabel: '?', turnoLabel: '?', isVC: false, turno: null };
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-        const dayLabel = d < today ? 'AYER' : d < tomorrow ? 'HOY' : 'MÃ‘N';
-        const turno = d.getHours() < 14 ? 'maÃ±ana' : 'tarde';
-        return { dayLabel, turnoLabel: turno === 'maÃ±ana' ? 'MAÃ‘ANA' : 'TARDE', isVC: !!item.data.esVideoconferencia, turno };
+        const dayLabel = d < today ? 'AYER' : d < tomorrow ? 'HOY' : 'MÑN';
+        const turno = d.getHours() < 14 ? 'mañana' : 'tarde';
+        return { dayLabel, turnoLabel: turno === 'mañana' ? 'MAÑANA' : 'TARDE', isVC: !!item.data.esVideoconferencia, turno };
     };
 
     // --- RENDER HELPERS ---
@@ -306,7 +366,7 @@ export default function NotificacionesPage() {
                     </div>
                     <div className={styles.ticketActions}>
                         {!isHistorial && pendingCount > 0 && <div className={styles.pendingCircle}>{pendingCount}</div>}
-                        <span className={styles.expandIcon}>{isExpanded ? 'â–²' : 'â–¼'}</span>
+                        <span className={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</span>
                     </div>
                 </div>
                 {isExpanded && (
@@ -327,7 +387,7 @@ export default function NotificacionesPage() {
                                                 <div className={styles.personaInfo}>
                                                     <strong>{persona.nombre}</strong> (DNI: {persona.dni})
                                                     {persona.fechaNotificado && <span style={{ display: 'block', fontSize: '12px', marginTop: '4px', opacity: 0.8 }}>Notificado el: {persona.fechaNotificado}</span>}
-                                                    {reviewingId === itemKey && <span className={styles.reviewStatusText}>â³ {reviewStatus}</span>}
+                                                    {reviewingId === itemKey && <span className={styles.reviewStatusText}>⏳ {reviewStatus}</span>}
                                                 </div>
                                                 <div className={styles.personaLinks}>
                                                     {persona.linkSolicitud && <a href={persona.linkSolicitud} target="_blank" rel="noreferrer" className={styles.linkBtn}>Ver Solicitud</a>}
@@ -356,7 +416,8 @@ export default function NotificacionesPage() {
                 <div className={styles.tabsContainer} style={{ flexWrap: 'wrap', gap: '8px' }}>
                     <button className={`${styles.tabBtn} ${activeTab === 'traslados' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('traslados'); setShowNextTurnoOnly(false); setSearchTerm(''); }}>Traslados y VC</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'mails' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('mails'); setSearchTerm(''); }}>Mails</button>
-                    <button className={`${styles.tabBtn} ${activeTab === 'telefonos' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('telefonos'); setSearchTerm(''); }}>TelÃ©fonos</button>
+                    <button className={`${styles.tabBtn} ${activeTab === 'telefonos' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('telefonos'); setSearchTerm(''); }}>Teléfonos</button>
+                    <button className={`${styles.tabBtn} ${activeTab === 'comisarias' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('comisarias'); setSearchTerm(''); }}>Comisarías</button>
                     <div style={{ width: '2px', background: '#e2e8f0', margin: '0 8px' }}></div>
                     <button className={`${styles.tabBtn} ${activeTab === 'pendientes' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('pendientes'); setSearchTerm(''); }}>Antiguas (Pendientes)</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'historial' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('historial'); setSearchTerm(''); }}>Antiguas (Historial)</button>
@@ -387,17 +448,168 @@ export default function NotificacionesPage() {
                     </div>
                 )}
 
+                {!isWorkspaceTab && activeTab === 'comisarias' && (
+                    <div className={styles.tabContent}>
+                        <div style={{ display: 'flex', gap: '24px', flexDirection: 'row', flexWrap: 'wrap' }}>
+                            {/* Formulario de Agregar / Editar */}
+                            <div style={{ flex: '1 1 300px', background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #cbd5e1', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', color: '#334155' }}>
+                                <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
+                                    {isEditingComisaria ? 'Editar Comisaría' : 'Agregar Nueva Comisaría'}
+                                </h3>
+                                <form onSubmit={handleSaveComisaria} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>Nombre de Comisaría</label>
+                                        <input 
+                                            type="text" 
+                                            required 
+                                            placeholder="Ej. Comisaría 1ra" 
+                                            value={newComisaria.nombre} 
+                                            onChange={e => setNewComisaria({...newComisaria, nombre: e.target.value})} 
+                                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '14px', background: '#fff', color: '#000' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>Departamental correspondiente</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Ej. Capital" 
+                                            value={newComisaria.departamental} 
+                                            onChange={e => setNewComisaria({...newComisaria, departamental: e.target.value})} 
+                                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '14px', background: '#fff', color: '#000' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>Mail de la Comisaría</label>
+                                        <input 
+                                            type="email" 
+                                            placeholder="Ej. comisaria1@sanjuan.gov.ar" 
+                                            value={newComisaria.mailComisaria} 
+                                            onChange={e => setNewComisaria({...newComisaria, mailComisaria: e.target.value})} 
+                                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '14px', background: '#fff', color: '#000' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>Mail de la Departamental</label>
+                                        <input 
+                                            type="email" 
+                                            placeholder="Ej. departamental@sanjuan.gov.ar" 
+                                            value={newComisaria.mailDepartamental} 
+                                            onChange={e => setNewComisaria({...newComisaria, mailDepartamental: e.target.value})} 
+                                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '14px', background: '#fff', color: '#000' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                        <button type="submit" style={{ flex: 1, padding: '8px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}>
+                                            Guardar
+                                        </button>
+                                        {isEditingComisaria && (
+                                            <button 
+                                                type="button" 
+                                                onClick={() => {
+                                                    setIsEditingComisaria(false);
+                                                    setEditingComisariaId(null);
+                                                    setNewComisaria({ nombre: '', departamental: '', mailComisaria: '', mailDepartamental: '' });
+                                                }} 
+                                                style={{ padding: '8px 16px', background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
+                                            >
+                                                Cancelar
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+                            </div>
+
+                            {/* Listado y Búsqueda */}
+                            <div style={{ flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Buscar comisaría, departamental o email..." 
+                                    value={searchComisaria} 
+                                    onChange={e => setSearchComisaria(e.target.value)} 
+                                    style={{ padding: '10px 14px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '14px', width: '100%', maxWidth: '400px', background: '#fff', color: '#000' }}
+                                />
+                                
+                                <div style={{ overflowX: 'auto', background: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                                        <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                                            <tr>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>COMISARÍA</th>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>DEPARTAMENTAL</th>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>EMAIL COMISARÍA</th>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>EMAIL DEPARTAMENTAL</th>
+                                                <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '12px', width: '140px' }}>ACCIONES</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Object.values(comisarias)
+                                                .filter(c => {
+                                                    const term = searchComisaria.toLowerCase().trim();
+                                                    if (!term) return true;
+                                                    return (c.nombre || '').toLowerCase().includes(term) ||
+                                                           (c.departamental || '').toLowerCase().includes(term) ||
+                                                           (c.mailComisaria || '').toLowerCase().includes(term) ||
+                                                           (c.mailDepartamental || '').toLowerCase().includes(term);
+                                                })
+                                                .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+                                                .map(c => (
+                                                    <tr key={c.nombre} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                                        <td style={{ padding: '10px 12px', fontWeight: 600, color: '#0f172a' }}>{c.nombre}</td>
+                                                        <td style={{ padding: '10px 12px', color: '#334155' }}>{c.departamental || '—'}</td>
+                                                        <td style={{ padding: '10px 12px', color: '#2563eb' }}>{c.mailComisaria || '—'}</td>
+                                                        <td style={{ padding: '10px 12px', color: '#2563eb' }}>{c.mailDepartamental || '—'}</td>
+                                                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                                <button 
+                                                                    onClick={() => {
+                                                                        setNewComisaria({
+                                                                            nombre: c.nombre,
+                                                                            departamental: c.departamental || '',
+                                                                            mailComisaria: c.mailComisaria || '',
+                                                                            mailDepartamental: c.mailDepartamental || ''
+                                                                        });
+                                                                        setIsEditingComisaria(true);
+                                                                        setEditingComisariaId(c.nombre);
+                                                                    }}
+                                                                    style={{ padding: '4px 8px', fontSize: '12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '3px', cursor: 'pointer', color: '#334155' }}
+                                                                >
+                                                                    Editar
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleDeleteComisaria(c.nombre)}
+                                                                    style={{ padding: '4px 8px', fontSize: '12px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: '3px', cursor: 'pointer' }}
+                                                                >
+                                                                    Eliminar
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            {Object.keys(comisarias).length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontStyle: 'italic' }}>
+                                                        No hay comisarías cargadas en la base de datos.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {isWorkspaceTab && (
                     <div className={styles.tabContent} style={{ padding: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
                         <div style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <h2 className={styles.sectionTitle} style={{ margin: 0 }}>
-                                    {activeTab === 'traslados' ? 'Traslados y Videoconferencias' : activeTab === 'mails' ? 'Mails' : 'TelÃ©fonos'}
+                                    {activeTab === 'traslados' ? 'Traslados y Videoconferencias' : activeTab === 'mails' ? 'Mails' : 'Teléfonos'}
                                 </h2>
                                 {/* Sub-filtro para MAILS */}
                                 {activeTab === 'mails' && (
                                     <div style={{ display: 'flex', gap: '6px' }}>
-                                        {[{id:'citaciones',label:'CITACIÃ“N'},{id:'general',label:'GENERAL'}].map(s => (
+                                        {[{id:'citaciones',label:'CITACIÓN'},{id:'general',label:'GENERAL'}].map(s => (
                                             <button key={s.id} onClick={() => setMailSubTab(s.id)} style={{ padding: '3px 10px', fontSize: '11px', fontWeight: 700, borderRadius: '3px', cursor: 'pointer', border: '1px solid', borderColor: mailSubTab === s.id ? '#2563eb' : '#cbd5e1', background: mailSubTab === s.id ? '#eff6ff' : '#f8fafc', color: mailSubTab === s.id ? '#2563eb' : '#64748b' }}>
                                                 {s.label}
                                             </button>
@@ -406,10 +618,10 @@ export default function NotificacionesPage() {
                                 )}
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                {/* BotÃ³n siguiente turno para TRASLADOS */}
+                                {/* Botón siguiente turno para TRASLADOS */}
                                 {activeTab === 'traslados' && (
                                     <button onClick={() => setShowNextTurnoOnly(v => !v)} style={{ padding: '5px 12px', fontSize: '12px', fontWeight: 700, borderRadius: '4px', cursor: 'pointer', border: '1px solid', borderColor: showNextTurnoOnly ? '#2563eb' : '#cbd5e1', background: showNextTurnoOnly ? '#2563eb' : '#f8fafc', color: showNextTurnoOnly ? '#fff' : '#334155' }}>
-                                        {showNextTurnoOnly ? `â–¶ ${getNextTurno().label}` : 'SIGUIENTE TURNO'}
+                                        {showNextTurnoOnly ? `▶ ${getNextTurno().label}` : 'SIGUIENTE TURNO'}
                                     </button>
                                 )}
                                 <button onClick={fetchWorkspaceData} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>ACTUALIZAR</button>
@@ -425,14 +637,21 @@ export default function NotificacionesPage() {
                                     <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
                                         <tr>
                                             {activeTab === 'traslados' && <>
-                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>DÃA / HORARIO</th>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>DÍA / HORARIO</th>
                                                 <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>TIPO</th>
                                             </>}
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>LEGAJO</th>
-                                            <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>CARÃTULA</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>CARÁTULA</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>APELLIDO Y NOMBRE</th>
+                                            {activeTab === 'traslados' && <>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>DIRECCIÓN</th>
+                                                <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>COMISARÍA</th>
+                                            </>}
                                             {activeTab !== 'traslados' && <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontSize: '12px' }}>DESTINO</th>}
-                                            <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '12px' }}>GESTIÃ“N</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '12px', width: '90px', borderLeft: '1px solid #e2e8f0' }}>LISTA</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '12px', width: '90px', borderLeft: '1px solid #e2e8f0' }}>NOTIF.</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '12px', width: '90px', borderLeft: '1px solid #e2e8f0' }}>COMPROB.</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '12px', width: '90px', borderLeft: '1px solid #e2e8f0' }}>INDICADA</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -440,19 +659,19 @@ export default function NotificacionesPage() {
                                             const { customId, data: itemData, docType } = item;
                                             const flags = itemData.statusFlags || { listaParaNotificar: false, notificada: false, comprobante: false, indicadaComoNotificada: false };
                                             const meta = activeTab === 'traslados' ? getTrasladoMeta(item) : null;
-                                            const borderColor = meta ? (meta.turno === 'maÃ±ana' ? '#3b82f6' : '#f97316') : (itemData.manual ? '#ef4444' : null);
-                                            const bgColor = meta ? (meta.turno === 'maÃ±ana' ? '#eff6ff' : '#fff7ed') : (itemData.manual ? '#fef2f2' : null);
+                                            const borderColor = meta ? (meta.turno === 'mañana' ? '#3b82f6' : '#f97316') : (itemData.manual ? '#ef4444' : null);
+                                            const bgColor = meta ? (meta.turno === 'mañana' ? '#eff6ff' : '#fff7ed') : (itemData.manual ? '#fef2f2' : null);
                                             const rowStyle = { borderBottom: '1px solid #f1f5f9', ...(borderColor ? { backgroundColor: bgColor, borderLeft: `3px solid ${borderColor}` } : {}) };
 
                                             return (
                                                 <React.Fragment key={customId}>
                                                     <tr style={rowStyle}>
-                                                        {/* Columnas especÃ­ficas de TRASLADOS */}
+                                                        {/* Columnas específicas de TRASLADOS */}
                                                         {activeTab === 'traslados' && <>
                                                             <td style={{ padding: '10px 12px' }}>
                                                                 <div style={{ fontWeight: 700, fontSize: '12px', color: '#0f172a' }}>{meta.dayLabel}</div>
                                                                 <div style={{ fontSize: '11px', color: '#64748b' }}>{itemData.fechaAud?.split(' ')[1] || ''}</div>
-                                                                <div style={{ fontSize: '10px', fontWeight: 700, color: meta.turno === 'maÃ±ana' ? '#3b82f6' : '#f97316' }}>{meta.turnoLabel}</div>
+                                                                <div style={{ fontSize: '10px', fontWeight: 700, color: meta.turno === 'mañana' ? '#3b82f6' : '#f97316' }}>{meta.turnoLabel}</div>
                                                             </td>
                                                             <td style={{ padding: '10px 12px' }}>
                                                                 <span style={{ padding: '3px 8px', borderRadius: '3px', fontSize: '10px', fontWeight: 700, background: meta.isVC ? 'rgba(139,92,246,0.12)' : '#f1f5f9', color: meta.isVC ? '#7c3aed' : '#475569', border: `1px solid ${meta.isVC ? 'rgba(139,92,246,0.3)' : '#e2e8f0'}` }}>
@@ -463,7 +682,7 @@ export default function NotificacionesPage() {
                                                         <td style={{ padding: '10px 12px', fontWeight: 600, color: '#0f172a' }}>
                                                             {itemData.numeroLeg}
                                                             <div style={{ fontSize: '11px', color: '#64748b', marginTop: '3px', cursor: 'pointer' }} onClick={() => setWsExpandedRow(wsExpandedRow === customId ? null : customId)}>
-                                                                {wsExpandedRow === customId ? 'â–² ocultar' : 'â–¼ texto'}
+                                                                {wsExpandedRow === customId ? '▲ ocultar' : '▼ texto'}
                                                             </div>
                                                         </td>
                                                         <td style={{ padding: '10px 12px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#334155' }}>
@@ -471,6 +690,60 @@ export default function NotificacionesPage() {
                                                             {itemData.tipoNotificacion && <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>{itemData.tipoNotificacion}</div>}
                                                         </td>
                                                         <td style={{ padding: '10px 12px', color: '#334155' }}>{itemData.ayp}</td>
+                                                        
+                                                        {/* Columnas DIRECCIÓN y COMISARÍA para traslados */}
+                                                        {activeTab === 'traslados' && (
+                                                            <>
+                                                                <td style={{ padding: '10px 12px', minWidth: '160px' }}>
+                                                                    <div onClick={() => { setWsEditingId(`${customId}-domicilio`); setWsEditValue(itemData.domicilio || ''); }} style={{ cursor: 'pointer', color: '#2563eb' }} title="Click para editar">
+                                                                        {wsEditingId === `${customId}-domicilio` ? (
+                                                                            <input autoFocus value={wsEditValue} onChange={e => setWsEditValue(e.target.value)} onBlur={() => { handleUpdateField(docType, customId, itemData, 'domicilio', wsEditValue); setWsEditingId(null); }} onKeyDown={e => { if (e.key === 'Enter') { handleUpdateField(docType, customId, itemData, 'domicilio', wsEditValue); setWsEditingId(null); }}} style={{ width: '100%', padding: '4px', border: '1px solid #cbd5e1' }} />
+                                                                        ) : (itemData.domicilio || 'Sin dirección')}
+                                                                    </div>
+                                                                </td>
+                                                                <td style={{ padding: '10px 12px', minWidth: '160px' }}>
+                                                                    <div 
+                                                                        onClick={(e) => { 
+                                                                            if (wsEditingId !== `${customId}-comisaria`) {
+                                                                                setWsEditingId(`${customId}-comisaria`); 
+                                                                                setWsEditValue(itemData.comisaria || ''); 
+                                                                            }
+                                                                        }} 
+                                                                        style={{ cursor: 'pointer', color: '#2563eb' }} 
+                                                                        title="Click para cambiar comisaría"
+                                                                    >
+                                                                        {wsEditingId === `${customId}-comisaria` ? (
+                                                                            <select 
+                                                                                autoFocus
+                                                                                value={wsEditValue} 
+                                                                                onChange={e => {
+                                                                                    const val = e.target.value;
+                                                                                    handleUpdateField(docType, customId, itemData, 'comisaria', val);
+                                                                                    setWsEditingId(null);
+                                                                                }} 
+                                                                                onBlur={() => setWsEditingId(null)}
+                                                                                style={{ width: '100%', padding: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#000', fontSize: '13px' }}
+                                                                            >
+                                                                                <option value="">-- Sin comisaría --</option>
+                                                                                {Object.keys(comisarias).sort().map(name => (
+                                                                                    <option key={name} value={name}>{name}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div style={{ fontWeight: 600 }}>{itemData.comisaria || 'Sin comisaría'}</div>
+                                                                                {itemData.comisaria && comisarias[itemData.comisaria] && (
+                                                                                    <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
+                                                                                        <div>Dep: {comisarias[itemData.comisaria].departamental || '—'}</div>
+                                                                                    </div>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                            </>
+                                                        )}
+
                                                         {/* Columna DESTINO solo para mails y telefonos */}
                                                         {activeTab === 'mails' && (
                                                             <td style={{ padding: '10px 12px', minWidth: '180px' }}>
@@ -486,24 +759,36 @@ export default function NotificacionesPage() {
                                                                 <div onClick={() => { setWsEditingId(customId); setWsEditValue(itemData.telefonos || ''); }} style={{ cursor: 'pointer', color: '#2563eb', fontWeight: 600 }} title="Click para editar">
                                                                     {wsEditingId === customId ? (
                                                                         <input autoFocus value={wsEditValue} onChange={e => setWsEditValue(e.target.value)} onBlur={() => { handleUpdateField(docType, customId, itemData, 'telefonos', wsEditValue); setWsEditingId(null); }} onKeyDown={e => { if (e.key === 'Enter') { handleUpdateField(docType, customId, itemData, 'telefonos', wsEditValue); setWsEditingId(null); }}} style={{ width: '100%', padding: '4px', border: '1px solid #cbd5e1' }} />
-                                                                    ) : (itemData.telefonos || 'Sin telÃ©fono')}
+                                                                    ) : (itemData.telefonos || 'Sin teléfono')}
                                                                 </div>
                                                             </td>
                                                         )}
-                                                        <td style={{ padding: '10px 12px' }}>
-                                                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                                                                {[{key:'listaParaNotificar',label:'Lista'},{key:'notificada',label:'Notif.'},{key:'comprobante',label:'Comprob.'},{key:'indicadaComoNotificada',label:'Indicada'}].map(({key, label}) => (
-                                                                    <label key={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '11px', color: '#64748b', cursor: 'pointer' }}>
-                                                                        <input type="checkbox" checked={!!flags[key]} onChange={() => handleCheckbox(docType, customId, itemData, key)} style={{ width: '15px', height: '15px' }} />
-                                                                        <span>{label}</span>
-                                                                    </label>
-                                                                ))}
-                                                            </div>
-                                                        </td>
+                                                        {[{key:'listaParaNotificar'},{key:'notificada'},{key:'comprobante'},{key:'indicadaComoNotificada'}].map(({key}) => (
+                                                            <td key={key} style={{ padding: 0, textIndent: 0, verticalAlign: 'middle', borderLeft: '1px solid #e2e8f0', width: '90px', minWidth: '90px' }}>
+                                                                <label className={styles.checkboxLabel}>
+                                                                    <input 
+                                                                        type="checkbox" 
+                                                                        checked={!!flags[key]} 
+                                                                        onChange={() => handleCheckbox(docType, customId, itemData, key)} 
+                                                                        style={{ width: '22px', height: '22px', cursor: 'pointer', accentColor: '#2563eb' }} 
+                                                                    />
+                                                                </label>
+                                                            </td>
+                                                        ))}
                                                     </tr>
                                                     {wsExpandedRow === customId && (
                                                         <tr style={{ background: '#f8fafc' }}>
-                                                            <td colSpan={activeTab === 'traslados' ? 6 : 5} style={{ padding: '14px' }}>
+                                                            <td colSpan={activeTab === 'traslados' ? 11 : 8} style={{ padding: '14px' }}>
+                                                                {activeTab === 'traslados' && itemData.comisaria && comisarias[itemData.comisaria] && (
+                                                                    <div style={{ marginBottom: '12px', padding: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '13px', color: '#334155' }}>
+                                                                        <strong style={{ color: '#0f172a' }}>Contacto Comisaría:</strong>
+                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '6px' }}>
+                                                                            <div><strong>Departamental:</strong> {comisarias[itemData.comisaria].departamental || '—'}</div>
+                                                                            <div><strong>Email Comisaría:</strong> {comisarias[itemData.comisaria].mailComisaria ? <a href={`mailto:${comisarias[itemData.comisaria].mailComisaria}`} style={{ color: '#2563eb', textDecoration: 'underline' }}>{comisarias[itemData.comisaria].mailComisaria}</a> : '—'}</div>
+                                                                            <div><strong>Email Departamental:</strong> {comisarias[itemData.comisaria].mailDepartamental ? <a href={`mailto:${comisarias[itemData.comisaria].mailDepartamental}`} style={{ color: '#2563eb', textDecoration: 'underline' }}>{comisarias[itemData.comisaria].mailDepartamental}</a> : '—'}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                                 <div style={{ fontSize: '13px', fontFamily: 'monospace', color: '#334155', whiteSpace: 'pre-wrap', maxHeight: '280px', overflowY: 'auto', padding: '10px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
                                                                     {itemData.text || 'Sin texto de documento.'}
                                                                 </div>
