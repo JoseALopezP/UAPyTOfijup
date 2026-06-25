@@ -399,8 +399,10 @@ export default function RegistroAudienciaLeft({ setNeedsSaving1, item, dateToUse
         setOperadorAud(valueAux)
     }
     const checkHoraDiff = () => {
-        const hora1 = parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]);
-        const hora2 = parseInt(item.hitos[0].split('|')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split('|')[0].split(':')[1]);
+        if (!item?.hora || !String(item.hora).includes(':')) return 0;
+        if (!item?.hitos || item.hitos.length === 0 || !item.hitos[0] || !String(item.hitos[0]).split('|')[0].includes(':')) return 0;
+        const hora1 = parseInt(String(item.hora).split(':')[0]) * 60 + parseInt(String(item.hora).split(':')[1]);
+        const hora2 = parseInt(String(item.hitos[0]).split('|')[0].split(':')[0]) * 60 + parseInt(String(item.hitos[0]).split('|')[0].split(':')[1]);
         return hora2 - hora1;
     };
     useEffect(() => {

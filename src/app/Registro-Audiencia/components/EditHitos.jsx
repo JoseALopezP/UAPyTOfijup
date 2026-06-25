@@ -24,11 +24,11 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
   }, [hitos]);
 
   const parseHito = (hitoStr) => {
-    // Tolerate both "HH:MM | STATUS" and "HH:MM|STATUS"
-    const sepIndex = hitoStr.indexOf('|');
-    if (sepIndex === -1) return { time: hitoStr.trim(), status: '' };
-    const time = hitoStr.slice(0, sepIndex).trim();
-    const status = hitoStr.slice(sepIndex + 1).trim();
+    const safeStr = String(hitoStr || '');
+    const sepIndex = safeStr.indexOf('|');
+    if (sepIndex === -1) return { time: safeStr.trim(), status: '' };
+    const time = safeStr.slice(0, sepIndex).trim();
+    const status = safeStr.slice(sepIndex + 1).trim();
     return { time, status };
   };
 
@@ -37,7 +37,7 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
       prev.map((hitoStr, i) => {
         if (i !== index) return hitoStr;
         const { time, status } = parseHito(hitoStr);
-        const [hours = '00', minutes = '00'] = time.split(':');
+        const [hours = '00', minutes = '00'] = String(time || '').split(':');
         const newHours   = field === 'hours'   ? value : hours;
         const newMinutes = field === 'minutes' ? value : minutes;
         const newStatus  = field === 'status'  ? value : status;
@@ -62,7 +62,7 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
     setSaving(true);
     isSavingRef.current = true;
     try {
-      await updateData(dateToUse, item.id, 'hitos', items);
+      await updateData(dateToUse, item?.id, 'hitos', items);
       hasChangesRef.current = false;
     } catch (err) {
       console.error('Error guardando hitos:', err);
@@ -76,7 +76,7 @@ export default function EditHitos({ hitos, isHovered, item, dateToUse }) {
     <div className={isHovered ? `${styles.editHitosBlock} ${styles.editHitosBlockHovered}` : styles.editHitosBlock}>
       {items.map((hitoStr, index) => {
         const { time, status } = parseHito(hitoStr);
-        const [hours = '00', minutes = '00'] = time.split(':');
+        const [hours = '00', minutes = '00'] = String(time || '').split(':');
 
         return (
           <div key={index} className={styles.hitoIndiv}>

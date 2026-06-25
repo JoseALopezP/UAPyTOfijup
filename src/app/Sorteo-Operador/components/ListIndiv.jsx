@@ -7,14 +7,14 @@ import { todayFunction } from '@/utils/dateUtils';
 
 export default function ListIndiv({ item }) {
     const { desplegables, updateData } = useContext(DataContext)
-    const [operadorAud, setOperadorAud] = useState(item.operador || '')
+    const [operadorAud, setOperadorAud] = useState(item?.operador || '')
     const handleOperadorChange = (value) => {
-        updateData(todayFunction(), item.id, 'operador', value);
+        updateData(todayFunction(), item?.id, 'operador', value);
         setOperadorAud(value)
     }
     useEffect(() => {
-        setOperadorAud(item.operador)
-    }, [item.operador])
+        setOperadorAud(item?.operador || '')
+    }, [item?.operador])
     return (
         <div className={styles.listIndivBlock}>
             <select onChange={(e) => { handleOperadorChange(e.target.value) }} className={styles.operadorItem}>
@@ -24,11 +24,11 @@ export default function ListIndiv({ item }) {
                     <option key={el} value={el}>{nameTranslate(el)}</option>
                 ))}
             </select>
-            <p className={styles.horaItem}>{item.hora}</p>
-            <p className={styles.legajoItem}>{item.numeroLeg.split('-SJ-')[1]}</p>
-            <p className={styles.tipoItem}>{item.tipo}</p>
-            <p className={styles.juezItem}>{item.juez ? item.juez.split('+').map(el => el.split(' ').splice(0, 3).join(' ')).join(' ') : "NA"}</p>
-            <p className={styles.demoraItem}>{demoraCalculator(item.tipo + item.tipo2 + item.tipo3)}</p>
+            <p className={styles.horaItem}>{item?.hora || ''}</p>
+            <p className={styles.legajoItem}>{item?.numeroLeg?.includes('-SJ-') ? item.numeroLeg.split('-SJ-')[1] : (item?.numeroLeg || '')}</p>
+            <p className={styles.tipoItem}>{item?.tipo || ''}</p>
+            <p className={styles.juezItem}>{typeof item?.juez === 'string' ? item.juez.split('+').map(el => el.split(' ').splice(0, 3).join(' ')).join(' ') : "NA"}</p>
+            <p className={styles.demoraItem}>{demoraCalculator((item?.tipo || '') + (item?.tipo2 || '') + (item?.tipo3 || ''))}</p>
         </div>
     );
 }
