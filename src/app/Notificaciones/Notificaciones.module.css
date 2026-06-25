@@ -20,6 +20,9 @@
     --input-bg: #1f1f1f;
     --input-border: #3c3c3c;
     --card-header-bg: #151515;
+    --turno-manana-bg: rgba(59, 130, 246, 0.15);
+    --turno-tarde-bg: rgba(249, 115, 22, 0.15);
+    --manual-bg: rgba(239, 68, 68, 0.15);
 
     width: calc(100vw - 2.4vw);
     margin-left: 2.4vw;
@@ -53,6 +56,9 @@
     --input-bg: #ffffff;
     --input-border: #d1d5db;
     --card-header-bg: #fafafa;
+    --turno-manana-bg: #eff6ff;
+    --turno-tarde-bg: #fff7ed;
+    --manual-bg: #fef2f2;
 }
 
 .header {
@@ -474,6 +480,26 @@
 }
 
 .checkboxLabel:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--surface-hover);
+}
+
+.direccionDiv {
+    font-size: 11px;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s ease;
+    color: var(--text-color);
+    border-bottom: 1px dashed var(--accent-color);
+    padding-bottom: 2px;
+    cursor: pointer;
+}
+
+.direccionDiv:hover {
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+    font-size: 12px;
 }
 

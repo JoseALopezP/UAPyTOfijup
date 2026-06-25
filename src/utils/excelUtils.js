@@ -74,7 +74,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
         , noti: ''
         , program: `${formattedDate.split('').splice(0, 2).join('')}/${formattedDate.split('').splice(2, 2).join('')}/${formattedDate.split('').splice(4, 4).join('')} ${item.hora}`
         , inicioReal: `${formattedDate.split('').splice(0, 2).join('')}/${formattedDate.split('').splice(2, 2).join('')}/${formattedDate.split('').splice(4, 4).join('')} ${item.hitos ? item.hitos[0].split(' | ')[0] : ''}`
-        , demora: `${item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))) : ''}`
+        , demora: `${(item.hitos && item.hora && item.hora.includes(':')) ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) * 60 + parseInt(item.hitos[0].split(' | ')[0].split(':')[1])) - (parseInt(item.hora.split(':')[0]) * 60 + parseInt(item.hora.split(':')[1]))) : ''}`
         , motivoDem: `${item.razonDemora ? (item.razonDemora) : ''}`
         , observDem: ''
         , durProg: ''
@@ -92,7 +92,7 @@ export async function getValuesInDateRange(startDateStr, endDateStr, getByDate) 
         , operador: excelTranslate(`${item.operador}`, 'operador')
         , fiscal: excelTranslate(item?.mpf?.[0]?.nombre ? `${item.mpf?.[0]?.nombre}` : '', 'fiscal')
         , defensor: excelTranslate(item?.defensa?.[0] ? formatDefensa(item.defensa[0]) : '', 'defensa')
-        , juez: excelTranslate(`${item.juez.split('. ')[1]}`, 'juez')
+        , juez: item.juez ? excelTranslate(item.juez.includes('. ') ? `${item.juez.split('. ')[1]}` : `${item.juez}`, 'juez') : ''
       });
     });
     currentDate.setDate(currentDate.getDate() + 1);
@@ -146,7 +146,7 @@ export async function getValuesInDateRangeInforme(startDateStr, endDateStr, getB
         , operador: item.operador ? item.operador : ''
         , minuta: item.minuta ? item.minuta.length > 20 : false
         , caratula: (item.mpf && item.caratula) ? true : false
-        , estados: item.hitos ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) + 1) >= parseInt(item.hora.split(':')[0])) : false
+        , estados: (item.hitos && item.hora && item.hora.includes(':')) ? ((parseInt(item.hitos[0].split(' | ')[0].split(':')[0]) + 1) >= parseInt(item.hora.split(':')[0])) : false
       });
     });
     currentDate.setDate(currentDate.getDate() + 1);

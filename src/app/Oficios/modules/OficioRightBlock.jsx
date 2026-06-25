@@ -19,10 +19,10 @@ export default function OficioRightBlock({aud, date}) {
     const [guardarInc, setGuardarInc] = useState(false);
     const [guardando, setGuardando] = useState(false);
     const updateComparisson = () => {
-        setResuelvo(aud.resuelvoText || '');
-        setResuelvo2(aud.resuelvoText || '');
-        setMinuta(aud.minuta || '');
-        setMinuta2(aud.minuta || '');
+        setResuelvo(aud?.resuelvoText || '');
+        setResuelvo2(aud?.resuelvoText || '');
+        setMinuta(aud?.minuta || '');
+        setMinuta2(aud?.minuta || '');
     };
     const handleShow = () =>{
         setShowOficio(!showOficio)
@@ -31,11 +31,11 @@ export default function OficioRightBlock({aud, date}) {
     const updateDataAud = async() =>{
             setGuardando(true)
             if (!deepEqual(resuelvo2, resuelvo) && resuelvo !== undefined && removeHtmlTags(resuelvo) !== '') {
-                await updateData(date, aud.id, 'resuelvoText', resuelvo);
+                await updateData(date, aud?.id, 'resuelvoText', resuelvo);
                 setResuelvo2(resuelvo);
             }
             if (!deepEqual(minuta2, minuta) && minuta !== undefined && removeHtmlTags(minuta) !== '') {
-                await updateData(date, aud.id, 'minuta', minuta);
+                await updateData(date, aud?.id, 'minuta', minuta);
                 setMinuta2(minuta);
             }
             await setGuardarInc(false)

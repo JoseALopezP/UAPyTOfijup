@@ -39,8 +39,12 @@ export default function GeneradorOficioBlock({ item, date, resuelvo }) {
     return nuevoArray;
   }
   useEffect(() => {
-    setImputadoList(item.imputado.map(el => ({ ...el, selected: true })))
-  }, [item.imputado])
+    if (item?.imputado && Array.isArray(item.imputado)) {
+      setImputadoList(item.imputado.map(el => ({ ...el, selected: true })));
+    } else {
+      setImputadoList([]);
+    }
+  }, [item?.imputado])
   useEffect(() => {
     if (inputList.map(el => el.value).includes('REGISTRO NACIONAL DE REINCIDENCIA ') && !traslado.includes('Se informa que, de ser necesaria la remisión de la ficha dactiloscópica, la misma deberá ser gestionada por el organismo solicitante ante el Departamento de Antecedentes Personales de la Policía, atento a que esta oficina no cuenta con los datos referidos.')) {
       setTraslado(traslado + '\nSe informa que, de ser necesaria la remisión de la ficha dactiloscópica, la misma deberá ser gestionada por el organismo solicitante ante el Departamento de Antecedentes Personales de la Policía, atento a que esta oficina no cuenta con los datos referidos.\nTIPO: PEDIDO de informes o RESOLUCIÓN, SENTENCIA o TESTIMONIO judicial\nORGANISMO: nombre del organismo judicial\nCAUSA: número de causa\nPRIORIDAD: (no completar)\nDELITO: descripción del delito\nRESOLUCIÓN: sentencia condenatoria, sobreseimiento, etc.\nDNI: número de DNI\nSEXO: MASCULINO o FEMENINO\nFECHA DE NACIMIENTO: formato DD/MM/AAAA (Prestar especial atención al formato de la fecha de nacimiento)\nNACIONALIDAD: nacionalidad de causante\nAPELLIDOS: apellidos del causante\nNOMBRES: nombres del causante\nAPELLIDOS DE LA MADRE: apellidos de la madre del causante\nNOMBRES DE LA MADRE: nombres de la madre del causante\nAPELLIDOS DEL PADRE: apellidos del padre del causante\nNOMBRES DEL PADRE: nombres del padre del causante')

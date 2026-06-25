@@ -6,10 +6,10 @@ import ErroresUgaList from './ErroresUgaList';
 
 export default function OficioLeftBlock({ date, aud }) {
     const { updateData, desplegables } = useContext(DataContext);
-    const [control, setControl] = useState(aud.control || '');
-    const [resultado, setResultado] = useState(aud.resultado || '');
+    const [control, setControl] = useState(aud?.control || '');
+    const [resultado, setResultado] = useState(aud?.resultado || '');
     const [resultadoSave, setResultadoSave] = useState(false);
-    const [auxControl, setAuxControl] = useState(aud.control || '');
+    const [auxControl, setAuxControl] = useState(aud?.control || '');
     const [errores, setErrores] = useState([]);
     const [errorTipo, setErrorTipo] = useState('');
     const [errorInput, setErrorInput] = useState('');
@@ -18,29 +18,29 @@ export default function OficioLeftBlock({ date, aud }) {
         event.preventDefault();
         const newError = { tipo: errorTipo, comentario: errorInput, estado: false };
         setErrores((prev) => [...prev, newError]);
-        await updateData(date, aud.id, 'erroresUga', [...errores, newError]);
+        await updateData(date, aud?.id, 'erroresUga', [...errores, newError]);
         setErrorTipo('');
         setErrorInput('');
     };
     const handleSave = async() =>{
-        await updateData(date, aud.id, 'resultado', resultado)
+        await updateData(date, aud?.id, 'resultado', resultado)
         setResultadoSave(false)
     }
     useEffect(() => {
-        setControl(aud.control);
-        setErrores(aud.erroresUga ? [...aud.erroresUga] : []);
-        setAuxControl(aud.control);
+        setControl(aud?.control || '');
+        setErrores(aud?.erroresUga ? [...aud.erroresUga] : []);
+        setAuxControl(aud?.control || '');
     }, [aud]);
     useEffect(()=>{
-        if(resultado !== aud.resultado){
+        if(resultado !== (aud?.resultado || '')){
             setResultadoSave(true)
         }else{
             setResultadoSave(false)
         }
-    },[resultado])
+    },[resultado, aud?.resultado])
     useEffect(()=>{
-        setResultado(aud.resultado)
-    },[aud.resultado])
+        setResultado(aud?.resultado || '')
+    },[aud?.resultado])
     return (
         <div className={styles.oficioLeftBlockContainer}>
             <span className={styles.oficioControlBlock}>

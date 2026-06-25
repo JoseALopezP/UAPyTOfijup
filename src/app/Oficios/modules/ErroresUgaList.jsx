@@ -6,22 +6,22 @@ export default function ErroresUgaList({ aud, date, errores, setErrores }) {
     const { updateData } = useContext(DataContext);
 
     const handleToggleEstado = async (index) => {
-        const updatedErrores = errores.map((error, i) =>
+        const updatedErrores = (errores || []).map((error, i) =>
             i === index ? { ...error, estado: !error.estado } : error
         );
         setErrores(updatedErrores);
-        await updateData(date, aud.id, 'erroresUga', updatedErrores);
+        await updateData(date, aud?.id, 'erroresUga', updatedErrores);
     };
 
     const handleRemoveError = async (index) => {
-        const newErrores = errores.filter((_, i) => i !== index);
+        const newErrores = (errores || []).filter((_, i) => i !== index);
         setErrores(newErrores);
-        await updateData(date, aud.numeroLeg, aud.hora, 'erroresUga', newErrores, (aud.aId || false));
+        await updateData(date, aud?.numeroLeg || '', aud?.hora || '', 'erroresUga', newErrores, (aud?.aId || false));
     };
 
     return (
         <div className={`${styles.erroresListBlock}`}>
-            {errores.map((el, i) => (
+            {(errores || []).map((el, i) => (
                 <span
                     key={`${el.tipo}-${el.comentario}`}
                     className={`${styles.tableRowErrores} ${el.estado ? styles.tableRowErroresSolved : ''}`}

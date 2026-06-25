@@ -23,17 +23,23 @@ export default function SorteoModule({date, arr}) {
     };
     const handleAsignacion = async () => {
         const sortedArr = [...arr].sort((a, b) => {
-            const timeA = a.hora.split(':').join('');
-            const timeB = b.hora.split(':').join('');
-            if (timeA !== timeB) return timeA - timeB;
-            return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+            const timeA = String(a?.hora || '').split(':').join('');
+            const timeB = String(b?.hora || '').split(':').join('');
+            if (timeA !== timeB) {
+                if (!timeA) return 1;
+                if (!timeB) return -1;
+                return Number(timeA) - Number(timeB);
+            }
+            return String(a?.numeroLeg || '').localeCompare(String(b?.numeroLeg || ''));
         });
 
         for (const [index, el] of sortedArr.entries()) {
-            if (turno === true && parseInt(el.hora.split(':')[0], 10) < 14) {
+            const hour = parseInt(String(el?.hora || '').split(':')[0], 10);
+            if (isNaN(hour)) continue;
+            if (turno === true && hour < 14) {
                 await updateData(date, el.id, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
-            if (turno === false && parseInt(el.hora.split(':')[0], 10) >= 14) {
+            if (turno === false && hour >= 14) {
                 await updateData(date, el.id, 'actuario', listaSeleccionado[index % listaSeleccionado.length]);
             }
         }

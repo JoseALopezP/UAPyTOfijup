@@ -56,10 +56,14 @@ export function ScheduleTable({ filterValue }) {
                                 )
                             )
                             .sort((a, b) => {
-                                const timeA = a.hora.split(':').join('');
-                                const timeB = b.hora.split(':').join('');
-                                if (timeA !== timeB) return timeA - timeB;
-                                return String(a.numeroLeg || '').localeCompare(String(b.numeroLeg || ''));
+                                const timeA = String(a?.hora || '').split(':').join('');
+                                const timeB = String(b?.hora || '').split(':').join('');
+                                if (timeA !== timeB) {
+                                    if (!timeA) return 1;
+                                    if (!timeB) return -1;
+                                    return Number(timeA) - Number(timeB);
+                                }
+                                return String(a?.numeroLeg || '').localeCompare(String(b?.numeroLeg || ''));
                             })
                             .map((el) => {
                                 return (
@@ -67,7 +71,7 @@ export function ScheduleTable({ filterValue }) {
                                         <td>{el.hora}</td>
                                         <td>SALA {el.sala}</td>
                                         <td>{el.numeroLeg}</td>
-                                        <td>{el.tipo.split('').slice(0, 40).join('')}{el.tipo.split('').length > 39 ? '...' : ''}</td>
+                                        <td>{el.tipo ? (el.tipo.length > 39 ? el.tipo.slice(0, 40) + '...' : el.tipo) : ''}</td>
                                         <td>{el.juez ? el.juez.split('+').map(e => <span key={e}>{e}<br /></span>) : <span>NA</span>}</td>
                                         {(el.estado === 'PROGRAMADA' && (realTime > el.hora)) ? (
                                             <td className={`${styles.DEMORADA}`}>DEMORADA</td>
