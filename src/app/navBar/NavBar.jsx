@@ -3,7 +3,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import IconNavBar from './IconNavBar';
-import styles from './NavBar.module.css'
+import styles from './NavBar.module.css';
+import { publicRoutes, routesByRole, routesByBuild } from './accesos';
 
 export default function NavBar() {
     const pathname = usePathname();
@@ -82,47 +83,30 @@ export default function NavBar() {
     const hasAccess = (route) => {
         if (!user) return false;
 
-        const publicRoutes = ['', 'tablero', 'Manual'];
-
-        // Filter by build target (exclude pages not compiled in this build)
         const buildTarget = process.env.NEXT_PUBLIC_BUILD_TARGET;
 
-        if (buildTarget === 'vercel' && route === 'Notificaciones') {
-            return false;
-        }
-
-        if (buildTarget && buildTarget !== 'admin' && buildTarget !== 'vercel') {
-            const targetAllowedRoutes = {
-                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Control-UAC', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal', 'Abogados'],
-                uga: ['Agregar-Audiencia', 'Centro-UGA', 'Registro-Audiencia', 'Sorteo-Operador', 'Gestion-Usuarios', 'Abogados'],
-                ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios', 'Abogados']
-            };
-            const allowed = targetAllowedRoutes[buildTarget];
-            if (allowed && !allowed.includes(route) && !publicRoutes.includes(route)) {
-                return false;
-            }
+        // Verificar restricciones de build
+        if (buildTarget === 'vercel') {
+            const excluidas = routesByBuild.vercel?.exclude ?? [];
+            if (excluidas.includes(route)) return false;
+        } else if (buildTarget && routesByBuild[buildTarget]) {
+            const permitidasBuild = routesByBuild[buildTarget];
+            if (!permitidasBuild.includes(route) && !publicRoutes.includes(route)) return false;
         }
 
         if (publicRoutes.includes(route)) return true;
 
-        if (!userRole) return true; // Lax default during loading or if role is missing
+        // Sin rol definido, acceso permisivo (carga o rol faltante)
+        if (!userRole) return true;
 
         const r = typeof userRole === 'string' ? userRole.toLowerCase() : '';
         if (!r) return true;
 
-        if (r === 'admin' || r === 'ual') return true;
+        const permisos = routesByRole[r];
+        if (permisos === 'all') return true;
+        if (Array.isArray(permisos)) return permisos.includes(route);
 
-        if (r === 'uac' || r === 'unc') {
-            const uacRoutes = ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Control-UAC', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'];
-            return uacRoutes.includes(route);
-        }
-
-        if (r === 'ugaadmin' || r === 'uga' || r === 'operador') {
-            const ugaRoutes = ['Agregar-Audiencia', 'Centro-UGA', 'Registro-Audiencia', 'Sorteo-Operador'];
-            return ugaRoutes.includes(route);
-        }
-
-        return true; // Lax fallback for unrecognized roles (e.g. operador, uapyt)
+        return true; // rol no reconocido: acceso permisivo
     };
 
     return (
