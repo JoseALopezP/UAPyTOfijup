@@ -59,7 +59,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const defensoresOficialesList = React.useMemo(() => {
         if (!abogados || !Array.isArray(abogados)) return [];
         return abogados
-            .filter(a => a.c && a.c.toLowerCase().includes('defens') && a.c.toLowerCase().includes('oficial'))
+            .filter(a => a.c && a.c.toLowerCase().includes('defens'))
             .map(a => a.n)
             .sort((a, b) => a.localeCompare(b));
     }, [abogados]);
@@ -75,7 +75,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const defensoresParticularesList = React.useMemo(() => {
         if (!abogados || !Array.isArray(abogados)) return [];
         return abogados
-            .filter(a => !a.c || (!a.c.toLowerCase().includes('fiscal') && !a.c.toLowerCase().includes('juez') && !a.c.toLowerCase().includes('oficial')))
+            .filter(a => !a.c || (!a.c.toLowerCase().includes('fiscal') && !a.c.toLowerCase().includes('juez') && !a.c.toLowerCase().includes('oficial') && !a.c.toLowerCase().includes('defens')))
             .map(a => `${a.n} (#${a.m})`)
             .sort((a, b) => a.localeCompare(b));
     }, [abogados]);
