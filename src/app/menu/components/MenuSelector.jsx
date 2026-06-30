@@ -30,6 +30,9 @@ export default function MenuSelector() {
       <div className={`${styles.menuSelector}`}>
         <div className={`${styles.selectorBody}`}>
           <Link href={'/audienciasUAC/control'} className={`${styles.linkRedirection} ${styles.linkRedirectionCarga}`}>UAC CARGA</Link>
+          {(userRole?.toLowerCase() === 'uac' || userRole?.toLowerCase() === 'unc' || userRole?.toLowerCase() === 'admin' || userRole?.toLowerCase() === 'ual') && (
+            <Link href="/Control-UAC" className={`${styles.linkRedirection}`}>CONTROL UAC</Link>
+          )}
           <Link href="/signup" className={`${styles.linkRedirection}`}>NUEVO USUARIO</Link>
           {(userRole?.toLowerCase() === 'ual' || userRole?.toLowerCase() === 'admin') && (
             <Link href="/Gestion-Usuarios" className={`${styles.linkRedirection}`}>GESTION USUARIOS</Link>

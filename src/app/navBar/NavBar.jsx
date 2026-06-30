@@ -93,7 +93,7 @@ export default function NavBar() {
 
         if (buildTarget && buildTarget !== 'admin' && buildTarget !== 'vercel') {
             const targetAllowedRoutes = {
-                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal', 'Abogados'],
+                unc: ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Control-UAC', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal', 'Abogados'],
                 uga: ['Agregar-Audiencia', 'Centro-UGA', 'Registro-Audiencia', 'Sorteo-Operador', 'Gestion-Usuarios', 'Abogados'],
                 ual: ['Pumba', 'tablero', 'Notificaciones', 'Gestion-Usuarios', 'Abogados']
             };
@@ -113,7 +113,7 @@ export default function NavBar() {
         if (r === 'admin' || r === 'ual') return true;
 
         if (r === 'uac' || r === 'unc') {
-            const uacRoutes = ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'];
+            const uacRoutes = ['Agregar-Audiencia', 'Carga-Juicio', 'Oficios', 'audienciasUAC/control', 'Control-UAC', 'Solicitudes-Audiencia', 'Notificaciones', 'Situacion-Corporal'];
             return uacRoutes.includes(route);
         }
 
@@ -153,6 +153,7 @@ export default function NavBar() {
                     {hasAccess('Carga-Juicio') && <IconNavBar iconRoute={'Carga-Juicio'} />}
                     {hasAccess('Oficios') && <IconNavBar iconRoute={'Oficios'} />}
                     {hasAccess('audienciasUAC/control') && <IconNavBar iconRoute={'audienciasUAC/control'} />}
+                    {hasAccess('Control-UAC') && <IconNavBar iconRoute={'Control-UAC'} />}
                     {hasAccess('Solicitudes-Audiencia') && <IconNavBar iconRoute={'Solicitudes-Audiencia'} />}
                     <div className={styles.separator} />
                     {hasAccess('Registro-Audiencia') && <IconNavBar iconRoute={'Registro-Audiencia'} />}

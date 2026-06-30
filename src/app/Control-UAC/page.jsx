@@ -5,6 +5,7 @@ import { DataContextProvider } from "@/context/DataContext";
 import TableHead from './components/TableHead';
 import { useEffect, useState } from 'react';
 import TableBody from './components/TableBody';
+import { todayFunction } from '@/utils/dateUtils';
 
 export default function page(){
     const [date, setDate] = useState(null)
@@ -23,8 +24,12 @@ export default function page(){
       <AuthContextProvider>
         <DataContextProvider>
             <div className={`${styles.tableControlUac}`}>
-                <TableHead date={date} dateFunction={handleSave} setFilterValue={setFilterValue} filterValue={filterValue}/>
-                <TableBody date={date} filterValue={filterValue}/>
+                {date && (
+                    <>
+                        <TableHead date={date} dateFunction={handleSave} setFilterValue={setFilterValue} filterValue={filterValue}/>
+                        <TableBody date={date} filterValue={filterValue}/>
+                    </>
+                )}
             </div>
         </DataContextProvider>
       </AuthContextProvider>

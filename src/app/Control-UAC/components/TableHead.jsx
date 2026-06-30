@@ -1,10 +1,18 @@
 import styles from '../ControlUac.module.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function TableHead({dateFunction, date, setFilterValue, filterValue}){
     const [dia, setDia] = useState(date.substring(0,2))
     const [mes, setMes] = useState(date.substring(2,4))
     const [anio, setAnio] = useState(date.substring(4,8))
+
+    useEffect(() => {
+        if (date && date.length === 8) {
+            setDia(date.substring(0,2))
+            setMes(date.substring(2,4))
+            setAnio(date.substring(4,8))
+        }
+    }, [date])
     return (
         <><input className={`${styles.inputSearch}`} value={filterValue} onChange={e => setFilterValue(e.target.value)}/>
         <div className={`${styles.tableHeadControlUac}`}>

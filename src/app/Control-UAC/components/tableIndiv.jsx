@@ -39,7 +39,7 @@ export default function TableIndiv({item, date}){
             <div className={`${styles.tableCell} ${styles.tipoCell}`}><p className={`${styles.tipoCellP}`}>
                 {item.tipo + ' ' + item.tipo2 + ' ' + item.tipo3}</p></div>
             <div className={`${styles.tableCell} ${styles.juezCell}`}><p className={`${styles.juezCellP}`}>
-                {item.juez.split('+').map(el => el.split(' ').slice(1,3).join(' ')).join(', ')}</p></div>
+                {(item.juez || '').split('+').map(el => el.split(' ').slice(1,3).join(' ')).join(', ')}</p></div>
             <div className={`${styles.tableCell} ${styles.resultCell}`}>
                 <textarea onChange={e => {setResult(e.target.value)}} value={result} className={`${styles.resultCellP}`}/></div>
             <div className={`${styles.tableCell} ${styles.commentCell}`}>

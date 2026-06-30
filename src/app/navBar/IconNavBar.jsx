@@ -111,6 +111,9 @@ export default function IconNavBar({ iconRoute }) {
             {iconRoute === 'audienciasUAC/control' && <svg stroke={('/' + iconRoute) === currentRoute ? 'var(--nav-icon-active)' : (hovering ? 'var(--nav-icon-hover)' : 'var(--nav-icon-inactive)')} fill={('/' + iconRoute) === currentRoute ? 'var(--nav-icon-active)' : (hovering ? 'var(--nav-icon-hover)' : 'var(--nav-icon-inactive)')} viewBox="0 0 24 24">
                 <path d="M11 6L21 6.00072M11 12L21 12.0007M11 18L21 18.0007M3 11.9444L4.53846 13.5L8 10M3 5.94444L4.53846 7.5L8 4M4.5 18H4.51M5 18C5 18.2761 4.77614 18.5 4.5 18.5C4.22386 18.5 4 18.2761 4 18C4 17.7239 4.22386 17.5 4.5 17.5C4.77614 17.5 5 17.7239 5 18Z" strokeWidth="1.5" />
             </svg>}
+            {iconRoute === 'Control-UAC' && <svg stroke={('/' + iconRoute) === currentRoute ? 'var(--nav-icon-active)' : (hovering ? 'var(--nav-icon-hover)' : 'var(--nav-icon-inactive)')} fill="none" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>}
             {iconRoute === 'Minuta-Juicio' && (
                 <svg stroke={('/' + iconRoute) === currentRoute ? 'var(--nav-icon-active)' : (hovering ? 'var(--nav-icon-hover)' : 'var(--nav-icon-inactive)')} viewBox="0 0 110.57153 112.57477">
                     <g transform="translate(-206.0073,-31.50867)">

@@ -10,6 +10,7 @@ const TARGET_ROUTES = {
     'Carga-Juicio',
     'Oficios',
     'audienciasUAC',
+    'Control-UAC',
     'Solicitudes-Audiencia',
     'Notificaciones',
     'Situacion-Corporal',
