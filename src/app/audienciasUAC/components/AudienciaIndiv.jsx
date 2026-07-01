@@ -2,6 +2,7 @@ import { useEffect, useContext, useState } from 'react';
 import styles from './audiencia.module.css';
 import { DataContext } from '@/context/DataContext';
 import { checkForResuelvo } from '@/utils/resuelvoUtils';
+import { formatSingleJudge } from '@/utils/judgeNameUtils';
 import { Oficio } from './Oficio';
 
 export function AudienciaIndiv({ date, element }) {
@@ -154,13 +155,31 @@ export function AudienciaIndiv({ date, element }) {
                 <span className={`${styles.tableCell} ${styles.tableCellLegajo} ${styles.tableCellLegajoIndiv}`}>{element.numeroLeg}</span></>
             }
             <span className={`${styles.tableCell} ${styles.tableCellTipoIndiv}`}>{element.tipo}{element.tipo2 && ' + ' + element.tipo2}{element.tipo3 && ' + ' + element.tipo3}</span>
-            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>{element.juez ? element.juez.split('+(').map((e,i)=> <span key={e}>{e.split(' ').slice(1,4).join(' ')} {i == (element.juez.split('+').length - 1) ? '' : '-'}</span>) : "NA"}</span>
+            <span className={`${styles.tableCell} ${styles.tableCellJuez} ${styles.tableCellJuezList}`}>
+                {element.juez ? (
+                    element.juez.split('+').map(el => el.replace(/[()]/g, '').trim()).filter(Boolean).map((el, i, arr) => {
+                        const formatted = formatSingleJudge(el);
+                        return (
+                            <span key={el}>
+                                {formatted} {i === arr.length - 1 ? '' : '- '}
+                            </span>
+                        );
+                    })
+                ) : "NA"}
+            </span>
             <span className={`${styles.tableCell} ${styles.tableCellJuezN}`}>
                 <select onChange={(e)=>{setJuezN(e.target.value)}}>
-                    {element.juezN ? <option key={element.juezN} value={element.juezN}>{element.juezN.split(' ').slice(1,4).map(word => word.substring(0, 1))}</option> : <option></option>}
-                    {juecesList && juecesList.sort().map((el) =>{
-                        return(
-                            <option key={el} value={el}>{el.split(' ').slice(1,4).join(' ')}</option>
+                    {element.juezN ? (
+                        <option key={element.juezN} value={element.juezN}>
+                            {(() => {
+                                const formatted = formatSingleJudge(element.juezN);
+                                return formatted !== 'NA' ? formatted.split(' ').map(word => word.substring(0, 1)).join('') : '';
+                            })()}
+                        </option>
+                    ) : <option></option>}
+                    {juecesList && juecesList.sort().map((el) => {
+                        return (
+                            <option key={el} value={el}>{formatSingleJudge(el)}</option>
                         )
                     })}
                 </select>

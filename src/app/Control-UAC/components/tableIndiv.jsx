@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { DataContext } from '@/context/DataContext'
+import { formatSingleJudge } from '@/utils/judgeNameUtils'
 import styles from '../ControlUac.module.css'
 
 export default function TableIndiv({item, date}){
@@ -39,7 +40,7 @@ export default function TableIndiv({item, date}){
             <div className={`${styles.tableCell} ${styles.tipoCell}`}><p className={`${styles.tipoCellP}`}>
                 {item.tipo + ' ' + item.tipo2 + ' ' + item.tipo3}</p></div>
             <div className={`${styles.tableCell} ${styles.juezCell}`}><p className={`${styles.juezCellP}`}>
-                {(item.juez || '').split('+').map(el => el.split(' ').slice(1,3).join(' ')).join(', ')}</p></div>
+                {(item.juez || '').split('+').map(el => formatSingleJudge(el)).filter(el => el && el !== 'NA').join(', ') || 'NA'}</p></div>
             <div className={`${styles.tableCell} ${styles.resultCell}`}>
                 <textarea onChange={e => {setResult(e.target.value)}} value={result} className={`${styles.resultCellP}`}/></div>
             <div className={`${styles.tableCell} ${styles.commentCell}`}>
