@@ -4,7 +4,7 @@ import { DataContext } from '@/context/DataContext';
 import InputReloj from '@/app/components/InputReloj';
 
 export function AddAudienciaIndiv({date, element}) {
-    const { desplegables, updateData, deleteAudiencia, updateDesplegables, updateByDate, juecesList} = useContext(DataContext);
+    const { desplegables, updateData, deleteAudiencia, updateDesplegables, updateByDate, juecesList, bydate} = useContext(DataContext);
     const [cambios, setCambios] = useState(false)
     const [del, setDel] = useState(false)
     const [hora, setHora] = useState(String(element?.hora || '').split(':')[0] || '')
@@ -110,6 +110,32 @@ export function AddAudienciaIndiv({date, element}) {
             setAlertSent(true)
             return
         }
+
+        if(cambios && !del){
+            const checkHora = (hora !== '' && minuto !== '') ? `${hora.padStart(2, '0')}:${minuto.padStart(2, '0')}` : element.hora;
+            const checkLegajo = legajo !== '' ? legajo : element.numeroLeg;
+
+            if (checkHora) {
+                const startMins = parseInt(checkHora.split(':')[0]) * 60 + parseInt(checkHora.split(':')[1]);
+                const endMins = startMins + parseInt(element.horaProgramada || 45);
+
+                const isDuplicate = bydate?.some((el) => {
+                    if (el.id !== element.id && el.numeroLeg === checkLegajo && el.hora) {
+                        const [h, m] = el.hora.split(":");
+                        const elStart = parseInt(h) * 60 + parseInt(m);
+                        const elEnd = elStart + parseInt(el.horaProgramada || 45);
+                        return startMins < elEnd && endMins > elStart;
+                    }
+                    return false;
+                });
+
+                if (isDuplicate) {
+                    alert("Ya existe una audiencia con ese número de legajo a la misma hora");
+                    return;
+                }
+            }
+        }
+
         if(cambios){
             if((minuto !== minutoBis || hora !== horaBis) && hora !== '' && minuto !== ''){
                 await updateData(date, element.id, 'hora', `${hora.replace(/:/g, '')}:${minuto}`);

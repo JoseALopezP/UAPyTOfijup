@@ -47,6 +47,8 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [solicitudesData, setSolicitudesData] = useState(defaultValue);
     const [solicitudesPendientes, setSolicitudesPendientes] = useState(defaultValue);
     const [abogados, setAbogados] = useState(defaultValue);
+    const [traducciones, setTraducciones] = useState(defaultValue);
+    const [traduccionesJueces, setTraduccionesJueces] = useState(defaultValue);
 
     const fiscalesList = React.useMemo(() => {
         if (!abogados || !Array.isArray(abogados)) return [];
@@ -767,7 +769,83 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         await saveAbogadosList(dataList);
     };
 
+    const updateTraducciones = async () => {
+        try {
+            const data = await getDocument('notificaciones', 'traducciones');
+            if (data && data.list) {
+                setTraducciones(data.list);
+            } else {
+                setTraducciones([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
 
+    const saveTraduccionesList = async (newList) => {
+        try {
+            await replaceDocument('notificaciones', 'traducciones', { list: newList });
+            setTraducciones(newList);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const addTraduccion = async (newTranslation) => {
+        const newList = [newTranslation, ...traducciones];
+        await saveTraduccionesList(newList);
+    };
+
+    const updateTraduccionData = async (updatedTranslation) => {
+        const newList = traducciones.map(t => 
+            (t.id === updatedTranslation.id) ? updatedTranslation : t
+        );
+        await saveTraduccionesList(newList);
+    };
+
+    const deleteTraduccion = async (id) => {
+        const newList = traducciones.filter(t => t.id !== id);
+        await saveTraduccionesList(newList);
+    };
+
+    const updateTraduccionesJueces = async () => {
+        try {
+            const data = await getDocument('notificaciones', 'traduccionesJueces');
+            if (data && data.list) {
+                setTraduccionesJueces(data.list);
+            } else {
+                setTraduccionesJueces([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const saveTraduccionesJuecesList = async (newList) => {
+        try {
+            await replaceDocument('notificaciones', 'traduccionesJueces', { list: newList });
+            setTraduccionesJueces(newList);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const addTraduccionJuez = async (newTranslation) => {
+        const newList = [newTranslation, ...traduccionesJueces];
+        await saveTraduccionesJuecesList(newList);
+    };
+
+    const updateTraduccionJuezData = async (updatedTranslation) => {
+        const newList = traduccionesJueces.map(t => 
+            (t.id === updatedTranslation.id) ? updatedTranslation : t
+        );
+        await saveTraduccionesJuecesList(newList);
+    };
+
+    const deleteTraduccionJuez = async (id) => {
+        const newList = traduccionesJueces.filter(t => t.id !== id);
+        await saveTraduccionesJuecesList(newList);
+    };
 
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
@@ -776,9 +854,11 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateSolicitudesCompletadas, updateSolicitudesData, addSolicitudData, addSolicitudCompletada, archiveOldSolicitudes,
         updateSolicitudesPendientes, removeSolicitudPendiente, updateDataOnly, changeStatusBlockJuicio,
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
+        updateTraducciones, saveTraduccionesList, addTraduccion, updateTraduccionData, deleteTraduccion,
+        updateTraduccionesJueces, saveTraduccionesJuecesList, addTraduccionJuez, updateTraduccionJuezData, deleteTraduccionJuez,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados, querellaAbogadosList,
-        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList
+        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList, traducciones, traduccionesJueces
     };
     return <Provider value={context}>{children}</Provider>;
 };

@@ -80,11 +80,21 @@ export function AddAudienciaForm({ dateFunction, date }) {
       "0"
     )}-${data.legajo3}`;
 
-    const isDuplicate = bydate.some(
-      (el) => el.hora === formattedHora && el.numeroLeg === formattedNumeroLeg
-    );
+    const startMins = parseInt(data.hora) * 60 + parseInt(data.hora2);
+    const endMins = startMins + parseInt(data.horaProgramada || 45);
+
+    const isDuplicate = bydate.some((el) => {
+      if (el.numeroLeg === formattedNumeroLeg && el.hora) {
+        const [h, m] = el.hora.split(":");
+        const elStart = parseInt(h) * 60 + parseInt(m);
+        const elEnd = elStart + parseInt(el.horaProgramada || 45);
+        return startMins < elEnd && endMins > elStart;
+      }
+      return false;
+    });
+
     if (isDuplicate) {
-      errs.duplicado = "Ya existe una audiencia con ese número de legajo y hora";
+      errs.duplicado = "Ya existe una audiencia con ese número de legajo a la misma hora";
     }
 
     return errs;
