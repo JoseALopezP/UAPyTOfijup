@@ -22,6 +22,7 @@ export default function NotificacionesPage() {
     const [wsExpandedRow, setWsExpandedRow] = useState(null);
     const [wsEditingId, setWsEditingId] = useState(null);
     const [wsEditValue, setWsEditValue] = useState('');
+    const [sortOrder, setSortOrder] = useState('asc'); // 'asc' | 'desc'
 
     // Reenvíos states
     const [resendModalItem, setResendModalItem] = useState(null);
@@ -105,21 +106,20 @@ export default function NotificacionesPage() {
 
             const processData = (d, source) => {
                 const { id, createdAt, updatedAt, ...rest } = d || {};
+                const result = {};
                 Object.keys(rest).forEach(k => {
                     if (rest[k] && typeof rest[k] === 'object') {
-                        rest[k]._sourceDoc = source;
+                        result[k] = { ...rest[k], _sourceDoc: source };
                     }
                 });
-                return rest;
+                return result;
             };
 
-            const combined = {
-                ...processData(mailsData, 'mails'),
-                ...processData(citacionesData, 'citaciones'),
-                ...processData(oficiosData, 'oficios')
-            };
-
-            setWorkspaceData(combined);
+            setWorkspaceData({
+                citaciones: processData(citacionesData, 'citaciones'),
+                oficios: processData(oficiosData, 'oficios'),
+                mails: processData(mailsData, 'mails')
+            });
         } catch (err) {
             console.error(err);
         } finally {
@@ -132,11 +132,15 @@ export default function NotificacionesPage() {
             let updatedItem = { ...itemData, [field]: value };
             if (field === 'emails' && itemData.manual) updatedItem.manual = false;
 
-            const sourceDoc = itemData._sourceDoc || 'mails';
+            const sourceDoc = itemData._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones');
             const { _sourceDoc, ...dataToSave } = updatedItem;
 
             setWorkspaceData(prev => ({
-                ...prev, [customId]: updatedItem
+                ...prev,
+                [sourceDoc]: {
+                    ...(prev[sourceDoc] || {}),
+                    [customId]: updatedItem
+                }
             }));
 
             await addOrUpdateObject('anotificar', sourceDoc, customId, dataToSave);
@@ -153,11 +157,15 @@ export default function NotificacionesPage() {
         const newFlags = { ...currentFlags, [flag]: !currentFlags[flag] };
         const updatedItem = { ...itemData, statusFlags: newFlags };
         
-        const sourceDoc = itemData._sourceDoc || 'mails';
+        const sourceDoc = itemData._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones');
 
         try {
             setWorkspaceData(prev => ({
-                ...prev, [customId]: updatedItem
+                ...prev,
+                [sourceDoc]: {
+                    ...(prev[sourceDoc] || {}),
+                    [customId]: updatedItem
+                }
             }));
             await addOrUpdateObject('anotificar', sourceDoc, customId, { statusFlags: newFlags });
         } catch (err) {
@@ -232,12 +240,16 @@ export default function NotificacionesPage() {
             await addOrUpdateObject('anotificar', sourceDoc, customId, { [newResendKey]: newResendData });
 
             setWorkspaceData(prev => {
-                const currentItem = prev[customId] || itemData;
+                const group = prev[sourceDoc] || {};
+                const currentItem = group[customId] || itemData;
                 return {
                     ...prev,
-                    [customId]: {
-                        ...currentItem,
-                        [newResendKey]: newResendData
+                    [sourceDoc]: {
+                        ...group,
+                        [customId]: {
+                            ...currentItem,
+                            [newResendKey]: newResendData
+                        }
                     }
                 };
             });
@@ -255,24 +267,37 @@ export default function NotificacionesPage() {
 
     const activeWorkspaceData = useMemo(() => {
         if (activeTab === 'citaciones' || activeTab === 'oficios') {
-            const itemsRaw = workspaceData || {};
-            const items = Object.entries(itemsRaw).map(([id, val]) => ({ customId: id, data: val }))
-                .filter(item => {
-                    if (activeTab === 'citaciones') {
-                        return item.data._sourceDoc !== 'oficios';
-                    } else if (activeTab === 'oficios') {
-                        return item.data._sourceDoc === 'oficios';
-                    }
-                    return true;
+            let sourceItems = {};
+            if (activeTab === 'citaciones') {
+                sourceItems = {
+                    ...(workspaceData.mails || {}),
+                    ...(workspaceData.citaciones || {})
+                };
+            } else if (activeTab === 'oficios') {
+                sourceItems = workspaceData.oficios || {};
+            }
+
+            let items = Object.entries(sourceItems).map(([id, val]) => ({ customId: id, data: val }));
+
+            if (searchTerm.trim()) {
+                const term = searchTerm.toLowerCase().trim();
+                items = items.filter(item => {
+                    const leg = (item.data.numeroLeg || '').toLowerCase();
+                    const caratula = (item.data.caratula || '').toLowerCase();
+                    const ayp = (item.data.ayp || '').toLowerCase();
+                    const emails = Array.isArray(item.data.emails) ? item.data.emails.join(' ').toLowerCase() : '';
+                    return leg.includes(term) || caratula.includes(term) || ayp.includes(term) || emails.includes(term);
                 });
+            }
             
             return items.sort((a, b) => {
                 const legA = a.data?.numeroLeg || '';
                 const legB = b.data?.numeroLeg || '';
                 
-                // Agrupar por legajo (orden alfabético)
+                // Agrupar por legajo (orden alfabético/numérico)
                 if (legA !== legB) {
-                    return legA.localeCompare(legB);
+                    const comp = legA.localeCompare(legB, undefined, { numeric: true, sensitivity: 'base' });
+                    return sortOrder === 'asc' ? comp : -comp;
                 }
                 
                 // Dentro del mismo legajo, ordenar por fecha (descendente)
@@ -282,7 +307,7 @@ export default function NotificacionesPage() {
             });
         }
         return [];
-    }, [workspaceData, activeTab]);
+    }, [workspaceData, activeTab, sortOrder, searchTerm]);
 
     return (
         <div className={styles.container}>
@@ -469,10 +494,20 @@ export default function NotificacionesPage() {
                 {(activeTab === 'citaciones' || activeTab === 'oficios') && (
                     <div className={styles.tabContent} style={{ padding: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
                         <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <h2 className={styles.sectionTitle} style={{ margin: 0, color: 'var(--text-color)' }}>
-                                    {activeTab === 'citaciones' ? 'Citaciones' : 'Oficios'}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                <h2 className={styles.sectionTitle} style={{ margin: 0, color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span>{activeTab === 'citaciones' ? 'Citaciones' : 'Oficios'}</span>
+                                    <span style={{ fontSize: '13px', background: 'var(--surface-color)', padding: '2px 8px', borderRadius: '12px', border: '1px solid var(--border-color)', fontWeight: 600 }}>
+                                        {activeWorkspaceData.length}
+                                    </span>
                                 </h2>
+                                <input 
+                                    type="text" 
+                                    placeholder="Buscar legajo, carátula o email..." 
+                                    value={searchTerm} 
+                                    onChange={e => setSearchTerm(e.target.value)} 
+                                    style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid var(--input-border)', fontSize: '13px', minWidth: '240px', background: 'var(--input-bg)', color: 'var(--text-color)' }}
+                                />
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <button onClick={handleClearAll} style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#ef4444', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>LIMPIAR TODO</button>
@@ -488,7 +523,21 @@ export default function NotificacionesPage() {
                                 <table style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'collapse', fontSize: '14px', background: 'var(--surface-color)', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid var(--border-color)' }}>
                                     <thead style={{ background: 'var(--card-header-bg)', borderBottom: '2px solid var(--border-color)' }}>
                                         <tr>
-                                            <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '155px' }}>LEGAJO</th>
+                                            <th 
+                                                 onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} 
+                                                 style={{ 
+                                                     padding: '10px 12px', 
+                                                     textAlign: 'left', 
+                                                     color: 'var(--text-muted)', 
+                                                     fontSize: '12px', 
+                                                     width: '155px',
+                                                     cursor: 'pointer',
+                                                     userSelect: 'none'
+                                                 }}
+                                                 title="Clic para cambiar el orden por legajo"
+                                             >
+                                                 LEGAJO {sortOrder === 'asc' ? '▲' : '▼'}
+                                             </th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px' }}>CARÁTULA</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '145px' }}>APELLIDO Y NOMBRE</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '220px' }}>DESTINO</th>
