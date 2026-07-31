@@ -15,7 +15,12 @@ export default function TraduccionesManager() {
         updateTraduccionesJueces,
         addTraduccionJuez,
         updateTraduccionJuezData,
-        deleteTraduccionJuez
+        deleteTraduccionJuez,
+        anulaciones,
+        updateAnulaciones,
+        addAnulacion,
+        updateAnulacionData,
+        deleteAnulacion
     } = useContext(DataContext);
 
     const [tab, setTab] = useState('generales'); // 'generales' | 'jueces'
@@ -34,7 +39,8 @@ export default function TraduccionesManager() {
             setLoading(true);
             await Promise.all([
                 updateTraducciones(),
-                updateTraduccionesJueces()
+                updateTraduccionesJueces(),
+                updateAnulaciones()
             ]);
             setLoading(false);
         };
@@ -47,10 +53,10 @@ export default function TraduccionesManager() {
     };
 
     // Conmutadores dinámicos según la pestaña activa
-    const activeList = tab === 'generales' ? traducciones : traduccionesJueces;
-    const addFunc = tab === 'generales' ? addTraduccion : addTraduccionJuez;
-    const updateFunc = tab === 'generales' ? updateTraduccionData : updateTraduccionJuezData;
-    const deleteFunc = tab === 'generales' ? deleteTraduccion : deleteTraduccionJuez;
+    const activeList = tab === 'generales' ? traducciones : (tab === 'jueces' ? traduccionesJueces : anulaciones);
+    const addFunc = tab === 'generales' ? addTraduccion : (tab === 'jueces' ? addTraduccionJuez : addAnulacion);
+    const updateFunc = tab === 'generales' ? updateTraduccionData : (tab === 'jueces' ? updateTraduccionJuezData : updateAnulacionData);
+    const deleteFunc = tab === 'generales' ? deleteTraduccion : (tab === 'jueces' ? deleteTraduccionJuez : deleteAnulacion);
 
     // Cambiar de pestaña limpiando la selección actual
     const handleTabChange = (newTab) => {
@@ -194,12 +200,18 @@ export default function TraduccionesManager() {
                     >
                         Jueces
                     </button>
+                    <button
+                        className={`${styles.tabButton} ${tab === 'anulaciones' ? styles.tabButtonActive : ''}`}
+                        onClick={() => handleTabChange('anulaciones')}
+                    >
+                        Anulaciones
+                    </button>
                 </div>
 
                 <div className={styles.searchContainer}>
                     <input
                         className={styles.searchInput}
-                        placeholder={tab === 'generales' ? "Buscar por coincidencia o mail..." : "Buscar por juez o mail..."}
+                        placeholder={tab === 'generales' ? "Buscar por coincidencia o mail..." : (tab === 'jueces' ? "Buscar por juez o mail..." : "Buscar por nombre o mail...")}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                     />
@@ -231,7 +243,7 @@ export default function TraduccionesManager() {
             <div className={styles.main}>
                 <div className={styles.toolbar}>
                     <span className={styles.toolbarTitle}>
-                        {tab === 'generales' ? 'Administración de Reglas Generales' : 'Administración de Reglas de Jueces'}
+                        {tab === 'generales' ? 'Administración de Reglas Generales' : (tab === 'jueces' ? 'Administración de Reglas de Jueces' : 'Administración de Correos Anulados')}
                         <span className={styles.toolbarSubtitle}>
                             {activeList?.length || 0} reglas configuradas
                         </span>
@@ -248,8 +260,8 @@ export default function TraduccionesManager() {
                                 <div>
                                     <h3 className={styles.detailTitle}>
                                         {showNuevo 
-                                            ? (tab === 'generales' ? 'Crear Nueva Regla General' : 'Crear Nueva Regla de Juez')
-                                            : (tab === 'generales' ? 'Editar Regla General' : 'Editar Regla de Juez')
+                                            ? (tab === 'generales' ? 'Crear Nueva Regla General' : (tab === 'jueces' ? 'Crear Nueva Regla de Juez' : 'Crear Nueva Anulación'))
+                                            : (tab === 'generales' ? 'Editar Regla General' : (tab === 'jueces' ? 'Editar Regla de Juez' : 'Editar Anulación'))
                                         }
                                     </h3>
                                     <p className={styles.detailSubtitle}>
@@ -272,25 +284,25 @@ export default function TraduccionesManager() {
                             {/* Campo Nombre */}
                             <div className={styles.formGroup}>
                                 <label className={styles.formLabel}>
-                                    {tab === 'generales' ? 'Nombre a Traducir / Coincidencia' : 'Nombre del Juez / Coincidencia'}
+                                    {tab === 'generales' ? 'Nombre a Traducir / Coincidencia' : (tab === 'jueces' ? 'Nombre del Juez / Coincidencia' : 'Nombre Descriptivo de la Anulación')}
                                 </label>
                                 <input
                                     className={styles.formInput}
-                                    placeholder={tab === 'generales' ? "Ej. José López o López José" : "Ej. Juez Perez"}
+                                    placeholder={tab === 'generales' ? "Ej. José López o López José" : (tab === 'jueces' ? "Ej. Juez Perez" : "Ej. Correo no válido")}
                                     value={form.nombre}
                                     onChange={e => setForm(prev => ({ ...prev, nombre: e.target.value }))}
                                 />
                                 <span className={styles.formHelp}>
                                     {tab === 'generales' 
                                         ? 'El scraper buscará coincidencias sin importar el orden de las palabras, mayúsculas, minúsculas o acentos.'
-                                        : 'El scraper detectará el nombre del juez y sustituirá el correo por los indicados a continuación.'
+                                        : (tab === 'jueces' ? 'El scraper detectará el nombre del juez y sustituirá el correo por los indicados a continuación.' : 'Nombre para identificar por qué se anula este correo (opcional pero recomendado).')
                                     }
                                 </span>
                             </div>
 
                             {/* Campo Agregar Email */}
                             <div className={styles.formGroup}>
-                                <label className={styles.formLabel}>Destinatarios de Correo (Notificaciones)</label>
+                                <label className={styles.formLabel}>{tab === 'anulaciones' ? 'Correos a Anular' : 'Destinatarios de Correo (Notificaciones)'}</label>
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <input
                                         className={styles.formInput}
@@ -365,7 +377,7 @@ export default function TraduccionesManager() {
                             <p className={styles.emptyStateText}>
                                 {tab === 'generales'
                                     ? 'Seleccione una regla general del panel izquierdo para ver o modificar su configuración, o cree una nueva.'
-                                    : 'Seleccione una regla de juez del panel izquierdo para ver o modificar su configuración, o cree una nueva.'
+                                    : (tab === 'jueces' ? 'Seleccione una regla de juez del panel izquierdo para ver o modificar su configuración, o cree una nueva.' : 'Seleccione una anulación del panel izquierdo para ver o modificar su configuración, o cree una nueva.')
                                 }
                             </p>
                         </div>

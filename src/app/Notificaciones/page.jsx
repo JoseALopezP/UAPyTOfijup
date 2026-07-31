@@ -4,6 +4,7 @@ import getDocument from '@/firebase/firestore/getDocument';
 import { addOrUpdateObject } from '@/firebase/firestore/addOrUpdateObject';
 import { removeObject } from '@/firebase/firestore/removeObject';
 import getCollection from '@/firebase/firestore/getCollection';
+import replaceDocument from '@/firebase/firestore/replaceDocument';
 import styles from './Notificaciones.module.css';
 import TrasladosTab from './components/TrasladosTab';
 import TraduccionesManager from '../Traducciones-Notificaciones/components/TraduccionesManager';
@@ -12,7 +13,7 @@ import { DataContextProvider } from "@/context/DataContext";
 
 export default function NotificacionesPage() {
     // Shared states
-    const [activeTab, setActiveTab] = useState('citaciones'); // 'citaciones' | 'traslados' | 'traducciones' | 'comisarias'
+    const [activeTab, setActiveTab] = useState('citaciones'); // 'citaciones' | 'oficios' | 'traslados' | 'traducciones' | 'comisarias'
     const [searchTerm, setSearchTerm] = useState('');
     
     // Workspace states (Mails)
@@ -21,6 +22,12 @@ export default function NotificacionesPage() {
     const [wsExpandedRow, setWsExpandedRow] = useState(null);
     const [wsEditingId, setWsEditingId] = useState(null);
     const [wsEditValue, setWsEditValue] = useState('');
+
+    // Reenvíos states
+    const [resendModalItem, setResendModalItem] = useState(null);
+    const [resendEmailInput, setResendEmailInput] = useState('');
+    const [resendError, setResendError] = useState('');
+    const [resendSaving, setResendSaving] = useState(false);
 
     // Comisarías states
     const [comisarias, setComisarias] = useState({});
@@ -83,7 +90,7 @@ export default function NotificacionesPage() {
     };
 
     useEffect(() => {
-        if (activeTab === 'citaciones') {
+        if (activeTab === 'citaciones' || activeTab === 'oficios') {
             fetchWorkspaceData();
         }
     }, [activeTab]);
@@ -159,10 +166,105 @@ export default function NotificacionesPage() {
         }
     };
 
+    const handleClearAll = async () => {
+        const firstConfirm = window.confirm("⚠️ ADVERTENCIA: Estás a punto de ELIMINAR TODOS los documentos (citaciones, oficios y mails). ¿Deseas continuar?");
+        if (!firstConfirm) return;
+        
+        const secondConfirm = window.confirm("🚨 SEGUNDA VERIFICACIÓN: Esta acción NO se puede deshacer. ¿Estás absolutamente seguro de que quieres BORRAR TODO?");
+        if (!secondConfirm) return;
+        
+        setWorkspaceLoading(true);
+        try {
+            await replaceDocument('anotificar', 'citaciones', {});
+            await replaceDocument('anotificar', 'oficios', {});
+            await replaceDocument('anotificar', 'mails', {});
+            alert("✅ Todos los documentos han sido eliminados correctamente.");
+            fetchWorkspaceData();
+        } catch (error) {
+            console.error("Error al limpiar documentos:", error);
+            alert("❌ Ocurrió un error al intentar eliminar los documentos.");
+            setWorkspaceLoading(false);
+        }
+    };
+
+    const parseEmails = (input) => {
+        if (!input) return [];
+        const parts = input.split(/[,;\s\n]+/);
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const valid = parts
+            .map(p => p.trim().toLowerCase())
+            .filter(p => p && emailRegex.test(p));
+        return Array.from(new Set(valid));
+    };
+
+    const handleSaveResend = async (e) => {
+        e.preventDefault();
+        if (!resendModalItem) return;
+
+        const { customId, itemData } = resendModalItem;
+        const parsedEmails = parseEmails(resendEmailInput);
+
+        if (parsedEmails.length === 0) {
+            setResendError('Debes ingresar al menos un email válido.');
+            return;
+        }
+
+        setResendSaving(true);
+        setResendError('');
+
+        try {
+            const existingNumbers = Object.keys(itemData || {})
+                .filter(key => /^resend\d+$/.test(key))
+                .map(key => parseInt(key.replace('resend', ''), 10))
+                .filter(num => !isNaN(num));
+
+            const nextNum = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+            const newResendKey = `resend${nextNum}`;
+
+            const newResendData = {
+                emails: parsedEmails,
+                notificada: false,
+                comprobante: false
+            };
+
+            const sourceDoc = itemData._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones');
+
+            await addOrUpdateObject('anotificar', sourceDoc, customId, { [newResendKey]: newResendData });
+
+            setWorkspaceData(prev => {
+                const currentItem = prev[customId] || itemData;
+                return {
+                    ...prev,
+                    [customId]: {
+                        ...currentItem,
+                        [newResendKey]: newResendData
+                    }
+                };
+            });
+
+            setResendModalItem(null);
+            setResendEmailInput('');
+        } catch (err) {
+            console.error('Error al guardar reenvío:', err);
+            setResendError('Ocurrió un error al guardar el reenvío.');
+        } finally {
+            setResendSaving(false);
+        }
+    };
+
+
     const activeWorkspaceData = useMemo(() => {
-        if (activeTab === 'citaciones') {
+        if (activeTab === 'citaciones' || activeTab === 'oficios') {
             const itemsRaw = workspaceData || {};
-            const items = Object.entries(itemsRaw).map(([id, val]) => ({ customId: id, data: val }));
+            const items = Object.entries(itemsRaw).map(([id, val]) => ({ customId: id, data: val }))
+                .filter(item => {
+                    if (activeTab === 'citaciones') {
+                        return item.data._sourceDoc !== 'oficios';
+                    } else if (activeTab === 'oficios') {
+                        return item.data._sourceDoc === 'oficios';
+                    }
+                    return true;
+                });
             
             return items.sort((a, b) => {
                 const legA = a.data?.numeroLeg || '';
@@ -187,7 +289,8 @@ export default function NotificacionesPage() {
             <header className={styles.header}>
                 <h1 className={styles.title}>Sistema de Notificaciones</h1>
                 <div className={styles.tabsContainer} style={{ flexWrap: 'wrap', gap: '8px' }}>
-                    <button className={`${styles.tabBtn} ${activeTab === 'citaciones' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('citaciones'); setSearchTerm(''); }}>Citaciones y Oficios</button>
+                    <button className={`${styles.tabBtn} ${activeTab === 'citaciones' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('citaciones'); setSearchTerm(''); }}>Citaciones</button>
+                    <button className={`${styles.tabBtn} ${activeTab === 'oficios' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('oficios'); setSearchTerm(''); }}>Oficios</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'traslados' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('traslados'); setSearchTerm(''); }}>Traslados y Videoconferencias</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'traducciones' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('traducciones'); setSearchTerm(''); }}>Traducciones</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'comisarias' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('comisarias'); setSearchTerm(''); }}>Comisarías</button>
@@ -363,15 +466,16 @@ export default function NotificacionesPage() {
                     </div>
                 )}
 
-                {activeTab === 'citaciones' && (
+                {(activeTab === 'citaciones' || activeTab === 'oficios') && (
                     <div className={styles.tabContent} style={{ padding: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
                         <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <h2 className={styles.sectionTitle} style={{ margin: 0, color: 'var(--text-color)' }}>
-                                    Mails de Citaciones y Oficios
+                                    {activeTab === 'citaciones' ? 'Citaciones' : 'Oficios'}
                                 </h2>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button onClick={handleClearAll} style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#ef4444', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>LIMPIAR TODO</button>
                                 <button onClick={fetchWorkspaceData} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>ACTUALIZAR</button>
                             </div>
                         </div>
@@ -406,13 +510,21 @@ export default function NotificacionesPage() {
                                             const bgColor = itemData.manual ? 'var(--manual-bg)' : null;
                                             const rowStyle = { borderBottom: '1px solid var(--border-color)', ...(borderColor ? { backgroundColor: bgColor, borderLeft: `3px solid ${borderColor}` } : {}) };
 
+                                            const resendKeys = Object.keys(itemData || {})
+                                                .filter(key => /^resend\d+$/.test(key))
+                                                .sort((a, b) => {
+                                                    const numA = parseInt(a.replace('resend', ''), 10);
+                                                    const numB = parseInt(b.replace('resend', ''), 10);
+                                                    return numA - numB;
+                                                });
+
                                             return (
                                                 <React.Fragment key={customId}>
                                                     <tr style={rowStyle}>
                                                         <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--text-color)' }}>
                                                             {itemData.numeroLeg}
                                                             <div style={{ fontSize: '13px', color: 'var(--accent-color)', fontWeight: 600, marginTop: '5px', cursor: 'pointer' }} onClick={() => setWsExpandedRow(wsExpandedRow === customId ? null : customId)}>
-                                                                {wsExpandedRow === customId ? '▲ Ocultar' : '▼ Ver Texto'}
+                                                                {wsExpandedRow === customId ? '▲ Ocultar' : '▼ Ver Detalle'}
                                                             </div>
                                                         </td>
                                                         <td style={{ padding: '10px 12px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-color)' }}>
@@ -427,6 +539,37 @@ export default function NotificacionesPage() {
                                                                     <input autoFocus value={wsEditValue} onChange={e => setWsEditValue(e.target.value)} onBlur={() => { handleUpdateField(customId, itemData, 'emails', wsEditValue.split(',').map(s=>s.trim()).filter(Boolean)); setWsEditingId(null); }} onKeyDown={e => { if (e.key === 'Enter') { handleUpdateField(customId, itemData, 'emails', wsEditValue.split(',').map(s=>s.trim()).filter(Boolean)); setWsEditingId(null); }}} style={{ width: '100%', padding: '4px', border: '1px solid var(--border-color)', background: 'var(--input-bg)', color: 'var(--text-color)' }} />
                                                                 ) : (itemData.emails?.length ? itemData.emails.join(', ') : 'Sin mail')}
                                                             </div>
+                                                            {resendKeys.length > 0 && (
+                                                                <div style={{ marginTop: '6px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                                                                    {resendKeys.map(rKey => {
+                                                                        const num = rKey.replace('resend', '');
+                                                                        const rObj = itemData[rKey] || {};
+                                                                        const isDone = rObj.notificada && rObj.comprobante;
+                                                                        return (
+                                                                            <span 
+                                                                                key={rKey} 
+                                                                                style={{
+                                                                                    fontSize: '10px',
+                                                                                    fontWeight: 700,
+                                                                                    padding: '1px 5px',
+                                                                                    borderRadius: '3px',
+                                                                                    background: isDone ? '#e5e7eb' : '#fef3c7',
+                                                                                    color: isDone ? '#374151' : '#92400e',
+                                                                                    border: '1px solid var(--border-color)',
+                                                                                    cursor: 'pointer'
+                                                                                }}
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setWsExpandedRow(customId);
+                                                                                }}
+                                                                                title={`Reenvío #${num}: ${rObj.emails?.join(', ') || ''}`}
+                                                                            >
+                                                                                🔄 R{num} {rObj.notificada ? '✓' : '⏳'}
+                                                                            </span>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )}
                                                         </td>
 
                                                         <td style={{ padding: '10px 12px', fontSize: '12px' }}>
@@ -465,9 +608,110 @@ export default function NotificacionesPage() {
                                                     </tr>
                                                     {wsExpandedRow === customId && (
                                                         <tr style={{ background: 'var(--card-header-bg)' }}>
-                                                            <td colSpan={9} style={{ padding: '14px' }}>
-                                                                <div style={{ fontSize: '13px', fontFamily: 'monospace', color: 'var(--text-color)', whiteSpace: 'pre-wrap', maxHeight: '280px', overflowY: 'auto', padding: '10px', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
-                                                                    {itemData.text || 'Sin texto de documento.'}
+                                                            <td colSpan={9} style={{ padding: '16px' }}>
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                                                    {/* Texto del documento */}
+                                                                    <div>
+                                                                        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                                            Texto de la Notificación
+                                                                        </div>
+                                                                        <div style={{ fontSize: '13px', fontFamily: 'monospace', color: 'var(--text-color)', whiteSpace: 'pre-wrap', maxHeight: '220px', overflowY: 'auto', padding: '10px', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
+                                                                            {itemData.text || 'Sin texto de documento.'}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Sección de Reenvíos */}
+                                                                    <div style={{ background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '14px' }}>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                                                            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                                <span>🔄 Reenvíos</span>
+                                                                                {resendKeys.length > 0 && (
+                                                                                    <span style={{ fontSize: '11px', background: 'var(--surface-color)', padding: '2px 8px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                                                                                        {resendKeys.length}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    setResendModalItem({ customId, itemData });
+                                                                                    setResendEmailInput('');
+                                                                                    setResendError('');
+                                                                                }}
+                                                                                style={{
+                                                                                    padding: '6px 12px',
+                                                                                    fontSize: '12px',
+                                                                                    fontWeight: 700,
+                                                                                    background: 'var(--accent-color)',
+                                                                                    color: '#fff',
+                                                                                    border: 'none',
+                                                                                    borderRadius: '4px',
+                                                                                    cursor: 'pointer'
+                                                                                }}
+                                                                            >
+                                                                                + Agregar reenvío
+                                                                            </button>
+                                                                        </div>
+
+                                                                        {resendKeys.length === 0 ? (
+                                                                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 0' }}>
+                                                                                No hay reenvíos cargados para esta notificación.
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                                {resendKeys.map(rKey => {
+                                                                                    const rObj = itemData[rKey] || {};
+                                                                                    const num = rKey.replace('resend', '');
+                                                                                    const emails = Array.isArray(rObj.emails) ? rObj.emails : [];
+
+                                                                                    return (
+                                                                                        <div key={rKey} style={{ padding: '10px 14px', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
+                                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+                                                                                                <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-color)' }}>
+                                                                                                    Reenvío #{num}
+                                                                                                </div>
+                                                                                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                                                                    {/* Indicador Notificada */}
+                                                                                                    <span style={{
+                                                                                                        fontSize: '11px',
+                                                                                                        fontWeight: 600,
+                                                                                                        padding: '2px 8px',
+                                                                                                        borderRadius: '4px',
+                                                                                                        background: rObj.notificada ? '#dcfce7' : '#f3f4f6',
+                                                                                                        color: rObj.notificada ? '#166534' : '#4b5563',
+                                                                                                        border: rObj.notificada ? '1px solid #86efac' : '1px solid #d1d5db',
+                                                                                                        display: 'inline-flex',
+                                                                                                        alignItems: 'center',
+                                                                                                        gap: '4px'
+                                                                                                    }}>
+                                                                                                        {rObj.notificada ? '✓ Enviado' : '⏳ Pendiente Envío'}
+                                                                                                    </span>
+                                                                                                    {/* Indicador Comprobante */}
+                                                                                                    <span style={{
+                                                                                                        fontSize: '11px',
+                                                                                                        fontWeight: 600,
+                                                                                                        padding: '2px 8px',
+                                                                                                        borderRadius: '4px',
+                                                                                                        background: rObj.comprobante ? '#dbeafe' : '#f3f4f6',
+                                                                                                        color: rObj.comprobante ? '#1e40af' : '#4b5563',
+                                                                                                        border: rObj.comprobante ? '1px solid #93c5fd' : '1px solid #d1d5db',
+                                                                                                        display: 'inline-flex',
+                                                                                                        alignItems: 'center',
+                                                                                                        gap: '4px'
+                                                                                                    }}>
+                                                                                                        {rObj.comprobante ? '✓ Comprobante' : '⏳ Pendiente Comprobante'}
+                                                                                                    </span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div style={{ fontSize: '13px', color: 'var(--text-color)' }}>
+                                                                                                <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>Destinatarios: </span>
+                                                                                                {emails.length > 0 ? emails.join(', ') : <span style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>Sin destinatarios</span>}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -482,6 +726,114 @@ export default function NotificacionesPage() {
                     </div>
                 )}
             </main>
+
+            {/* Modal para Agregar Reenvío */}
+            {resendModalItem && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '16px'
+                }}>
+                    <div style={{
+                        background: 'var(--surface-color)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '8px',
+                        width: '100%',
+                        maxWidth: '480px',
+                        padding: '24px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        color: 'var(--text-color)'
+                    }}>
+                        <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700 }}>
+                            Agregar Reenvío
+                        </h3>
+                        <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+                            Legajo: <strong>{resendModalItem.itemData.numeroLeg || '—'}</strong> — {resendModalItem.itemData.ayp || resendModalItem.itemData.caratula || ''}
+                        </p>
+
+                        <form onSubmit={handleSaveResend}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>
+                                    Emails de los nuevos destinatarios
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    autoFocus
+                                    placeholder="Ej. destinatario1@dominio.com, destinatario2@dominio.com"
+                                    value={resendEmailInput}
+                                    onChange={e => {
+                                        setResendEmailInput(e.target.value);
+                                        if (resendError) setResendError('');
+                                    }}
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '4px',
+                                        border: '1px solid var(--input-border)',
+                                        background: 'var(--input-bg)',
+                                        color: 'var(--text-color)',
+                                        fontSize: '14px',
+                                        fontFamily: 'inherit',
+                                        resize: 'vertical'
+                                    }}
+                                />
+                                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                                    Separá los emails por coma, espacio o salto de línea.
+                                </span>
+                            </div>
+
+                            {resendError && (
+                                <div style={{ color: '#ef4444', fontSize: '12px', marginBottom: '12px', fontWeight: 600 }}>
+                                    ⚠️ {resendError}
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                <button
+                                    type="button"
+                                    disabled={resendSaving}
+                                    onClick={() => setResendModalItem(null)}
+                                    style={{
+                                        padding: '8px 16px',
+                                        background: 'var(--surface-color)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '4px',
+                                        color: 'var(--text-color)',
+                                        fontSize: '13px',
+                                        fontWeight: 600,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={resendSaving}
+                                    style={{
+                                        padding: '8px 16px',
+                                        background: 'var(--accent-color)',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        color: '#fff',
+                                        fontSize: '13px',
+                                        fontWeight: 600,
+                                        cursor: resendSaving ? 'wait' : 'pointer'
+                                    }}
+                                >
+                                    {resendSaving ? 'Guardando...' : 'Guardar Reenvío'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

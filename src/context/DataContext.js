@@ -49,6 +49,7 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [abogados, setAbogados] = useState(defaultValue);
     const [traducciones, setTraducciones] = useState(defaultValue);
     const [traduccionesJueces, setTraduccionesJueces] = useState(defaultValue);
+    const [anulaciones, setAnulaciones] = useState(defaultValue);
 
     const fiscalesList = React.useMemo(() => {
         if (!abogados || !Array.isArray(abogados)) return [];
@@ -847,6 +848,45 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         await saveTraduccionesJuecesList(newList);
     };
 
+    const updateAnulaciones = async () => {
+        try {
+            const data = await getDocument('notificaciones', 'anulaciones');
+            if (data && data.list) {
+                setAnulaciones(data.list);
+            } else {
+                setAnulaciones([]);
+            }
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const saveAnulacionesList = async (newList) => {
+        try {
+            await replaceDocument('notificaciones', 'anulaciones', { list: newList });
+            setAnulaciones(newList);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const addAnulacion = async (newAnulacion) => {
+        const newList = [newAnulacion, ...anulaciones];
+        await saveAnulacionesList(newList);
+    };
+
+    const updateAnulacionData = async (updatedAnulacion) => {
+        const newList = anulaciones.map(a => 
+            (a.id === updatedAnulacion.id) ? updatedAnulacion : a
+        );
+        await saveAnulacionesList(newList);
+    };
+
+    const deleteAnulacion = async (id) => {
+        const newList = anulaciones.filter(a => a.id !== id);
+        await saveAnulacionesList(newList);
+    };
+
     const context = {
         updateByDate, updateByDateView, addAudiencia, updateLegajosDatabase, addSorteo, getSorteoList, deleteAudiencia, updateData, addDesplegable, deleteDesplegables,
         updateDesplegables, addFeriado, deleteFeriado, updateFeriados, deleteImportantDate, updateImportantDates, addOrUpdateModeloMinuta, removeModeloMinuta, updateModelosMinuta, updateByLegajo, moveBetween, addReleaseNote, updateReleaseNotes, getByDate,
@@ -856,9 +896,10 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateAbogados, addAbogado, updateAbogadoData, deleteAbogado, importAbogados,
         updateTraducciones, saveTraduccionesList, addTraduccion, updateTraduccionData, deleteTraduccion,
         updateTraduccionesJueces, saveTraduccionesJuecesList, addTraduccionJuez, updateTraduccionJuezData, deleteTraduccionJuez,
+        updateAnulaciones, saveAnulacionesList, addAnulacion, updateAnulacionData, deleteAnulacion,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados, querellaAbogadosList,
-        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList, traducciones, traduccionesJueces
+        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList, traducciones, traduccionesJueces, anulaciones
     };
     return <Provider value={context}>{children}</Provider>;
 };
