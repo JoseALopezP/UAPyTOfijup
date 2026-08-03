@@ -94,7 +94,50 @@ export default function NotificacionesPage() {
         if (activeTab === 'citaciones' || activeTab === 'oficios') {
             fetchWorkspaceData();
         }
+        if (activeTab === 'verificacion') {
+            fetchVerificacionData();
+        }
     }, [activeTab]);
+
+    // Verificación states
+    const [verificacionData, setVerificacionData] = useState(null);
+    const [verificacionLoading, setVerificacionLoading] = useState(true);
+
+    const fetchVerificacionData = async () => {
+        setVerificacionLoading(true);
+        try {
+            const data = await getDocument('notificaciones', 'verificacionGenerales');
+            setVerificacionData(data || { fecha: '', completado: false, fallos: [] });
+        } catch (error) {
+            console.error("Error fetching verificacion:", error);
+            setVerificacionData({ fecha: '', completado: false, fallos: [] });
+        } finally {
+            setVerificacionLoading(false);
+        }
+    };
+
+    const handleVerificacionFechaChange = async (nuevaFecha) => {
+        const data = { fecha: nuevaFecha, completado: false, fallos: [], completadoEn: null };
+        setVerificacionData(data);
+        try {
+            await replaceDocument('notificaciones', 'verificacionGenerales', data);
+        } catch (error) {
+            console.error("Error guardando fecha de verificacion:", error);
+            alert("Error al guardar la fecha de verificación.");
+        }
+    };
+
+    const handleForzarReverificacion = async () => {
+        if (!verificacionData) return;
+        const data = { ...verificacionData, completado: false };
+        setVerificacionData(data);
+        try {
+            await replaceDocument('notificaciones', 'verificacionGenerales', data);
+        } catch (error) {
+            console.error("Error forzando re-verificacion:", error);
+            alert("Error al forzar la re-verificación.");
+        }
+    };
 
     const fetchWorkspaceData = async () => {
         setWorkspaceLoading(true);
@@ -319,6 +362,7 @@ export default function NotificacionesPage() {
                     <button className={`${styles.tabBtn} ${activeTab === 'traslados' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('traslados'); setSearchTerm(''); }}>Traslados y Videoconferencias</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'traducciones' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('traducciones'); setSearchTerm(''); }}>Traducciones</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'comisarias' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('comisarias'); setSearchTerm(''); }}>Comisarías</button>
+                    <button className={`${styles.tabBtn} ${activeTab === 'verificacion' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('verificacion'); setSearchTerm(''); }}>Verificación</button>
                 </div>
             </header>
 
@@ -772,6 +816,100 @@ export default function NotificacionesPage() {
                                 </table>
                             )}
                         </div>
+                    </div>
+                )}
+
+                {activeTab === 'verificacion' && (
+                    <div className={styles.tabContent} style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {verificacionLoading || !verificacionData ? (
+                            <div className={styles.loading}>Cargando datos...</div>
+                        ) : (
+                            <>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>Fecha a verificar</label>
+                                        <input
+                                            type="date"
+                                            value={verificacionData.fecha || ''}
+                                            onChange={e => handleVerificacionFechaChange(e.target.value)}
+                                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid var(--input-border)', fontSize: '14px', background: 'var(--input-bg)', color: 'var(--text-color)' }}
+                                        />
+                                    </div>
+
+                                    <span style={{
+                                        fontSize: '13px',
+                                        fontWeight: 700,
+                                        padding: '6px 14px',
+                                        borderRadius: '6px',
+                                        background: verificacionData.completado ? '#dcfce7' : '#fef9c3',
+                                        color: verificacionData.completado ? '#166534' : '#854d0e',
+                                        border: verificacionData.completado ? '1px solid #86efac' : '1px solid #fde047',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}>
+                                        {verificacionData.completado ? '✅ Revisado' : '⏳ Pendiente'}
+                                    </span>
+
+                                    {verificacionData.completado && (
+                                        <button
+                                            onClick={handleForzarReverificacion}
+                                            style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                                        >
+                                            FORZAR RE-VERIFICACIÓN
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={fetchVerificacionData}
+                                        style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                                    >
+                                        ACTUALIZAR
+                                    </button>
+                                </div>
+
+                                {!verificacionData.fecha ? (
+                                    <div className={styles.emptyState}>Elegí una fecha para ejecutar la verificación.</div>
+                                ) : !verificacionData.completado ? (
+                                    <div className={styles.emptyState}>Verificación pendiente de ejecutarse para {verificacionData.fecha}.</div>
+                                ) : (Array.isArray(verificacionData.fallos) && verificacionData.fallos.length === 0) ? (
+                                    <div style={{ padding: '16px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '6px', color: '#166534', fontSize: '14px', fontWeight: 600 }}>
+                                        ✅ No se encontraron fallos para {verificacionData.fecha}.
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {Object.entries(
+                                            (verificacionData.fallos || []).reduce((acc, fallo) => {
+                                                const key = fallo.numeroLeg || 'Sin legajo';
+                                                if (!acc[key]) acc[key] = [];
+                                                acc[key].push(fallo);
+                                                return acc;
+                                            }, {})
+                                        ).map(([numeroLeg, fallos]) => (
+                                            <div key={numeroLeg} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px 16px' }}>
+                                                <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-color)', marginBottom: '8px' }}>
+                                                    {numeroLeg}
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                    {fallos.map((fallo, idx) => (
+                                                        <div key={idx} style={{ fontSize: '13px', color: '#ef4444', display: 'flex', gap: '6px' }}>
+                                                            <span>⚠️</span>
+                                                            <span>
+                                                                {fallo.motivo === 'falta_email'
+                                                                    ? `Falta notificar a: ${fallo.email}`
+                                                                    : fallo.motivo === 'falta_documento'
+                                                                        ? `A ${fallo.email} le falta el documento: ${fallo.documento || '(desconocido)'}`
+                                                                        : (fallo.detalle || 'Fallo sin descripción')}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 )}
             </main>
