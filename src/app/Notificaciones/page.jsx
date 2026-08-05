@@ -127,6 +127,44 @@ export default function NotificacionesPage() {
         }
     };
 
+    /**
+     * Arma la lista de notificaciones con fallas AGRUPADA POR LINK.
+     *
+     * Una notificación puede tener varios destinatarios sin notificar; el link tiene que
+     * aparecer UNA sola vez con todos sus mails al lado, no repetido por cada mail. Y un
+     * legajo puede tener varias notificaciones, cada una con su propio link. Por eso las
+     * tres cantidades (legajos, notificaciones/links y mails) son distintas entre sí.
+     *
+     * C.O.N.O. ya envía esto listo en `notificacionesConFallas`. El agrupado a mano desde
+     * `fallos` es solo para documentos viejos, guardados antes de que la verificación
+     * empezara a mandar el link — sin esto, esos resultados se verían vacíos.
+     */
+    const agruparNotificacionesConFallas = (data) => {
+        if (!data) return [];
+        if (Array.isArray(data.notificacionesConFallas) && data.notificacionesConFallas.length > 0) {
+            return data.notificacionesConFallas;
+        }
+        const porLink = new Map();
+        for (const fallo of (data.fallos || [])) {
+            const clave = fallo.link || `${fallo.numeroLeg}::sin-link`;
+            if (!porLink.has(clave)) {
+                porLink.set(clave, {
+                    numeroLeg: fallo.numeroLeg,
+                    link: fallo.link || '',
+                    emailsFaltantes: [],
+                    documentosFaltantes: []
+                });
+            }
+            const grupo = porLink.get(clave);
+            if (fallo.motivo === 'falta_email') {
+                if (!grupo.emailsFaltantes.includes(fallo.email)) grupo.emailsFaltantes.push(fallo.email);
+            } else if (fallo.documento) {
+                grupo.documentosFaltantes.push({ email: fallo.email, documento: fallo.documento });
+            }
+        }
+        return Array.from(porLink.values());
+    };
+
     const handleForzarReverificacion = async () => {
         if (!verificacionData) return;
         const data = { ...verificacionData, completado: false };
@@ -873,39 +911,104 @@ export default function NotificacionesPage() {
                                 ) : !verificacionData.completado ? (
                                     <div className={styles.emptyState}>Verificación pendiente de ejecutarse para {verificacionData.fecha}.</div>
                                 ) : (Array.isArray(verificacionData.fallos) && verificacionData.fallos.length === 0) ? (
-                                    <div style={{ padding: '16px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '6px', color: '#166534', fontSize: '14px', fontWeight: 600 }}>
-                                        ✅ No se encontraron fallos para {verificacionData.fecha}.
-                                    </div>
+                                    // El verde solo es "todo limpio" si además NO quedaron legajos sin
+                                    // verificar; si los hay, decir "no se encontraron fallos" a secas
+                                    // daría por notificado algo que en realidad no se pudo comprobar.
+                                    (Array.isArray(verificacionData.legajosNoVerificables) && verificacionData.legajosNoVerificables.length > 0) ? (
+                                        <div style={{ padding: '16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#334155', fontSize: '14px', fontWeight: 600 }}>
+                                            No se encontraron fallas en lo que sí se pudo verificar del {verificacionData.fecha}, pero quedaron legajos sin comprobar (abajo).
+                                        </div>
+                                    ) : (
+                                        <div style={{ padding: '16px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '6px', color: '#166534', fontSize: '14px', fontWeight: 600 }}>
+                                            ✅ No se encontraron fallos para {verificacionData.fecha}.
+                                        </div>
+                                    )
                                 ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                         {Object.entries(
-                                            (verificacionData.fallos || []).reduce((acc, fallo) => {
-                                                const key = fallo.numeroLeg || 'Sin legajo';
+                                            agruparNotificacionesConFallas(verificacionData).reduce((acc, notif) => {
+                                                const key = notif.numeroLeg || 'Sin legajo';
                                                 if (!acc[key]) acc[key] = [];
-                                                acc[key].push(fallo);
+                                                acc[key].push(notif);
                                                 return acc;
                                             }, {})
-                                        ).map(([numeroLeg, fallos]) => (
+                                        ).map(([numeroLeg, notificaciones]) => (
                                             <div key={numeroLeg} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px 16px' }}>
                                                 <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-color)', marginBottom: '8px' }}>
                                                     {numeroLeg}
+                                                    {notificaciones.length > 1 && (
+                                                        <span style={{ fontWeight: 500, fontSize: '12px', color: 'var(--text-muted, #6b7280)', marginLeft: '8px' }}>
+                                                            {notificaciones.length} notificaciones
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                                    {fallos.map((fallo, idx) => (
-                                                        <div key={idx} style={{ fontSize: '13px', color: '#ef4444', display: 'flex', gap: '6px' }}>
-                                                            <span>⚠️</span>
-                                                            <span>
-                                                                {fallo.motivo === 'falta_email'
-                                                                    ? `Falta notificar a: ${fallo.email}`
-                                                                    : fallo.motivo === 'falta_documento'
-                                                                        ? `A ${fallo.email} le falta el documento: ${fallo.documento || '(desconocido)'}`
-                                                                        : (fallo.detalle || 'Fallo sin descripción')}
-                                                            </span>
+
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                    {notificaciones.map((notif, nIdx) => (
+                                                        <div
+                                                            key={notif.link || nIdx}
+                                                            style={{
+                                                                borderLeft: '3px solid #fca5a5',
+                                                                paddingLeft: '10px',
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                gap: '4px'
+                                                            }}
+                                                        >
+                                                            {/* El link va UNA vez por notificación, no por cada mail faltante. */}
+                                                            {notif.link ? (
+                                                                <a
+                                                                    href={notif.link}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ fontSize: '13px', fontWeight: 600, color: '#2563eb', textDecoration: 'none' }}
+                                                                >
+                                                                    🔗 Abrir notificación
+                                                                </a>
+                                                            ) : (
+                                                                <span style={{ fontSize: '12px', color: 'var(--text-muted, #6b7280)' }}>
+                                                                    (sin link — verificación anterior al guardado de links)
+                                                                </span>
+                                                            )}
+
+                                                            {(notif.emailsFaltantes || []).map((email, i) => (
+                                                                <div key={`e${i}`} style={{ fontSize: '13px', color: '#ef4444', display: 'flex', gap: '6px' }}>
+                                                                    <span>⚠️</span>
+                                                                    <span>Falta notificar a: {email}</span>
+                                                                </div>
+                                                            ))}
+
+                                                            {(notif.documentosFaltantes || []).map((d, i) => (
+                                                                <div key={`d${i}`} style={{ fontSize: '13px', color: '#ef4444', display: 'flex', gap: '6px' }}>
+                                                                    <span>⚠️</span>
+                                                                    <span>A {d.email} le falta el documento: {d.documento || '(desconocido)'}</span>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
+                                )}
+
+                                {/* Legajos que NO se pudieron verificar. Van aparte y NO cuentan como
+                                    "sin problemas": la verificación no logró comprobar nada de ellos,
+                                    así que hay que volver a correrla para cubrirlos. Mostrarlos como
+                                    limpios sería exactamente el error que se quiso evitar. */}
+                                {Array.isArray(verificacionData.legajosNoVerificables) && verificacionData.legajosNoVerificables.length > 0 && (
+                                    <div style={{ marginTop: '16px', padding: '12px 16px', background: '#fef9c3', border: '1px solid #fde047', borderRadius: '6px' }}>
+                                        <div style={{ fontWeight: 700, fontSize: '13px', color: '#854d0e', marginBottom: '6px' }}>
+                                            ❔ {verificacionData.legajosNoVerificables.length} legajo(s) sin verificar
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: '#854d0e', marginBottom: '8px' }}>
+                                            No se pudo comprobar si fueron notificados. No están libres de fallas: hay que volver a correr la verificación.
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: '#854d0e', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                            {verificacionData.legajosNoVerificables.map((leg, i) => (
+                                                <span key={i} style={{ background: '#fef3c7', border: '1px solid #fde047', borderRadius: '4px', padding: '2px 6px' }}>{leg}</span>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </>
