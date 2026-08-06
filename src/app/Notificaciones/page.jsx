@@ -103,27 +103,160 @@ export default function NotificacionesPage() {
     const [verificacionData, setVerificacionData] = useState(null);
     const [verificacionLoading, setVerificacionLoading] = useState(true);
 
+    // Revisión manual de fallas: por cada notificación (link) con fallas, el operador
+    // marca si el hallazgo está bien indicado (true) o mal indicado / falso positivo
+    // (false), con un comentario opcional. Se guarda EN VIVO (por ítem, no con un botón
+    // de "guardar todo") en `revisionesVerificacion/{fecha}` — una colección separada de
+    // `notificaciones/verificacionGenerales`, así que sobrevive aunque esta última se
+    // resetee al cambiar de fecha o rehacer la verificación.
+    // Forma en memoria: { [claveNotificacion]: { correcto, comentario, guardando, ... } }
+    const [revisiones, setRevisiones] = useState({});
+    // Cartel de confirmación antes de cambiar de fecha o rehacer si quedan notificaciones
+    // sin marcar — para no perder revisión sin que el usuario lo haya decidido a propósito.
+    const [confirmDialog, setConfirmDialog] = useState(null); // { tipo: 'fecha'|'rehacer', nuevaFecha?, mensaje }
+
+    // Consulta de revisiones guardadas (pestaña "Revisiones"): elegís una fecha y trae lo
+    // que se guardó ese día, sin depender de que la verificación de esa fecha siga cargada.
+    const [revisionesConsultaFecha, setRevisionesConsultaFecha] = useState('');
+    const [revisionesConsultaData, setRevisionesConsultaData] = useState(null);
+    const [revisionesConsultaLoading, setRevisionesConsultaLoading] = useState(false);
+
+    /**
+     * Clave estable de una notificación para agrupar su revisión: el link de Puma (que
+     * identifica la notificación real) o, si no hay link (verificaciones guardadas antes
+     * de que se empezara a mandar el link), legajo+"sin-link" como respaldo.
+     */
+    const claveNotificacion = (notif) => notif.link || `${notif.numeroLeg}::sin-link`;
+
+    const fetchRevisionesDelDia = async (fecha) => {
+        if (!fecha) { setRevisiones({}); return; }
+        try {
+            const data = await getDocument('revisionesVerificacion', fecha);
+            setRevisiones((data && data.revisiones) || {});
+        } catch (error) {
+            console.error("Error fetching revisiones del día:", error);
+            setRevisiones({});
+        }
+    };
+
     const fetchVerificacionData = async () => {
         setVerificacionLoading(true);
         try {
             const data = await getDocument('notificaciones', 'verificacionGenerales');
-            setVerificacionData(data || { fecha: '', completado: false, fallos: [] });
+            const finalData = data || { fecha: '', completado: false, fallos: [] };
+            setVerificacionData(finalData);
+            await fetchRevisionesDelDia(finalData.fecha);
         } catch (error) {
             console.error("Error fetching verificacion:", error);
             setVerificacionData({ fecha: '', completado: false, fallos: [] });
+            setRevisiones({});
         } finally {
             setVerificacionLoading(false);
         }
     };
 
-    const handleVerificacionFechaChange = async (nuevaFecha) => {
+    /**
+     * true si hay al menos una notificación con fallas todavía sin marcar (ni bien ni mal
+     * indicada). Se usa para decidir si hace falta el cartel de confirmación antes de
+     * cambiar de fecha o rehacer — si ya está todo revisado (y por lo tanto ya guardado),
+     * no hay nada que se pueda perder y no hace falta preguntar.
+     */
+    const hayRevisionesPendientes = () => {
+        const notifs = agruparNotificacionesConFallas(verificacionData);
+        return notifs.some(notif => {
+            const rev = revisiones[claveNotificacion(notif)];
+            return !rev || rev.correcto !== true && rev.correcto !== false;
+        });
+    };
+
+    const handleVerificacionFechaChangeConfirmado = async (nuevaFecha) => {
         const data = { fecha: nuevaFecha, completado: false, fallos: [], completadoEn: null };
         setVerificacionData(data);
+        setRevisiones({});
         try {
             await replaceDocument('notificaciones', 'verificacionGenerales', data);
         } catch (error) {
             console.error("Error guardando fecha de verificacion:", error);
             alert("Error al guardar la fecha de verificación.");
+        }
+        if (nuevaFecha) fetchRevisionesDelDia(nuevaFecha);
+    };
+
+    const handleVerificacionFechaChange = (nuevaFecha) => {
+        if (hayRevisionesPendientes()) {
+            setConfirmDialog({
+                tipo: 'fecha',
+                nuevaFecha,
+                mensaje: 'Hay notificaciones con fallas sin marcar (ni como bien ni como mal indicadas) en la fecha actual. Si cambiás de fecha ahora, esas quedan sin revisar y se pierden. ¿Querés cambiar de fecha igual?'
+            });
+            return;
+        }
+        handleVerificacionFechaChangeConfirmado(nuevaFecha);
+    };
+
+    /**
+     * Guarda (o actualiza) la revisión de UNA notificación. Se guarda de inmediato en
+     * `revisionesVerificacion/{fecha}` con `addOrUpdateObject`, que solo toca esa clave del
+     * documento del día — así revisar una notificación nunca pisa la revisión de otra.
+     */
+    const guardarRevision = async (notif, cambios) => {
+        const fecha = verificacionData?.fecha;
+        if (!fecha) return;
+        const key = claveNotificacion(notif);
+        const anterior = revisiones[key] || {};
+
+        const nuevo = {
+            numeroLeg: notif.numeroLeg || '',
+            link: notif.link || '',
+            emailsFaltantes: notif.emailsFaltantes || [],
+            documentosFaltantes: notif.documentosFaltantes || [],
+            correcto: anterior.correcto ?? null,
+            comentario: anterior.comentario ?? '',
+            ...cambios,
+            revisadoEn: new Date().toISOString()
+        };
+
+        setRevisiones(prev => ({ ...prev, [key]: { ...nuevo, guardando: true } }));
+        try {
+            await addOrUpdateObject('revisionesVerificacion', fecha, key, nuevo);
+            setRevisiones(prev => ({ ...prev, [key]: { ...nuevo, guardando: false } }));
+        } catch (error) {
+            console.error("Error guardando revisión:", error);
+            setRevisiones(prev => ({ ...prev, [key]: { ...anterior, guardando: false } }));
+            alert("No se pudo guardar la revisión. Probá de nuevo.");
+        }
+    };
+
+    // El comentario se guarda al salir del campo (blur), no en cada tecla — evita una
+    // escritura a Firestore por letra tipeada. El valor mientras se escribe vive solo en
+    // el estado local (marcado con `_dirty`) hasta que se confirma el guardado.
+    const handleComentarioChange = (notif, value) => {
+        const key = claveNotificacion(notif);
+        setRevisiones(prev => ({
+            ...prev,
+            [key]: { ...(prev[key] || {}), comentario: value, _dirty: true }
+        }));
+    };
+
+    const handleComentarioBlur = (notif) => {
+        const key = claveNotificacion(notif);
+        const actual = revisiones[key];
+        if (!actual || !actual._dirty) return;
+        guardarRevision(notif, { comentario: actual.comentario || '' });
+    };
+
+    const handleBuscarRevisionesGuardadas = async (fecha) => {
+        setRevisionesConsultaFecha(fecha);
+        if (!fecha) { setRevisionesConsultaData(null); return; }
+        setRevisionesConsultaLoading(true);
+        try {
+            const data = await getDocument('revisionesVerificacion', fecha);
+            setRevisionesConsultaData(data || { revisiones: {} });
+        } catch (error) {
+            console.error("Error buscando revisiones guardadas:", error);
+            setRevisionesConsultaData({ revisiones: {} });
+        } finally {
+            setRevisionesConsultaLoading(false);
         }
     };
 
@@ -165,7 +298,7 @@ export default function NotificacionesPage() {
         return Array.from(porLink.values());
     };
 
-    const handleForzarReverificacion = async () => {
+    const handleForzarReverificacionConfirmado = async () => {
         if (!verificacionData) return;
         const data = { ...verificacionData, completado: false };
         setVerificacionData(data);
@@ -175,6 +308,17 @@ export default function NotificacionesPage() {
             console.error("Error forzando re-verificacion:", error);
             alert("Error al forzar la re-verificación.");
         }
+    };
+
+    const handleForzarReverificacion = () => {
+        if (hayRevisionesPendientes()) {
+            setConfirmDialog({
+                tipo: 'rehacer',
+                mensaje: 'Hay notificaciones con fallas sin marcar (ni como bien ni como mal indicadas). Al rehacer la verificación, esa lista se va a reemplazar y lo no revisado se pierde. ¿Querés rehacer igual?'
+            });
+            return;
+        }
+        handleForzarReverificacionConfirmado();
     };
 
     const fetchWorkspaceData = async () => {
@@ -401,6 +545,7 @@ export default function NotificacionesPage() {
                     <button className={`${styles.tabBtn} ${activeTab === 'traducciones' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('traducciones'); setSearchTerm(''); }}>Traducciones</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'comisarias' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('comisarias'); setSearchTerm(''); }}>Comisarías</button>
                     <button className={`${styles.tabBtn} ${activeTab === 'verificacion' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('verificacion'); setSearchTerm(''); }}>Verificación</button>
+                    <button className={`${styles.tabBtn} ${activeTab === 'revisiones' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('revisiones'); setSearchTerm(''); }}>Revisiones</button>
                 </div>
             </header>
 
@@ -984,6 +1129,64 @@ export default function NotificacionesPage() {
                                                                     <span>A {d.email} le falta el documento: {d.documento || '(desconocido)'}</span>
                                                                 </div>
                                                             ))}
+
+                                                            {/* Revisión manual: ¿este hallazgo está bien indicado o es un falso
+                                                                positivo? Se guarda solo, sin botón de "guardar" — ver guardarRevision. */}
+                                                            {(() => {
+                                                                const rev = revisiones[claveNotificacion(notif)] || {};
+                                                                return (
+                                                                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed var(--border-color)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                                            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>
+                                                                                ¿Está bien indicado?
+                                                                            </span>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => guardarRevision(notif, { correcto: true })}
+                                                                                style={{
+                                                                                    padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                                                                                    border: rev.correcto === true ? '1px solid #16a34a' : '1px solid var(--border-color)',
+                                                                                    background: rev.correcto === true ? '#dcfce7' : 'var(--surface-color)',
+                                                                                    color: rev.correcto === true ? '#166534' : 'var(--text-color)'
+                                                                                }}
+                                                                            >
+                                                                                ✔️ Sí, está bien
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => guardarRevision(notif, { correcto: false })}
+                                                                                style={{
+                                                                                    padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                                                                                    border: rev.correcto === false ? '1px solid #dc2626' : '1px solid var(--border-color)',
+                                                                                    background: rev.correcto === false ? '#fee2e2' : 'var(--surface-color)',
+                                                                                    color: rev.correcto === false ? '#991b1b' : 'var(--text-color)'
+                                                                                }}
+                                                                            >
+                                                                                ✖️ No, está mal
+                                                                            </button>
+                                                                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                                                                                {rev.guardando
+                                                                                    ? 'Guardando…'
+                                                                                    : (rev.correcto === true || rev.correcto === false)
+                                                                                        ? '✓ Guardado'
+                                                                                        : 'Sin revisar'}
+                                                                            </span>
+                                                                        </div>
+                                                                        <textarea
+                                                                            rows={2}
+                                                                            placeholder="Comentario (opcional) — por qué está bien o mal indicado"
+                                                                            value={rev.comentario || ''}
+                                                                            onChange={e => handleComentarioChange(notif, e.target.value)}
+                                                                            onBlur={() => handleComentarioBlur(notif)}
+                                                                            style={{
+                                                                                padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--input-border)',
+                                                                                background: 'var(--input-bg)', color: 'var(--text-color)', fontSize: '12px',
+                                                                                fontFamily: 'inherit', resize: 'vertical', maxWidth: '520px'
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                );
+                                                            })()}
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1015,7 +1218,140 @@ export default function NotificacionesPage() {
                         )}
                     </div>
                 )}
+
+                {activeTab === 'revisiones' && (
+                    <div className={styles.tabContent} style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>Fecha a consultar</label>
+                                <input
+                                    type="date"
+                                    value={revisionesConsultaFecha}
+                                    onChange={e => handleBuscarRevisionesGuardadas(e.target.value)}
+                                    style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid var(--input-border)', fontSize: '14px', background: 'var(--input-bg)', color: 'var(--text-color)' }}
+                                />
+                            </div>
+                        </div>
+
+                        {revisionesConsultaLoading ? (
+                            <div className={styles.loading}>Cargando revisiones...</div>
+                        ) : !revisionesConsultaFecha ? (
+                            <div className={styles.emptyState}>Elegí una fecha para ver las revisiones guardadas ese día.</div>
+                        ) : (() => {
+                            const lista = Object.entries((revisionesConsultaData && revisionesConsultaData.revisiones) || {})
+                                .map(([key, rev]) => ({ key, ...rev }))
+                                .sort((a, b) => (a.numeroLeg || '').localeCompare(b.numeroLeg || ''));
+
+                            if (lista.length === 0) {
+                                return <div className={styles.emptyState}>No hay revisiones guardadas para el {revisionesConsultaFecha}.</div>;
+                            }
+
+                            const correctas = lista.filter(r => r.correcto === true).length;
+                            const incorrectas = lista.filter(r => r.correcto === false).length;
+
+                            return (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                                        {lista.length} notificación(es) revisada(s) — ✔️ {correctas} bien indicada(s), ✖️ {incorrectas} mal indicada(s)
+                                    </div>
+                                    {lista.map(rev => (
+                                        <div key={rev.key} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                                <strong style={{ fontSize: '14px', color: 'var(--text-color)' }}>{rev.numeroLeg || 'Sin legajo'}</strong>
+                                                <span style={{
+                                                    fontSize: '12px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px',
+                                                    background: rev.correcto === true ? '#dcfce7' : '#fee2e2',
+                                                    color: rev.correcto === true ? '#166534' : '#991b1b'
+                                                }}>
+                                                    {rev.correcto === true ? '✔️ Bien indicado' : '✖️ Mal indicado'}
+                                                </span>
+                                                {rev.link && (
+                                                    <a href={rev.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>
+                                                        🔗 Abrir notificación
+                                                    </a>
+                                                )}
+                                            </div>
+
+                                            {(rev.emailsFaltantes || []).length > 0 && (
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                                                    Faltaba notificar a: {rev.emailsFaltantes.join(', ')}
+                                                </div>
+                                            )}
+                                            {(rev.documentosFaltantes || []).length > 0 && (
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                                                    Documentos faltantes: {rev.documentosFaltantes.map(d => `${d.email} → ${d.documento}`).join(' · ')}
+                                                </div>
+                                            )}
+                                            {rev.comentario && (
+                                                <div style={{ fontSize: '13px', color: 'var(--text-color)', background: 'var(--input-bg)', borderRadius: '4px', padding: '8px', border: '1px solid var(--border-color)' }}>
+                                                    💬 {rev.comentario}
+                                                </div>
+                                            )}
+                                            {rev.revisadoEn && (
+                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                                                    Revisado el {new Date(rev.revisadoEn).toLocaleString('es-AR')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()}
+                    </div>
+                )}
             </main>
+
+            {/* Cartel de confirmación antes de cambiar de fecha o rehacer con revisiones sin marcar */}
+            {confirmDialog && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', zIndex: 1000, padding: '16px'
+                }}>
+                    <div style={{
+                        background: 'var(--surface-color)', border: '1px solid var(--border-color)',
+                        borderRadius: '8px', width: '100%', maxWidth: '440px', padding: '24px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', color: 'var(--text-color)'
+                    }}>
+                        <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700 }}>
+                            ⚠️ Revisiones sin marcar
+                        </h3>
+                        <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+                            {confirmDialog.mensaje}
+                        </p>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                            <button
+                                type="button"
+                                onClick={() => setConfirmDialog(null)}
+                                style={{
+                                    padding: '8px 16px', background: 'var(--surface-color)', border: '1px solid var(--border-color)',
+                                    borderRadius: '4px', color: 'var(--text-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer'
+                                }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const dialogo = confirmDialog;
+                                    setConfirmDialog(null);
+                                    if (dialogo.tipo === 'fecha') {
+                                        handleVerificacionFechaChangeConfirmado(dialogo.nuevaFecha);
+                                    } else {
+                                        handleForzarReverificacionConfirmado();
+                                    }
+                                }}
+                                style={{
+                                    padding: '8px 16px', background: '#ef4444', border: 'none',
+                                    borderRadius: '4px', color: '#fff', fontSize: '13px', fontWeight: 600, cursor: 'pointer'
+                                }}
+                            >
+                                Sí, continuar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Modal para Agregar Reenvío */}
             {resendModalItem && (
