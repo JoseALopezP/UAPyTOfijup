@@ -769,6 +769,7 @@ export default function NotificacionesPage() {
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '145px' }}>APELLIDO Y NOMBRE</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '220px' }}>DESTINO</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '115px' }}>DOCUMENTOS</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px', width: '70px' }}>NOTIF.</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px', width: '55px', borderLeft: '1px solid var(--border-color)' }}>LISTA</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px', width: '55px', borderLeft: '1px solid var(--border-color)' }}>NOTIF.</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px', width: '55px', borderLeft: '1px solid var(--border-color)' }}>COMPROB.</th>
@@ -779,9 +780,20 @@ export default function NotificacionesPage() {
                                         {activeWorkspaceData.map(item => {
                                             const { customId, data: itemData } = item;
                                             const flags = itemData.statusFlags || { listaParaNotificar: false, notificada: false, comprobante: false, indicadaComoNotificada: false };
-                                             const docsArray = Array.isArray(itemData?.documentos)
-                                                 ? itemData.documentos
-                                                 : (itemData?.documentos && typeof itemData.documentos === 'object' ? Object.values(itemData.documentos) : []);
+                                            // Los NOMBRES de los documentos viven en `adjuntos` ([{nombre, url}]),
+                                            // no en `documentos`: ese campo guarda solo la CANTIDAD como string (el
+                                            // extractor hace `docText.match(/\d+/)` sobre la celda "Documentos" de
+                                            // Puma). Leer `documentos` mostraba un número suelto o nada.
+                                            // Se mantiene el respaldo a `documentos` por si algún registro viejo
+                                            // llegó a guardarse con forma de lista.
+                                            const normalizarDocs = (v) => {
+                                                if (Array.isArray(v)) return v;
+                                                if (v && typeof v === 'object') return Object.values(v);
+                                                return [];
+                                            };
+                                            const docsArray = normalizarDocs(itemData?.adjuntos).length > 0
+                                                ? normalizarDocs(itemData.adjuntos)
+                                                : normalizarDocs(itemData?.documentos).filter(d => d && typeof d === 'object');
                                             const borderColor = itemData.manual ? '#ef4444' : null;
                                             const bgColor = itemData.manual ? 'var(--manual-bg)' : null;
                                             const rowStyle = { borderBottom: '1px solid var(--border-color)', ...(borderColor ? { backgroundColor: bgColor, borderLeft: `3px solid ${borderColor}` } : {}) };
@@ -851,19 +863,43 @@ export default function NotificacionesPage() {
                                                         <td style={{ padding: '10px 12px', fontSize: '12px' }}>
                                                             {docsArray.length > 0 ? (
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                    {docsArray.map((doc, idx) => (
-                                                                        <a 
-                                                                            key={idx} 
-                                                                            href={doc?.link} 
-                                                                            target="_blank" 
-                                                                            rel="noopener noreferrer" 
-                                                                            style={{ color: 'var(--accent-color)', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                                                            title={doc?.nombre}
-                                                                        >
-                                                                            📄 {doc?.nombre || 'Documento'}
-                                                                        </a>
-                                                                    ))}
+                                                                    {docsArray.map((doc, idx) => {
+                                                                        // El extractor guarda la URL de descarga en `url`; `link` no
+                                                                        // existe en estos objetos y dejaba el <a> sin destino.
+                                                                        const href = doc?.url || doc?.link || null;
+                                                                        const nombre = doc?.nombre || 'Documento';
+                                                                        const estilo = { color: 'var(--accent-color)', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
+                                                                        return href ? (
+                                                                            <a key={idx} href={href} target="_blank" rel="noopener noreferrer" style={estilo} title={nombre}>
+                                                                                📄 {nombre}
+                                                                            </a>
+                                                                        ) : (
+                                                                            <span key={idx} style={{ ...estilo, color: 'var(--text-color)' }} title={nombre}>
+                                                                                📄 {nombre}
+                                                                            </span>
+                                                                        );
+                                                                    })}
                                                                 </div>
+                                                            ) : (
+                                                                <span style={{ color: 'var(--text-muted)' }}>—</span>
+                                                            )}
+                                                        </td>
+
+                                                        {/* Link a la notificación en Puma (10.107...), para abrirla sin
+                                                            tener que buscarla a mano. El extractor guarda esa URL en
+                                                            `link`; `legajoLink` apunta al legajo, no a la notificación,
+                                                            así que solo se usa como respaldo. */}
+                                                        <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: '12px' }}>
+                                                            {(itemData.link || itemData.legajoLink) ? (
+                                                                <a
+                                                                    href={itemData.link || itemData.legajoLink}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    title={itemData.link ? 'Abrir la notificación en Puma' : 'Abrir el legajo en Puma (no hay link directo a la notificación)'}
+                                                                    style={{ color: 'var(--accent-color)', textDecoration: 'none', fontWeight: 600 }}
+                                                                >
+                                                                    🔗 Abrir
+                                                                </a>
                                                             ) : (
                                                                 <span style={{ color: 'var(--text-muted)' }}>—</span>
                                                             )}
@@ -884,7 +920,10 @@ export default function NotificacionesPage() {
                                                     </tr>
                                                     {wsExpandedRow === customId && (
                                                         <tr style={{ background: 'var(--card-header-bg)' }}>
-                                                            <td colSpan={9} style={{ padding: '16px' }}>
+                                                            {/* 10 columnas desde que se agregó NOTIF. (link a Puma):
+                                                                LEGAJO, CARÁTULA, AYP, DESTINO, DOCUMENTOS, NOTIF.,
+                                                                LISTA, NOTIF., COMPROB., INDICADA. */}
+                                                            <td colSpan={10} style={{ padding: '16px' }}>
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                                                     {/* Texto del documento */}
                                                                     <div>
