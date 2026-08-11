@@ -24,6 +24,29 @@ export default function NotificacionesPage() {
     const [wsEditValue, setWsEditValue] = useState('');
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc' | 'desc'
 
+    // Edición del asunto del mail (columna ASUNTO). Estado propio y separado del de
+    // emails: si compartieran `wsEditingId`, abrir uno cerraría el otro.
+    const [wsEditingAsuntoId, setWsEditingAsuntoId] = useState(null);
+    const [wsEditAsuntoValue, setWsEditAsuntoValue] = useState('');
+
+    // Tipos de notificación configurados en C.O.N.O. (Config > REGLAS DE DETECCIÓN,
+    // `config_tipos_notificacion/rulesDoc`). Son los MISMOS que evalúa el clasificador del
+    // extractor, así que el desplegable no puede ofrecer un tipo que el sistema no conozca.
+    const [tiposNotificacion, setTiposNotificacion] = useState([]);
+
+    const fetchTiposNotificacion = async () => {
+        try {
+            const data = await getDocument('config_tipos_notificacion', 'rulesDoc');
+            const nombres = (data?.rules || [])
+                .map(r => (r?.name || '').trim())
+                .filter(Boolean);
+            setTiposNotificacion(Array.from(new Set(nombres)).sort());
+        } catch (error) {
+            console.error("Error fetching tipos de notificación:", error);
+            setTiposNotificacion([]);
+        }
+    };
+
     // Reenvíos states
     const [resendModalItem, setResendModalItem] = useState(null);
     const [resendEmailInput, setResendEmailInput] = useState('');
@@ -48,6 +71,7 @@ export default function NotificacionesPage() {
 
     useEffect(() => {
         fetchComisarias();
+        fetchTiposNotificacion();
     }, []);
 
     const handleSaveComisaria = async (e) => {
@@ -352,10 +376,21 @@ export default function NotificacionesPage() {
         }
     };
 
-    const handleUpdateField = async (customId, itemData, field, value) => {
+    const handleUpdateField = (customId, itemData, field, value) => {
+        const extra = (field === 'emails' && itemData.manual) ? { manual: false } : {};
+        return handleUpdateFields(customId, itemData, { [field]: value, ...extra });
+    };
+
+    /**
+     * Igual que handleUpdateField pero para varios campos de una sola escritura. Hace falta
+     * porque el asunto y el tipo se guardan JUNTO con su marca de edición manual
+     * (`asuntoManual` / `tipoManual`): si fueran dos escrituras separadas, una corrida del
+     * extractor en el medio podría pisar el valor antes de que llegue la marca que lo
+     * protege (ver automationRunner.ts, "Preservar configuraciones manuales").
+     */
+    const handleUpdateFields = async (customId, itemData, fields) => {
         try {
-            let updatedItem = { ...itemData, [field]: value };
-            if (field === 'emails' && itemData.manual) updatedItem.manual = false;
+            let updatedItem = { ...itemData, ...fields };
 
             const sourceDoc = itemData._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones');
             const { _sourceDoc, ...dataToSave } = updatedItem;
@@ -370,9 +405,57 @@ export default function NotificacionesPage() {
 
             await addOrUpdateObject('anotificar', sourceDoc, customId, dataToSave);
         } catch (err) {
-            console.error('Error updating field', err);
+            console.error('Error updating fields', err);
             fetchWorkspaceData();
         }
+    };
+
+    /**
+     * Asunto sugerido a partir del tipo: `TIPO LEGAJO`. Tiene que dar EXACTAMENTE lo mismo
+     * que `construirAsunto` en C.O.N.O. (electron/automations/shared/tipoNotificacionClassifier.ts):
+     * si divergen, el asunto que se ve acá no es el que sale por mail. Sin tipo, solo el legajo.
+     *
+     * Solo se acepta como prefijo un tipo que exista en Config. `tipoNotificacion` puede
+     * traer el valor CRUDO de la columna de Puma ("NOTIFICACIÓN DE FINALIZACIÓN DE
+     * AUDIENCIA") cuando el clasificador no resolvió: eso describe el trámite, no es un
+     * prefijo de asunto, y C.O.N.O. tampoco lo usa para armarlo. En ese caso el asunto
+     * queda solo con el legajo hasta que alguien elija un tipo en el desplegable.
+     */
+    const construirAsuntoSugerido = (tipo, numeroLeg) => {
+        const t = (tipo || '').trim();
+        const leg = (numeroLeg || '').trim();
+        const prefijoValido = t && tiposNotificacion.includes(t);
+        return (prefijoValido ? `${t} ${leg}`.trim() : leg).substring(0, 200);
+    };
+
+    /**
+     * Cambio de tipo desde el desplegable. Además de guardar el tipo, recalcula el asunto —
+     * salvo que el operador ya lo haya escrito a mano (`asuntoManual`), en cuyo caso lo
+     * escrito manda y el tipo se cambia solo. `tipoManual` hace que la próxima corrida del
+     * extractor respete esta elección en vez de reclasificar.
+     */
+    const handleTipoChange = (customId, itemData, nuevoTipo) => {
+        const fields = { tipoNotificacion: nuevoTipo, tipoManual: true };
+        if (itemData.asuntoManual !== true) {
+            fields.asunto = construirAsuntoSugerido(nuevoTipo, itemData.numeroLeg);
+        }
+        handleUpdateFields(customId, itemData, fields);
+    };
+
+    /** Guarda el asunto escrito a mano y lo marca como manual para que nada lo pise. */
+    const handleAsuntoSave = (customId, itemData, valor) => {
+        const limpio = (valor || '').trim().substring(0, 200);
+        setWsEditingAsuntoId(null);
+        if (limpio === (itemData.asunto || '')) return;
+        handleUpdateFields(customId, itemData, { asunto: limpio, asuntoManual: true });
+    };
+
+    /** Vuelve al asunto calculado a partir del tipo actual (deshace la edición manual). */
+    const handleAsuntoReset = (customId, itemData) => {
+        handleUpdateFields(customId, itemData, {
+            asunto: construirAsuntoSugerido(itemData.tipoNotificacion, itemData.numeroLeg),
+            asuntoManual: false
+        });
     };
 
     const handleCheckbox = async (customId, itemData, flag) => {
@@ -766,6 +849,7 @@ export default function NotificacionesPage() {
                                                  LEGAJO {sortOrder === 'asc' ? '▲' : '▼'}
                                              </th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px' }}>CARÁTULA</th>
+                                            <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '210px' }} title="Asunto con el que sale el mail. Se calcula desde el tipo y se puede editar.">ASUNTO</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '145px' }}>APELLIDO Y NOMBRE</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '220px' }}>DESTINO</th>
                                             <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '12px', width: '115px' }}>DOCUMENTOS</th>
@@ -810,15 +894,97 @@ export default function NotificacionesPage() {
                                                 <React.Fragment key={customId}>
                                                     <tr style={rowStyle}>
                                                         <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--text-color)' }}>
-                                                            {itemData.numeroLeg}
+                                                            {/* Una fila sin legajo no se puede identificar ni corregir: se muestra
+                                                                la clave del registro en Firestore (`customId`) para poder ir a
+                                                                buscarlo. C.O.N.O. no guarda registros sin `numeroLeg` (el extractor
+                                                                los saltea), así que si aparece uno acá vino por otra vía y hay que
+                                                                saber cuál es. */}
+                                                            {itemData.numeroLeg || (
+                                                                <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '11px', wordBreak: 'break-all' }} title="Registro sin numeroLeg en Firestore — clave del documento">
+                                                                    ⚠️ sin legajo · {customId}
+                                                                </span>
+                                                            )}
                                                             <div style={{ fontSize: '13px', color: 'var(--accent-color)', fontWeight: 600, marginTop: '5px', cursor: 'pointer' }} onClick={() => setWsExpandedRow(wsExpandedRow === customId ? null : customId)}>
                                                                 {wsExpandedRow === customId ? '▲ Ocultar' : '▼ Ver Detalle'}
                                                             </div>
                                                         </td>
-                                                        <td style={{ padding: '10px 12px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-color)' }}>
-                                                            {itemData.caratula}
-                                                            {itemData.tipoNotificacion && <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>{itemData.tipoNotificacion}</div>}
+                                                        <td style={{ padding: '10px 12px', maxWidth: '200px', color: 'var(--text-color)' }}>
+                                                            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={itemData.caratula}>
+                                                                {itemData.caratula}
+                                                            </div>
+                                                            {/* Cómo lo marca Puma (columna "Tipo Notificación" de la grilla), sin
+                                                                pasar por el clasificador. Es informativo: describe el trámite, no el
+                                                                asunto del mail. */}
+                                                            {itemData.tipoNotificacionPuma && (
+                                                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={`Puma: ${itemData.tipoNotificacionPuma}`}>
+                                                                    Puma: {itemData.tipoNotificacionPuma}
+                                                                </div>
+                                                            )}
+                                                            {/* Tipo de notificación: desplegable con los tipos de Config (los mismos
+                                                                que evalúa el clasificador). Si el valor guardado no es uno de esos
+                                                                —típicamente el texto crudo de la columna de Puma, que queda cuando el
+                                                                clasificador no resolvió— se agrega igual como opción para no perderlo
+                                                                en silencio, marcado como "(de Puma)". */}
+                                                            <select
+                                                                value={itemData.tipoNotificacion || ''}
+                                                                onChange={e => handleTipoChange(customId, itemData, e.target.value)}
+                                                                title={itemData.tipoManual ? 'Tipo elegido a mano (el extractor no lo va a reclasificar)' : 'Tipo detectado automáticamente'}
+                                                                style={{
+                                                                    marginTop: '4px', width: '100%', fontSize: '11px', padding: '2px 4px',
+                                                                    borderRadius: '3px', background: 'var(--input-bg)', color: 'var(--text-color)',
+                                                                    border: itemData.tipoManual ? '1px solid var(--accent-color)' : '1px solid var(--border-color)'
+                                                                }}
+                                                            >
+                                                                <option value="">— sin tipo —</option>
+                                                                {itemData.tipoNotificacion && !tiposNotificacion.includes(itemData.tipoNotificacion) && (
+                                                                    <option value={itemData.tipoNotificacion}>{itemData.tipoNotificacion} (de Puma)</option>
+                                                                )}
+                                                                {tiposNotificacion.map(t => (
+                                                                    <option key={t} value={t}>{t}</option>
+                                                                ))}
+                                                            </select>
                                                         </td>
+
+                                                        {/* ASUNTO del mail: lo calcula C.O.N.O. al extraer (tipo + legajo) y se
+                                                            guarda en Firestore. Es lo que `notificaciones.ts` usa tal cual al
+                                                            enviar, así que lo que se edite acá es lo que sale. */}
+                                                        <td style={{ padding: '10px 12px', fontSize: '12px' }}>
+                                                            {wsEditingAsuntoId === customId ? (
+                                                                <input
+                                                                    autoFocus
+                                                                    value={wsEditAsuntoValue}
+                                                                    onChange={e => setWsEditAsuntoValue(e.target.value)}
+                                                                    onBlur={() => handleAsuntoSave(customId, itemData, wsEditAsuntoValue)}
+                                                                    onKeyDown={e => {
+                                                                        if (e.key === 'Enter') handleAsuntoSave(customId, itemData, wsEditAsuntoValue);
+                                                                        if (e.key === 'Escape') setWsEditingAsuntoId(null);
+                                                                    }}
+                                                                    style={{ width: '100%', padding: '4px', border: '1px solid var(--border-color)', background: 'var(--input-bg)', color: 'var(--text-color)', fontSize: '12px' }}
+                                                                />
+                                                            ) : (
+                                                                <div
+                                                                    onClick={() => { setWsEditingAsuntoId(customId); setWsEditAsuntoValue(itemData.asunto || ''); }}
+                                                                    title={itemData.asunto || 'Sin asunto — click para escribirlo'}
+                                                                    style={{ cursor: 'pointer', color: itemData.asunto ? 'var(--text-color)' : 'var(--text-muted)', wordBreak: 'break-word' }}
+                                                                >
+                                                                    {itemData.asunto || '— sin asunto —'}
+                                                                </div>
+                                                            )}
+                                                            {itemData.asuntoManual && wsEditingAsuntoId !== customId && (
+                                                                <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                    <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--accent-color)' }}>✎ manual</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleAsuntoReset(customId, itemData)}
+                                                                        title="Volver al asunto calculado desde el tipo"
+                                                                        style={{ fontSize: '10px', padding: '0 4px', background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '3px', color: 'var(--text-muted)', cursor: 'pointer' }}
+                                                                    >
+                                                                        restaurar
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </td>
+
                                                         <td style={{ padding: '10px 12px', color: 'var(--text-color)' }}>{itemData.ayp}</td>
                                                         
                                                         <td style={{ padding: '10px 12px', minWidth: '180px' }}>
@@ -920,10 +1086,10 @@ export default function NotificacionesPage() {
                                                     </tr>
                                                     {wsExpandedRow === customId && (
                                                         <tr style={{ background: 'var(--card-header-bg)' }}>
-                                                            {/* 10 columnas desde que se agregó NOTIF. (link a Puma):
-                                                                LEGAJO, CARÁTULA, AYP, DESTINO, DOCUMENTOS, NOTIF.,
-                                                                LISTA, NOTIF., COMPROB., INDICADA. */}
-                                                            <td colSpan={10} style={{ padding: '16px' }}>
+                                                            {/* 11 columnas desde que se agregó ASUNTO:
+                                                                LEGAJO, CARÁTULA, ASUNTO, AYP, DESTINO, DOCUMENTOS,
+                                                                NOTIF. (link a Puma), LISTA, NOTIF., COMPROB., INDICADA. */}
+                                                            <td colSpan={11} style={{ padding: '16px' }}>
                                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                                                     {/* Texto del documento */}
                                                                     <div>
