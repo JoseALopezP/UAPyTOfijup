@@ -23,6 +23,12 @@ export default function NotificacionesPage() {
     const [wsEditingId, setWsEditingId] = useState(null);
     const [wsEditValue, setWsEditValue] = useState('');
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc' | 'desc'
+    // Vista "Completadas (semana)": items ya notificados+comprobante+indicada (tienen
+    // completadoEn) que CONO deja en anotificar/{tipo} 7 días antes de archivar a
+    // histórico, para poder seguir agregándoles un reenvío si hizo falta. Por defecto la
+    // tabla operativa solo muestra pendientes; este toggle cambia a una vista más simple
+    // con solo lo completado recientemente.
+    const [showCompletadas, setShowCompletadas] = useState(false);
 
     // Edición del asunto del mail (columna ASUNTO). Estado propio y separado del de
     // emails: si compartieran `wsEditingId`, abrir uno cerraría el otro.
@@ -482,6 +488,39 @@ export default function NotificacionesPage() {
         }
     };
 
+    // Reclasificación manual citaciones<->oficios: cuando la detección automática de CONO
+    // clasificó mal un item (p. ej. algo que llegó a Citaciones pero en realidad es un
+    // Oficio), esto lo mueve de colección a mano. Se marca coleccionManual con el destino
+    // para que la próxima extracción de CONO (automationRunner.ts) respete el traslado y no
+    // lo vuelva a poner en la colección original — mismo patrón que asuntoManual/tipoManual.
+    const handleMoverColeccion = async (customId, itemData) => {
+        const sourceDoc = itemData._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones');
+        const targetDoc = sourceDoc === 'oficios' ? 'citaciones' : 'oficios';
+
+        const confirmMsg = `¿Mover el legajo ${itemData.numeroLeg || customId} de ${sourceDoc === 'oficios' ? 'Oficios' : 'Citaciones'} a ${targetDoc === 'oficios' ? 'Oficios' : 'Citaciones'}?\n\nLa próxima corrida de extracción va a respetar este traslado y no lo va a devolver a ${sourceDoc}.`;
+        if (!window.confirm(confirmMsg)) return;
+
+        try {
+            const movedItem = { ...itemData, coleccionManual: targetDoc };
+            delete movedItem._sourceDoc;
+            await addOrUpdateObject('anotificar', targetDoc, customId, movedItem);
+            await removeObject('anotificar', sourceDoc, customId);
+
+            setWorkspaceData(prev => {
+                const next = { ...prev };
+                const remainingSource = { ...(next[sourceDoc] || {}) };
+                delete remainingSource[customId];
+                next[sourceDoc] = remainingSource;
+                next[targetDoc] = { ...(next[targetDoc] || {}), [customId]: movedItem };
+                return next;
+            });
+        } catch (err) {
+            console.error('Error moviendo item entre colecciones', err);
+            alert('No se pudo mover la notificación. Revisá la consola para más detalle.');
+            fetchWorkspaceData();
+        }
+    };
+
     const handleClearAll = async () => {
         const firstConfirm = window.confirm("⚠️ ADVERTENCIA: Estás a punto de ELIMINAR TODOS los documentos (citaciones, oficios y mails). ¿Deseas continuar?");
         if (!firstConfirm) return;
@@ -616,6 +655,24 @@ export default function NotificacionesPage() {
         }
         return [];
     }, [workspaceData, activeTab, sortOrder, searchTerm]);
+
+    // completadoEn lo setea CONO cuando el item deja de aparecer como "A NOTIFICAR" en
+    // Puma: desde ese momento arranca la semana de gracia antes de archivarse a histórico.
+    const pendientesData = useMemo(
+        () => activeWorkspaceData.filter(item => !item.data?.completadoEn),
+        [activeWorkspaceData]
+    );
+    const completadasData = useMemo(
+        () => activeWorkspaceData.filter(item => !!item.data?.completadoEn),
+        [activeWorkspaceData]
+    );
+    const visibleWorkspaceData = showCompletadas ? completadasData : pendientesData;
+
+    const diasDesde = (isoString) => {
+        if (!isoString) return null;
+        const ms = Date.now() - new Date(isoString).getTime();
+        return Math.max(0, Math.floor(ms / (24 * 60 * 60 * 1000)));
+    };
 
     return (
         <div className={styles.container}>
@@ -808,18 +865,42 @@ export default function NotificacionesPage() {
                                 <h2 className={styles.sectionTitle} style={{ margin: 0, color: 'var(--text-color)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <span>{activeTab === 'citaciones' ? 'Citaciones' : 'Oficios'}</span>
                                     <span style={{ fontSize: '13px', background: 'var(--surface-color)', padding: '2px 8px', borderRadius: '12px', border: '1px solid var(--border-color)', fontWeight: 600 }}>
-                                        {activeWorkspaceData.length}
+                                        {visibleWorkspaceData.length}
                                     </span>
                                 </h2>
-                                <input 
-                                    type="text" 
-                                    placeholder="Buscar legajo, carátula o email..." 
-                                    value={searchTerm} 
-                                    onChange={e => setSearchTerm(e.target.value)} 
+                                <input
+                                    type="text"
+                                    placeholder="Buscar legajo, carátula o email..."
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
                                     style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid var(--input-border)', fontSize: '13px', minWidth: '240px', background: 'var(--input-bg)', color: 'var(--text-color)' }}
                                 />
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button
+                                    onClick={() => setShowCompletadas(false)}
+                                    title="Notificaciones activas: pendientes o en proceso de envío"
+                                    style={{
+                                        background: !showCompletadas ? 'var(--accent-color)' : 'var(--surface-color)',
+                                        border: '1px solid var(--border-color)',
+                                        color: !showCompletadas ? '#fff' : 'var(--text-color)',
+                                        padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold'
+                                    }}
+                                >
+                                    PENDIENTES ({pendientesData.length})
+                                </button>
+                                <button
+                                    onClick={() => setShowCompletadas(true)}
+                                    title="Completadas en los últimos 7 días — siguen acá para poder agregarles un reenvío antes de archivarse"
+                                    style={{
+                                        background: showCompletadas ? 'var(--accent-color)' : 'var(--surface-color)',
+                                        border: '1px solid var(--border-color)',
+                                        color: showCompletadas ? '#fff' : 'var(--text-color)',
+                                        padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold'
+                                    }}
+                                >
+                                    COMPLETADAS ESTA SEMANA ({completadasData.length})
+                                </button>
                                 <button onClick={handleClearAll} style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#ef4444', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>LIMPIAR TODO</button>
                                 <button onClick={fetchWorkspaceData} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>ACTUALIZAR</button>
                             </div>
@@ -827,8 +908,51 @@ export default function NotificacionesPage() {
                         <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
                             {workspaceLoading ? (
                                 <div className={styles.loading}>Cargando datos...</div>
-                            ) : activeWorkspaceData.length === 0 ? (
-                                <div className={styles.emptyState}>No hay datos para esta vista.</div>
+                            ) : visibleWorkspaceData.length === 0 ? (
+                                <div className={styles.emptyState}>{showCompletadas ? 'No hay notificaciones completadas en los últimos 7 días.' : 'No hay datos para esta vista.'}</div>
+                            ) : showCompletadas ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    {completadasData.map(item => {
+                                        const { customId, data: itemData } = item;
+                                        const resendKeys = Object.keys(itemData || {})
+                                            .filter(key => /^resend\d+$/.test(key))
+                                            .sort((a, b) => parseInt(a.replace('resend', ''), 10) - parseInt(b.replace('resend', ''), 10));
+                                        const dias = diasDesde(itemData.completadoEn);
+                                        return (
+                                            <div key={customId} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                                        <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-color)' }}>{itemData.numeroLeg || '—'}</span>
+                                                        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{itemData.caratula || itemData.ayp || ''}</span>
+                                                        <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: '#dcfce7', color: '#166534', border: '1px solid #86efac' }}>
+                                                            ✓ Completada {dias === 0 ? 'hoy' : dias === 1 ? 'hace 1 día' : `hace ${dias} días`}
+                                                        </span>
+                                                        {resendKeys.length > 0 && (
+                                                            <span style={{ fontSize: '11px', background: 'var(--card-header-bg)', padding: '2px 8px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                                                                {resendKeys.length} reenvío{resendKeys.length > 1 ? 's' : ''}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                        {itemData.link && (
+                                                            <a href={itemData.link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', fontSize: '12px', fontWeight: 600 }}>🔗 Abrir en Puma</a>
+                                                        )}
+                                                        <button
+                                                            onClick={() => { setResendModalItem({ customId, itemData }); setResendEmailInput(''); setResendError(''); }}
+                                                            style={{ padding: '5px 12px', fontSize: '12px', fontWeight: 700, background: 'var(--accent-color)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                                        >
+                                                            + Agregar reenvío
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div style={{ fontSize: '13px', color: 'var(--text-color)' }}>
+                                                    <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>Destinatarios: </span>
+                                                    {Array.isArray(itemData.emails) && itemData.emails.length > 0 ? itemData.emails.join(', ') : <span style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>Sin destinatarios</span>}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             ) : (
                                 <table style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'collapse', fontSize: '14px', background: 'var(--surface-color)', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid var(--border-color)' }}>
                                     <thead style={{ background: 'var(--card-header-bg)', borderBottom: '2px solid var(--border-color)' }}>
@@ -861,7 +985,7 @@ export default function NotificacionesPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {activeWorkspaceData.map(item => {
+                                        {pendientesData.map(item => {
                                             const { customId, data: itemData } = item;
                                             const flags = itemData.statusFlags || { listaParaNotificar: false, notificada: false, comprobante: false, indicadaComoNotificada: false };
                                             // Los NOMBRES de los documentos viven en `adjuntos` ([{nombre, url}]),
@@ -1100,6 +1224,23 @@ export default function NotificacionesPage() {
                                                                             {itemData.text || 'Sin texto de documento.'}
                                                                         </div>
                                                                     </div>
+
+                                                                    {/* Reclasificación: mover a la otra colección si CONO clasificó mal
+                                                                        (detectó Citación pero es Oficio, o al revés). No aplica a items
+                                                                        que vienen de anotificar/mails (otro pipeline, sin este soporte). */}
+                                                                    {(itemData._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones')) !== 'mails' && (
+                                                                        <div style={{ background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                                                            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                                                                                ¿La detección se equivocó de tipo? Este item está en <strong>{activeTab === 'oficios' ? 'Oficios' : 'Citaciones'}</strong>.
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => handleMoverColeccion(customId, itemData)}
+                                                                                style={{ padding: '6px 12px', fontSize: '12px', fontWeight: 700, background: 'var(--surface-color)', color: 'var(--text-color)', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer' }}
+                                                                            >
+                                                                                ↔ Mover a {activeTab === 'oficios' ? 'Citaciones' : 'Oficios'}
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
 
                                                                     {/* Sección de Reenvíos */}
                                                                     <div style={{ background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '14px' }}>
