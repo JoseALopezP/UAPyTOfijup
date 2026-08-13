@@ -209,17 +209,20 @@ function GestionUsuariosContent() {
         }
     };
 
+    const normalizedRole = typeof userRole === 'string' ? userRole.trim().toLowerCase() : '';
+    const hasAccess = normalizedRole === 'ual' || normalizedRole === 'admin';
+
     useEffect(() => {
-        if (user && (userRole === 'ual' || userRole === 'admin')) {
+        if (user && hasAccess) {
             fetchUsers();
         }
-    }, [user, userRole]);
+    }, [user, hasAccess]);
 
     if (!user) {
         return <div className={styles.denied}>Debes iniciar sesión para ver esta página.</div>;
     }
 
-    if (userRole !== 'ual' && userRole !== 'admin') {
+    if (!hasAccess) {
         return <div className={styles.denied}>Acceso Denegado. Solo UAL y Admin pueden gestionar usuarios.</div>;
     }
 

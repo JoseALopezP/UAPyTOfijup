@@ -45,7 +45,7 @@ export const AuthContextProvider = ({
                         traverse(usersData);
                         
                         const userEntry = flatList.find(u => u.userId === user.uid || u.uid === user.uid);
-                        
+
                         if (userEntry) {
                             setUserRole(userEntry.type);
                         } else {

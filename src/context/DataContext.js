@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import getDocument from "@/firebase/firestore/getDocument.js";
 import addOrUpdateDocument from "@/firebase/firestore/addOrUpdateDocument.js";
 import getListCollection from "@/firebase/firestore/getListCollection.js";
@@ -22,6 +22,7 @@ import { updateDocumentOnly } from "@/firebase/firestore/updateDocumentOnly.js";
 import getCollection from "@/firebase/firestore/getCollection.js";
 import { setDocument, deleteDocument } from "@/firebase/firestore/basicDocs.js";
 import { batchWrite } from "@/firebase/firestore/batchWrite.js";
+import { setApodosFromList } from "@/utils/traductorNombres.js";
 
 
 export const DataContext = createContext({});
@@ -50,6 +51,20 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
     const [traducciones, setTraducciones] = useState(defaultValue);
     const [traduccionesJueces, setTraduccionesJueces] = useState(defaultValue);
     const [anulaciones, setAnulaciones] = useState(defaultValue);
+    const [apodos, setApodos] = useState([]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const data = await getDocument('configuracion', 'apodos');
+                const list = (data && data.list) || [];
+                setApodos(list);
+                setApodosFromList(list);
+            } catch (error) {
+                console.error("Error fetching apodos:", error);
+            }
+        })();
+    }, []);
 
     const fiscalesList = React.useMemo(() => {
         if (!abogados || !Array.isArray(abogados)) return [];
@@ -875,6 +890,44 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         await saveAnulacionesList(newList);
     };
 
+    const updateApodos = async () => {
+        try {
+            const data = await getDocument('configuracion', 'apodos');
+            const list = (data && data.list) || [];
+            setApodos(list);
+            setApodosFromList(list);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const saveApodosList = async (newList) => {
+        try {
+            await replaceDocument('configuracion', 'apodos', { list: newList });
+            setApodos(newList);
+            setApodosFromList(newList);
+        } catch (error) {
+            setErrorMessage(`${error.message}`);
+        }
+    };
+
+    const addApodo = async (newApodo) => {
+        const newList = [newApodo, ...apodos];
+        await saveApodosList(newList);
+    };
+
+    const updateApodoData = async (updatedApodo) => {
+        const newList = apodos.map(a =>
+            (a.id === updatedApodo.id) ? updatedApodo : a
+        );
+        await saveApodosList(newList);
+    };
+
+    const deleteApodo = async (id) => {
+        const newList = apodos.filter(a => a.id !== id);
+        await saveApodosList(newList);
+    };
+
     const updateAnulacionData = async (updatedAnulacion) => {
         const newList = anulaciones.map(a => 
             (a.id === updatedAnulacion.id) ? updatedAnulacion : a
@@ -897,9 +950,10 @@ export const DataContextProvider = ({ defaultValue = [], children }) => {
         updateTraducciones, saveTraduccionesList, addTraduccion, updateTraduccionData, deleteTraduccion,
         updateTraduccionesJueces, saveTraduccionesJuecesList, addTraduccionJuez, updateTraduccionJuezData, deleteTraduccionJuez,
         updateAnulaciones, saveAnulacionesList, addAnulacion, updateAnulacionData, deleteAnulacion,
+        updateApodos, saveApodosList, addApodo, updateApodoData, deleteApodo,
         bydate, bydateView, errorMessage, sorteoList, desplegables, feriados, importantDates, modelosMinuta, byLegajo, releaseNotes, realTime, juiciosList, pumaData, UALData,
         solicitudesCompletadas, solicitudesData, solicitudesPendientes, abogados, querellaAbogadosList,
-        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList, traducciones, traduccionesJueces, anulaciones
+        fiscalesList, defensoresOficialesList, juecesList, defensoresParticularesList, traducciones, traduccionesJueces, anulaciones, apodos
     };
     return <Provider value={context}>{children}</Provider>;
 };
