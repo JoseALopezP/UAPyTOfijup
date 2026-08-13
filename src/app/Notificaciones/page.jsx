@@ -521,23 +521,59 @@ export default function NotificacionesPage() {
         }
     };
 
+    // Alcance del botón "LIMPIAR" (pedido explícito del usuario, 13/08/2026): antes borraba
+    // TODO (citaciones + oficios + mails) sin importar la pestaña activa ni si algo ya
+    // había sido notificado — un solo click podía tirar registros reales ya enviados. Ahora:
+    //   - Solo toca la pestaña activa (Citaciones u Oficios, incluyendo "mails" cuando
+    //     corresponde porque Citaciones mezcla ambas colecciones para mostrarlas juntas).
+    //   - En la vista PENDIENTES, nunca borra algo con notificada:true (ni siquiera si por
+    //     algún motivo no tiene completadoEn todavía — Fase A ya mandó el mail).
+    //   - En la vista COMPLETADAS ESTA SEMANA, borra justamente esas: es el botón pensado
+    //     para purgar a mano lo ya cerrado, sin esperar los 7 días de gracia.
     const handleClearAll = async () => {
-        const firstConfirm = window.confirm("⚠️ ADVERTENCIA: Estás a punto de ELIMINAR TODOS los documentos (citaciones, oficios y mails). ¿Deseas continuar?");
+        const tabLabel = activeTab === 'oficios' ? 'Oficios' : 'Citaciones';
+        const scopeLabel = showCompletadas ? 'COMPLETADAS ESTA SEMANA (ya notificadas)' : 'PENDIENTES (no notificadas)';
+
+        const candidatos = showCompletadas
+            ? completadasData
+            : pendientesData.filter(item => {
+                const d = item.data || {};
+                const yaNotificada = d.notificada === true || d.statusFlags?.notificada === true;
+                return !yaNotificada;
+            });
+
+        if (candidatos.length === 0) {
+            alert(`No hay notificaciones en "${scopeLabel}" (${tabLabel}) para eliminar.`);
+            return;
+        }
+
+        const firstConfirm = window.confirm(`⚠️ ADVERTENCIA: Estás a punto de ELIMINAR ${candidatos.length} notificación(es) de "${scopeLabel}" en ${tabLabel}. ¿Deseas continuar?`);
         if (!firstConfirm) return;
-        
-        const secondConfirm = window.confirm("🚨 SEGUNDA VERIFICACIÓN: Esta acción NO se puede deshacer. ¿Estás absolutamente seguro de que quieres BORRAR TODO?");
+
+        const secondConfirm = window.confirm("🚨 SEGUNDA VERIFICACIÓN: Esta acción NO se puede deshacer. ¿Estás absolutamente seguro?");
         if (!secondConfirm) return;
-        
+
         setWorkspaceLoading(true);
         try {
-            await replaceDocument('anotificar', 'citaciones', {});
-            await replaceDocument('anotificar', 'oficios', {});
-            await replaceDocument('anotificar', 'mails', {});
-            alert("✅ Todos los documentos han sido eliminados correctamente.");
+            // Agrupar por colección real: la pestaña Citaciones mezcla anotificar/citaciones
+            // y anotificar/mails para mostrarlas juntas (ver activeWorkspaceData más arriba).
+            const porColeccion = {};
+            for (const item of candidatos) {
+                const sourceDoc = item.data?._sourceDoc || (activeTab === 'oficios' ? 'oficios' : 'citaciones');
+                if (!porColeccion[sourceDoc]) porColeccion[sourceDoc] = [];
+                porColeccion[sourceDoc].push(item.customId);
+            }
+            for (const [sourceDoc, ids] of Object.entries(porColeccion)) {
+                for (const id of ids) {
+                    await removeObject('anotificar', sourceDoc, id);
+                }
+            }
+            alert(`✅ ${candidatos.length} notificación(es) eliminada(s) de "${scopeLabel}" en ${tabLabel}.`);
             fetchWorkspaceData();
         } catch (error) {
             console.error("Error al limpiar documentos:", error);
             alert("❌ Ocurrió un error al intentar eliminar los documentos.");
+        } finally {
             setWorkspaceLoading(false);
         }
     };
@@ -901,7 +937,13 @@ export default function NotificacionesPage() {
                                 >
                                     COMPLETADAS ESTA SEMANA ({completadasData.length})
                                 </button>
-                                <button onClick={handleClearAll} style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#ef4444', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>LIMPIAR TODO</button>
+                                <button
+                                    onClick={handleClearAll}
+                                    title={`Elimina solo las notificaciones ${showCompletadas ? 'completadas' : 'pendientes (no notificadas)'} de ${activeTab === 'oficios' ? 'Oficios' : 'Citaciones'}`}
+                                    style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#ef4444', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                                >
+                                    LIMPIAR {showCompletadas ? 'COMPLETADAS' : 'PENDIENTES'}
+                                </button>
                                 <button onClick={fetchWorkspaceData} style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>ACTUALIZAR</button>
                             </div>
                         </div>
