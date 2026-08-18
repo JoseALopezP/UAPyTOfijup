@@ -26,6 +26,7 @@ export const routesByRole = {
         'Solicitudes-Audiencia',
         'Notificaciones',
         'Situacion-Corporal',
+        'Registro-Audiencia',
     ],
 
     unc: [
@@ -37,6 +38,7 @@ export const routesByRole = {
         'Solicitudes-Audiencia',
         'Notificaciones',
         'Situacion-Corporal',
+        'Registro-Audiencia',
     ],
 
     ugaadmin: [
@@ -78,6 +80,7 @@ export const routesByBuild = {
         'Notificaciones',
         'Situacion-Corporal',
         'Abogados',
+        'Registro-Audiencia',
     ],
 
     uga: [
