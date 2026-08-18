@@ -233,18 +233,19 @@ export function generateResuelvoSection(item, date) {
             });
         }
     }
-    if (item.imputado) {
-        listImputado(item.imputado).split('\n').forEach(i => {
-            if (i.split('detención:')[0] !== "Fecha de ") {
-                sections.push({ title: i.split(':')[0] + ':', text: i.split(':')[1] + i.split(':')[2] })
-            }
-            else {
-                if (i.split('detención:')[0] === "Fecha de ") {
-                    sections.push({ title: i.split(':')[0] + ':', text: i.split(':')[1] })
+    if (item.imputado && item.imputado.length > 0) {
+        const imputadosListStr = listImputado(item.imputado);
+        if (imputadosListStr && imputadosListStr.trim()) {
+            imputadosListStr.split('\n').forEach(i => {
+                if (!i.trim()) return;
+                const firstColonIndex = i.indexOf(':');
+                if (firstColonIndex !== -1) {
+                    const title = i.slice(0, firstColonIndex) + ':';
+                    const text = i.slice(firstColonIndex + 1);
+                    sections.push({ title, text });
                 }
-            }
+            });
         }
-        )
     }
     if (item.partes) {
         const groupedPartes = listPartes(item.partes);
@@ -295,9 +296,12 @@ export async function generateOficioSection(item, date, traslado = '', oficiados
     const sections = [];
     sections.push({ right: `San Juan, ${today.slice(0, 2)} de ${getMonthName(today.slice(2, 4))} de ${today.slice(4, 8)}.` });
     oficiados.forEach(el => sections.push({ title: el.value, text: '' }));
+    
+    const impList = imputadoList || item.imputado || [];
+
     sections.push({
         text: `Me dirijo a Uds, en legajo ${item.numeroLeg}${item.saeNum ? ` SAE N°: ${item.saeNum}` : ''} caratulado ${item.caratula}; a fin de informarles que en Audiencia de ${item.tipo}${item.tipo2 ? ' - ' + item.tipo2 : ''}${item.tipo3 ? ' - ' + item.tipo3 : ''} llevada a cabo ${today === date ? "en el día de la fecha" : `el ${date.slice(0, 1) === '0' ? date.slice(1, 2) : date.slice(0, 2)} de ${getMonthName(date.slice(2, 4))} de ${date.slice(4, 8)}`}, ${juecesPart(item.juez)}, resolvió: ${removeTimeMarks(removeHtmlTags(resuelvo))}
-    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${formatAbogadoName(el.nombre)}${el.subrogando ? ` (subrogando por ${item.mpfSubrogandoPor || item.ufi})` : ''}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${item.defensa.map(el => ` Defensa ${el.tipo}: ${formatAbogadoName(el.nombre)}${el.subrogando ? ` (subrogando a la Defensoría Oficial N°${item.defensoria})` : ''}.`).join(' ')} ${item.imputado.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${normalizeName(el.nombre)} D.N.I. N.°: ${el.dni}${el.nropp ? ` Planilla Prontuarial Nro. ${el.nropp}` : ''}.`).join(' ')} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${normalizeName(item.operador)}. ${traslado !== '' ? `
+    En la presente audiencia intervinieron: ${juecesPart(item.juez)}. ${(item.mpf && item.mpf.length > 0) ? item.mpf.map(el => ` Ministerio Público Fiscal: ${formatAbogadoName(el.nombre)}${el.subrogando ? ` (subrogando por ${item.mpfSubrogandoPor || item.ufi})` : ''}${item.ufi === "EJECUCIÓN" ? '' : ` UFI: ${item.ufi}`}.`).join(' ') : ''} ${(item.defensa && item.defensa.length > 0) ? item.defensa.map(el => ` Defensa ${el.tipo}: ${formatAbogadoName(el.nombre)}${el.subrogando ? ` (subrogando a la Defensoría Oficial N°${item.defensoria})` : ''}.`).join(' ') : ''} ${(impList && impList.length > 0) ? impList.map(el => ` ${el.condenado ? 'Condenado:' : 'Imputado:'} ${normalizeName(el.nombre)} D.N.I. N.°: ${el.dni}${el.nropp ? ` Planilla Prontuarial Nro. ${el.nropp}` : ''}.`).join(' ') : ''} ${item.partes ? Object.entries(listPartes(item.partes)).map(([role, people]) => ` ${role}: ${people.join(', ')}.`).join('') : ''} Operador: ${normalizeName(item.operador)}. ${traslado !== '' ? `
         `+ traslado : ''}
     Saluda atte.`});
     await PDFGenerator(sections, item.numeroLeg);
@@ -313,5 +317,5 @@ export function copyResuelvoToClipboard(item, date) {
 }
 
 export function checkForResuelvo(item) {
-    return item.imputado && item.defensa && item.caratula && item.resuelvoText;
+    return item.defensa && item.caratula && item.resuelvoText;
 }
